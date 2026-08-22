@@ -1,0 +1,4 @@
+interface:
+  display_name: "Publish TraceLab to Hugging Face"
+  short_description: "Prepare and publish versioned TraceLab datasets to HF"
+  default_prompt: "Use $publish-tracelab-huggingface to publish and validate a TraceLab dataset release on Hugging Face."

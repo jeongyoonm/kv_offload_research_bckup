@@ -427,11 +427,12 @@ def stage_rpc(core, step, base, candidates):
                                     * core.scheduler._late_seal_prediction_scale_percent
                                     // 100
                                 )
-                                predicted_deadline_ns = (
-                                    max(r[3] for r in records)
-                                    + predicted
-                                    - core.scheduler._late_seal_prediction_reserve_us
+                                reserve_ns = timing.seal_estimator.preparation_reserve(
+                                    core.scheduler._late_seal_prediction_reserve_us
                                     * 1000
+                                )
+                                predicted_deadline_ns = (
+                                    max(r[3] for r in records) + predicted - reserve_ns
                                 )
                                 prediction = dict(
                                     predecessor_step=a_step,
@@ -441,6 +442,10 @@ def stage_rpc(core, step, base, candidates):
                                         data
                                     ).tolist(),
                                     training_samples=len(timing.seal_estimator.samples),
+                                    preparation_samples=len(
+                                        timing.seal_estimator.preparation_ns
+                                    ),
+                                    preparation_reserve_ns=reserve_ns,
                                 )
                                 record(
                                     core.scheduler,

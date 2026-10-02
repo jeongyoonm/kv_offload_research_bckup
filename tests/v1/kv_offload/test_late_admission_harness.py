@@ -112,7 +112,7 @@ def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
 
 
-def test_prediction_seals_before_a_finishes_with_valid_gpu_start():
+def test_prediction_reserves_worker_preparation_while_a_is_held():
     import numpy as np
 
     executor = ControlledExecutor()
@@ -128,6 +128,8 @@ def test_prediction_seals_before_a_finishes_with_valid_gpu_start():
         predict=lambda data: 50_000_000,
         features=lambda data: np.ones(4),
         samples=[0] * 8,
+        preparation_reserve=lambda extra: extra + 20_000_000,
+        preparation_ns=[20_000_000] * 8,
     )
     core.deferral_timing = SimpleNamespace(
         steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
@@ -145,7 +147,8 @@ def test_prediction_seals_before_a_finishes_with_valid_gpu_start():
     transport = core.scheduler._late_transport
     assert transport["seal_reason"] == "predicted_compute_deadline"
     assert transport["prediction"]["predicted_duration_ns"] == 50_000_000
-    assert transport["seal_ns"] >= start + 40_000_000
+    assert transport["prediction"]["preparation_reserve_ns"] == 30_000_000
+    assert transport["seal_ns"] >= start + 20_000_000
     assert not core.batch_queue[-1][0].poll()
     executor.finish()
 

@@ -325,6 +325,7 @@ class TimingChannel:
                 continue
             if complete or now - data["dispatch_ns"] > 60_000_000_000:
                 self.seal_estimator.observe(data, execution)
+                self.seal_estimator.observe_preparation(records)
                 self.emit(
                     "step_completion",
                     **data,

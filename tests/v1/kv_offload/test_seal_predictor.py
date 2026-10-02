@@ -29,3 +29,13 @@ def test_predictor_rejects_incomplete_rank_observation():
     estimator = ComputeEstimator()
     estimator.observe({"step": 1, "request_shapes": [[1024, 0]]}, [None] * 8)
     assert not estimator.samples
+
+
+def test_preparation_reserve_requires_a_complete_consistent_rank_snapshot():
+    estimator = ComputeEstimator()
+    records = [(1, 1, 20_000_001, 0, 0, 0, 0, 1, 0)] * 8
+    estimator.observe_preparation(records)
+    assert estimator.preparation_reserve(10_000_000) == 30_000_000
+    estimator.observe_preparation(records[:7] + [None])
+    estimator.observe_preparation(records[:7] + [(2, 1, 100_000_001, 0, 0, 0, 0, 1, 0)])
+    assert len(estimator.preparation_ns) == 1

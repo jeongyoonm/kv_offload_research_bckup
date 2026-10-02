@@ -14,6 +14,25 @@ class ComputeEstimator:
         self.samples = deque(maxlen=128)
         self.coefficients = None
         self.errors = deque(maxlen=32)
+        self.preparation_ns = deque(maxlen=64)
+
+    def observe_preparation(self, records):
+        if not records or any(
+            not r
+            or len(r) != 9
+            or r[0] != records[0][0]
+            or r[7] != 1
+            or not 0 < r[1] <= r[2]
+            for r in records
+        ):
+            return
+        self.preparation_ns.append(max(r[2] - r[1] for r in records))
+
+    def preparation_reserve(self, extra_ns):
+        observed = (
+            int(np.quantile(self.preparation_ns, 0.9)) if self.preparation_ns else 0
+        )
+        return observed + extra_ns
 
     @staticmethod
     def features(data):

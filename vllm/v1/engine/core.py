@@ -2013,6 +2013,12 @@ class EngineCore:
             self.scheduler._late_seal_adaptive_poll_us = options[
                 "late_seal_adaptive_poll_us"
             ]
+            self.scheduler._late_seal_hybrid_wait_us = options[
+                "late_seal_hybrid_wait_us"
+            ]
+            self.scheduler._late_seal_hybrid_guard_us = options[
+                "late_seal_hybrid_guard_us"
+            ]
             self.scheduler._late_seal_prediction_reserve_us = options[
                 "late_seal_prediction_reserve_us"
             ]

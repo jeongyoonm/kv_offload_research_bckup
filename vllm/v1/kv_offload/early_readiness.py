@@ -35,6 +35,8 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_recent_preparation": False,
     "late_seal_poll_us": 25,
     "late_seal_adaptive_poll_us": 1000,
+    "late_seal_hybrid_wait_us": 0,
+    "late_seal_hybrid_guard_us": 50_000,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,
     "late_seal_safety_us": 2_000_000,
@@ -77,6 +79,8 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         ("late_seal_prediction_reserve_us", 100_000),
         ("late_seal_prediction_scale_percent", 200),
         ("late_seal_safety_us", 5_000_000),
+        ("late_seal_hybrid_wait_us", 50_000),
+        ("late_seal_hybrid_guard_us", 100_000),
         ("late_seal_target_candidates", 16),
         ("late_seal_load_only_target_candidates", 16),
         ("late_seal_repeat_us", 100_000),
@@ -124,6 +128,11 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         or not result["late_seal_condition_preparation"]
     ):
         raise ValueError("recent preparation requires conditioned predictive seal")
+    if (
+        result["late_seal_hybrid_wait_us"]
+        and result["late_seal_policy"] != "predictive"
+    ):
+        raise ValueError("hybrid wait requires predictive seal")
     if result["late_admission_mode"] and (
         not result["cooperative_response_progress"]
         or result["zero_token_queue_credit"]

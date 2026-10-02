@@ -112,14 +112,22 @@ def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
 
 
-@pytest.mark.parametrize("conditioned", [False, True])
-def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
+@pytest.mark.parametrize(
+    "conditioned,recent", [(False, False), (True, False), (True, True)]
+)
+@pytest.mark.parametrize("hybrid_us", [0, 20_000, 50_000])
+def test_prediction_reserves_worker_preparation_while_a_is_held(
+    conditioned, recent, hybrid_us
+):
     import numpy as np
 
     executor = ControlledExecutor()
     core = _core(executor)
     core.scheduler._late_seal_policy = "predictive"
     core.scheduler._late_seal_condition_preparation = conditioned
+    core.scheduler._late_seal_recent_preparation = recent
+    core.scheduler._late_seal_hybrid_wait_us = hybrid_us
+    core.scheduler._late_seal_hybrid_guard_us = 5000
     core.scheduler._late_base_request_shapes = [[1, 8192]]
     core.scheduler.requests = {}
     queries = []
@@ -138,6 +146,9 @@ def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
             or extra + (5_000_000 if upcoming is not None else 20_000_000)
         ),
         preparation_ns=[20_000_000] * 8,
+        recent_preparation_reserve=lambda extra, upcoming: (
+            queries.append(upcoming) or extra + 5_000_000
+        ),
     )
     core.deferral_timing = SimpleNamespace(
         steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
@@ -158,10 +169,75 @@ def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
     expected_reserve = 15_000_000 if conditioned else 30_000_000
     assert transport["prediction"]["preparation_reserve_ns"] == expected_reserve
     assert transport["seal_ns"] >= start + 50_000_000 - expected_reserve
+    if hybrid_us:
+        assert transport["hybrid_coarse_sleeps"] > 0
     if conditioned:
         assert queries[-1] == {"request_shapes": [[1, 8192]]}
         assert transport["prediction"]["preparation_conditioned"]
     assert not core.batch_queue[-1][0].poll()
+    executor.finish()
+
+
+def test_hybrid_rechecks_predecessor_completion_after_a_bounded_wait(monkeypatch):
+    """Completion during the coarse phase must stop before the forecast deadline."""
+    import numpy as np
+
+    from vllm.v1.kv_offload import late_admission_runtime as late
+
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.scheduler._late_seal_policy = "predictive"
+    core.scheduler._late_seal_prediction_scale_percent = 100
+    core.scheduler._late_seal_prediction_reserve_us = 10_000
+    core.scheduler._late_seal_safety_us = 1_000_000
+    core.scheduler._late_seal_hybrid_wait_us = 20_000
+    core.scheduler._late_seal_hybrid_guard_us = 50_000
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
+    core.batch_queue[-1][1].readiness_timeline_step = 8
+    started = time.monotonic_ns()
+    core.deferral_timing = SimpleNamespace(
+        steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+        read_execution=lambda step: (
+            [(step, started, started, started + 100, time.monotonic_ns(), 1, 0, 0, 0)]
+            * 8
+        ),
+        seal_estimator=SimpleNamespace(
+            predict=lambda data: 500_000_000,
+            features=lambda data: np.ones(4),
+            samples=[0] * 8,
+            preparation_reserve=lambda extra: extra,
+            preparation_ns=[],
+        ),
+    )
+    sleeps = []
+
+    def sleep(seconds):
+        sleeps.append(seconds)
+        if seconds >= 0.01:
+            core.batch_queue[-1][0].release.set()
+        time.sleep(seconds)
+
+    monkeypatch.setattr(
+        late,
+        "time",
+        SimpleNamespace(
+            monotonic=time.monotonic,
+            monotonic_ns=time.monotonic_ns,
+            thread_time_ns=time.thread_time_ns,
+            sleep=sleep,
+        ),
+    )
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], [_request("a")])
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        result.result(timeout=5)
+    transport = core.scheduler._late_transport
+    assert transport["seal_reason"] == "predecessor_compute_finished"
+    assert transport["hybrid_coarse_sleeps"] == 1
+    assert max(sleeps) <= 0.02
+    assert transport["seal_ns"] < transport["prediction"]["deadline_ns"]
     executor.finish()
 
 

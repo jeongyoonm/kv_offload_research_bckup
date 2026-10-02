@@ -328,12 +328,31 @@ def stage_rpc(core, step, base, candidates):
     progress_polls = 0
     poll_cpu_ns = 0
     sleep_ns = 0
+    adaptive_sleeps = 0
+    coarse_sleeps = 0
+    requested_sleep_ns = 0
+    hybrid_wait_us = getattr(core.scheduler, "_late_seal_hybrid_wait_us", 0)
+    hybrid_guard_us = getattr(core.scheduler, "_late_seal_hybrid_guard_us", 50_000)
 
-    def adaptive_sleep():
+    def adaptive_sleep(predicted_deadline=None):
         nonlocal poll_cpu_ns, sleep_ns
+        nonlocal adaptive_sleeps, coarse_sleeps, requested_sleep_ns
         before = time.monotonic_ns()
+        requested = adaptive_poll_us * 1000
+        if hybrid_wait_us and predicted_deadline:
+            coarse_remaining = predicted_deadline - hybrid_guard_us * 1000 - before
+            safety_remaining = (
+                base_ready_ns + core.scheduler._late_seal_safety_us * 1000 - before
+            )
+            if coarse_remaining > requested and safety_remaining > requested:
+                requested = min(
+                    hybrid_wait_us * 1000, coarse_remaining, safety_remaining
+                )
+                coarse_sleeps += 1
+        adaptive_sleeps += 1
+        requested_sleep_ns += requested
         poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
-        time.sleep(adaptive_poll_us / 1e6)
+        time.sleep(requested / 1e9)
         sleep_ns += time.monotonic_ns() - before
 
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
@@ -581,7 +600,7 @@ def stage_rpc(core, step, base, candidates):
                         ):
                             seal_reason = "adaptive_safety_deadline"
                             break
-                        adaptive_sleep()
+                        adaptive_sleep(predicted_deadline_ns)
                         continue
                 if (
                     seal_when_all_ready
@@ -684,6 +703,11 @@ def stage_rpc(core, step, base, candidates):
             progress_polls=progress_polls,
             adaptive_poll_cpu_ns=poll_cpu_ns,
             adaptive_sleep_ns=sleep_ns,
+            adaptive_sleeps=adaptive_sleeps,
+            adaptive_requested_sleep_ns=requested_sleep_ns,
+            hybrid_coarse_sleeps=coarse_sleeps,
+            hybrid_wait_us=hybrid_wait_us,
+            hybrid_guard_us=hybrid_guard_us,
         )
         return [
             c.req_id

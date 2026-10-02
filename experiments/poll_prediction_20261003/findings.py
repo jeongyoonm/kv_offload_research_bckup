@@ -241,7 +241,6 @@ def main(root):
         artifact_link(
             "Forecast diagnostics", root / "summary/prediction_diagnostics.csv"
         ),
-        "",
     ]
     path = root / "summary/FINDINGS.md"
     path.write_text(

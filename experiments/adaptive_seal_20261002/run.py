@@ -229,9 +229,12 @@ def cell(directory, workload, options, server_dir, manifest):
     trace_files = list((server_dir / "timing").glob("engine-*.jsonl"))
     offsets = {p.name: p.stat().st_size for p in trace_files}
     late_before = set((server_dir / "timing/late_admission").glob("*.json"))
-    replay = profile(
-        directory, workload / "replay.json", 32, manifest["request_count"], "replay"
-    )
+    from measurement_guard import measure_guard
+
+    with measure_guard(directory, server_dir) as guard:
+        replay = profile(
+            directory, workload / "replay.json", 32, manifest["request_count"], "replay"
+        )
     after = glm.metrics(directory, "metrics_after")
     configure(directory, PRIME, "drain_setting")
     for p in (server_dir / "timing").glob("engine-*.jsonl"):
@@ -266,7 +269,9 @@ def cell(directory, workload, options, server_dir, manifest):
         preemptions=preemptions,
         h2d_bytes=after["vllm:kv_offload_load_bytes"]
         - before["vllm:kv_offload_load_bytes"],
-        accepted=len(raw) == manifest["request_count"]
+        **guard,
+        accepted=not any(guard.values())
+        and len(raw) == manifest["request_count"]
         and observed == expected
         and gpu_hits == 0
         and preemptions == 0,
@@ -353,10 +358,23 @@ def main():
                         )
                         continue
                     print("START", target, flush=True)
-                    results[str(target)] = cell(
-                        target, work, POLICIES[policy], run / "server", manifest
-                    )
-                    save(run / "results.json", results)
+                    for attempt in range(3):
+                        measured = (
+                            target
+                            if not attempt
+                            else target.with_name(target.name + f"_warmretry{attempt}")
+                        )
+                        result = cell(
+                            measured, work, POLICIES[policy], run / "server", manifest
+                        )
+                        results[str(measured)] = result
+                        save(run / "results.json", results)
+                        if result["accepted"]:
+                            break
+                        if not result.get("measurement_jit_lines"):
+                            raise RuntimeError(f"Invalid measured cell: {measured}")
+                    else:
+                        raise RuntimeError(f"Repeated first-use compilation: {target}")
     save(
         run / "complete.json",
         dict(cells=len(results), accepted=sum(x["accepted"] for x in results.values())),

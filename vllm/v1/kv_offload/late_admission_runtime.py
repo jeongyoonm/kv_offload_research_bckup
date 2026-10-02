@@ -320,6 +320,9 @@ def stage_rpc(core, step, base, candidates):
     )
     partial_min = getattr(core.scheduler, "_late_partial_min_pending_candidates", 0)
     partial_percent = getattr(core.scheduler, "_late_partial_ready_percent", 0)
+    policy = getattr(core.scheduler, "_late_seal_policy", "fixed")
+    prediction = None
+    predicted_deadline_ns = None
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
     data_fd, data_path = tempfile.mkstemp(prefix="vllm-late-data-")
     try:
@@ -391,6 +394,67 @@ def stage_rpc(core, step, base, candidates):
                         for status in statuses[world * (slot + 1) : world * (slot + 2)]
                     )
                 ]
+                if policy == "predictive" and candidates:
+                    from vllm.v1.kv_offload.seal_progress import compute_progress
+
+                    has_compute, compute_finished = compute_progress(core, queued)
+                    if has_compute and compute_finished:
+                        seal_reason = "predecessor_compute_finished"
+                        break
+                    timing = getattr(core, "deferral_timing", None)
+                    a_step = getattr(queued[-1][1], "readiness_timeline_step", None)
+                    if timing and a_step and predicted_deadline_ns is None:
+                        data = timing.steps.get(a_step)
+                        records = timing.read_execution(a_step)
+                        if data and records and all(r and r[3] for r in records):
+                            predicted = timing.seal_estimator.predict(data)
+                            if predicted:
+                                predicted = (
+                                    predicted
+                                    * core.scheduler._late_seal_prediction_scale_percent
+                                    // 100
+                                )
+                                predicted_deadline_ns = (
+                                    max(r[3] for r in records)
+                                    + predicted
+                                    - core.scheduler._late_seal_prediction_reserve_us
+                                    * 1000
+                                )
+                                prediction = dict(
+                                    predecessor_step=a_step,
+                                    predicted_duration_ns=predicted,
+                                    deadline_ns=predicted_deadline_ns,
+                                    features=timing.seal_estimator.features(
+                                        data
+                                    ).tolist(),
+                                    training_samples=len(timing.seal_estimator.samples),
+                                )
+                                record(
+                                    core.scheduler,
+                                    "seal_prediction",
+                                    step=step,
+                                    **prediction,
+                                )
+                    if predicted_deadline_ns and now_ns >= predicted_deadline_ns:
+                        seal_reason = "predicted_compute_deadline"
+                        break
+                    if has_compute:
+                        if (
+                            seal_when_all_ready
+                            and candidates
+                            and len(ready_acked) == len(candidates)
+                        ):
+                            seal_reason = "all_candidates_ready"
+                            break
+                        if (
+                            now_ns
+                            >= base_ready_ns
+                            + core.scheduler._late_seal_safety_us * 1000
+                        ):
+                            seal_reason = "adaptive_safety_deadline"
+                            break
+                        time.sleep(0.001)
+                        continue
                 if (
                     seal_when_all_ready
                     and candidates
@@ -483,6 +547,8 @@ def stage_rpc(core, step, base, candidates):
             kv_ready=kv_ready,
             cancelled=sorted(cancelled),
             predecessor_ready=predecessor_ready,
+            adaptive_policy=policy,
+            prediction=prediction,
         )
         return [
             c.req_id

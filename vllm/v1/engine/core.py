@@ -1995,6 +1995,14 @@ class EngineCore:
             self.scheduler._late_admission_mode = options["late_admission_mode"]
             self.scheduler._late_seal_delay_us = options["late_seal_delay_us"]
             self.scheduler._late_seal_extension_us = options["late_seal_extension_us"]
+            self.scheduler._late_seal_policy = options["late_seal_policy"]
+            self.scheduler._late_seal_prediction_reserve_us = options[
+                "late_seal_prediction_reserve_us"
+            ]
+            self.scheduler._late_seal_prediction_scale_percent = options[
+                "late_seal_prediction_scale_percent"
+            ]
+            self.scheduler._late_seal_safety_us = options["late_seal_safety_us"]
             self.scheduler._late_seal_when_all_candidates_ready = options[
                 "late_seal_when_all_candidates_ready"
             ]

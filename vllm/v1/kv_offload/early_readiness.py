@@ -27,6 +27,10 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_admission_markers": False,
     "late_seal_delay_us": 0,
     "late_seal_extension_us": 0,
+    "late_seal_policy": "fixed",
+    "late_seal_prediction_reserve_us": 10_000,
+    "late_seal_prediction_scale_percent": 100,
+    "late_seal_safety_us": 2_000_000,
     "late_seal_when_all_candidates_ready": False,
     "late_candidate_slots": 4,
     "late_partial_min_pending_candidates": 0,
@@ -63,6 +67,9 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         ("late_admission_mode", 4),
         ("late_seal_delay_us", 300_000),
         ("late_seal_extension_us", 100_000),
+        ("late_seal_prediction_reserve_us", 100_000),
+        ("late_seal_prediction_scale_percent", 200),
+        ("late_seal_safety_us", 5_000_000),
         ("late_candidate_slots", 16),
         ("late_partial_min_pending_candidates", 16),
         ("late_partial_ready_percent", 100),
@@ -82,6 +89,15 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         raise ValueError(
             "zero-token credit requires cooperative progress without holds"
         )
+    if result["late_seal_policy"] not in ("fixed", "predictive") or (
+        result["late_seal_policy"] == "predictive"
+        and (
+            result["late_admission_mode"] != 4
+            or not result["late_seal_prediction_scale_percent"]
+            or not result["late_seal_safety_us"]
+        )
+    ):
+        raise ValueError("predictive seal requires mode 4 and positive timing")
     if result["late_admission_mode"] and (
         not result["cooperative_response_progress"]
         or result["zero_token_queue_credit"]

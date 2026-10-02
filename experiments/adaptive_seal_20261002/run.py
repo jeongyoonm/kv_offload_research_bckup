@@ -46,6 +46,13 @@ PRIME = dict(
     late_partial_ready_percent=0,
 )
 POLICIES = {
+    "predictive": dict(COMMON, late_seal_policy="predictive"),
+    "predictive80": dict(
+        COMMON, late_seal_policy="predictive", late_seal_prediction_scale_percent=80
+    ),
+    "predictive120": dict(
+        COMMON, late_seal_policy="predictive", late_seal_prediction_scale_percent=120
+    ),
     "worker": PRIME,
     "fixed0": dict(
         COMMON,

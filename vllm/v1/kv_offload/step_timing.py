@@ -162,6 +162,9 @@ class TimingChannel:
             raise
         config.kv_transfer_config.kv_connector_extra_config[PATH_KEY] = self.paths
         self.events: list[dict] = []
+        from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
+
+        self.seal_estimator = ComputeEstimator()
         self.steps: dict[int, dict] = {}
         self.registrations: dict[int, tuple[int, int]] = {}
         self.predictor: Predictor | OverlapPredictor | None = None
@@ -321,6 +324,7 @@ class TimingChannel:
             ):
                 continue
             if complete or now - data["dispatch_ns"] > 60_000_000_000:
+                self.seal_estimator.observe(data, execution)
                 self.emit(
                     "step_completion",
                     **data,

@@ -10,12 +10,13 @@ from collections import deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import nullcontext, suppress
 from types import SimpleNamespace
+from typing import Any
 from unittest.mock import MagicMock
 
 import pytest
 
 from tests.v1.kv_connector.unit.offloading_connector.conftest import (
-    request_runner as request_runner,
+    request_runner as offloading_request_runner,
 )
 from vllm.v1.core.sched.output import SchedulerOutput
 from vllm.v1.engine.core import EngineCore
@@ -28,8 +29,12 @@ from vllm.v1.kv_offload.late_admission_runtime import (
 )
 from vllm.v1.request import RequestStatus
 
+request_runner = offloading_request_runner
+
 
 class ControlledExecutor:
+    execute_model: Any
+
     def __init__(self, ranks=8, candidate_before_base_last=False):
         self.ranks = ranks
         self.candidate_before_base_last = candidate_before_base_last
@@ -137,18 +142,22 @@ def test_prediction_reserves_worker_preparation_while_a_is_held(
     core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
     core.batch_queue[-1][1].readiness_timeline_step = 8
     start = time.monotonic_ns()
+
+    def reserve(extra, upcoming=None):
+        queries.append(upcoming)
+        return extra + (5_000_000 if upcoming is not None else 20_000_000)
+
+    def recent_reserve(extra, upcoming):
+        queries.append(upcoming)
+        return extra + 5_000_000
+
     estimator = SimpleNamespace(
         predict=lambda data: 50_000_000,
         features=lambda data: np.ones(4),
         samples=[0] * 8,
-        preparation_reserve=lambda extra, upcoming=None: (
-            queries.append(upcoming)
-            or extra + (5_000_000 if upcoming is not None else 20_000_000)
-        ),
+        preparation_reserve=reserve,
         preparation_ns=[20_000_000] * 8,
-        recent_preparation_reserve=lambda extra, upcoming: (
-            queries.append(upcoming) or extra + 5_000_000
-        ),
+        recent_preparation_reserve=recent_reserve,
     )
     core.deferral_timing = SimpleNamespace(
         steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
@@ -914,10 +923,10 @@ def test_full_queue_polls_readiness_before_oldest_output(monkeypatch):
     from vllm.v1.kv_offload import queue_stages
 
     monkeypatch.setattr(queue_stages, "active", False)
-    oldest = Future()
+    oldest: Any = Future()
     oldest.set_result("oldest-output")
     oldest.poll = MagicMock(return_value=False)
-    newer = Future()
+    newer: Any = Future()
     newer.set_result("newer-output")
     output = lambda step: SimpleNamespace(
         readiness_timeline_step=step,
@@ -1029,7 +1038,7 @@ def test_candidate_only_mode_uses_ordinary_base_request_path(
     runner.connector_scheduler._current_batch_load_jobs = set()
     runner.new_request(token_ids=[2] * 24)
     scheduler._late_admission_mode = mode
-    prepared_base = []
+    prepared_base: list[str] = []
 
     def prepare(step, base, candidates):
         prepared_base.extend(request.req_id for request in base)
@@ -1042,7 +1051,9 @@ def test_candidate_only_mode_uses_ordinary_base_request_path(
     assert output.num_scheduled_tokens == {"1": 24}
 
 
-@pytest.mark.parametrize("outcome", ["ready", "complete", "physical", "cancel"])
+@pytest.mark.parametrize(
+    "outcome", ["ready", "complete", "physical", "physical_cancel", "cancel"]
+)
 def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
     """A forecast controls sleep size; it cannot finalize membership."""
     import numpy as np
@@ -1065,6 +1076,15 @@ def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
     core.batch_queue[-1][1].readiness_timeline_step = 8
     started = time.monotonic_ns()
     physical_finished = threading.Event()
+    finish_and_cancel = threading.Event()
+
+    def refresh(poll_markers=False):
+        if finish_and_cancel.is_set():
+            scheduler.finished_recving_kv_req_ids.add("a")
+            core.aborts_queue.put(["a"])
+            physical_finished.set()
+
+    core._refresh_early_load_readiness.side_effect = refresh
 
     def execution(step):
         now = time.monotonic_ns()
@@ -1102,22 +1122,28 @@ def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
             core.batch_queue[-1][0].release.set()
         elif outcome == "physical":
             physical_finished.set()
+        elif outcome == "physical_cancel":
+            finish_and_cancel.set()
         else:
             core.aborts_queue.put(["a"])
         # stage_rpc returns prepared slots; final admission uses the KV/cancel snapshot.
         assert result.result(timeout=5) == ["a"]
-        assert scheduler._late_kv_snapshot == ({"a"} if outcome == "ready" else set())
-        assert scheduler._late_cancelled == ({"a"} if outcome == "cancel" else set())
+        assert scheduler._late_kv_snapshot == (
+            {"a"} if outcome in {"ready", "physical_cancel"} else set()
+        )
+        assert scheduler._late_cancelled == (
+            {"a"} if outcome in {"cancel", "physical_cancel"} else set()
+        )
     transport = scheduler._late_transport
     assert transport["seal_reason"] == (
         "predecessor_compute_finished"
-        if outcome in {"complete", "physical"}
+        if outcome in {"complete", "physical", "physical_cancel"}
         else "candidate_target_ready"
     )
     assert transport["seal_ns"] > transport["prediction"]["deadline_ns"]
     assert transport["hybrid_coarse_sleeps"] > 0
     assert transport["hybrid_polling_ns"] is not None
-    if outcome == "physical":
+    if outcome in {"physical", "physical_cancel"}:
         assert not core.batch_queue[-1][0].poll()
     executor.finish()
 
@@ -1152,6 +1178,7 @@ def test_prediction_to_readiness_handles_physical_completion_before_base_ack():
     core = _core(executor)
     core.scheduler._late_seal_policy = "predictive"
     core.scheduler._late_seal_prediction_to_readiness = True
+    core.scheduler._late_seal_target_candidates = 16
     core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
     core.batch_queue[-1][1].readiness_timeline_step = 8
     started = time.monotonic_ns()

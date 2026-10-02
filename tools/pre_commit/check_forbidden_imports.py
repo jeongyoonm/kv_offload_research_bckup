@@ -36,6 +36,9 @@ CHECK_IMPORTS = {
         allowed_files={
             # Trusted startup-selected artifacts; never request-supplied pickle.
             "vllm/v1/kv_offload/timing_replay.py",
+            # Trusted engine-generated preparation IPC and its CPU harness.
+            "vllm/v1/kv_offload/late_admission_runtime.py",
+            "tests/v1/kv_offload/test_late_admission_harness.py",
             # pickle
             "vllm/multimodal/hasher.py",
             "vllm/transformers_utils/config.py",

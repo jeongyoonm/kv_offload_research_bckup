@@ -399,7 +399,7 @@ def stage_rpc(core, step, base, candidates):
         seal_reason = None
         cancelled = None
         partial_ready_count = 0
-        target = None
+        target = 0
         partial_target = (len(candidates) * partial_percent + 99) // 100
         while True:
             progress_polls += 1
@@ -501,6 +501,12 @@ def stage_rpc(core, step, base, candidates):
                     from vllm.v1.kv_offload.execution_timing import valid_snapshot
 
                     has_compute, compute_finished = compute_progress(core, queued)
+                    if prediction_to_readiness:
+                        cancelled = cancelled_candidates(core, candidates)
+                        active = {c.req_id for c in candidates} - cancelled
+                        target = min(
+                            core.scheduler._late_seal_target_candidates, len(active)
+                        )
                     if has_compute and compute_finished:
                         seal_reason = "predecessor_compute_finished"
                         break
@@ -556,8 +562,12 @@ def stage_rpc(core, step, base, candidates):
                                     step=step,
                                     **prediction,
                                 )
-                    if prediction and getattr(
-                        core.scheduler, "_late_seal_condition_preparation", False
+                    if (
+                        prediction
+                        and timing is not None
+                        and getattr(
+                            core.scheduler, "_late_seal_condition_preparation", False
+                        )
                     ):
                         upcoming_shapes = list(
                             getattr(core.scheduler, "_late_base_request_shapes", [])
@@ -616,15 +626,12 @@ def stage_rpc(core, step, base, candidates):
                         seal_reason = "predicted_compute_deadline"
                         break
                     if has_compute:
-                        if prediction_to_readiness:
-                            cancelled = cancelled_candidates(core, candidates)
-                            active = {c.req_id for c in candidates} - cancelled
-                            target = min(
-                                core.scheduler._late_seal_target_candidates, len(active)
-                            )
-                            if len(set(ready_acked) & active) >= target:
-                                seal_reason = "candidate_target_ready"
-                                break
+                        if (
+                            prediction_to_readiness
+                            and len(set(ready_acked) & active) >= target
+                        ):
+                            seal_reason = "candidate_target_ready"
+                            break
                         if (
                             seal_when_all_ready
                             and candidates

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Summarize past-only forecasts and observed preparation; no performance inference."""
 
 import argparse

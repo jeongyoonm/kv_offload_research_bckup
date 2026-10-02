@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Validate preserved raw AIPerf usage and cache/transfer accounting."""
 
 import argparse

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Write final numerical tables only after all registered phases complete."""
 
 import argparse
@@ -143,7 +145,7 @@ def main(root):
         ),
         (
             "- Known-answer and distinct-fact probes are stored in each phase. "
-            "The new branch passes 69 CPU protocol/predictor tests and 12 selected "
+            "The new branch passes 70 CPU protocol/predictor tests and 12 selected "
             "option tests. Earlier polling/hybrid gates passed 67 CPU checks and 19 "
             "option checks. Two broader inherited fixture/artifact failures are "
             "retained and reproduced on the unchanged old evaluation source."

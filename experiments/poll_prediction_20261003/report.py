@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Summarize matched controls and preserve every accepted polling cell."""
 
 import argparse
@@ -137,8 +139,7 @@ def summarize(root):
         "Concurrency 32, one output token. Single-replay screens are exploratory. "
         "Repeated throughput is an arithmetic mean; p95 is the mean of replay p95. "
         "Recovery denominators change with batching. Poll CPU excludes final, "
-        "pre-ack and fixed iterations; preparation is wall time.</p>"
-        + body
+        "pre-ack and fixed iterations; preparation is wall time.</p>" + body
     )
     print(json.dumps({"groups": len(rows), "cells": sum(r["repeats"] for r in rows)}))
 

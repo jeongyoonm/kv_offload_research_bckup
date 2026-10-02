@@ -1,0 +1,26 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_seal_hybrid_20261003",
+  "source_sha256": {
+    "experiments/adaptive_seal_20261002/correctness.py": "254482eca6c8e13dd42123cbe1baa1739707a217968b20ea450f875bf81541fc",
+    "experiments/adaptive_seal_20261002/measurement_guard.py": "271eaf0f3d5a7d74bbc980b3ec71578e430fdc4f1662d1d514cd4b41ce3b5e43",
+    "experiments/adaptive_seal_20261002/run.py": "494b30f7efb5739abff60547d38e3c560ba2eac94e9a445e3c4413fba63e754a",
+    "experiments/adaptive_seal_20261002/study.json": "e9e56f998f93c6196cba5464866e8760cee64812713f22f81f6d7754ea0a096b",
+    "experiments/poll_prediction_20261003/analyze.py": "2e986ae114c947ef9de15cfd0eaf10d428749f7ddd0c259963f49bff95e0182c",
+    "experiments/poll_prediction_20261003/run.py": "1edb65e2e32c840a00503575ee905d00a47d42e3fae906fe895d37290fb2cf6d",
+    "tests/v1/kv_offload/test_early_readiness.py": "a14e7cc6b0f9c03d3a584692dde4f0eb053214d947bd1cd47363baa4c68dc5cd",
+    "tests/v1/kv_offload/test_late_admission_harness.py": "6af216c9ced7b894aa40f52bc80251fac1ac3170774367a068c252a7180c81a2",
+    "tests/v1/kv_offload/test_scheduling_endpoint.py": "244df32363604514f168cb4e3a1ecbd45a544622fff52e48558eca0c99ccf943",
+    "tests/v1/kv_offload/test_seal_predictor.py": "8fd47ed4e0c747c28b9f1c55771b6dd672f5e102f74409fb331424124ff2a7e7",
+    "vllm/entrypoints/serve/experimental/kv_load_scheduling.py": "5a7e5277ff3477447cf644056873e08bae99978bb2e14bccca4106de6e8d96d9",
+    "vllm/v1/core/sched/scheduler.py": "e09775585cf4b9952a5c2338f63d1e9ef8296a5424ca0eaaa3ecdc2c0eb50464",
+    "vllm/v1/engine/core.py": "b56388b0c3ac0c33f80a7dc74cd60e4e8132d02bebc832a59d9c665525fb476e",
+    "vllm/v1/kv_offload/early_readiness.py": "0f45a29c00f81fe009b41a77346affe6979ea33463af4739c41243e585bac1ca",
+    "vllm/v1/kv_offload/late_admission_runtime.py": "f8150a4788c6205881222f54f0b0f275fb9fac0f15d4096e0ca6df490fcdc470",
+    "vllm/v1/kv_offload/seal_predictor.py": "9e73977a56cec91c5b90c56e7d11518e9164030c7cf3d165bdaade876ae6ce57",
+    "vllm/v1/kv_offload/seal_progress.py": "7ab465e9a4ec2e84d6d69fb96e3c5edf26d312f858bc15e7770f25e8fa873844",
+    "vllm/v1/kv_offload/step_timing.py": "5b127829bee1c7d75feb43e13120d22829ebea23128b2b45758366204ad547cb"
+  },
+  "commit": "1a634d3c656e63b7ca65d0c4ca297ce6c42fff31",
+  "shared_server_from": "/mnt/localnvme/glm53_poll_prediction_20261003/screen",
+  "past_predictor_state_retained": true
+}

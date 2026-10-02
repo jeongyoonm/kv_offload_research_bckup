@@ -1,0 +1,196 @@
+{
+  "time": 1790981303.490799,
+  "phases": {
+    "screen": {
+      "cells": 42,
+      "accepted": 42,
+      "probes": {
+        "correctness": {
+          "worker": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "fixed": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "readiness_10ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "prediction_10ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "recent_1ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "hybrid_50ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          }
+        }
+      },
+      "equal_uncached_work": true,
+      "missing_execution_timing_steps": {},
+      "all_primary_completions_valid": true
+    },
+    "confirmation": {
+      "cells": 24,
+      "accepted": 24,
+      "probes": {
+        "correctness": {
+          "hybrid_50ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "recent_1ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "readiness_10ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "fixed": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          }
+        },
+        "correctness_distinct": {
+          "hybrid_50ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 13,
+            "passed": true
+          },
+          "hybrid_20ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 15,
+            "passed": true
+          },
+          "recent_1ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 11,
+            "passed": true
+          },
+          "prediction_5ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 16,
+            "passed": true
+          },
+          "prediction_1ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 16,
+            "passed": true
+          },
+          "readiness_10ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 15,
+            "passed": true
+          },
+          "readiness_1ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 15,
+            "passed": true
+          },
+          "fixed": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 15,
+            "passed": true
+          }
+        }
+      },
+      "equal_uncached_work": true,
+      "missing_execution_timing_steps": {
+        "/mnt/localnvme/glm53_poll_prediction_20261003/confirmation/p8192_f95_h100/r0_readiness_1ms": [
+          7958
+        ]
+      },
+      "all_primary_completions_valid": true
+    },
+    "predicted_readiness": {
+      "cells": 12,
+      "accepted": 12,
+      "probes": {
+        "correctness": {
+          "fixed": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "prediction_1ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "readiness_2ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          },
+          "predicted_readiness_50ms": {
+            "text_matches": 16,
+            "requests": 16,
+            "passed": true
+          }
+        },
+        "correctness_distinct": {
+          "fixed": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 14,
+            "passed": true
+          },
+          "prediction_1ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 14,
+            "passed": true
+          },
+          "readiness_2ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 16,
+            "passed": true
+          },
+          "predicted_readiness_50ms": {
+            "requests": 16,
+            "factual_matches": 16,
+            "exact_cold_matches": 16,
+            "passed": true
+          }
+        }
+      },
+      "equal_uncached_work": true,
+      "missing_execution_timing_steps": {},
+      "all_primary_completions_valid": true
+    }
+  },
+  "measured_requests": 11960,
+  "native_hashes_verified": {
+    "experiment/glm53-seal-polling-20261003": 18,
+    "experiment/glm53-seal-predictor-recent-20261003": 18,
+    "experiment/glm53-seal-hybrid-20261003": 18,
+    "experiment/glm53-seal-predicted-readiness-20261003": 18
+  },
+  "status": "verified"
+}

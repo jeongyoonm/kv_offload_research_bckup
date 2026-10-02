@@ -1,0 +1,50 @@
+{
+  "status": "verified-awaiting-archive",
+  "time": 1790981337.2536163,
+  "cpu_checks": 67,
+  "option_checks": 19,
+  "workloads": [
+    [
+      8192,
+      95,
+      100
+    ],
+    [
+      61440,
+      95,
+      100
+    ],
+    [
+      61440,
+      99,
+      100
+    ]
+  ],
+  "counts": [
+    300,
+    80,
+    80
+  ],
+  "poll_intervals_ms": [
+    1,
+    2,
+    5,
+    10
+  ],
+  "pre_ack_us": 25,
+  "seed": 55,
+  "concurrency": 32,
+  "output_tokens": 1,
+  "screen_repeats": 1,
+  "protocol": "All policies share code/native assets and independent cache reset/priming; performance repeats may follow. No policy promoted.",
+  "planned_cells": 78,
+  "planned_measured_requests": 11960,
+  "confirmation_cells": 24,
+  "predicted_readiness_cells": 12,
+  "predicted_readiness_cpu_checks": 70,
+  "predicted_readiness_option_checks": 12,
+  "observed_cells": 78,
+  "accepted_cells": 78,
+  "measured_requests": 11960,
+  "owned_gpu_processes_remaining": 0
+}

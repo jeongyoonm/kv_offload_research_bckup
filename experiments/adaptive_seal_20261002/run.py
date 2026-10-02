@@ -294,6 +294,7 @@ def main():
     parser.add_argument("--requests", type=int, default=160)
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--max-model-len", type=int, default=32768)
+    parser.add_argument("--workload-request-counts")
     args = parser.parse_args()
     run = ROOT / args.name
     run.mkdir(parents=True, exist_ok=True)
@@ -344,11 +345,18 @@ def main():
     )
     workloads = [tuple(map(int, x.split(":"))) for x in args.workloads.split(",")]
     policies = args.policies.split(",")
+    counts = (
+        [int(value) for value in args.workload_request_counts.split(",")]
+        if args.workload_request_counts
+        else [args.requests] * len(workloads)
+    )
+    if len(counts) != len(workloads) or any(count <= 0 for count in counts):
+        raise ValueError("positive request count required for each workload")
     if any(length + 1 > args.max_model_len for length, _, _ in workloads):
         raise ValueError("prompt plus output exceeds configured model length")
-    if (
-        args.requests * max(length for length, _, _ in workloads) * 381600
-        > 1984 * 1024**3
+    if any(
+        count * length * 381600 > 1984 * 1024**3
+        for (length, _, _), count in zip(workloads, counts)
     ):
         raise ValueError("unique prompt cohort exceeds physical CPU cache capacity")
     results = {}
@@ -363,10 +371,10 @@ def main():
             PRIME,
             prefix_len=58368 if args.max_model_len >= 65536 else 11776,
         )
-        for length, fraction, hit_percent in workloads:
+        for (length, fraction, hit_percent), request_count in zip(workloads, counts):
             name = f"p{length}_f{fraction}_h{hit_percent}"
-            work = ROOT / "workloads" / f"{name}_n{args.requests}"
-            manifest = make_workload(work, length, fraction, hit_percent, args.requests)
+            work = ROOT / "workloads" / f"{name}_n{request_count}"
+            manifest = make_workload(work, length, fraction, hit_percent, request_count)
             for repeat in range(args.repeats):
                 order = policies if repeat % 2 == 0 else list(reversed(policies))
                 for policy in order:

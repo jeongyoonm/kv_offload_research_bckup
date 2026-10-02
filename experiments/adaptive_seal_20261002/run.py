@@ -361,6 +361,7 @@ def main():
             configure,
             glm,
             PRIME,
+            prefix_len=58368 if args.max_model_len >= 65536 else 11776,
         )
         for length, fraction, hit_percent in workloads:
             name = f"p{length}_f{fraction}_h{hit_percent}"

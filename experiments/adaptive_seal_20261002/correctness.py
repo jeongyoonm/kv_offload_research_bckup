@@ -4,17 +4,17 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 
 
-def check(directory, policies, configure, glm, prime_options):
+def check(directory, policies, configure, glm, prime_options, prefix_len=11776):
     from transformers import AutoTokenizer
 
     directory.mkdir(parents=True, exist_ok=True)
     tokenizer = AutoTokenizer.from_pretrained(str(glm.MODEL), local_files_only=True)
-    prefix_len = 11776
     requests, primes = [], []
     for index in range(16):
         prefix = tokenizer.encode(
             f"Document {index:06d}. "
-            + "The research team recorded river flow and rainfall every day. " * 1400,
+            + "The research team recorded river flow and rainfall every day. "
+            * (prefix_len // 8 + 200),
             add_special_tokens=False,
         )[:prefix_len]
         tail = tokenizer.encode(

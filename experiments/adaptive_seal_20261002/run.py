@@ -192,7 +192,13 @@ def usage(path):
     rows = []
     for line in path.read_text().splitlines():
         item = json.loads(line)
-        for packet in item.get("response", {}).get("data", []):
+        packets = [
+            packet
+            for response in item.get("responses", [])
+            for packet in response.get("packets", [])
+        ]
+        packets += item.get("response", {}).get("data", [])
+        for packet in packets:
             try:
                 value = json.loads(packet["value"])
             except (ValueError, KeyError, TypeError):

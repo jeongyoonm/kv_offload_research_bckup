@@ -317,7 +317,15 @@ def main():
         run / "provenance.json",
         dict(
             source=str(SOURCE),
-            source_sha256={},
+            source_sha256={
+                name: hashlib.sha256((SOURCE / name).read_bytes()).hexdigest()
+                for name in subprocess.check_output(
+                    ["git", "diff", "--name-only", "5147414", "HEAD"],
+                    cwd=SOURCE,
+                    text=True,
+                ).splitlines()
+                if (SOURCE / name).is_file()
+            },
             commit=subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=SOURCE, text=True
             ).strip(),

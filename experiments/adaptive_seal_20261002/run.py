@@ -295,6 +295,7 @@ def main():
     parser.add_argument("--repeats", type=int, default=1)
     parser.add_argument("--max-model-len", type=int, default=32768)
     parser.add_argument("--workload-request-counts")
+    parser.add_argument("--distinct-fact-probe", action="store_true")
     args = parser.parse_args()
     run = ROOT / args.name
     run.mkdir(parents=True, exist_ok=True)
@@ -371,6 +372,17 @@ def main():
             PRIME,
             prefix_len=58368 if args.max_model_len >= 65536 else 11776,
         )
+        if args.distinct_fact_probe:
+            from correctness import check_distinct
+
+            check_distinct(
+                run / "correctness_distinct",
+                {name: POLICIES[name] for name in policies},
+                configure,
+                glm,
+                PRIME,
+                prefix_len=58368 if args.max_model_len >= 65536 else 11776,
+            )
         for (length, fraction, hit_percent), request_count in zip(workloads, counts):
             name = f"p{length}_f{fraction}_h{hit_percent}"
             work = ROOT / "workloads" / f"{name}_n{request_count}"

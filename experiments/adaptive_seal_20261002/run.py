@@ -305,6 +305,9 @@ def main():
         if isinstance(command, list) and "--max-model-len" in command:
             command = list(command)
             command[command.index("--max-model-len") + 1] = str(args.max_model_len)
+            if "--async-scheduling" not in command:
+                command.append("--async-scheduling")
+            save(run / "server/launched_command.json", command)
         return early.async_scheduler_popen(command, *positional, **keywords)
 
     subprocess.Popen = experiment_popen

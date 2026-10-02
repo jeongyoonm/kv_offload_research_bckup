@@ -63,6 +63,7 @@ POLICIES = {
         late_partial_ready_percent=0,
     ),
     "fixed200ext100": COMMON,
+    "fixed200ext100_poll1ms": dict(COMMON, late_seal_poll_us=1000),
     "fixed100": dict(COMMON, late_seal_delay_us=100_000, late_seal_extension_us=0),
     "fixed300": dict(COMMON, late_seal_delay_us=300_000, late_seal_extension_us=0),
 }

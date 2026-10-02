@@ -3106,3 +3106,19 @@ def test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selecti
     assert result["batches"][1]["boundaries"]["worker_entry"]["became_ready"] == [
         "first"
     ]
+
+
+@pytest.mark.parametrize("poll_us", [0, 5001, -1, True, 1.5])
+def test_fixed_seal_poll_interval_rejects_busy_spin_and_invalid_values(poll_us):
+    with pytest.raises(ValueError):
+        early.validate_experiment_options({"late_seal_poll_us": poll_us})
+
+
+def test_fixed_seal_poll_control_preserves_default():
+    assert early.validate_experiment_options({})["late_seal_poll_us"] == 25
+    assert (
+        early.validate_experiment_options({"late_seal_poll_us": 1000})[
+            "late_seal_poll_us"
+        ]
+        == 1000
+    )

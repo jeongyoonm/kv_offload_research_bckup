@@ -538,7 +538,7 @@ def stage_rpc(core, step, base, candidates):
                 return []
             if time.monotonic() >= deadline:
                 raise TimeoutError("late preparation timed out")
-            time.sleep(0.000025)
+            time.sleep(getattr(core.scheduler, "_late_seal_poll_us", 25) / 1e6)
         if cancelled is None:
             cancelled = cancelled_candidates(core, candidates)
         partial_ready_count = len(set(ready_acked) - cancelled)

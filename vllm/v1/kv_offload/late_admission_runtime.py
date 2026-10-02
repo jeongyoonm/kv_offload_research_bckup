@@ -403,7 +403,15 @@ def stage_rpc(core, step, base, candidates):
                         seal_reason = "predecessor_compute_finished"
                         break
                     timing = getattr(core, "deferral_timing", None)
-                    a_step = getattr(queued[-1][1], "readiness_timeline_step", None)
+                    a_output = next(
+                        (
+                            output
+                            for _, output, _ in reversed(queued)
+                            if getattr(output, "total_num_scheduled_tokens", 0) > 0
+                        ),
+                        None,
+                    )
+                    a_step = getattr(a_output, "readiness_timeline_step", None)
                     if timing and a_step and predicted_deadline_ns is None:
                         data = timing.steps.get(a_step)
                         records = timing.read_execution(a_step)

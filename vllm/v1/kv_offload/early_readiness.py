@@ -33,6 +33,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_repeat_us": 25_000,
     "late_seal_condition_preparation": False,
     "late_seal_poll_us": 25,
+    "late_seal_adaptive_poll_us": 1000,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,
     "late_seal_safety_us": 2_000_000,
@@ -90,6 +91,8 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
             raise ValueError(f"invalid experimental option: {key}")
     if not 1 <= result["late_seal_poll_us"] <= 5000:
         raise ValueError("invalid experimental option: late_seal_poll_us")
+    if not 1 <= result["late_seal_adaptive_poll_us"] <= 10_000:
+        raise ValueError("invalid experimental option: late_seal_adaptive_poll_us")
     if result["zero_token_queue_credit"] and (
         not result["cooperative_response_progress"]
         or result["deferral_policy"] not in ("disabled", "timing")

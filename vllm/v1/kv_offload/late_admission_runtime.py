@@ -324,6 +324,17 @@ def stage_rpc(core, step, base, candidates):
     repeated_intervals = 0
     prediction = None
     predicted_deadline_ns = None
+    adaptive_poll_us = getattr(core.scheduler, "_late_seal_adaptive_poll_us", 1000)
+    progress_polls = 0
+    poll_cpu_ns = 0
+    sleep_ns = 0
+
+    def adaptive_sleep():
+        nonlocal poll_cpu_ns, sleep_ns
+        before = time.monotonic_ns()
+        poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
+        time.sleep(adaptive_poll_us / 1e6)
+        sleep_ns += time.monotonic_ns() - before
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
     data_fd, data_path = tempfile.mkstemp(prefix="vllm-late-data-")
     try:
@@ -348,6 +359,8 @@ def stage_rpc(core, step, base, candidates):
         partial_ready_count = 0
         partial_target = (len(candidates) * partial_percent + 99) // 100
         while True:
+            progress_polls += 1
+            poll_cpu_start = time.thread_time_ns()
             predecessor_ready = predecessor.poll()
             core._refresh_early_load_readiness(poll_markers=False)
             kv_ready = sorted(
@@ -435,7 +448,7 @@ def stage_rpc(core, step, base, candidates):
                             target=target,
                             has_compute=has_compute,
                         )
-                    time.sleep(0.001)
+                    adaptive_sleep()
                     continue
                 if policy == "predictive" and candidates:
                     from vllm.v1.kv_offload.execution_timing import valid_snapshot
@@ -555,7 +568,7 @@ def stage_rpc(core, step, base, candidates):
                         ):
                             seal_reason = "adaptive_safety_deadline"
                             break
-                        time.sleep(0.001)
+                        adaptive_sleep()
                         continue
                 if (
                     seal_when_all_ready
@@ -654,6 +667,10 @@ def stage_rpc(core, step, base, candidates):
             ready_target=target if policy == "event" and candidates else None,
             has_compute=has_compute if policy == "event" and candidates else None,
             prediction=prediction,
+            adaptive_poll_us=adaptive_poll_us,
+            progress_polls=progress_polls,
+            adaptive_poll_cpu_ns=poll_cpu_ns,
+            adaptive_sleep_ns=sleep_ns,
         )
         return [
             c.req_id

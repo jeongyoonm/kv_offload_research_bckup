@@ -3124,6 +3124,19 @@ def test_fixed_seal_poll_control_preserves_default():
     )
 
 
+@pytest.mark.parametrize("poll_us", [1000, 2000, 5000, 10000])
+def test_adaptive_poll_interval_preserves_pre_ack_interval(poll_us):
+    options = early.validate_experiment_options({"late_seal_adaptive_poll_us": poll_us})
+    assert options["late_seal_adaptive_poll_us"] == poll_us
+    assert options["late_seal_poll_us"] == 25
+
+
+@pytest.mark.parametrize("poll_us", [0, -1, 10001, True, 1.5])
+def test_adaptive_poll_interval_is_positive_and_bounded(poll_us):
+    with pytest.raises(ValueError):
+        early.validate_experiment_options({"late_seal_adaptive_poll_us": poll_us})
+
+
 @pytest.mark.parametrize(
     "invalid",
     [

@@ -2007,6 +2007,9 @@ class EngineCore:
                 "late_seal_condition_preparation"
             ]
             self.scheduler._late_seal_poll_us = options["late_seal_poll_us"]
+            self.scheduler._late_seal_adaptive_poll_us = options[
+                "late_seal_adaptive_poll_us"
+            ]
             self.scheduler._late_seal_prediction_reserve_us = options[
                 "late_seal_prediction_reserve_us"
             ]

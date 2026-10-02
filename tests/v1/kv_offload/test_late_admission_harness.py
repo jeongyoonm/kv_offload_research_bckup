@@ -165,10 +165,12 @@ def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
     executor.finish()
 
 
-def test_event_seal_repeats_until_candidate_ready_with_a_held():
+@pytest.mark.parametrize("poll_us", [1000, 2000, 5000, 10000])
+def test_event_seal_repeats_until_candidate_ready_with_a_held(poll_us):
     executor = ControlledExecutor()
     core = _core(executor)
     core.scheduler._late_seal_policy = "event"
+    core.scheduler._late_seal_adaptive_poll_us = poll_us
     core.scheduler._late_seal_target_candidates = 1
     core.scheduler._late_seal_repeat_us = 1000
     core.scheduler._late_seal_safety_us = 1_000_000
@@ -193,6 +195,7 @@ def test_event_seal_repeats_until_candidate_ready_with_a_held():
         core.scheduler.finished_recving_kv_req_ids.add("a")
         assert result.result(timeout=5) == ["a"]
     assert core.scheduler._late_transport["seal_reason"] == "candidate_target_ready"
+    assert core.scheduler._late_transport["adaptive_poll_us"] == poll_us
     assert not core.batch_queue[-1][0].poll()
     executor.finish()
 

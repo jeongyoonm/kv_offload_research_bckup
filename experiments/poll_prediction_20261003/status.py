@@ -28,13 +28,14 @@ with (ROOT / "process_log.jsonl").open("a") as stream:
             json.dumps(dict(event="cell_observed", time=time.time(), **row)) + "\n"
         )
 seen_path.write_text(json.dumps(seen, indent=2) + "\n")
-log = ROOT / "driver.log"
-lines = log.read_text().splitlines() if log.exists() else []
+logs = [ROOT / "driver.log", ROOT / "predicted_readiness_driver.log"]
+log = max((p for p in logs if p.exists()), key=lambda p: p.stat().st_mtime)
+lines = log.read_text().splitlines()
 last = next(
     (
         line
         for line in reversed(lines)
-        if line.startswith(("START", "CORRECTNESS", "READY"))
+        if line.startswith(("START", "CORRECTNESS", "DISTINCT_CORRECTNESS", "READY"))
     ),
     None,
 )

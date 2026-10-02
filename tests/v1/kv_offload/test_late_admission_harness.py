@@ -112,12 +112,17 @@ def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
 
 
-def test_prediction_reserves_worker_preparation_while_a_is_held():
+@pytest.mark.parametrize("conditioned", [False, True])
+def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
     import numpy as np
 
     executor = ControlledExecutor()
     core = _core(executor)
     core.scheduler._late_seal_policy = "predictive"
+    core.scheduler._late_seal_condition_preparation = conditioned
+    core.scheduler._late_base_request_shapes = [[1, 8192]]
+    core.scheduler.requests = {}
+    queries = []
     core.scheduler._late_seal_prediction_scale_percent = 100
     core.scheduler._late_seal_prediction_reserve_us = 10_000
     core.scheduler._late_seal_safety_us = 1_000_000
@@ -128,7 +133,10 @@ def test_prediction_reserves_worker_preparation_while_a_is_held():
         predict=lambda data: 50_000_000,
         features=lambda data: np.ones(4),
         samples=[0] * 8,
-        preparation_reserve=lambda extra: extra + 20_000_000,
+        preparation_reserve=lambda extra, upcoming=None: (
+            queries.append(upcoming)
+            or extra + (5_000_000 if upcoming is not None else 20_000_000)
+        ),
         preparation_ns=[20_000_000] * 8,
     )
     core.deferral_timing = SimpleNamespace(
@@ -147,8 +155,12 @@ def test_prediction_reserves_worker_preparation_while_a_is_held():
     transport = core.scheduler._late_transport
     assert transport["seal_reason"] == "predicted_compute_deadline"
     assert transport["prediction"]["predicted_duration_ns"] == 50_000_000
-    assert transport["prediction"]["preparation_reserve_ns"] == 30_000_000
-    assert transport["seal_ns"] >= start + 20_000_000
+    expected_reserve = 15_000_000 if conditioned else 30_000_000
+    assert transport["prediction"]["preparation_reserve_ns"] == expected_reserve
+    assert transport["seal_ns"] >= start + 50_000_000 - expected_reserve
+    if conditioned:
+        assert queries[-1] == {"request_shapes": [[1, 8192]]}
+        assert transport["prediction"]["preparation_conditioned"]
     assert not core.batch_queue[-1][0].poll()
     executor.finish()
 

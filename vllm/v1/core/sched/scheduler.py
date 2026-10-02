@@ -792,6 +792,10 @@ class Scheduler(SchedulerInterface):
                     if late_mode not in (3, 4)
                     else []
                 )
+                self._late_base_request_shapes = [
+                    [n, self.requests[req_id].num_computed_tokens]
+                    for req_id, n in num_scheduled_tokens.items()
+                ]
                 late_allowed = prepare_candidates(self, token_budget, base_reqs)
                 if not late_allowed:
                     break

@@ -39,3 +39,28 @@ def test_preparation_reserve_requires_a_complete_consistent_rank_snapshot():
     estimator.observe_preparation(records[:7] + [None])
     estimator.observe_preparation(records[:7] + [(2, 1, 100_000_001, 0, 0, 0, 0, 1, 0)])
     assert len(estimator.preparation_ns) == 1
+
+
+def test_cached_successor_reserve_does_not_use_cold_priming_cost():
+    """A cold 61K batch must not force a 700ms reserve on a cached 4K batch."""
+    estimator = ComputeEstimator()
+    cold = {"request_shapes": [[61440, 0]]}
+    warm = {"request_shapes": [[1024, 30720]] * 4}
+    for step in range(1, 25):
+        duration = 700_000_000 if step <= 16 else 20_000_000
+        data = cold if step <= 16 else warm
+        records = [(step, 1, duration + 1, 0, 0, 0, 0, 1, 0)] * 8
+        estimator.observe_preparation(records, data)
+    assert estimator.preparation_reserve(10_000_000) == 710_000_000
+    assert estimator.preparation_reserve(10_000_000, warm) == 30_000_000
+    assert (
+        estimator.preparation_reserve(10_000_000, {"request_shapes": []}) == 10_000_000
+    )
+
+
+def test_unknown_successor_shape_uses_measured_token_rate():
+    estimator = ComputeEstimator()
+    records = [(1, 1, 700_000_001, 0, 0, 0, 0, 1, 0)] * 8
+    estimator.observe_preparation(records, {"request_shapes": [[61440, 0]]})
+    upcoming = {"request_shapes": [[3072, 58368]]}
+    assert estimator.preparation_reserve(10_000_000, upcoming) == 45_000_000

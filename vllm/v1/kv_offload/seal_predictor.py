@@ -15,8 +15,9 @@ class ComputeEstimator:
         self.coefficients = None
         self.errors = deque(maxlen=32)
         self.preparation_ns = deque(maxlen=64)
+        self.preparation_shapes = deque(maxlen=128)
 
-    def observe_preparation(self, records):
+    def observe_preparation(self, records, data=None):
         if not records or any(
             not r
             or len(r) != 9
@@ -26,9 +27,47 @@ class ComputeEstimator:
             for r in records
         ):
             return
-        self.preparation_ns.append(max(r[2] - r[1] for r in records))
+        duration = max(r[2] - r[1] for r in records)
+        self.preparation_ns.append(duration)
+        shape = self.preparation_shape(data) if data else None
+        if shape is not None:
+            self.preparation_shapes.append((shape, duration))
 
-    def preparation_reserve(self, extra_ns):
+    @staticmethod
+    def preparation_shape(data):
+        shapes = data.get("request_shapes", [])
+        if not shapes or any(n <= 0 or context < 0 for n, context in shapes):
+            return None
+        return np.array(
+            [
+                sum(n for n, _ in shapes),
+                sum(context for _, context in shapes),
+                len(shapes),
+            ],
+            dtype=float,
+        )
+
+    def preparation_reserve(self, extra_ns, upcoming=None):
+        if upcoming is not None:
+            query = self.preparation_shape(upcoming)
+            if query is None:
+                return extra_ns
+            if self.preparation_shapes:
+                distances = [
+                    float(np.linalg.norm(np.log1p(query) - np.log1p(shape)))
+                    for shape, _ in self.preparation_shapes
+                ]
+                order = np.argsort(distances)[:8]
+                near = [i for i in order if distances[i] <= 1.5]
+                if near:
+                    return extra_ns + int(
+                        np.quantile([self.preparation_shapes[i][1] for i in near], 0.9)
+                    )
+                # Extrapolate per-token preparation from the closest shape.
+                index = int(order[0])
+                shape, duration = self.preparation_shapes[index]
+                return extra_ns + int(duration * query[0] / shape[0])
+            return extra_ns
         observed = (
             int(np.quantile(self.preparation_ns, 0.9)) if self.preparation_ns else 0
         )

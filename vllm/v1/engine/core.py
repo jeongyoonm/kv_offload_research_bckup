@@ -1996,6 +1996,9 @@ class EngineCore:
             self.scheduler._late_seal_delay_us = options["late_seal_delay_us"]
             self.scheduler._late_seal_extension_us = options["late_seal_extension_us"]
             self.scheduler._late_seal_policy = options["late_seal_policy"]
+            self.scheduler._late_seal_condition_preparation = options[
+                "late_seal_condition_preparation"
+            ]
             self.scheduler._late_seal_poll_us = options["late_seal_poll_us"]
             self.scheduler._late_seal_prediction_reserve_us = options[
                 "late_seal_prediction_reserve_us"

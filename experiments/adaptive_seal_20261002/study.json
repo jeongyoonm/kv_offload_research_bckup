@@ -1,7 +1,7 @@
 {
-  "strategy": "Online positive duration regression from past GPU observations; subtract recent p90 worker preparation plus RPC margin; physical completion fallback",
-  "cpu_tests": 44,
-  "test_log": "predictive_tests_preparation_reserve.log",
+  "strategy": "Compute prediction with B-shape-conditioned preparation reserve",
+  "cpu_tests": 47,
+  "test_log": "conditioned_tests_v2.log",
   "artifact_root": "/mnt/localnvme/glm53_adaptive_seal_20261002",
   "process_log": "/mnt/localnvme/glm53_adaptive_seal_20261002/process_log.jsonl",
   "queue": "/mnt/localnvme/glm53_adaptive_seal_20261002/queue.json",
@@ -9,7 +9,7 @@
   "parallelism": "TP8",
   "kv_dtype": "fp8_e4m3",
   "source_base_commit": "5147414",
-  "branch": "experiment/glm53-seal-predictive-20261002",
+  "branch": "experiment/glm53-seal-predictive-conditioned-20261002",
   "feature_disabled_by_default": true,
   "restrictions": [
     "text-only",
@@ -29,5 +29,6 @@
     "aggregate_h2d_bytes_per_cached_token": 381600,
     "readable_answer_probe": "16 requests, exact five-token factual answers against cold execution",
     "raw_forced_continuation_diagnostic": "/mnt/localnvme/glm53_adaptive_seal_20261002/completion_screen/correctness"
-  }
+  },
+  "derivation": "Live nominal reserve about 735ms was dominated by cold priming; condition p90 CPU preparation on already ready B base/candidates, using nearest prior shapes and token-rate fallback rather than a global pool"
 }

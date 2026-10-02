@@ -28,6 +28,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_delay_us": 0,
     "late_seal_extension_us": 0,
     "late_seal_policy": "fixed",
+    "late_seal_condition_preparation": False,
     "late_seal_poll_us": 25,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,

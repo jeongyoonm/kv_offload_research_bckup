@@ -436,6 +436,7 @@ def stage_rpc(core, step, base, candidates):
                                 )
                                 prediction = dict(
                                     predecessor_step=a_step,
+                                    gpu_start_upper_ns=max(r[3] for r in records),
                                     predicted_duration_ns=predicted,
                                     deadline_ns=predicted_deadline_ns,
                                     features=timing.seal_estimator.features(
@@ -453,6 +454,46 @@ def stage_rpc(core, step, base, candidates):
                                     step=step,
                                     **prediction,
                                 )
+                    if prediction and getattr(
+                        core.scheduler, "_late_seal_condition_preparation", False
+                    ):
+                        upcoming_shapes = list(
+                            getattr(core.scheduler, "_late_base_request_shapes", [])
+                        )
+                        for req_id in ready_acked:
+                            request = core.scheduler.requests.get(req_id)
+                            if request is not None:
+                                upcoming_shapes.append(
+                                    [
+                                        request.num_tokens
+                                        - request.num_computed_tokens,
+                                        request.num_computed_tokens,
+                                    ]
+                                )
+                        if upcoming_shapes != prediction.get("upcoming_shapes"):
+                            reserve_ns = timing.seal_estimator.preparation_reserve(
+                                core.scheduler._late_seal_prediction_reserve_us * 1000,
+                                {"request_shapes": upcoming_shapes},
+                            )
+                            predicted_deadline_ns = (
+                                prediction["gpu_start_upper_ns"]
+                                + prediction["predicted_duration_ns"]
+                                - reserve_ns
+                            )
+                            prediction.update(
+                                deadline_ns=predicted_deadline_ns,
+                                preparation_reserve_ns=reserve_ns,
+                                upcoming_shapes=upcoming_shapes,
+                                preparation_conditioned=True,
+                            )
+                            record(
+                                core.scheduler,
+                                "seal_preparation_prediction",
+                                step=step,
+                                upcoming_shapes=upcoming_shapes,
+                                preparation_reserve_ns=reserve_ns,
+                                deadline_ns=predicted_deadline_ns,
+                            )
                     if predicted_deadline_ns and now_ns >= predicted_deadline_ns:
                         seal_reason = "predicted_compute_deadline"
                         break

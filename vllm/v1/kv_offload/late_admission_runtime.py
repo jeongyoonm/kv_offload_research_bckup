@@ -395,6 +395,7 @@ def stage_rpc(core, step, base, candidates):
                     )
                 ]
                 if policy == "predictive" and candidates:
+                    from vllm.v1.kv_offload.execution_timing import valid_snapshot
                     from vllm.v1.kv_offload.seal_progress import compute_progress
 
                     has_compute, compute_finished = compute_progress(core, queued)
@@ -406,7 +407,11 @@ def stage_rpc(core, step, base, candidates):
                     if timing and a_step and predicted_deadline_ns is None:
                         data = timing.steps.get(a_step)
                         records = timing.read_execution(a_step)
-                        if data and records and all(r and r[3] for r in records):
+                        if (
+                            data
+                            and len(records) == world
+                            and valid_snapshot(records, a_step, time.monotonic_ns())
+                        ):
                             predicted = timing.seal_estimator.predict(data)
                             if predicted:
                                 predicted = (

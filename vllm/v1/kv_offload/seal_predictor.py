@@ -16,6 +16,7 @@ class ComputeEstimator:
         self.errors = deque(maxlen=32)
         self.preparation_ns = deque(maxlen=64)
         self.preparation_shapes = deque(maxlen=128)
+        self.recent_preparation = deque(maxlen=128)
 
     def observe_preparation(self, records, data=None):
         if not records or any(
@@ -32,6 +33,9 @@ class ComputeEstimator:
         shape = self.preparation_shape(data) if data else None
         if shape is not None:
             self.preparation_shapes.append((shape, duration))
+            self.recent_preparation.append(
+                (shape, duration, self.preparation_regime(data))
+            )
 
     @staticmethod
     def preparation_shape(data):
@@ -72,6 +76,35 @@ class ComputeEstimator:
             int(np.quantile(self.preparation_ns, 0.9)) if self.preparation_ns else 0
         )
         return observed + extra_ns
+
+    @staticmethod
+    def preparation_regime(data):
+        contexts = [context > 0 for _, context in data.get("request_shapes", [])]
+        return (
+            "cached"
+            if contexts and all(contexts)
+            else ("cold" if not any(contexts) else "mixed")
+        )
+
+    def recent_preparation_reserve(self, extra_ns, upcoming):
+        """Use recent nearby shapes from the same cold/cache regime."""
+        query = self.preparation_shape(upcoming)
+        if query is None:
+            return extra_ns
+        regime = self.preparation_regime(upcoming)
+        candidates = [
+            (shape, duration)
+            for shape, duration, observed_regime in self.recent_preparation
+            if observed_regime == regime
+        ][-32:]
+        distances = [
+            float(np.linalg.norm(np.log1p(query) - np.log1p(shape)))
+            for shape, _ in candidates
+        ]
+        near = [i for i in np.argsort(distances)[:8] if distances[i] <= 0.75]
+        if not near:
+            return extra_ns
+        return extra_ns + int(np.quantile([candidates[i][1] for i in near], 0.75))
 
     @staticmethod
     def features(data):

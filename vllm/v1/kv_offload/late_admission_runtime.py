@@ -335,6 +335,7 @@ def stage_rpc(core, step, base, candidates):
         poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
         time.sleep(adaptive_poll_us / 1e6)
         sleep_ns += time.monotonic_ns() - before
+
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
     data_fd, data_path = tempfile.mkstemp(prefix="vllm-late-data-")
     try:
@@ -527,7 +528,14 @@ def stage_rpc(core, step, base, candidates):
                                     ]
                                 )
                         if upcoming_shapes != prediction.get("upcoming_shapes"):
-                            reserve_ns = timing.seal_estimator.preparation_reserve(
+                            reserve_method = timing.seal_estimator.preparation_reserve
+                            if getattr(
+                                core.scheduler, "_late_seal_recent_preparation", False
+                            ):
+                                reserve_method = (
+                                    timing.seal_estimator.recent_preparation_reserve
+                                )
+                            reserve_ns = reserve_method(
                                 core.scheduler._late_seal_prediction_reserve_us * 1000,
                                 {"request_shapes": upcoming_shapes},
                             )
@@ -541,6 +549,11 @@ def stage_rpc(core, step, base, candidates):
                                 preparation_reserve_ns=reserve_ns,
                                 upcoming_shapes=upcoming_shapes,
                                 preparation_conditioned=True,
+                                preparation_recent=getattr(
+                                    core.scheduler,
+                                    "_late_seal_recent_preparation",
+                                    False,
+                                ),
                             )
                             record(
                                 core.scheduler,

@@ -64,3 +64,33 @@ def test_unknown_successor_shape_uses_measured_token_rate():
     estimator.observe_preparation(records, {"request_shapes": [[61440, 0]]})
     upcoming = {"request_shapes": [[3072, 58368]]}
     assert estimator.preparation_reserve(10_000_000, upcoming) == 45_000_000
+
+
+def test_recent_reserve_excludes_cold_and_mixed_preparation_for_cached_successor():
+    estimator = ComputeEstimator()
+    warm = {"request_shapes": [[1024, 30720]] * 4}
+    mixed = {"request_shapes": [[1024, 30720]] * 3 + [[1024, 0]]}
+    cold = {"request_shapes": [[61440, 0]]}
+    for step, data in enumerate([cold] * 16 + [mixed] * 8 + [warm] * 8, 1):
+        duration = 20_000_000 if data is warm else 700_000_000
+        estimator.observe_preparation(
+            [(step, 1, duration + 1, 0, 0, 0, 0, 1, 0)] * 8, data
+        )
+    assert estimator.recent_preparation_reserve(10_000_000, warm) == 30_000_000
+    assert (
+        estimator.recent_preparation_reserve(
+            10_000_000, {"request_shapes": [[4096, 0]] * 4}
+        )
+        == 10_000_000
+    )
+
+
+def test_recent_reserve_tracks_changed_cost_and_resists_a_single_outlier():
+    estimator = ComputeEstimator()
+    shape = {"request_shapes": [[1024, 30720]] * 4}
+    for step in range(1, 49):
+        duration = 700_000_000 if step <= 8 or step == 48 else 20_000_000
+        estimator.observe_preparation(
+            [(step, 1, duration + 1, 0, 0, 0, 0, 1, 0)] * 8, shape
+        )
+    assert estimator.recent_preparation_reserve(10_000_000, shape) == 30_000_000

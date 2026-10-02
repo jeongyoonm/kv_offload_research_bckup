@@ -183,6 +183,14 @@ def main(root):
         "## Interpretation limits and verification",
         "",
         (
+            "- Confirmation readiness_1ms on 8K has one missing rank6 execution "
+            "timing snapshot (step7958). All eight primary completion records and "
+            "all responses are valid. GPU-interval diagnostics omit that interval; "
+            "nominal token work, compute counts, throughput and TTFT retain it. "
+            "No timing values are imputed. All other replay batches have complete "
+            "execution timing."
+        ),
+        (
             "- Each replay resets and independently primes the CPU cache, then "
             "resets GPU prefix state. Raw cache positions, exact transfer bytes, "
             "uncached token work, output counts, compilation/errors and GPU process "

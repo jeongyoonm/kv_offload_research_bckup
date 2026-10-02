@@ -13,6 +13,9 @@ ROOT = Path("/mnt/localnvme/glm53_poll_prediction_20261003")
 SOURCE = Path(__file__).resolve().parents[2]
 HELPERS = SOURCE / "experiments/poll_prediction_20261003"
 PHASES = {"screen": 42, "confirmation": 24, "predicted_readiness": 12}
+EXPECTED_TIMING_GAPS = {
+    ("confirmation", "p8192_f95_h100", "r0_readiness_1ms"): [7958],
+}
 WORK = {"p8192_f95_h100": 134400, "p61440_f95_h100": 245760, "p61440_f99_h100": 51200}
 
 
@@ -44,6 +47,11 @@ def main():
         for row in shapes:
             workload = Path(row["path"]).parent.name
             assert not row["invalid_steps"], row["path"]
+            key = (phase, workload, Path(row["path"]).name)
+            assert row["missing_execution_timing_steps"] == EXPECTED_TIMING_GAPS.get(
+                key, []
+            ), row["path"]
+            assert all(batch["primary_completion_valid"] for batch in row["batches"])
             assert row["total_uncached_tokens"] == WORK[workload], row["path"]
             requests += 300 if workload == "p8192_f95_h100" else 80
         probes = {}
@@ -69,12 +77,18 @@ def main():
                 }
                 for policy, row in summary.items()
             }
+        timing_gaps = {
+            row["path"]: row["missing_execution_timing_steps"]
+            for row in shapes
+            if row["missing_execution_timing_steps"]
+        }
         gates[phase] = dict(
             cells=count,
             accepted=count,
             probes=probes,
             equal_uncached_work=True,
-            valid_gpu_timings=True,
+            missing_execution_timing_steps=timing_gaps,
+            all_primary_completions_valid=True,
         )
     assert requests == 11960, requests
     native = {}

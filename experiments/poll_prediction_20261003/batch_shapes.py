@@ -13,7 +13,7 @@ from analyze import stats
 def describe(cell):
     usage = json.loads((cell / "usage.json").read_text())
     ids = {row["request_id"] for row in usage}
-    batches, invalid = [], []
+    batches, invalid, missing_timing = [], [], []
     for line in (cell / "engine.jsonl").read_text().splitlines():
         row = json.loads(line)
         selected = row.get("selected", {})
@@ -23,24 +23,30 @@ def describe(cell):
             continue
         ranks = row.get("execution_ranks", [])
         shapes = row.get("request_shapes", [])
-        if len(ranks) != 8 or not all(r and r[6] for r in ranks) or not shapes:
+        if not shapes or sum(n for n, _ in shapes) != sum(selected.values()):
             invalid.append(row["step"])
             continue
+        complete_timing = len(ranks) == 8 and all(r and r[6] for r in ranks)
+        if not complete_timing:
+            missing_timing.append(row["step"])
         batches.append(
             dict(
                 step=row["step"],
                 requests=len(shapes),
                 uncached_tokens=sum(n for n, _ in shapes),
                 attention_work=sum(n * (context + n / 2) for n, context in shapes),
-                gpu_wall_ms=max(r[6] for r in ranks) / 1e6,
+                gpu_wall_ms=max(r[6] for r in ranks) / 1e6 if complete_timing else None,
+                primary_completion_valid=row.get("valid", False),
             )
         )
     grouped = defaultdict(list)
     for batch in batches:
-        grouped[batch["requests"]].append(batch["gpu_wall_ms"])
+        if batch["gpu_wall_ms"] is not None:
+            grouped[batch["requests"]].append(batch["gpu_wall_ms"])
     return dict(
         path=str(cell),
         invalid_steps=invalid,
+        missing_execution_timing_steps=missing_timing,
         compute_batches=len(batches),
         total_uncached_tokens=sum(batch["uncached_tokens"] for batch in batches),
         requests_per_batch=stats([batch["requests"] for batch in batches]),
@@ -64,6 +70,8 @@ def main():
             dict(
                 cells=results,
                 limitation=(
+                    "Token work and batch counts include completed batches with "
+                    "missing GPU timing; their GPU wall time is null. "
                     "GPU wall time includes required output completion and host "
                     "submission stalls. Batch-shape differences are descriptive; "
                     "they do not isolate kernel cost or transfer interference."
@@ -85,6 +93,8 @@ def main():
             row["requests_per_batch"].get("mean"),
             "invalid",
             row["invalid_steps"],
+            "missing timing",
+            row["missing_execution_timing_steps"],
         )
 
 

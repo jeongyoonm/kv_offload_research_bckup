@@ -276,6 +276,14 @@ def analyze(directory):
             opportunities.add(req)
     result.update(
         compute_calls=len(replay_compute),
+        missing_execution_timing_steps=[
+            row["step"]
+            for row in replay_compute
+            if not (
+                len(completed.get(row["step"], {}).get("execution_ranks", [])) == 8
+                and all(r and r[6] for r in completed[row["step"]]["execution_ranks"])
+            )
+        ],
         dispatch_calls=len(dispatch),
         load_only_dispatch_calls=sum(
             not row.get("selected") and row.get("load_state", [0])[0] > 0

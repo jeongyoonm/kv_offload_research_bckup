@@ -32,6 +32,9 @@ def summarize(root):
         ):
             row[key] = statistics.mean(c.get(key, 0) for c in cells)
         row["throughput_min"] = min(c["throughput"] for c in cells)
+        row["missing_execution_timing_batches"] = sum(
+            len(c.get("missing_execution_timing_steps", [])) for c in cells
+        )
         row["throughput_max"] = max(c["throughput"] for c in cells)
         row["exposed_hold_ms"] = statistics.mean(
             c["exposed_lower_ms"].get("total", 0) for c in cells
@@ -91,6 +94,7 @@ def summarize(root):
         "mean_ttft_ms",
         "p95_ttft_ms",
         "compute_calls",
+        "missing_execution_timing_batches",
         "recovery_percent",
         "exposed_hold_ms",
         "adaptive_sleeps",
@@ -139,7 +143,11 @@ def summarize(root):
         "Concurrency 32, one output token. Single-replay screens are exploratory. "
         "Repeated throughput is an arithmetic mean; p95 is the mean of replay p95. "
         "Recovery denominators change with batching. Poll CPU excludes final, "
-        "pre-ack and fixed iterations; preparation is wall time.</p>" + body
+        "pre-ack and fixed iterations; preparation is wall time. "
+        "One confirmation readiness-1ms short batch lacks rank6 GPU timing; "
+        "GPU interval/admission diagnostics omit that interval. Batch counts, "
+        "token work, raw throughput and TTFT retain the batch and its requests.</p>"
+        + body
     )
     print(json.dumps({"groups": len(rows), "cells": sum(r["repeats"] for r in rows)}))
 

@@ -7,6 +7,7 @@ import gzip
 import hashlib
 import json
 import shutil
+import textwrap
 from pathlib import Path
 
 
@@ -62,7 +63,7 @@ def main(root):
             if path.is_file() and path.name not in {"index.json", "README.md"}
         }
         (destination / "index.json").write_text(json.dumps(digest, indent=2) + "\n")
-        (destination / "README.md").write_text(
+        readme = (
             "# Local experiment evidence\n\n"
             f"Strategy branch: `{branch['branch']}`.\n\n"
             f"Implemented runtime commit: `{branch['runtime_commit']}`. "
@@ -79,6 +80,15 @@ def main(root):
             "`index.json` records archive SHA256 hashes.\n\n"
             "See [findings](summary/FINDINGS.md), [decisions](summary/DECISIONS.md) "
             "and [full tables](summary/report.html).\n"
+        )
+        (destination / "README.md").write_text(
+            "\n".join(
+                textwrap.fill(
+                    line, width=80, break_long_words=False, break_on_hyphens=False
+                )
+                for line in readme.splitlines()
+            )
+            + "\n"
         )
         print(destination)
 

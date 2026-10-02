@@ -5,6 +5,7 @@
 import argparse
 import json
 import statistics
+import textwrap
 from pathlib import Path
 
 CASES = ["p8192_f95_h100", "p61440_f95_h100", "p61440_f99_h100"]
@@ -140,6 +141,7 @@ def main(root):
         (
             "Throughput and mean TTFT changes use the control from the same new "
             "server and workload. Positive TTFT reduction means improvement. "
+            "Paired columns show readiness/hybrid. "
             "Polling CPU is the measured adaptive-iteration counter; exposed hold "
             "is the lower timestamp bound summed over the replay."
         ),
@@ -147,12 +149,12 @@ def main(root):
         table(
             [
                 "Workload",
-                "Throughput gain",
-                "Mean TTFT reduction",
-                "Compute rounds (ready / hybrid)",
-                "Poll CPU ms (ready / hybrid)",
-                "Recovery % (ready / hybrid)",
-                "Exposed ms (ready / hybrid)",
+                "Δreq/s",
+                "ΔTTFT",
+                "Rounds",
+                "CPU ms",
+                "Recov%",
+                "Expose ms",
             ],
             [
                 [
@@ -161,12 +163,11 @@ def main(root):
                     "{:+.2f}%".format(
                         100 * (1 - hybrid["mean_ttft_ms"] / ready["mean_ttft_ms"])
                     ),
-                    f"{ready['compute_calls']:.0f} / {hybrid['compute_calls']:.0f}",
-                    f"{ready['adaptive_poll_cpu_ms']:.1f} / "
+                    f"{ready['compute_calls']:.0f}/{hybrid['compute_calls']:.0f}",
+                    f"{ready['adaptive_poll_cpu_ms']:.1f}/"
                     f"{hybrid['adaptive_poll_cpu_ms']:.1f}",
-                    f"{ready['recovery_percent']:.1f} / "
-                    f"{hybrid['recovery_percent']:.1f}",
-                    f"{ready['exposed_hold_ms']:.1f} / {hybrid['exposed_hold_ms']:.1f}",
+                    f"{ready['recovery_percent']:.1f}/{hybrid['recovery_percent']:.1f}",
+                    f"{ready['exposed_hold_ms']:.1f}/{hybrid['exposed_hold_ms']:.1f}",
                 ]
                 for label, case in zip(LABELS, CASES)
                 for ready, hybrid in [
@@ -243,7 +244,21 @@ def main(root):
         "",
     ]
     path = root / "summary/FINDINGS.md"
-    path.write_text("\n".join(text))
+    path.write_text(
+        "\n".join(
+            line
+            if line.startswith("|")
+            else textwrap.fill(
+                line,
+                width=80,
+                break_long_words=False,
+                break_on_hyphens=False,
+                subsequent_indent="  " if line.startswith("- ") else "",
+            )
+            for line in text
+        )
+        + "\n"
+    )
     print(path)
 
 

@@ -142,7 +142,7 @@ def profile(directory, dataset, concurrency, count, phase):
     return result
 
 
-def make_workload(directory, length, fraction, request_hit_percent, count):
+def make_workload(directory, length, fraction, request_hit_percent, count, seed=55):
     if (directory / "manifest.json").exists():
         return json.loads((directory / "manifest.json").read_text())
     from transformers import AutoTokenizer
@@ -156,7 +156,7 @@ def make_workload(directory, length, fraction, request_hit_percent, count):
         count,
         prefix_tokens=prefix,
         suffix_tokens=length - prefix,
-        seed=55,
+        seed=seed,
     )
     hits = count * request_hit_percent // 100
     # Interleave cache misses to exercise mixed compute/transfer batches.
@@ -171,6 +171,7 @@ def make_workload(directory, length, fraction, request_hit_percent, count):
         save(directory / (name + ".json"), value)
     manifest.update(
         prompt_tokens=length,
+        dataset_seed=seed,
         prefix_tokens=prefix,
         cached_prompt_percent=fraction,
         request_hit_percent=request_hit_percent,
@@ -260,6 +261,7 @@ def cell(directory, workload, options, server_dir, manifest):
     preemptions = after["vllm:num_preemptions"] - before["vllm:num_preemptions"]
     result = dict(
         path=str(directory),
+        workload_manifest=str(workload / "manifest.json"),
         throughput=replay["request_throughput"]["avg"],
         mean_ttft_ms=replay["time_to_first_token"]["avg"],
         p95_ttft_ms=replay["time_to_first_token"]["p95"],
@@ -282,6 +284,45 @@ def cell(directory, workload, options, server_dir, manifest):
     return result
 
 
+def run_cells(run, server_dir, workloads, counts, policies, repeats, seed=55):
+    results = {}
+    for (length, fraction, hit_percent), request_count in zip(workloads, counts):
+        name = f"p{length}_f{fraction}_h{hit_percent}"
+        suffix = "" if seed == 55 else f"_seed{seed}"
+        work = ROOT / "workloads" / f"{name}{suffix}_n{request_count}"
+        manifest = make_workload(
+            work, length, fraction, hit_percent, request_count, seed=seed
+        )
+        for repeat in range(repeats):
+            order = policies if repeat % 2 == 0 else list(reversed(policies))
+            for policy in order:
+                target = run / name / f"r{repeat}_{policy}"
+                if (target / "result.json").exists():
+                    results[str(target)] = json.loads(
+                        (target / "result.json").read_text()
+                    )
+                    continue
+                print("START", target, flush=True)
+                for attempt in range(3):
+                    measured = (
+                        target
+                        if not attempt
+                        else target.with_name(target.name + f"_warmretry{attempt}")
+                    )
+                    result = cell(
+                        measured, work, POLICIES[policy], server_dir, manifest
+                    )
+                    results[str(measured)] = result
+                    save(run / "results.json", results)
+                    if result["accepted"]:
+                        break
+                    if not result.get("measurement_jit_lines"):
+                        raise RuntimeError(f"Invalid measured cell: {measured}")
+                else:
+                    raise RuntimeError(f"Repeated first-use compilation: {target}")
+    return results
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--name", required=True)
@@ -297,6 +338,7 @@ def main():
     parser.add_argument("--max-model-len", type=int, default=32768)
     parser.add_argument("--workload-request-counts")
     parser.add_argument("--distinct-fact-probe", action="store_true")
+    parser.add_argument("--continuation-file", type=Path)
     args = parser.parse_args()
     run = ROOT / args.name
     run.mkdir(parents=True, exist_ok=True)
@@ -334,7 +376,11 @@ def main():
     )
     save(
         run / "protocol.json",
-        vars(args) | dict(source=str(SOURCE), gpu_gib=96, cpu_gib=1984, concurrency=32),
+        {
+            key: str(value) if isinstance(value, Path) else value
+            for key, value in vars(args).items()
+        }
+        | dict(source=str(SOURCE), gpu_gib=96, cpu_gib=1984, concurrency=32),
     )
     os.environ.update(
         VLLM_COOPERATIVE_RESPONSE_PROGRESS="1",
@@ -392,41 +438,103 @@ def main():
                 PRIME,
                 prefix_len=58368 if args.max_model_len >= 65536 else 11776,
             )
-        for (length, fraction, hit_percent), request_count in zip(workloads, counts):
-            name = f"p{length}_f{fraction}_h{hit_percent}"
-            work = ROOT / "workloads" / f"{name}_n{request_count}"
-            manifest = make_workload(work, length, fraction, hit_percent, request_count)
-            for repeat in range(args.repeats):
-                order = policies if repeat % 2 == 0 else list(reversed(policies))
-                for policy in order:
-                    target = run / name / f"r{repeat}_{policy}"
-                    if (target / "result.json").exists():
-                        results[str(target)] = json.loads(
-                            (target / "result.json").read_text()
-                        )
-                        continue
-                    print("START", target, flush=True)
-                    for attempt in range(3):
-                        measured = (
-                            target
-                            if not attempt
-                            else target.with_name(target.name + f"_warmretry{attempt}")
-                        )
-                        result = cell(
-                            measured, work, POLICIES[policy], run / "server", manifest
-                        )
-                        results[str(measured)] = result
-                        save(run / "results.json", results)
-                        if result["accepted"]:
-                            break
-                        if not result.get("measurement_jit_lines"):
-                            raise RuntimeError(f"Invalid measured cell: {measured}")
-                    else:
-                        raise RuntimeError(f"Repeated first-use compilation: {target}")
+        results = run_cells(
+            run, run / "server", workloads, counts, policies, args.repeats
+        )
+        extra_runs = []
+        if args.continuation_file and args.continuation_file.exists():
+            plan = json.loads(args.continuation_file.read_text())
+            if plan:
+                extra = ROOT / plan["name"]
+                if extra == run or (extra / "results.json").exists():
+                    raise ValueError("continuation requires a new artifact directory")
+                extra.mkdir(parents=True, exist_ok=True)
+                extra_workloads = [tuple(case) for case in plan["workloads"]]
+                extra_counts = plan["counts"]
+                if len(extra_workloads) != len(extra_counts) or any(
+                    count <= 0
+                    or count * case[0] * 381600 > 1984 * 1024**3
+                    or case[0] + 1 > args.max_model_len
+                    for case, count in zip(extra_workloads, extra_counts)
+                ):
+                    raise ValueError("continuation exceeds server or cache capacity")
+                extra_policies = plan["policies"]
+                if any(name not in POLICIES for name in extra_policies):
+                    raise ValueError("continuation policy not in this source branch")
+                (extra / "server").symlink_to(run / "server")
+                save(
+                    extra / "protocol.json",
+                    dict(
+                        **plan,
+                        max_model_len=args.max_model_len,
+                        source=str(SOURCE),
+                        gpu_gib=96,
+                        cpu_gib=1984,
+                        concurrency=32,
+                        shared_server_from=str(run),
+                    ),
+                )
+                provenance = json.loads((run / "provenance.json").read_text())
+                save(
+                    extra / "provenance.json",
+                    dict(
+                        **provenance,
+                        shared_server_from=str(run),
+                        past_predictor_state_retained=True,
+                    ),
+                )
+                print("CONTINUATION", plan, flush=True)
+                check(
+                    extra / "correctness",
+                    {name: POLICIES[name] for name in extra_policies},
+                    configure,
+                    glm,
+                    PRIME,
+                    prefix_len=58368 if args.max_model_len >= 65536 else 11776,
+                )
+                if plan.get("distinct_fact_probe"):
+                    from correctness import check_distinct
+
+                    check_distinct(
+                        extra / "correctness_distinct",
+                        {name: POLICIES[name] for name in extra_policies},
+                        configure,
+                        glm,
+                        PRIME,
+                        prefix_len=plan.get("distinct_prefix_len", 11776),
+                    )
+                extra_results = run_cells(
+                    extra,
+                    run / "server",
+                    extra_workloads,
+                    extra_counts,
+                    extra_policies,
+                    plan["repeats"],
+                    seed=plan.get("seed", 56),
+                )
+                extra_runs.append((extra, extra_results))
+
     save(
         run / "complete.json",
         dict(cells=len(results), accepted=sum(x["accepted"] for x in results.values())),
     )
+
+    for extra, extra_results in extra_runs:
+        save(
+            extra / "complete.json",
+            dict(
+                cells=len(extra_results),
+                accepted=sum(row["accepted"] for row in extra_results.values()),
+            ),
+        )
+        subprocess.run(
+            [
+                "/mnt/localnvme/glm53-compat-venv/bin/python",
+                "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/experiments/adaptive_seal_20261002/analyze.py",
+                str(extra),
+            ],
+            check=True,
+        )
 
 
 if __name__ == "__main__":

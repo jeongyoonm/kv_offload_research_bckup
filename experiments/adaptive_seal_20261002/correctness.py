@@ -102,6 +102,14 @@ def check_distinct(
         ("length", "width"),
         ("mass", "volume"),
         ("latitude", "longitude"),
+        ("frequency", "amplitude"),
+        ("density", "viscosity"),
+        ("wavelength", "intensity"),
+        ("conductivity", "resistance"),
+        ("depth", "turbidity"),
+        ("altitude", "velocity"),
+        ("acidity", "salinity"),
+        ("diameter", "circumference"),
     ]
     requests, primes, expected = [], [], []
     for index in range(16):

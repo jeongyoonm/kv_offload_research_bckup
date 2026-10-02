@@ -5,6 +5,7 @@
 import pickle
 import queue
 import threading
+import time
 from collections import deque
 from concurrent.futures import Future, ThreadPoolExecutor
 from contextlib import nullcontext, suppress
@@ -109,6 +110,44 @@ def _core(executor, predecessor=None):
 
 def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
+
+
+def test_prediction_seals_before_a_finishes_with_valid_gpu_start():
+    import numpy as np
+
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.scheduler._late_seal_policy = "predictive"
+    core.scheduler._late_seal_prediction_scale_percent = 100
+    core.scheduler._late_seal_prediction_reserve_us = 10_000
+    core.scheduler._late_seal_safety_us = 1_000_000
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
+    core.batch_queue[-1][1].readiness_timeline_step = 8
+    start = time.monotonic_ns()
+    estimator = SimpleNamespace(
+        predict=lambda data: 50_000_000,
+        features=lambda data: np.ones(4),
+        samples=[0] * 8,
+    )
+    core.deferral_timing = SimpleNamespace(
+        steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+        read_execution=lambda step: (
+            [(step, start, start, start + 100, time.monotonic_ns(), 1, 0, 0, 0)] * 8
+        ),
+        seal_estimator=estimator,
+    )
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], [_request("a")])
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        result.result(timeout=5)
+    transport = core.scheduler._late_transport
+    assert transport["seal_reason"] == "predicted_compute_deadline"
+    assert transport["prediction"]["predicted_duration_ns"] == 50_000_000
+    assert transport["seal_ns"] >= start + 40_000_000
+    assert not core.batch_queue[-1][0].poll()
+    executor.finish()
 
 
 def test_eight_rank_base_seal_does_not_wait_for_optional_ack_or_a():

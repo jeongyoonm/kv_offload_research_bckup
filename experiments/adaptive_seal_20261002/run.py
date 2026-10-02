@@ -330,6 +330,15 @@ def main():
     policies = args.policies.split(",")
     results = {}
     with glm.server(run / "server", "tp8", "A", settings):
+        from correctness import check
+
+        check(
+            run / "correctness",
+            {name: POLICIES[name] for name in policies},
+            configure,
+            glm,
+            PRIME,
+        )
         for length, fraction, hit_percent in workloads:
             name = f"p{length}_f{fraction}_h{hit_percent}"
             work = ROOT / "workloads" / f"{name}_n{args.requests}"

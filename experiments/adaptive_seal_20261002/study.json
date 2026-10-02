@@ -1,0 +1,33 @@
+{
+  "strategy": "Online positive duration regression from past GPU observations; subtract recent p90 worker preparation plus RPC margin; physical completion fallback",
+  "cpu_tests": 44,
+  "test_log": "predictive_tests_preparation_reserve.log",
+  "artifact_root": "/mnt/localnvme/glm53_adaptive_seal_20261002",
+  "process_log": "/mnt/localnvme/glm53_adaptive_seal_20261002/process_log.jsonl",
+  "queue": "/mnt/localnvme/glm53_adaptive_seal_20261002/queue.json",
+  "model": "GLM 5.3 NVFP4",
+  "parallelism": "TP8",
+  "kv_dtype": "fp8_e4m3",
+  "source_base_commit": "5147414",
+  "branch": "experiment/glm53-seal-predictive-20261002",
+  "feature_disabled_by_default": true,
+  "restrictions": [
+    "text-only",
+    "whole uncached suffix <=4096 tokens",
+    "maximum 16 candidate slots, measured with 10",
+    "one open scheduler transaction",
+    "authoritative final ordered execute RPC"
+  ],
+  "workload_semantics": {
+    "f": "target cached prompt percentage for hit requests, rounded down to 64-token blocks",
+    "h": "percentage of requests independently primed; remaining requests are cache misses"
+  },
+  "verification": {
+    "raw_usage": true,
+    "no_gpu_prefix_hits": true,
+    "no_preemption": true,
+    "aggregate_h2d_bytes_per_cached_token": 381600,
+    "readable_answer_probe": "16 requests, exact five-token factual answers against cold execution",
+    "raw_forced_continuation_diagnostic": "/mnt/localnvme/glm53_adaptive_seal_20261002/completion_screen/correctness"
+  }
+}

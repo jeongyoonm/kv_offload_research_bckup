@@ -74,8 +74,8 @@ def main():
     (ROOT / "preparation_shadow.json").write_text(
         json.dumps(
             dict(
-                note="Past-only reserve estimates on recorded snapshots; actual successor "
-                "membership is from the old run. This does not measure throughput.",
+                note="Past-only reserves on recorded snapshots; actual successor "
+                "membership comes from the old run. This is not live throughput.",
                 summary=summary,
                 samples=rows,
             ),

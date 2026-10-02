@@ -43,6 +43,9 @@ Pre-acknowledgment polling stays 25 us for every policy. The prediction deadline
 physical-completion exit, readiness exits and two-second safety cap remain
 unchanged. The hybrid is opt-in and default-disabled. Fine sleeps retain the
 original behavior; a condition during sleep is detected on the next iteration.
+Readiness polling applies during compute and load-only waits. Prediction polling
+applies during active compute; its existing fixed/partial-ready load-only path
+continues to use the unchanged fixed-policy interval.
 
 ## Measurements and limits
 

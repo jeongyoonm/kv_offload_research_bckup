@@ -399,6 +399,7 @@ def stage_rpc(core, step, base, candidates):
         seal_reason = None
         cancelled = None
         partial_ready_count = 0
+        target = None
         partial_target = (len(candidates) * partial_percent + 99) // 100
         while True:
             progress_polls += 1

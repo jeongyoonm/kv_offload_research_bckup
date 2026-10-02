@@ -67,6 +67,7 @@ def plot(root):
         "prediction_1ms",
         "prediction_5ms",
         "recent_1ms",
+        "hybrid_20ms",
         "hybrid_50ms",
     ]
     labels = [
@@ -75,6 +76,7 @@ def plot(root):
         "Predict 1 ms",
         "Predict 5 ms",
         "Recent reserve",
+        "Hybrid 20 ms",
         "Hybrid 50 ms",
     ]
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.8), layout="constrained")
@@ -93,7 +95,15 @@ def plot(root):
         ax.bar(
             np.arange(len(policies)),
             means,
-            color=["#777777", "#2266aa", "#cc6633", "#e69a6b", "#339977", "#8866aa"],
+            color=[
+                "#777777",
+                "#2266aa",
+                "#cc6633",
+                "#e69a6b",
+                "#339977",
+                "#997bbb",
+                "#8866aa",
+            ],
             yerr=[low, high],
             capsize=3,
         )
@@ -103,6 +113,42 @@ def plot(root):
     axes[0].set_ylabel("Mean throughput (requests/s)")
     fig.suptitle("Matched screening and confirmation seeds; whiskers show range")
     save(fig, out, "strategy_comparison")
+
+    policies = ["fixed", "prediction_1ms", "readiness_2ms", "predicted_readiness_50ms"]
+    labels = [
+        "Fixed",
+        "Prediction 1 ms",
+        "Readiness 2 ms",
+        "Predicted wait → readiness",
+    ]
+    phase = "predicted_readiness"
+    if all((phase, case, policy) in lookup for case, _ in CASES for policy in policies):
+        fig, axes = plt.subplots(2, 3, figsize=(12, 6), layout="constrained")
+        for col, (case, title) in enumerate(CASES):
+            for index, (metric, ylabel) in enumerate(
+                [
+                    ("throughput", "Throughput (requests/s)"),
+                    ("mean_ttft_ms", "Mean TTFT (ms)"),
+                ]
+            ):
+                ax = axes[index, col]
+                values = [lookup[(phase, case, policy)][metric] for policy in policies]
+                bars = ax.bar(
+                    np.arange(len(policies)),
+                    values,
+                    color=["#777777", "#cc6633", "#2266aa", "#8866aa"],
+                )
+                ax.bar_label(bars, fmt="%.2f" if index == 0 else "%.0f", fontsize=8)
+                ax.set(xticks=np.arange(len(labels)), xticklabels=labels)
+                if index == 0:
+                    ax.set_title(title)
+                if col == 0:
+                    ax.set_ylabel(ylabel)
+                ax.tick_params(axis="x", labelrotation=28)
+                ax.grid(axis="y", alpha=0.2)
+                ax.margins(y=0.18)
+        fig.suptitle("Prediction schedules polling; readiness seals — matched seed56")
+        save(fig, out, "predicted_readiness_comparison")
 
 
 if __name__ == "__main__":

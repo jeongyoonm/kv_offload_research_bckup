@@ -1042,7 +1042,7 @@ def test_candidate_only_mode_uses_ordinary_base_request_path(
     assert output.num_scheduled_tokens == {"1": 24}
 
 
-@pytest.mark.parametrize("outcome", ["ready", "complete", "cancel"])
+@pytest.mark.parametrize("outcome", ["ready", "complete", "physical", "cancel"])
 def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
     """A forecast controls sleep size; it cannot finalize membership."""
     import numpy as np
@@ -1064,12 +1064,19 @@ def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
     core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
     core.batch_queue[-1][1].readiness_timeline_step = 8
     started = time.monotonic_ns()
+    physical_finished = threading.Event()
+
+    def execution(step):
+        now = time.monotonic_ns()
+        duration = now - started if physical_finished.is_set() else 0
+        ended = now if physical_finished.is_set() else 0
+        return [
+            (step, started, started, started + 100, now, 1, duration, ended, ended)
+        ] * 8
+
     core.deferral_timing = SimpleNamespace(
         steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
-        read_execution=lambda step: (
-            [(step, started, started, started + 100, time.monotonic_ns(), 1, 0, 0, 0)]
-            * 8
-        ),
+        read_execution=execution,
         seal_estimator=SimpleNamespace(
             predict=lambda data: 100_000_000,
             features=lambda data: np.ones(4),
@@ -1093,6 +1100,8 @@ def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
             scheduler.finished_recving_kv_req_ids.add("a")
         elif outcome == "complete":
             core.batch_queue[-1][0].release.set()
+        elif outcome == "physical":
+            physical_finished.set()
         else:
             core.aborts_queue.put(["a"])
         # stage_rpc returns prepared slots; final admission uses the KV/cancel snapshot.
@@ -1102,12 +1111,14 @@ def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
     transport = scheduler._late_transport
     assert transport["seal_reason"] == (
         "predecessor_compute_finished"
-        if outcome == "complete"
+        if outcome in {"complete", "physical"}
         else "candidate_target_ready"
     )
     assert transport["seal_ns"] > transport["prediction"]["deadline_ns"]
     assert transport["hybrid_coarse_sleeps"] > 0
     assert transport["hybrid_polling_ns"] is not None
+    if outcome == "physical":
+        assert not core.batch_queue[-1][0].poll()
     executor.finish()
 
 
@@ -1132,5 +1143,45 @@ def test_prediction_to_readiness_uses_partial_target_without_compute():
         assert first <= set(result.result(timeout=5))
         assert scheduler._late_kv_snapshot == first
     assert scheduler._late_transport["seal_reason"] == "candidate_target_ready"
+    assert not core.batch_queue[-1][0].poll()
+    executor.finish()
+
+
+def test_prediction_to_readiness_handles_physical_completion_before_base_ack():
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.scheduler._late_seal_policy = "predictive"
+    core.scheduler._late_seal_prediction_to_readiness = True
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
+    core.batch_queue[-1][1].readiness_timeline_step = 8
+    started = time.monotonic_ns()
+    core.deferral_timing = SimpleNamespace(
+        read_execution=lambda step: (
+            [
+                (
+                    step,
+                    started,
+                    started,
+                    started + 100,
+                    time.monotonic_ns(),
+                    1,
+                    1000,
+                    started + 1000,
+                    started + 2000,
+                )
+            ]
+            * 8
+        ),
+    )
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], [_request("a")])
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        result.result(timeout=5)
+    assert (
+        core.scheduler._late_transport["seal_reason"] == "predecessor_compute_finished"
+    )
+    assert core.scheduler._late_transport["prediction"] is None
     assert not core.batch_queue[-1][0].poll()
     executor.finish()

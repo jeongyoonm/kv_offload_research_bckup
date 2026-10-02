@@ -28,7 +28,7 @@ def check(directory, policies, configure, glm, prime_options):
         payload = dict(
             model="glm53-compat",
             prompt=prefix + tail,
-            max_tokens=16,
+            max_tokens=5,
             ignore_eos=True,
             temperature=0,
             seed=55,
@@ -45,6 +45,9 @@ def check(directory, policies, configure, glm, prime_options):
     with ThreadPoolExecutor(max_workers=16) as pool:
         cold = list(pool.map(infer, requests))
     glm.save(directory / "cold.json", dict(requests=requests, responses=cold))
+    expected_answer = "river flow and rainfall."
+    if any(r["choices"][0]["text"].strip() != expected_answer for r in cold):
+        raise RuntimeError("cold probe did not produce the known five-token answer")
     summaries = {}
     for name, options in policies.items():
         target = directory / name
@@ -68,10 +71,12 @@ def check(directory, policies, configure, glm, prime_options):
         summaries[name] = dict(
             text_matches=matches,
             requests=16,
+            answer=expected_answer,
+            completion_tokens=5,
             cached_tokens=cached,
             passed=matches == 16
             and cached == [prefix_len] * 16
-            and all(r["usage"]["completion_tokens"] == 16 for r in restored),
+            and all(r["usage"]["completion_tokens"] == 5 for r in restored),
         )
         glm.save(directory / "summary.json", summaries)
         print("CORRECTNESS", name, summaries[name], flush=True)

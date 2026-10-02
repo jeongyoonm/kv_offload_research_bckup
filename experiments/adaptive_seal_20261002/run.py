@@ -16,9 +16,9 @@ from types import SimpleNamespace
 ROOT = Path("/mnt/localnvme/glm53_adaptive_seal_20261002")
 SOURCE = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "code/bin"))
-import cpu_offload_benchmark as benchmark
-import glm53_early_kv_experiment as early
-import glm53_reproduce as glm
+import cpu_offload_benchmark as benchmark  # noqa: E402
+import glm53_early_kv_experiment as early  # noqa: E402
+import glm53_reproduce as glm  # noqa: E402
 
 COMMON = dict(
     copy_pipeline_depth=2,
@@ -293,13 +293,21 @@ def main():
     )
     parser.add_argument("--requests", type=int, default=160)
     parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--max-model-len", type=int, default=32768)
     args = parser.parse_args()
     run = ROOT / args.name
     run.mkdir(parents=True, exist_ok=True)
     glm.SOURCE = SOURCE
     glm.SCRIPTS = ROOT / "code"
     glm.config = early.config
-    subprocess.Popen = early.async_scheduler_popen
+
+    def experiment_popen(command, *positional, **keywords):
+        if isinstance(command, list) and "--max-model-len" in command:
+            command = list(command)
+            command[command.index("--max-model-len") + 1] = str(args.max_model_len)
+        return early.async_scheduler_popen(command, *positional, **keywords)
+
+    subprocess.Popen = experiment_popen
     save(
         run / "provenance.json",
         dict(
@@ -333,6 +341,13 @@ def main():
     )
     workloads = [tuple(map(int, x.split(":"))) for x in args.workloads.split(",")]
     policies = args.policies.split(",")
+    if any(length + 1 > args.max_model_len for length, _, _ in workloads):
+        raise ValueError("prompt plus output exceeds configured model length")
+    if (
+        args.requests * max(length for length, _, _ in workloads) * 381600
+        > 1984 * 1024**3
+    ):
+        raise ValueError("unique prompt cohort exceeds physical CPU cache capacity")
     results = {}
     with glm.server(run / "server", "tp8", "A", settings):
         from correctness import check

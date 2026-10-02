@@ -1,6 +1,6 @@
 {
   "strategy": "Matched evaluation of isolated event/load-aware and predictive/conditioned strategies",
-  "cpu_tests": 60,
+  "cpu_tests": 64,
   "test_log": "conditioned_tests_v2.log",
   "artifact_root": "/mnt/localnvme/glm53_adaptive_seal_20261002",
   "process_log": "/mnt/localnvme/glm53_adaptive_seal_20261002/process_log.jsonl",
@@ -37,6 +37,8 @@
   ],
   "test_logs": [
     "evaluation_tests.log",
-    "evaluation_schema_tests.log"
-  ]
+    "evaluation_schema_tests.log",
+    "endpoint_retry_tests.log"
+  ],
+  "control_plane_fix": "Preserve HTTP 409 for generic utility RPC drain rejection; four tests cover retryable/native invalid/unrelated errors."
 }

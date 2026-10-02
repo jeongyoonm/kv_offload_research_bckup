@@ -56,6 +56,15 @@ async def set_kv_load_scheduling(
         raise HTTPException(status_code=409, detail=str(error)) from error
     except ValueError as error:
         raise HTTPException(status_code=422, detail=str(error)) from error
+    except Exception as error:
+        # Utility RPC failures lose their original exception type in transit.
+        # Retry only the known drain rejection; keep unrelated failures visible.
+        if (
+            "KV load scheduling settings require requests, queued steps, "
+            "and connector work to be drained"
+        ) in str(error):
+            raise HTTPException(status_code=409, detail=str(error)) from error
+        raise
 
 
 def attach_router(app: FastAPI) -> None:

@@ -165,6 +165,86 @@ def test_prediction_reserves_worker_preparation_while_a_is_held(conditioned):
     executor.finish()
 
 
+def test_event_seal_repeats_until_candidate_ready_with_a_held():
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.scheduler._late_seal_policy = "event"
+    core.scheduler._late_seal_target_candidates = 1
+    core.scheduler._late_seal_repeat_us = 1000
+    core.scheduler._late_seal_safety_us = 1_000_000
+    core.scheduler._late_record_enabled = True
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], [_request("a")])
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        for prepared in executor.prepared_base + executor.prepared_candidate:
+            assert prepared.wait(5)
+        for _ in range(1000):
+            if any(
+                row["event"] == "seal_repeat"
+                for row in getattr(core.scheduler, "_late_admission_records", [])
+            ):
+                break
+            threading.Event().wait(0.001)
+        else:
+            pytest.fail("event hold did not repeat")
+        assert not result.done()
+        core.scheduler.finished_recving_kv_req_ids.add("a")
+        assert result.result(timeout=5) == ["a"]
+    assert core.scheduler._late_transport["seal_reason"] == "candidate_target_ready"
+    assert not core.batch_queue[-1][0].poll()
+    executor.finish()
+
+
+@pytest.mark.parametrize("compute_tokens", [0, 3])
+def test_load_aware_target_is_lower_only_without_preceding_compute(compute_tokens):
+    """Four transfers can start B after a load-only A; live compute waits for all."""
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.batch_queue[0][1].total_num_scheduled_tokens = compute_tokens
+    core.scheduler._late_seal_policy = "event"
+    core.scheduler._late_seal_target_candidates = 16
+    core.scheduler._late_seal_load_only_target_candidates = 4
+    core.scheduler._late_seal_repeat_us = 1000
+    core.scheduler._late_seal_safety_us = 1_000_000
+    core.scheduler._late_record_enabled = True
+    candidates = [_request(f"candidate-{i}") for i in range(8)]
+    first = {c.req_id for c in candidates[:4]}
+    core.scheduler.finished_recving_kv_req_ids.update(first)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], candidates)
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        for prepared in executor.prepared_base + executor.prepared_candidate:
+            assert prepared.wait(5)
+        if compute_tokens:
+            for _ in range(1000):
+                if any(
+                    row["event"] == "seal_repeat"
+                    and row["ready"] == 4
+                    and row["target"] == 8
+                    and row["has_compute"]
+                    for row in getattr(core.scheduler, "_late_admission_records", [])
+                ):
+                    break
+                threading.Event().wait(0.001)
+            else:
+                pytest.fail("compute path did not hold after observing four ready")
+            assert not result.done()
+            core.scheduler.finished_recving_kv_req_ids.update(
+                c.req_id for c in candidates
+            )
+            expected = {c.req_id for c in candidates}
+        else:
+            expected = first
+        assert expected <= set(result.result(timeout=5))
+        assert core.scheduler._late_kv_snapshot == expected
+    assert not core.batch_queue[-1][0].poll()
+    executor.finish()
+
+
 def test_eight_rank_base_seal_does_not_wait_for_optional_ack_or_a():
     executor = ControlledExecutor()
     core = _core(executor)

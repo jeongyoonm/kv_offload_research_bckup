@@ -3122,3 +3122,24 @@ def test_fixed_seal_poll_control_preserves_default():
         ]
         == 1000
     )
+
+
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"late_admission_mode": 0},
+        {"late_seal_safety_us": 0},
+        {"late_seal_target_candidates": 0},
+        {"late_seal_repeat_us": 0},
+    ],
+)
+def test_evaluation_event_options_require_mode_and_bounded_progress(invalid):
+    options = dict(
+        late_seal_policy="event",
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        deferral_policy="timing",
+    )
+    assert early.validate_experiment_options(options)["late_seal_policy"] == "event"
+    with pytest.raises(ValueError):
+        early.validate_experiment_options(dict(options, **invalid))

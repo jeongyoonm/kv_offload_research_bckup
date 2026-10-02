@@ -46,6 +46,20 @@ PRIME = dict(
     late_partial_ready_percent=0,
 )
 POLICIES = {
+    "event_all": dict(COMMON, late_seal_policy="event", late_seal_target_candidates=16),
+    "event4": dict(COMMON, late_seal_policy="event", late_seal_target_candidates=4),
+    "event_all_load4": dict(
+        COMMON,
+        late_seal_policy="event",
+        late_seal_target_candidates=16,
+        late_seal_load_only_target_candidates=4,
+    ),
+    "event8_load4": dict(
+        COMMON,
+        late_seal_policy="event",
+        late_seal_target_candidates=8,
+        late_seal_load_only_target_candidates=4,
+    ),
     "predictive_conditioned": dict(
         COMMON,
         late_seal_policy="predictive",

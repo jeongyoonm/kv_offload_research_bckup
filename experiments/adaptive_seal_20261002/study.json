@@ -1,6 +1,6 @@
 {
-  "strategy": "Compute prediction with B-shape-conditioned preparation reserve",
-  "cpu_tests": 47,
+  "strategy": "Matched evaluation of isolated event/load-aware and predictive/conditioned strategies",
+  "cpu_tests": 60,
   "test_log": "conditioned_tests_v2.log",
   "artifact_root": "/mnt/localnvme/glm53_adaptive_seal_20261002",
   "process_log": "/mnt/localnvme/glm53_adaptive_seal_20261002/process_log.jsonl",
@@ -9,7 +9,7 @@
   "parallelism": "TP8",
   "kv_dtype": "fp8_e4m3",
   "source_base_commit": "5147414",
-  "branch": "experiment/glm53-seal-predictive-conditioned-20261002",
+  "branch": "experiment/glm53-adaptive-evaluation-20261002",
   "feature_disabled_by_default": true,
   "restrictions": [
     "text-only",
@@ -30,5 +30,13 @@
     "readable_answer_probe": "16 requests, exact five-token factual answers against cold execution",
     "raw_forced_continuation_diagnostic": "/mnt/localnvme/glm53_adaptive_seal_20261002/completion_screen/correctness"
   },
-  "derivation": "Live nominal reserve about 735ms was dominated by cold priming; condition p90 CPU preparation on already ready B base/candidates, using nearest prior shapes and token-rate fallback rather than a global pool"
+  "derivation": "Integrate the tested branches for matched comparisons in one server, preserving separate implementation branches and disabled defaults. Save initialization time and avoid choosing a confirmation strategy before comparing both new methods.",
+  "parents": [
+    "f0d02c2",
+    "c622365"
+  ],
+  "test_logs": [
+    "evaluation_tests.log",
+    "evaluation_schema_tests.log"
+  ]
 }

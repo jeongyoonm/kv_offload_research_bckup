@@ -321,6 +321,7 @@ def stage_rpc(core, step, base, candidates):
     partial_min = getattr(core.scheduler, "_late_partial_min_pending_candidates", 0)
     partial_percent = getattr(core.scheduler, "_late_partial_ready_percent", 0)
     policy = getattr(core.scheduler, "_late_seal_policy", "fixed")
+    repeated_intervals = 0
     prediction = None
     predicted_deadline_ns = None
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
@@ -394,6 +395,48 @@ def stage_rpc(core, step, base, candidates):
                         for status in statuses[world * (slot + 1) : world * (slot + 2)]
                     )
                 ]
+                if policy == "event" and candidates:
+                    from vllm.v1.kv_offload.seal_progress import compute_progress
+
+                    cancelled = cancelled_candidates(core, candidates)
+                    active = {c.req_id for c in candidates} - cancelled
+                    ready_count = len(set(ready_acked) & active)
+                    target = min(
+                        core.scheduler._late_seal_target_candidates, len(active)
+                    )
+                    has_compute, compute_finished = compute_progress(core, queued)
+                    load_only_target = getattr(
+                        core.scheduler, "_late_seal_load_only_target_candidates", 0
+                    )
+                    if not has_compute and load_only_target:
+                        target = min(target, load_only_target)
+                    if ready_count >= target:
+                        seal_reason = "candidate_target_ready"
+                        break
+                    if has_compute and compute_finished:
+                        seal_reason = "predecessor_compute_finished"
+                        break
+                    if (
+                        now_ns
+                        >= base_ready_ns + core.scheduler._late_seal_safety_us * 1000
+                    ):
+                        seal_reason = "adaptive_safety_deadline"
+                        break
+                    interval = core.scheduler._late_seal_repeat_us * 1000
+                    rounds = (now_ns - base_ready_ns) // interval
+                    if rounds > repeated_intervals:
+                        repeated_intervals = rounds
+                        record(
+                            core.scheduler,
+                            "seal_repeat",
+                            step=step,
+                            intervals=rounds,
+                            ready=ready_count,
+                            target=target,
+                            has_compute=has_compute,
+                        )
+                    time.sleep(0.001)
+                    continue
                 if policy == "predictive" and candidates:
                     from vllm.v1.kv_offload.execution_timing import valid_snapshot
                     from vllm.v1.kv_offload.seal_progress import compute_progress
@@ -607,6 +650,9 @@ def stage_rpc(core, step, base, candidates):
             cancelled=sorted(cancelled),
             predecessor_ready=predecessor_ready,
             adaptive_policy=policy,
+            repeated_intervals=repeated_intervals,
+            ready_target=target if policy == "event" and candidates else None,
+            has_compute=has_compute if policy == "event" and candidates else None,
             prediction=prediction,
         )
         return [

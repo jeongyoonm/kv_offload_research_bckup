@@ -1040,3 +1040,97 @@ def test_candidate_only_mode_uses_ordinary_base_request_path(
     output = scheduler.schedule()
     assert prepared_base == expected_base
     assert output.num_scheduled_tokens == {"1": 24}
+
+
+@pytest.mark.parametrize("outcome", ["ready", "complete", "cancel"])
+def test_prediction_to_readiness_keeps_waiting_after_forecast(outcome):
+    """A forecast controls sleep size; it cannot finalize membership."""
+    import numpy as np
+
+    executor = ControlledExecutor()
+    core = _core(executor)
+    scheduler = core.scheduler
+    scheduler._late_seal_policy = "predictive"
+    scheduler._late_seal_prediction_to_readiness = True
+    scheduler._late_seal_target_candidates = 16
+    scheduler._late_seal_repeat_us = 1000
+    scheduler._late_seal_adaptive_poll_us = 2000
+    scheduler._late_seal_prediction_scale_percent = 100
+    scheduler._late_seal_prediction_reserve_us = 10_000
+    scheduler._late_seal_safety_us = 1_000_000
+    scheduler._late_seal_hybrid_wait_us = 20_000
+    scheduler._late_seal_hybrid_guard_us = 50_000
+    scheduler._late_record_enabled = True
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
+    core.batch_queue[-1][1].readiness_timeline_step = 8
+    started = time.monotonic_ns()
+    core.deferral_timing = SimpleNamespace(
+        steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+        read_execution=lambda step: (
+            [(step, started, started, started + 100, time.monotonic_ns(), 1, 0, 0, 0)]
+            * 8
+        ),
+        seal_estimator=SimpleNamespace(
+            predict=lambda data: 100_000_000,
+            features=lambda data: np.ones(4),
+            samples=[0] * 8,
+            preparation_reserve=lambda extra: extra,
+            preparation_ns=[],
+        ),
+    )
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], [_request("a")])
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        for prepared in executor.prepared_base + executor.prepared_candidate:
+            assert prepared.wait(5)
+        deadline = started + 120_000_000
+        while time.monotonic_ns() < deadline:
+            threading.Event().wait(0.002)
+        assert not result.done()
+        if outcome == "ready":
+            scheduler.finished_recving_kv_req_ids.add("a")
+        elif outcome == "complete":
+            core.batch_queue[-1][0].release.set()
+        else:
+            core.aborts_queue.put(["a"])
+        # stage_rpc returns prepared slots; final admission uses the KV/cancel snapshot.
+        assert result.result(timeout=5) == ["a"]
+        assert scheduler._late_kv_snapshot == ({"a"} if outcome == "ready" else set())
+        assert scheduler._late_cancelled == ({"a"} if outcome == "cancel" else set())
+    transport = scheduler._late_transport
+    assert transport["seal_reason"] == (
+        "predecessor_compute_finished"
+        if outcome == "complete"
+        else "candidate_target_ready"
+    )
+    assert transport["seal_ns"] > transport["prediction"]["deadline_ns"]
+    assert transport["hybrid_coarse_sleeps"] > 0
+    assert transport["hybrid_polling_ns"] is not None
+    executor.finish()
+
+
+def test_prediction_to_readiness_uses_partial_target_without_compute():
+    executor = ControlledExecutor()
+    core = _core(executor)
+    scheduler = core.scheduler
+    scheduler._late_seal_policy = "predictive"
+    scheduler._late_seal_prediction_to_readiness = True
+    scheduler._late_seal_target_candidates = 16
+    scheduler._late_seal_load_only_target_candidates = 4
+    scheduler._late_seal_repeat_us = 1000
+    scheduler._late_seal_safety_us = 1_000_000
+    candidates = [_request(f"candidate-{i}") for i in range(8)]
+    first = {c.req_id for c in candidates[:4]}
+    scheduler.finished_recving_kv_req_ids.update(first)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(stage_rpc, core, 9, [_request("base")], candidates)
+        assert executor.published.wait(5)
+        for release in executor.release_base + executor.release_candidate:
+            release.set()
+        assert first <= set(result.result(timeout=5))
+        assert scheduler._late_kv_snapshot == first
+    assert scheduler._late_transport["seal_reason"] == "candidate_target_ready"
+    assert not core.batch_queue[-1][0].poll()
+    executor.finish()

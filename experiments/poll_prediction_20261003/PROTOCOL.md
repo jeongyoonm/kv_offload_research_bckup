@@ -70,3 +70,25 @@ tests pass. An exploratory broader suite had 406 passes and two inherited
 fixture/artifact failures; these are retained in the process log. Native assets
 match the previous evaluation. Missing packaged third-party interfaces were
 restored in fresh worktrees after an initial startup failure, before any replay.
+
+
+## Predicted wait followed by readiness polling
+
+A separate branch `experiment/glm53-seal-predicted-readiness-20261003` retains
+all screening policies and adds `late_seal_prediction_to_readiness` (default
+false). In this variant the forecast does not cause a seal. Up to 50 ms initial
+sleeps are bounded by the first predicted seal deadline minus a 50 ms guard and
+the safety deadline. Once that initial phase ends, the engine uses 2 ms polling
+until all active published candidates are ready and acknowledged, preceding
+physical compute completes, or the two-second safety limit is reached. The
+transition is fixed at the first conditioned forecast; later membership shape
+changes cannot resume the coarse phase. With no preceding compute, the target
+is min(4, active candidates), as in readiness polling. Candidate cancellation
+reduces the active target. Every wake-up still refreshes progress and readiness.
+
+A new-server matched phase compares fixed, original prediction at 1 ms,
+readiness at 2 ms, and predicted-readiness at 50 ms across the same three
+workloads. Seed56;300/80/80 requests; independent resets and priming. This phase
+starts after the screen and confirmation server has stopped. The changed
+mechanism gets its own known-answer and distinct-fact probes before replays.
+The results from its new server are compared within that phase.

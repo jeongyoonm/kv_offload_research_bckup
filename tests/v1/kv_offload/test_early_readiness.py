@@ -3156,3 +3156,30 @@ def test_evaluation_event_options_require_mode_and_bounded_progress(invalid):
     assert early.validate_experiment_options(options)["late_seal_policy"] == "event"
     with pytest.raises(ValueError):
         early.validate_experiment_options(dict(options, **invalid))
+
+
+@pytest.mark.parametrize("policy", ["fixed", "event"])
+def test_prediction_to_readiness_requires_predictive_policy(policy):
+    with pytest.raises(ValueError, match="prediction-to-readiness"):
+        early.validate_experiment_options(
+            {
+                "late_admission_mode": 4,
+                "cooperative_response_progress": True,
+                "late_seal_policy": policy,
+                "late_seal_prediction_to_readiness": True,
+            }
+        )
+
+
+def test_prediction_to_readiness_is_opt_in():
+    assert not early.validate_experiment_options({})[
+        "late_seal_prediction_to_readiness"
+    ]
+    assert early.validate_experiment_options(
+        {
+            "late_admission_mode": 4,
+            "cooperative_response_progress": True,
+            "late_seal_policy": "predictive",
+            "late_seal_prediction_to_readiness": True,
+        }
+    )["late_seal_prediction_to_readiness"]

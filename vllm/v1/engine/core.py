@@ -2016,6 +2016,9 @@ class EngineCore:
             self.scheduler._late_seal_hybrid_wait_us = options[
                 "late_seal_hybrid_wait_us"
             ]
+            self.scheduler._late_seal_prediction_to_readiness = options[
+                "late_seal_prediction_to_readiness"
+            ]
             self.scheduler._late_seal_hybrid_guard_us = options[
                 "late_seal_hybrid_guard_us"
             ]

@@ -302,6 +302,8 @@ class PreparationLane:
 
 def stage_rpc(core, step, base, candidates):
     """Publish B independently, then seal after the configured base-ready hold."""
+    from vllm.v1.kv_offload.seal_progress import compute_progress
+
     world = core.vllm_config.parallel_config.world_size
     queued = getattr(core, "batch_queue", None)
     core.scheduler._late_kv_snapshot = set()
@@ -333,14 +335,34 @@ def stage_rpc(core, step, base, candidates):
     requested_sleep_ns = 0
     hybrid_wait_us = getattr(core.scheduler, "_late_seal_hybrid_wait_us", 0)
     hybrid_guard_us = getattr(core.scheduler, "_late_seal_hybrid_guard_us", 50_000)
+    prediction_to_readiness = getattr(
+        core.scheduler, "_late_seal_prediction_to_readiness", False
+    )
+    hybrid_transition_ns = None
+    hybrid_polling_ns = None
 
     def adaptive_sleep(predicted_deadline=None):
         nonlocal poll_cpu_ns, sleep_ns
         nonlocal adaptive_sleeps, coarse_sleeps, requested_sleep_ns
+        nonlocal hybrid_transition_ns, hybrid_polling_ns
         before = time.monotonic_ns()
         requested = adaptive_poll_us * 1000
         if hybrid_wait_us and predicted_deadline:
-            coarse_remaining = predicted_deadline - hybrid_guard_us * 1000 - before
+            transition = predicted_deadline - hybrid_guard_us * 1000
+            if prediction_to_readiness:
+                if hybrid_transition_ns is None:
+                    hybrid_transition_ns = transition
+                transition = hybrid_transition_ns
+                if before >= transition and hybrid_polling_ns is None:
+                    hybrid_polling_ns = before
+                    record(
+                        core.scheduler,
+                        "seal_prediction_polling",
+                        step=step,
+                        transition_ns=transition,
+                        observed_ns=before,
+                    )
+            coarse_remaining = transition - before
             safety_remaining = (
                 base_ready_ns + core.scheduler._late_seal_safety_us * 1000 - before
             )
@@ -428,9 +450,13 @@ def stage_rpc(core, step, base, candidates):
                         for status in statuses[world * (slot + 1) : world * (slot + 2)]
                     )
                 ]
-                if policy == "event" and candidates:
-                    from vllm.v1.kv_offload.seal_progress import compute_progress
-
+                if candidates and (
+                    policy == "event"
+                    or (
+                        prediction_to_readiness
+                        and not compute_progress(core, queued)[0]
+                    )
+                ):
                     cancelled = cancelled_candidates(core, candidates)
                     active = {c.req_id for c in candidates} - cancelled
                     ready_count = len(set(ready_acked) & active)
@@ -472,7 +498,6 @@ def stage_rpc(core, step, base, candidates):
                     continue
                 if policy == "predictive" and candidates:
                     from vllm.v1.kv_offload.execution_timing import valid_snapshot
-                    from vllm.v1.kv_offload.seal_progress import compute_progress
 
                     has_compute, compute_finished = compute_progress(core, queued)
                     if has_compute and compute_finished:
@@ -582,10 +607,23 @@ def stage_rpc(core, step, base, candidates):
                                 preparation_reserve_ns=reserve_ns,
                                 deadline_ns=predicted_deadline_ns,
                             )
-                    if predicted_deadline_ns and now_ns >= predicted_deadline_ns:
+                    if (
+                        not prediction_to_readiness
+                        and predicted_deadline_ns
+                        and now_ns >= predicted_deadline_ns
+                    ):
                         seal_reason = "predicted_compute_deadline"
                         break
                     if has_compute:
+                        if prediction_to_readiness:
+                            cancelled = cancelled_candidates(core, candidates)
+                            active = {c.req_id for c in candidates} - cancelled
+                            target = min(
+                                core.scheduler._late_seal_target_candidates, len(active)
+                            )
+                            if len(set(ready_acked) & active) >= target:
+                                seal_reason = "candidate_target_ready"
+                                break
                         if (
                             seal_when_all_ready
                             and candidates
@@ -696,8 +734,16 @@ def stage_rpc(core, step, base, candidates):
             predecessor_ready=predecessor_ready,
             adaptive_policy=policy,
             repeated_intervals=repeated_intervals,
-            ready_target=target if policy == "event" and candidates else None,
-            has_compute=has_compute if policy == "event" and candidates else None,
+            ready_target=(
+                target
+                if (policy == "event" or prediction_to_readiness) and candidates
+                else None
+            ),
+            has_compute=(
+                has_compute
+                if (policy == "event" or prediction_to_readiness) and candidates
+                else None
+            ),
             prediction=prediction,
             adaptive_poll_us=adaptive_poll_us,
             progress_polls=progress_polls,
@@ -708,6 +754,9 @@ def stage_rpc(core, step, base, candidates):
             hybrid_coarse_sleeps=coarse_sleeps,
             hybrid_wait_us=hybrid_wait_us,
             hybrid_guard_us=hybrid_guard_us,
+            prediction_to_readiness=prediction_to_readiness,
+            hybrid_transition_ns=hybrid_transition_ns,
+            hybrid_polling_ns=hybrid_polling_ns,
         )
         return [
             c.req_id

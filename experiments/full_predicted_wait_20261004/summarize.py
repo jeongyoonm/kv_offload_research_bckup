@@ -201,16 +201,22 @@ def summarize(root):
     text = [
         "# Full predicted wait: GLM 5.3 TP8",
         "",
-        f"Completed cells: {len(rows)}/48. "
-        f"Accepted: {sum(c['accepted'] for c in rows)}.",
+        (
+            f"Completed cells: {len(rows)}/48. "
+            f"Accepted: {sum(c['accepted'] for c in rows)}."
+        ),
         "",
-        "Values are arithmetic means across available seed 57/58 cells. "
-        "Gains use the matched capped control. Provisional until both phases "
-        "are complete.",
+        (
+            "Values are arithmetic means across available seed 57/58 cells. "
+            "Gains use the matched capped control. Provisional until both phases "
+            "are complete."
+        ),
         "",
-        "| Workload | Policy | Repeats | req/s | Gain | Mean TTFT ms | "
-        "p95 TTFT ms | Compute rounds | Accounted polling CPU ms | "
-        "Exposed hold ms | Sleep after stop ms | Admission ratio |",
+        (
+            "| Workload | Policy | Repeats | req/s | Gain | Mean TTFT ms | "
+            "p95 TTFT ms | Compute rounds | Accounted polling CPU ms | "
+            "Exposed hold ms | Sleep after stop ms | Admission ratio |"
+        ),
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for item in aggregate:
@@ -233,18 +239,22 @@ def summarize(root):
             "",
             "## Timing and CPU limits",
             "",
-            "Sleep-after-stop is the sum of recorded wait intervals after an "
-            "eligible stop condition and preceding compute completion. "
-            "Candidate ACK times are engine observations; completion timing "
-            "uses its upper endpoint. It is a diagnostic estimate, not an "
-            "exact causal latency bound.",
+            (
+                "Sleep-after-stop is the sum of recorded wait intervals after an "
+                "eligible stop condition and preceding compute completion. "
+                "Candidate ACK times are engine observations; completion timing "
+                "uses its upper endpoint. It is a diagnostic estimate, not an "
+                "exact causal latency bound."
+            ),
             "",
-            "Main polling CPU covers iterations leading to adaptive waits "
-            "(and observer installation), excluding final/pre-ACK iterations. "
-            "Bridge CPU covers the entire observer thread. Their sum is "
-            "accounted polling CPU, not whole-engine CPU. Unknown GPU timing "
-            "windows are excluded and listed in cells.json. The bridge polls "
-            "read-only transport state every 1 ms during coarse waits.",
+            (
+                "Main polling CPU covers iterations leading to adaptive waits "
+                "(and observer installation), excluding final/pre-ACK iterations. "
+                "Bridge CPU covers the entire observer thread. Their sum is "
+                "accounted polling CPU, not whole-engine CPU. Unknown GPU timing "
+                "windows are excluded and listed in cells.json. The bridge polls "
+                "read-only transport state every 1 ms during coarse waits."
+            ),
         ]
     )
     (out / "REPORT.md").write_text("\n".join(text) + "\n")

@@ -198,6 +198,11 @@ def summarize(root):
             writer = csv.DictWriter(stream, fieldnames=list(aggregate[0]))
             writer.writeheader()
             writer.writerows(aggregate)
+    complete = (
+        len(rows) == 48
+        and all(c["accepted"] for c in rows)
+        and (root / "confirmation/complete.json").exists()
+    )
     text = [
         "# Full predicted wait: GLM 5.3 TP8",
         "",
@@ -208,8 +213,14 @@ def summarize(root):
         "",
         (
             "Values are arithmetic means across available seed 57/58 cells. "
-            "Gains use the matched capped control. Provisional until both phases "
-            "are complete."
+            "Gains use the matched capped control. "
+            + (
+                "Both phases are complete. See paired_comparisons.json for "
+                "individual seed comparisons; two replays do not establish "
+                "statistical significance."
+                if complete
+                else "Provisional until both phases are complete."
+            )
         ),
         "",
         (

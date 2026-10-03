@@ -2978,7 +2978,7 @@ def test_late_notice_candidate_slot_cap_still_respects_token_budget():
         current_step=5,
         _late_cancelled=set(),
     )
-    staged = []
+    staged: list = []
 
     def prepare(step, base, candidates):
         staged.extend(c.req_id for c in candidates)
@@ -3183,3 +3183,22 @@ def test_prediction_to_readiness_is_opt_in():
             "late_seal_prediction_to_readiness": True,
         }
     )["late_seal_prediction_to_readiness"]
+
+
+@pytest.mark.parametrize(
+    "missing", ["late_seal_condition_preparation", "late_seal_prediction_to_readiness"]
+)
+def test_full_predicted_wait_requires_conditioned_readiness_policy(missing):
+    options = dict(
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        late_seal_policy="predictive",
+        late_seal_condition_preparation=True,
+        late_seal_prediction_to_readiness=True,
+        late_seal_full_prediction_wait=True,
+    )
+    assert early.validate_experiment_options(options)["late_seal_full_prediction_wait"]
+    options[missing] = False
+    with pytest.raises(ValueError, match="full predicted wait"):
+        early.validate_experiment_options(options)
+    assert not early.validate_experiment_options({})["late_seal_full_prediction_wait"]

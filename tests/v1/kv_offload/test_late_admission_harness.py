@@ -4,6 +4,7 @@
 
 import pickle
 import queue
+import struct
 import threading
 import time
 from collections import deque
@@ -115,6 +116,176 @@ def _core(executor, predecessor=None):
 
 def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
+
+
+@pytest.mark.parametrize("guard_us", [0, 50_000])
+@pytest.mark.parametrize("poll_us", [2000, 5000, 10000])
+@pytest.mark.parametrize("event", ["compute", "kv", "cancel", "fine"])
+def test_full_prediction_wait_is_interrupted_before_its_timer(
+    tmp_path, monkeypatch, guard_us, poll_us, event
+):
+    """A long forecast cannot hide physical completion, KV readiness, or aborts."""
+    import numpy as np
+
+    from vllm.v1.kv_offload.seal_wakeup import TransportWakeup
+    from vllm.v1.kv_offload.step_timing import RankFile
+
+    executor = ControlledExecutor()
+    core = _core(executor)
+    scheduler = core.scheduler
+    scheduler._late_seal_policy = "predictive"
+    scheduler._late_seal_prediction_to_readiness = True
+    scheduler._late_seal_full_prediction_wait = True
+    scheduler._late_seal_wait_trace = True
+    scheduler._late_seal_condition_preparation = True
+    scheduler._late_seal_hybrid_guard_us = guard_us
+    scheduler._late_seal_adaptive_poll_us = poll_us
+    scheduler._late_seal_target_candidates = 16
+    scheduler._late_seal_repeat_us = 25_000
+    scheduler._late_seal_prediction_scale_percent = 100
+    scheduler._late_seal_prediction_reserve_us = 10_000
+    scheduler._late_seal_safety_us = 1_000_000
+    scheduler._late_base_request_shapes = []
+    scheduler.requests = {}
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
+    core.batch_queue[-1][1].readiness_timeline_step = 8
+    started = time.monotonic_ns()
+    predicted = 120_000_000 if event == "fine" else 500_000_000
+    ranks = [RankFile(str(tmp_path / f"rank-{i}"), create=True) for i in range(8)]
+    paths = [str(tmp_path / f"ring-{i}") for i in range(8)]
+    for path in paths:
+        with open(path, "wb") as stream:
+            stream.write(bytes(64))
+    for rank in ranks:
+        rank.write(
+            [8, started, started, started + 100, time.monotonic_ns(), 1, 0, 0, 0]
+        )
+    core.early_load_readiness = SimpleNamespace(paths=paths)
+    core.deferral_timing = SimpleNamespace(
+        execution_ranks=ranks,
+        steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+        read_execution=lambda step: [rank.read(step) for rank in ranks],
+        seal_estimator=SimpleNamespace(
+            predict=lambda data: predicted,
+            features=lambda data: np.ones(4),
+            samples=[0] * 8,
+            preparation_reserve=lambda extra, upcoming=None: extra,
+            preparation_ns=[],
+        ),
+    )
+    kv = threading.Event()
+    core._refresh_early_load_readiness.side_effect = lambda **kw: (
+        scheduler.finished_recving_kv_req_ids.add("a") if kv.is_set() else None
+    )
+    waiting = threading.Event()
+    original_wait = TransportWakeup.wait
+
+    def wait(self, ticket, seconds):
+        waiting.set()
+        return original_wait(self, ticket, seconds)
+
+    monkeypatch.setattr(TransportWakeup, "wait", wait)
+    if event == "fine":
+        from vllm.v1.kv_offload import late_admission_runtime as late
+
+        def fine_sleep(seconds):
+            if seconds == poll_us / 1e6:
+                kv.set()
+            time.sleep(seconds)
+
+        monkeypatch.setattr(
+            late,
+            "time",
+            SimpleNamespace(
+                monotonic=time.monotonic,
+                monotonic_ns=time.monotonic_ns,
+                thread_time_ns=time.thread_time_ns,
+                sleep=fine_sleep,
+            ),
+        )
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            result = pool.submit(
+                stage_rpc, core, 9, [_request("base")], [_request("a")]
+            )
+            assert executor.published.wait(5)
+            for release in executor.release_base + executor.release_candidate:
+                release.set()
+            for prepared in executor.prepared_base + executor.prepared_candidate:
+                assert prepared.wait(5)
+            assert waiting.wait(5)
+            observed = time.monotonic_ns()
+            if event == "compute":
+                for rank in ranks:
+                    now = time.monotonic_ns()
+                    rank.write(
+                        [
+                            8,
+                            started,
+                            started,
+                            started + 100,
+                            now,
+                            1,
+                            now - started,
+                            now - 100,
+                            now,
+                        ]
+                    )
+            elif event == "kv":
+                kv.set()
+                for path in paths:
+                    with open(path, "r+b") as ring_stream:
+                        ring_stream.seek(24)
+                        ring_stream.write(struct.pack("Q", 1))
+            elif event == "cancel":
+                core.aborts_queue.put(["a"])
+            result.result(timeout=5)
+        transport = scheduler._late_transport
+        assert any(
+            w["phase"] == "coarse" and w["requested_ns"] > 50_000_000
+            for w in transport["adaptive_waits"]
+        )
+        if event == "fine":
+            assert transport["seal_ns"] >= transport["hybrid_transition_ns"]
+            assert any(
+                w["phase"] == "fine" and w["requested_ns"] == poll_us * 1000
+                for w in transport["adaptive_waits"]
+            )
+        else:
+            assert (
+                transport["seal_ns"]
+                < started + predicted - 10_000_000 - guard_us * 1000
+            )
+            assert transport["seal_ns"] - observed < 100_000_000
+        assert transport["progress_bridge_cpu_ns"] > 0
+        assert not core.batch_queue[-1][0].poll()
+        if event == "compute":
+            assert transport["seal_reason"] == "predecessor_compute_finished"
+        elif event in ("kv", "fine"):
+            assert transport["seal_reason"] == "candidate_target_ready"
+            assert scheduler._late_kv_snapshot == {"a"}
+        else:
+            assert scheduler._late_cancelled == {"a"}
+    finally:
+        executor.finish()
+        for rank in ranks:
+            rank.close()
+
+
+def test_progress_between_snapshot_and_wait_is_not_lost():
+    from vllm.v1.kv_offload.seal_wakeup import SealWakeup
+
+    value = [0]
+    wakeup = SealWakeup(lambda: value[0])
+    ticket = wakeup.ticket()
+    value[0] = 1
+    try:
+        assert wakeup.wait(ticket, 1) == "progress"
+        # A notification observed before entering wait also remains visible.
+        assert wakeup.wait(ticket, 1) == "progress"
+    finally:
+        wakeup.close()
+    assert not wakeup.thread.is_alive()
 
 
 @pytest.mark.parametrize(

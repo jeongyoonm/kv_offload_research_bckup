@@ -340,14 +340,25 @@ def stage_rpc(core, step, base, candidates):
     )
     hybrid_transition_ns = None
     hybrid_polling_ns = None
+    full_prediction_wait = getattr(
+        core.scheduler, "_late_seal_full_prediction_wait", False
+    )
+    wait_trace = getattr(core.scheduler, "_late_seal_wait_trace", False)
+    wakeup = None
+    wake_ticket = None
+    waits: list[dict[str, int | str]] = []
 
     def adaptive_sleep(predicted_deadline=None):
         nonlocal poll_cpu_ns, sleep_ns
         nonlocal adaptive_sleeps, coarse_sleeps, requested_sleep_ns
         nonlocal hybrid_transition_ns, hybrid_polling_ns
+        nonlocal wakeup
         before = time.monotonic_ns()
         requested = adaptive_poll_us * 1000
-        if hybrid_wait_us and predicted_deadline:
+        if full_prediction_wait and not has_compute:
+            requested = 2_000_000
+        coarse = False
+        if (hybrid_wait_us or full_prediction_wait) and predicted_deadline:
             transition = predicted_deadline - hybrid_guard_us * 1000
             if prediction_to_readiness:
                 if hybrid_transition_ns is None:
@@ -368,14 +379,48 @@ def stage_rpc(core, step, base, candidates):
             )
             if coarse_remaining > requested and safety_remaining > requested:
                 requested = min(
-                    hybrid_wait_us * 1000, coarse_remaining, safety_remaining
+                    coarse_remaining if full_prediction_wait else hybrid_wait_us * 1000,
+                    coarse_remaining,
+                    safety_remaining,
                 )
-                coarse_sleeps += 1
+                coarse = True
+        if full_prediction_wait and coarse and wakeup is None:
+            from vllm.v1.kv_offload.seal_wakeup import TransportWakeup
+
+            wakeup = TransportWakeup(core, fd, queued)
+            poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
+            # Recheck progress after installing the observer, before any wait.
+            return
+        if coarse:
+            coarse_sleeps += 1
         adaptive_sleeps += 1
         requested_sleep_ns += requested
         poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
-        time.sleep(requested / 1e9)
-        sleep_ns += time.monotonic_ns() - before
+        reason = "timer"
+        wait_begin = time.monotonic_ns()
+        if full_prediction_wait and coarse:
+            assert wakeup is not None
+            reason = wakeup.wait(wake_ticket, requested / 1e9)
+        else:
+            if wakeup is not None:
+                wakeup.pause()
+            time.sleep(requested / 1e9)
+        ended = time.monotonic_ns()
+        sleep_ns += ended - before
+        if wait_trace:
+            if len(waits) >= 4096:
+                raise RuntimeError("seal wait trace capacity exceeded")
+            waits.append(
+                dict(
+                    begin_ns=wait_begin,
+                    end_ns=ended,
+                    requested_ns=requested,
+                    progress_begin_ns=progress_begin_ns,
+                    decision_ns=before,
+                    phase="coarse" if coarse else "fine",
+                    reason=reason,
+                )
+            )
 
     fd, path = tempfile.mkstemp(prefix="vllm-late-")
     data_fd, data_path = tempfile.mkstemp(prefix="vllm-late-data-")
@@ -402,7 +447,10 @@ def stage_rpc(core, step, base, candidates):
         target = 0
         partial_target = (len(candidates) * partial_percent + 99) // 100
         while True:
+            if wakeup is not None:
+                wake_ticket = wakeup.ticket()
             progress_polls += 1
+            progress_begin_ns = time.monotonic_ns()
             poll_cpu_start = time.thread_time_ns()
             predecessor_ready = predecessor.poll()
             core._refresh_early_load_readiness(poll_markers=False)
@@ -714,6 +762,8 @@ def stage_rpc(core, step, base, candidates):
             if time.monotonic() >= deadline:
                 raise TimeoutError("late preparation timed out")
             time.sleep(getattr(core.scheduler, "_late_seal_poll_us", 25) / 1e6)
+        if wakeup is not None:
+            wakeup.close()
         if cancelled is None:
             cancelled = cancelled_candidates(core, candidates)
         partial_ready_count = len(set(ready_acked) - cancelled)
@@ -765,6 +815,11 @@ def stage_rpc(core, step, base, candidates):
             prediction_to_readiness=prediction_to_readiness,
             hybrid_transition_ns=hybrid_transition_ns,
             hybrid_polling_ns=hybrid_polling_ns,
+            full_prediction_wait=full_prediction_wait,
+            progress_bridge_cpu_ns=wakeup.cpu_ns if wakeup else 0,
+            progress_bridge_scans=wakeup.scans if wakeup else 0,
+            progress_bridge_notifications=wakeup.notifications if wakeup else 0,
+            adaptive_waits=waits,
         )
         return [
             c.req_id
@@ -772,6 +827,8 @@ def stage_rpc(core, step, base, candidates):
             if all(s == 1 for s in statuses[world * (slot + 1) : world * (slot + 2)])
         ]
     finally:
+        if wakeup is not None and not wakeup.closed:
+            wakeup.close()
         os.close(fd)
         os.unlink(path)
         os.unlink(data_path)

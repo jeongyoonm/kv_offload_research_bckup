@@ -2019,6 +2019,10 @@ class EngineCore:
             self.scheduler._late_seal_prediction_to_readiness = options[
                 "late_seal_prediction_to_readiness"
             ]
+            self.scheduler._late_seal_full_prediction_wait = options[
+                "late_seal_full_prediction_wait"
+            ]
+            self.scheduler._late_seal_wait_trace = options["late_seal_wait_trace"]
             self.scheduler._late_seal_hybrid_guard_us = options[
                 "late_seal_hybrid_guard_us"
             ]

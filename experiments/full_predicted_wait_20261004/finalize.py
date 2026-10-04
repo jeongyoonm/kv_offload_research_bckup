@@ -25,7 +25,23 @@ def finalize():
     )
     validation = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(validation)
-    rows = validation.validate_root(ROOT)
+    rows = {}
+    for phase in ("screen", "confirmation"):
+        rows.update(validation.validate_root(ROOT / phase))
+    (ROOT / "validated_results.json").write_text(json.dumps(rows, indent=2) + "\n")
+    (ROOT / "validation_complete.json").write_text(
+        json.dumps(
+            dict(
+                cells=len(rows),
+                accepted=sum(row["accepted"] for row in rows.values()),
+                failed_paths=[
+                    name for name, row in rows.items() if not row["accepted"]
+                ],
+            ),
+            indent=2,
+        )
+        + "\n"
+    )
     accepted = {name: row for name, row in rows.items() if row["accepted"]}
     assert len(accepted) == 48
     counts = {"p8192_f95_h100": 300, "p61440_f95_h100": 80, "p61440_f99_h100": 80}

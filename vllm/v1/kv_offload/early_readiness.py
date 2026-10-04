@@ -14,6 +14,7 @@ from vllm.v1.kv_offload import timeline
 
 if TYPE_CHECKING:
     from vllm.config import VllmConfig
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
 
 RING_CAPACITY = 4096
 EARLY_COMPLETION_KEY = "early_load_completion"
@@ -39,6 +40,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_hybrid_guard_us": 50_000,
     "late_seal_prediction_to_readiness": False,
     "late_seal_full_prediction_wait": False,
+    "late_seal_coalesced_notifications": False,
     "late_seal_wait_trace": False,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,
@@ -149,6 +151,11 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         raise ValueError(
             "full predicted wait requires conditioned prediction-to-readiness"
         )
+    if (
+        result["late_seal_coalesced_notifications"]
+        and not result["late_seal_full_prediction_wait"]
+    ):
+        raise ValueError("coalesced notifications require full predicted waits")
     if result["late_admission_mode"] and (
         not result["cooperative_response_progress"]
         or result["zero_token_queue_credit"]
@@ -248,6 +255,7 @@ class EarlyLoadReadiness:
         self._released_jobs: set[int] = set()
         self._closed = False
         self.experiment_options = dict(EXPERIMENT_DEFAULTS)
+        self.seal_notifications: SealNotifications | None = None
 
     @classmethod
     def from_config(cls, vllm_config: "VllmConfig") -> "EarlyLoadReadiness | None":
@@ -298,7 +306,35 @@ class EarlyLoadReadiness:
 
         extra[_RING_PATHS_KEY] = paths
         extra[_SESSION_KEY] = session
-        return cls(session, handles, paths, enabled, delay)
+        readiness = cls(session, handles, paths, enabled, delay)
+        opt_in = extra.get("coalesced_seal_notifications", False)
+        if type(opt_in) is not bool:
+            readiness.close()
+            raise ValueError("coalesced_seal_notifications must be a boolean")
+        if opt_in:
+            from vllm.v1.kv_offload.seal_notifications import (
+                PATH_KEY,
+                SealNotifications,
+            )
+
+            try:
+                import torch
+
+                abi = getattr(
+                    torch.ops._C_cache_ops, "coalesced_seal_notification_abi", None
+                )
+                if abi is None or abi() != 1:
+                    raise RuntimeError("async KV extension lacks seal notifications")
+                readiness.seal_notifications = SealNotifications(
+                    str(directory / (prefix + "-seal")), session, world_size
+                )
+                for rank, path in enumerate(paths):
+                    readiness.seal_notifications.descriptor(path, rank)
+                extra[PATH_KEY] = readiness.seal_notifications.path
+            except BaseException:
+                readiness.close()
+                raise
+        return readiness
 
     @property
     def world_size(self) -> int:
@@ -398,6 +434,8 @@ class EarlyLoadReadiness:
         if self._closed:
             return
         self._closed = True
+        if self.seal_notifications is not None:
+            self.seal_notifications.close()
         for handle in self.handles:
             ops.destroy_async_batch_memcpy_completion_ring(handle)
         self.handles.clear()

@@ -183,6 +183,10 @@ class NativeExecutionObserver:
         from pathlib import Path
 
         self.lib = ctypes.CDLL(library)
+        if Path(path + ".seal").exists():
+            abi = getattr(self.lib, "timing_seal_notification_abi", None)
+            if abi is None or abi() != 1:
+                raise ValueError("native timing observer lacks seal notifications")
         self.lib.timing_abi_version.argtypes = []
         self.lib.timing_abi_version.restype = ctypes.c_int
         if self.lib.timing_abi_version() != 2:

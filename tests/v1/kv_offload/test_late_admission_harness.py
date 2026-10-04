@@ -118,11 +118,12 @@ def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
 
 
+@pytest.mark.parametrize("coalesced", [False, True])
 @pytest.mark.parametrize("guard_us", [0, 50_000])
 @pytest.mark.parametrize("poll_us", [2000, 5000, 10000])
 @pytest.mark.parametrize("event", ["compute", "kv", "cancel", "fine"])
 def test_full_prediction_wait_is_interrupted_before_its_timer(
-    tmp_path, monkeypatch, guard_us, poll_us, event
+    tmp_path, monkeypatch, guard_us, poll_us, event, coalesced, coalesced_channel
 ):
     """A long forecast cannot hide physical completion, KV readiness, or aborts."""
     import numpy as np
@@ -136,6 +137,7 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
     scheduler._late_seal_policy = "predictive"
     scheduler._late_seal_prediction_to_readiness = True
     scheduler._late_seal_full_prediction_wait = True
+    scheduler._late_seal_coalesced_notifications = coalesced
     scheduler._late_seal_wait_trace = True
     scheduler._late_seal_condition_preparation = True
     scheduler._late_seal_hybrid_guard_us = guard_us
@@ -160,7 +162,29 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
         rank.write(
             [8, started, started, started + 100, time.monotonic_ns(), 1, 0, 0, 0]
         )
-    core.early_load_readiness = SimpleNamespace(paths=paths)
+    channel, lib, handles = coalesced_channel
+    core.early_load_readiness = SimpleNamespace(
+        paths=paths,
+        seal_notifications=channel if coalesced else None,
+        _released_jobs=set(),
+        _rank_reports={},
+    )
+    if coalesced:
+        from vllm.v1.kv_offload.seal_notifications import NotificationQueue
+
+        core.aborts_queue = NotificationQueue(channel)
+        scheduler.connector = SimpleNamespace(
+            connector_scheduler=SimpleNamespace(
+                _req_status={"a": SimpleNamespace(transfer_jobs={101})}
+            )
+        )
+        for index, rank in enumerate(ranks):
+            channel.descriptor(str(tmp_path / f"rank-{index}") + ".execution", index)
+            # Separate worker writers use the same completion-publication hook.
+            from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+            rank.seal = SealNotifications(channel.path)
+            rank.seal_rank = index
     core.deferral_timing = SimpleNamespace(
         execution_ranks=ranks,
         steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
@@ -178,13 +202,14 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
         scheduler.finished_recving_kv_req_ids.add("a") if kv.is_set() else None
     )
     waiting = threading.Event()
-    original_wait = TransportWakeup.wait
+    wait_class = type(channel) if coalesced else TransportWakeup
+    original_wait = wait_class.wait
 
     def wait(self, ticket, seconds):
         waiting.set()
         return original_wait(self, ticket, seconds)
 
-    monkeypatch.setattr(TransportWakeup, "wait", wait)
+    monkeypatch.setattr(wait_class, "wait", wait)
     if event == "fine":
         from vllm.v1.kv_offload import late_admission_runtime as late
 
@@ -233,6 +258,9 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
                     )
             elif event == "kv":
                 kv.set()
+                if coalesced:
+                    for handle in handles:
+                        assert lib.seal_kv(handle, 101, 1)
                 for path in paths:
                     with open(path, "r+b") as ring_stream:
                         ring_stream.seek(24)
@@ -257,7 +285,12 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
                 < started + predicted - 10_000_000 - guard_us * 1000
             )
             assert transport["seal_ns"] - observed < 100_000_000
-        assert transport["progress_bridge_cpu_ns"] > 0
+        if coalesced:
+            assert transport["coalesced_notifications"]
+            assert transport["progress_bridge_scans"] == 0
+            assert transport["progress_bridge_cpu_ns"] == 0
+        else:
+            assert transport["progress_bridge_cpu_ns"] > 0
         assert not core.batch_queue[-1][0].poll()
         if event == "compute":
             assert transport["seal_reason"] == "predecessor_compute_finished"
@@ -1383,3 +1416,335 @@ def test_prediction_to_readiness_handles_physical_completion_before_base_ack():
     assert core.scheduler._late_transport["prediction"] is None
     assert not core.batch_queue[-1][0].poll()
     executor.finish()
+
+
+@pytest.fixture(scope="module")
+def native_seal_library(tmp_path_factory):
+    """Compile the same CUDA-independent publisher used by the H2D worker."""
+    import ctypes
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[3]
+    output = tmp_path_factory.mktemp("seal-native") / "publisher.so"
+    subprocess.run(
+        [
+            "g++",
+            "-std=c++17",
+            "-shared",
+            "-fPIC",
+            "-pthread",
+            "-O2",
+            "-I",
+            str(root / "csrc/libtorch_stable"),
+            str(root / "experiments/coalesced_notify_20261004/native_harness.cpp"),
+            "-o",
+            str(output),
+        ],
+        check=True,
+    )
+    lib = ctypes.CDLL(str(output))
+    lib.seal_open.argtypes = [ctypes.c_char_p]
+    lib.seal_open.restype = ctypes.c_void_p
+    lib.seal_close.argtypes = [ctypes.c_void_p]
+    lib.seal_kv.argtypes = [ctypes.c_void_p, ctypes.c_int64, ctypes.c_int]
+    lib.seal_compute.argtypes = [ctypes.c_void_p, ctypes.c_uint64, ctypes.c_int]
+    return lib
+
+
+@pytest.fixture
+def coalesced_channel(tmp_path, native_seal_library):
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+    channel = SealNotifications(tmp_path / "seal", 123, 8)
+    paths = [str(tmp_path / f"rank-{rank}") for rank in range(8)]
+    handles = []
+    for rank, path in enumerate(paths):
+        channel.descriptor(path, rank)
+        handle = native_seal_library.seal_open(path.encode())
+        assert handle
+        handles.append(handle)
+    try:
+        yield channel, native_seal_library, handles
+    finally:
+        for handle in handles:
+            native_seal_library.seal_close(handle)
+        channel.close()
+
+
+@pytest.mark.parametrize("prep_first", [False, True])
+def test_coalescing_requires_same_candidate_all_rank_kv_and_preparation(
+    coalesced_channel, prep_first
+):
+    """Different per-rank job orders and partial ACKs produce no engine wake."""
+    import select
+
+    channel, lib, handles = coalesced_channel
+    channel.arm(9, 1, [[101, 102], [201]], [8])
+    ticket = channel.ticket()
+    if prep_first:
+        for slot in range(2):
+            for rank in range(8):
+                channel.prepared(9, rank, 1, slot)
+    for rank, handle in enumerate(handles):
+        assert lib.seal_kv(handle, 101 if rank % 2 else 201, 1)
+    assert not select.select([channel.pipe], [], [], 0)[0]
+    # Completing one of a candidate's multiple jobs still cannot notify.
+    for handle in handles:
+        assert lib.seal_kv(handle, 101, 1)
+    assert channel.ticket() == ticket
+    for handle in handles:
+        assert lib.seal_kv(handle, 102, 1)
+    if not prep_first:
+        for rank in range(7):
+            channel.prepared(9, rank, 1, 0)
+        assert not select.select([channel.pipe], [], [], 0)[0]
+        channel.prepared(9, 7, 1, 0)
+    assert channel.wait(ticket, 1) == "progress"
+    assert channel.ticket() == ticket + 1
+    # Duplicate reports cannot produce a second notification for this candidate.
+    for rank, handle in enumerate(handles):
+        assert lib.seal_kv(handle, 102, 1)
+        channel.prepared(9, rank, 1, 0)
+    assert channel.ticket() == ticket + 1
+    channel.disarm()
+
+
+@pytest.mark.parametrize("event", ["kv", "ack", "compute", "cancel", "failure"])
+def test_producer_notification_interrupts_one_blocking_wait(
+    coalesced_channel, monkeypatch, event
+):
+    """No observer thread or periodic timeout is needed to interrupt a long wait."""
+    from vllm.v1.kv_offload import seal_notifications as notices
+
+    channel, lib, handles = coalesced_channel
+    channel.arm(9, 1, [[101]], [8])
+    for rank, handle in enumerate(handles):
+        if rank != 7 or event == "ack":
+            assert lib.seal_kv(handle, 101, 1)
+        if event != "ack" or rank != 7:
+            channel.prepared(9, rank, 1, 0)
+        if rank != 7:
+            assert lib.seal_compute(handle, 8, 1)
+    ticket = channel.ticket()
+    blocked = threading.Event()
+    calls = []
+    original = notices.select.select
+
+    def select_once(read, write, error, timeout):
+        calls.append(timeout)
+        blocked.set()
+        return original(read, write, error, timeout)
+
+    monkeypatch.setattr(notices.select, "select", select_once)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(channel.wait, ticket, 2)
+        assert blocked.wait(5)
+        if event == "kv":
+            assert lib.seal_kv(handles[7], 101, 1)
+        elif event == "ack":
+            channel.prepared(9, 7, 1, 0)
+        elif event == "compute":
+            assert lib.seal_compute(handles[7], 8, 1)
+        elif event == "cancel":
+            aborts = notices.NotificationQueue(channel)
+            aborts.put_nowait(["candidate"])
+            assert aborts.get_nowait() == ["candidate"]
+        else:
+            assert lib.seal_kv(handles[7], 101, 0)
+        if event == "failure":
+            with pytest.raises(RuntimeError, match="producer failed"):
+                result.result(timeout=1)
+        else:
+            assert result.result(timeout=1) == "progress"
+    assert len(calls) == 1
+    assert calls[0] > 1.5
+    assert channel.scans == 0
+    assert not hasattr(channel, "thread")
+    channel.disarm()
+
+
+def test_notification_before_wait_and_generation_reset_are_not_lost(coalesced_channel):
+    channel, lib, handles = coalesced_channel
+    channel.arm(9, 1, [[101]], [8])
+    ticket = channel.ticket()
+    for rank, handle in enumerate(handles):
+        channel.prepared(9, rank, 1, 0, generation=1)
+        assert lib.seal_kv(handle, 101, 1)
+    assert channel.wait(ticket, 1) == "progress"
+    channel.disarm()
+    channel.arm(9, 2, [[201]], [18])
+    ticket = channel.ticket()
+    for rank, handle in enumerate(handles):
+        channel.prepared(9, rank, 1, 0, generation=1)
+        assert lib.seal_kv(handle, 101, 1)
+        assert lib.seal_compute(handle, 8, 1)
+    assert channel.ticket() == ticket
+    for rank, handle in enumerate(handles):
+        channel.prepared(9, rank, 1, 0, generation=2)
+        assert lib.seal_kv(handle, 201, 1)
+    assert channel.wait(ticket, 1) == "progress"
+    channel.disarm()
+
+
+def test_arm_seeds_completions_that_preceded_candidate_publication(coalesced_channel):
+    channel, _, _ = coalesced_channel
+    channel.arm(9, 1, [[101, 102]], [8])
+    ticket = channel.ticket()
+    for rank in range(8):
+        channel.prepared(9, rank, 1, 0)
+    channel.seed(
+        SimpleNamespace(_released_jobs={101}, _rank_reports={102: set(range(8))})
+    )
+    assert channel.wait(ticket, 1) == "progress"
+    channel.disarm()
+
+
+def test_full_fifo_retains_notification_sequence(coalesced_channel):
+    channel, _, _ = coalesced_channel
+    channel.arm(9, 1, [[101]], [])
+    ticket = channel.ticket()
+    import os
+
+    with pytest.raises(BlockingIOError):
+        while True:
+            os.write(channel.pipe, bytes(4096))
+    channel.notify()
+    assert channel.wait(ticket, 1) == "progress"
+    assert channel.ticket() == ticket + 1
+    channel.disarm()
+
+
+def _seal_process_publish(library, transport, channel_path, rank, barrier):
+    import ctypes
+
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+    lib = ctypes.CDLL(library)
+    lib.seal_open.argtypes = [ctypes.c_char_p]
+    lib.seal_open.restype = ctypes.c_void_p
+    lib.seal_close.argtypes = [ctypes.c_void_p]
+    lib.seal_kv.argtypes = [ctypes.c_void_p, ctypes.c_int64, ctypes.c_int]
+    handle = lib.seal_open(transport.encode())
+    assert handle
+    channel = SealNotifications(channel_path)
+    try:
+        barrier.wait(timeout=30)
+        channel.prepared(9, rank, 1, 0)
+        for job in [101, 102] if rank % 2 else [102, 101]:
+            assert lib.seal_kv(handle, job, 1)
+    finally:
+        channel.close()
+        lib.seal_close(handle)
+
+
+def test_eight_processes_publish_without_losing_rank_updates(
+    tmp_path, coalesced_channel
+):
+    """Separate worker processes share masks; concurrent updates notify once."""
+    import multiprocessing
+
+    channel, lib, _ = coalesced_channel
+    channel.arm(9, 1, [[101, 102]], [])
+    ticket = channel.ticket()
+    context = multiprocessing.get_context("spawn")
+    barrier = context.Barrier(8)
+    workers = []
+    try:
+        for rank in range(8):
+            path = str(tmp_path / f"process-{rank}")
+            channel.descriptor(path, rank)
+            worker = context.Process(
+                target=_seal_process_publish,
+                args=(lib._name, path, channel.path, rank, barrier),
+            )
+            worker.start()
+            workers.append(worker)
+        for worker in workers:
+            worker.join(timeout=40)
+            assert worker.exitcode == 0
+        assert channel.wait(ticket, 1) == "progress"
+        assert channel.ticket() == ticket + 1
+    finally:
+        for worker in workers:
+            if worker.is_alive():
+                worker.terminate()
+                worker.join(timeout=5)
+        channel.disarm()
+
+
+def test_terminal_compute_stays_visible_after_a_busy_authoritative_read(
+    coalesced_channel,
+):
+    """An advisory end must not be lost if the engine's timing read was busy."""
+    channel, lib, handles = coalesced_channel
+    channel.arm(9, 1, [[101]], [8])
+    for handle in handles:
+        assert lib.seal_compute(handle, 8, 1)
+    ticket = channel.ticket()
+    assert channel.wait(ticket, 1) == "progress"
+    # Same ticket remains immediately actionable until the engine disarms.
+    assert channel.wait(ticket, 1) == "progress"
+    channel.disarm()
+
+
+def test_notification_channel_cleanup_preserves_abort_queue(tmp_path):
+    from pathlib import Path
+
+    from vllm.v1.kv_offload.seal_notifications import (
+        NotificationQueue,
+        SealNotifications,
+    )
+
+    channel = SealNotifications(str(tmp_path / "seal"), 123, 8)
+    descriptor = channel.descriptor(str(tmp_path / "worker"), 0)
+    aborts = NotificationQueue(channel)
+    channel.close()
+    channel.close()
+    assert not Path(descriptor).exists()
+    assert not Path(channel.path).exists()
+    assert not Path(channel.path + ".fifo").exists()
+    aborts.put_nowait(["request"])
+    assert aborts.get_nowait() == ["request"]
+
+
+def test_disarm_wakes_waiter_and_next_window_has_no_old_membership(
+    coalesced_channel, monkeypatch
+):
+    from vllm.v1.kv_offload import seal_notifications as notices
+
+    channel, _, _ = coalesced_channel
+    channel.arm(9, 1, [[101]], [8])
+    ticket = channel.ticket()
+    blocked = threading.Event()
+    original = notices.select.select
+
+    def wait(read, write, error, timeout):
+        blocked.set()
+        return original(read, write, error, timeout)
+
+    monkeypatch.setattr(notices.select, "select", wait)
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        result = pool.submit(channel.wait, ticket, 2)
+        assert blocked.wait(5)
+        channel.disarm()
+        assert result.result(timeout=1) == "progress"
+    channel.arm(19, 2, [[201]], [18])
+    assert channel.wait(channel.ticket(), 0) == "timer"
+    channel.disarm()
+
+
+@pytest.mark.parametrize("status", [2, 3])
+def test_coalesced_preparation_preserves_nonready_and_failure_status(
+    coalesced_channel, status
+):
+    channel, _, _ = coalesced_channel
+    channel.arm(9, 1, [[101]], [])
+    ticket = channel.ticket()
+    channel.prepared(9, 0, status, 0)
+    if status == 3:
+        with pytest.raises(RuntimeError, match="producer failed"):
+            channel.wait(ticket, 0)
+    else:
+        assert channel.wait(ticket, 0) == "timer"
+    channel.disarm()

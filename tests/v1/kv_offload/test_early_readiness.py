@@ -3202,3 +3202,39 @@ def test_full_predicted_wait_requires_conditioned_readiness_policy(missing):
     with pytest.raises(ValueError, match="full predicted wait"):
         early.validate_experiment_options(options)
     assert not early.validate_experiment_options({})["late_seal_full_prediction_wait"]
+
+
+def test_coalesced_notifications_require_full_prediction_wait():
+    assert not early.validate_experiment_options({})[
+        "late_seal_coalesced_notifications"
+    ]
+    with pytest.raises(ValueError, match="require full predicted waits"):
+        early.validate_experiment_options({"late_seal_coalesced_notifications": True})
+
+
+def test_coalesced_startup_owns_rank_descriptors_and_closes_them():
+    """Create real native CPU rings; allocating the channel requires no CUDA work."""
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    extra = {
+        "early_load_completion": True,
+        "async_h2d_submission": True,
+        "coalesced_seal_notifications": True,
+    }
+    config = SimpleNamespace(
+        kv_transfer_config=SimpleNamespace(kv_connector_extra_config=extra),
+        parallel_config=SimpleNamespace(world_size=8),
+    )
+    readiness = EarlyLoadReadiness.from_config(config)
+    assert readiness is not None
+    try:
+        channel = readiness.seal_notifications
+        assert channel is not None
+        descriptors = [Path(path + ".seal") for path in readiness.paths]
+        assert all(path.exists() for path in descriptors)
+        assert not hasattr(channel, "thread")
+    finally:
+        readiness.close()
+    assert all(not path.exists() for path in descriptors)
+    assert not Path(channel.path).exists()

@@ -922,13 +922,15 @@ STABLE_TORCH_LIBRARY_FRAGMENT(_C_cache_ops, ops) {
       "                  Tensor sizes,"
       "                  bool is_src_access_order_any=False) -> ()");
 
+  ops.def("coalesced_seal_notification_abi() -> int");
   ops.def(
       "create_async_batch_memcpy_submitter(int device_index, "
       "int chunk_bytes, int max_descriptors, str completion_ring_path='', "
       "int completion_session=0) -> int");
   ops.def(
       "submit_async_batch_memcpy(int handle, int job_id, Tensor src_ptrs, "
-      "Tensor dst_ptrs, Tensor sizes, bool src_access_any, int compute_stream) -> ()");
+      "Tensor dst_ptrs, Tensor sizes, bool src_access_any, int "
+      "compute_stream) -> ()");
   ops.def("poll_async_batch_memcpy(int handle) -> (int[], float[])");
   ops.def("wait_async_batch_memcpy(int handle, int[] job_ids) -> ()");
   ops.def("destroy_async_batch_memcpy_submitter(int handle) -> ()");
@@ -1075,6 +1077,8 @@ STABLE_TORCH_LIBRARY_IMPL(_C_cache_ops, CompositeExplicitAutograd, ops) {
   ops.impl("wait_async_batch_memcpy", TORCH_BOX(&wait_async_batch_memcpy));
   ops.impl("destroy_async_batch_memcpy_submitter",
            TORCH_BOX(&destroy_async_batch_memcpy_submitter));
+  ops.impl("coalesced_seal_notification_abi",
+           TORCH_BOX(&coalesced_seal_notification_abi));
   ops.impl("create_async_batch_memcpy_completion_ring",
            TORCH_BOX(&create_async_batch_memcpy_completion_ring));
   ops.impl("poll_async_batch_memcpy_completion_ring",

@@ -266,7 +266,14 @@ class EngineCore:
         )
         self.async_scheduling = vllm_config.scheduler_config.async_scheduling
 
-        self.aborts_queue = queue.Queue[list[str]]()
+        from vllm.v1.kv_offload.seal_notifications import NotificationQueue
+
+        notifications = getattr(self.early_load_readiness, "seal_notifications", None)
+        self.aborts_queue: queue.Queue[list[str]] = (
+            NotificationQueue(notifications)
+            if notifications
+            else queue.Queue[list[str]]()
+        )
 
         self._idle_state_callbacks: list[Callable] = []
 
@@ -1804,6 +1811,11 @@ class EngineCore:
             or not 0 <= schedule_delay_ms <= 120
         ):
             raise ValueError("schedule_delay_ms must be a number from 0 to 120")
+        if (
+            options["late_seal_coalesced_notifications"]
+            and getattr(readiness, "seal_notifications", None) is None
+        ):
+            raise ValueError("start with coalesced_seal_notifications enabled")
         policy = options["deferral_policy"]
         from vllm.v1.kv_offload.overlap_predictor import OverlapPredictor
         from vllm.v1.kv_offload.scheduling_deferral import Predictor
@@ -2021,6 +2033,9 @@ class EngineCore:
             ]
             self.scheduler._late_seal_full_prediction_wait = options[
                 "late_seal_full_prediction_wait"
+            ]
+            self.scheduler._late_seal_coalesced_notifications = options[
+                "late_seal_coalesced_notifications"
             ]
             self.scheduler._late_seal_wait_trace = options["late_seal_wait_trace"]
             self.scheduler._late_seal_hybrid_guard_us = options[

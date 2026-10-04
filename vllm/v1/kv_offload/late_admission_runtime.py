@@ -145,6 +145,9 @@ def signal_prepared(path, step, rank, status, slot=-1):
         if os.pread(fd, 1, offset) != b"\0":
             raise RuntimeError("duplicate late preparation publication")
         os.pwrite(fd, bytes([status]), offset)
+        from vllm.v1.kv_offload.seal_notifications import signal_preparation
+
+        signal_preparation(path, step, rank, status, slot)
     finally:
         os.close(fd)
 
@@ -343,6 +346,15 @@ def stage_rpc(core, step, base, candidates):
     full_prediction_wait = getattr(
         core.scheduler, "_late_seal_full_prediction_wait", False
     )
+    coalesced = (
+        getattr(core.scheduler, "_late_seal_coalesced_notifications", False) is True
+    )
+    notifications = None
+    notifications_armed = False
+    if coalesced:
+        notifications = getattr(core.early_load_readiness, "seal_notifications", None)
+        if notifications is None or not full_prediction_wait:
+            raise RuntimeError("coalesced seal notifications are unavailable")
     wait_trace = getattr(core.scheduler, "_late_seal_wait_trace", False)
     wakeup = None
     wake_ticket = None
@@ -387,7 +399,11 @@ def stage_rpc(core, step, base, candidates):
         if full_prediction_wait and coarse and wakeup is None:
             from vllm.v1.kv_offload.seal_wakeup import TransportWakeup
 
-            wakeup = TransportWakeup(core, fd, queued)
+            wakeup = (
+                notifications
+                if notifications is not None
+                else TransportWakeup(core, fd, queued)
+            )
             poll_cpu_ns += time.thread_time_ns() - poll_cpu_start
             # Recheck progress after installing the observer, before any wait.
             return
@@ -435,6 +451,24 @@ def stage_rpc(core, step, base, candidates):
                 destination,
                 protocol=pickle.HIGHEST_PROTOCOL,
             )
+        if notifications is not None:
+            connector = core.scheduler.connector.connector_scheduler
+            candidate_jobs = [
+                sorted(connector._req_status[c.req_id].transfer_jobs)
+                for c in candidates
+            ]
+            compute_steps = [
+                output.readiness_timeline_step
+                for _, output, _ in queued
+                if output.total_num_scheduled_tokens > 0
+            ]
+            notifications.arm(
+                step, core.scheduler._late_generation, candidate_jobs, compute_steps
+            )
+            notifications_armed = True
+            notifications.descriptor(
+                path, 0, core.scheduler._late_generation, track=False
+            )
         core.model_executor.publish_late_preparation(data_path)
         deadline = time.monotonic() + 30
         previous = None
@@ -471,6 +505,15 @@ def stage_rpc(core, step, base, candidates):
                 raise RuntimeError("invalid late preparation publication")
             if 3 in statuses:
                 raise RuntimeError("worker preparation failed")
+            if notifications is not None:
+                notifications.seed(
+                    core.early_load_readiness,
+                    (slot for slot, c in enumerate(candidates) if c.req_id in kv_ready),
+                )
+                for compute_step in compute_steps:
+                    notifications.seed_compute(
+                        compute_step, core.deferral_timing.read_execution(compute_step)
+                    )
             if statuses != previous:
                 record(
                     core.scheduler,
@@ -762,7 +805,7 @@ def stage_rpc(core, step, base, candidates):
             if time.monotonic() >= deadline:
                 raise TimeoutError("late preparation timed out")
             time.sleep(getattr(core.scheduler, "_late_seal_poll_us", 25) / 1e6)
-        if wakeup is not None:
+        if wakeup is not None and notifications is None:
             wakeup.close()
         if cancelled is None:
             cancelled = cancelled_candidates(core, candidates)
@@ -816,6 +859,7 @@ def stage_rpc(core, step, base, candidates):
             hybrid_transition_ns=hybrid_transition_ns,
             hybrid_polling_ns=hybrid_polling_ns,
             full_prediction_wait=full_prediction_wait,
+            coalesced_notifications=coalesced,
             progress_bridge_cpu_ns=wakeup.cpu_ns if wakeup else 0,
             progress_bridge_scans=wakeup.scans if wakeup else 0,
             progress_bridge_notifications=wakeup.notifications if wakeup else 0,
@@ -827,7 +871,12 @@ def stage_rpc(core, step, base, candidates):
             if all(s == 1 for s in statuses[world * (slot + 1) : world * (slot + 2)])
         ]
     finally:
-        if wakeup is not None and not wakeup.closed:
+        if notifications_armed:
+            assert notifications is not None
+            notifications.disarm()
+            with suppress(FileNotFoundError):
+                os.unlink(path + ".seal")
+        elif wakeup is not None and not wakeup.closed:
             wakeup.close()
         os.close(fd)
         os.unlink(path)

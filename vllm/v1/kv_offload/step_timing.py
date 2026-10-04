@@ -100,6 +100,17 @@ class RankFile:
             os.ftruncate(self.fd, CAPACITY * RECORD.size)
         self.mem = mmap.mmap(self.fd, CAPACITY * RECORD.size)
         self.lock = threading.Lock()
+        self.seal = None
+        descriptor = Path(path + ".seal")
+        if path.endswith(".execution") and descriptor.exists():
+            from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+            lines = descriptor.read_text().splitlines()
+            self.seal = SealNotifications(lines[0])
+            self.seal_rank = int(lines[1])
+            if self.seal._get(1) != int(lines[2]):
+                self.seal.close()
+                raise RuntimeError("stale execution notification session")
 
     def write(self, record: list[int]) -> None:
         with self.lock:
@@ -108,6 +119,8 @@ class RankFile:
                 RECORD.pack_into(self.mem, record[0] % CAPACITY * RECORD.size, *record)
             finally:
                 fcntl.flock(self.fd, fcntl.LOCK_UN)
+        if self.seal is not None and (record[5] == 0 or record[8]):
+            self.seal.compute(record[0], self.seal_rank, record[5] != 0)
 
     def read(self, step: int) -> tuple[int, ...] | None:
         return self.read_with_status(step)[0]
@@ -126,6 +139,8 @@ class RankFile:
             fcntl.flock(self.fd, fcntl.LOCK_UN)
 
     def close(self):
+        if self.seal is not None:
+            self.seal.close()
         self.mem.close()
         os.close(self.fd)
 
@@ -160,7 +175,22 @@ class TimingChannel:
         except BaseException:
             self.close()
             raise
-        config.kv_transfer_config.kv_connector_extra_config[PATH_KEY] = self.paths
+        extra = config.kv_transfer_config.kv_connector_extra_config
+        from vllm.v1.kv_offload.seal_notifications import PATH_KEY as SEAL_PATH_KEY
+
+        self.notification_links = []
+        if SEAL_PATH_KEY in extra:
+            from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+            channel = SealNotifications(extra[SEAL_PATH_KEY])
+            try:
+                for rank, path in enumerate(self.paths):
+                    self.notification_links.append(
+                        channel.descriptor(path + ".execution", rank)
+                    )
+            finally:
+                channel.close()
+        extra[PATH_KEY] = self.paths
         self.events: list[dict] = []
         from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
 
@@ -387,6 +417,9 @@ class TimingChannel:
         for path in self.paths:
             with contextlib.suppress(FileNotFoundError):
                 os.unlink(path + ".execution")
+        for path in getattr(self, "notification_links", []):
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(path)
 
 
 def timing_only(fn):
@@ -445,6 +478,8 @@ class WorkerTiming:
                     else ExecutionObserver(path + ".execution", device)
                 )
             except Exception:
+                if os.path.exists(path + ".execution.seal"):
+                    raise
                 self.execution = UnavailableExecutionObserver(path + ".execution")
         self.thread.start()
 

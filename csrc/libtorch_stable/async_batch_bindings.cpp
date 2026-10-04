@@ -1,6 +1,7 @@
 #include "ops.h"
 #include <torch/csrc/stable/library.h>
 STABLE_TORCH_LIBRARY_FRAGMENT(_C_cache_ops, ops) {
+  ops.def("coalesced_seal_notification_abi() -> int");
   ops.def(
       "create_async_batch_memcpy_submitter(int device_index, "
       "int chunk_bytes, int max_descriptors, str completion_ring_path='', "
@@ -33,6 +34,8 @@ STABLE_TORCH_LIBRARY_IMPL(_C_cache_ops, CompositeExplicitAutograd, ops) {
            TORCH_BOX(&configure_async_batch_memcpy_pipeline));
   ops.impl("destroy_async_batch_memcpy_submitter",
            TORCH_BOX(&destroy_async_batch_memcpy_submitter));
+  ops.impl("coalesced_seal_notification_abi",
+           TORCH_BOX(&coalesced_seal_notification_abi));
   ops.impl("create_async_batch_memcpy_completion_ring",
            TORCH_BOX(&create_async_batch_memcpy_completion_ring));
   ops.impl("poll_async_batch_memcpy_completion_ring",

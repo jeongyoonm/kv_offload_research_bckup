@@ -736,3 +736,5 @@ void ngram_compute_n_gram_ids(
     torch::stable::Tensor& exclusive_req_len_sums,
     torch::stable::Tensor& ne_token_table, torch::stable::Tensor& row_indices,
     torch::stable::Tensor& column_starts, torch::stable::Tensor& n_gram_ids);
+
+int64_t coalesced_seal_notification_abi();

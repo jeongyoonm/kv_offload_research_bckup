@@ -53,6 +53,7 @@ class SchedulerInterface(ABC):
     _late_seal_hybrid_guard_us: int
     _late_seal_prediction_to_readiness: bool
     _late_seal_full_prediction_wait: bool
+    _late_seal_coalesced_notifications: bool
     _late_seal_wait_trace: bool
     _late_seal_prediction_reserve_us: int
     _late_seal_prediction_scale_percent: int

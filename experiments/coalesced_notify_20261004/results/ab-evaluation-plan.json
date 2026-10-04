@@ -1,0 +1,14 @@
+{
+  "model": "Inferact/GLM-5.3-NVFP4",
+  "parallelism": "TP8",
+  "concurrency": 32,
+  "requests_per_measured_cell": 64,
+  "repeats": 3,
+  "workloads": [[8192,95,100],[61440,95,100]],
+  "mode_order": [["bridge","coalesced"],["coalesced","bridge"],["bridge","coalesced"]],
+  "training": "Both workloads once on bridge before freezing common predictor",
+  "prediction": "Full predicted remaining wait minus 50 ms, readiness-conditioned, 2 ms fine polling",
+  "cpu": "All API-server descendants, user+system process time, samples every 25 ms; both full profile envelope and replay trace interval",
+  "limits": ["Short cells are not a full benchmark", "Three repeats do not establish statistical significance", "GPU readiness-to-seal uses observed preparation ACK time", "Both modes share new native binaries and inactive notifier transport"],
+  "stop": "12 accepted measured cells and correctness probes; no 300-request expansion"
+}

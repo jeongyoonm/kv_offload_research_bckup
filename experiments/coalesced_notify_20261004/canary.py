@@ -132,6 +132,12 @@ if __name__ == "__main__":
             json.dumps(dict(event="started", time=time.time(), argv=sys.argv)) + "\n"
         )
     try:
+        # Resuming saved cells would skip common training on a fresh server.
+        if any((ROOT / "gpu").glob("p*/*/result.json")):
+            raise RuntimeError("Archive the existing A/B directory before rerunning")
+        from environment_preflight import check
+
+        check(SOURCE, ROOT, runner.glm.UUIDS)
         runner.main()
     except BaseException as error:
         with (ROOT / "process_log.jsonl").open("a") as log:

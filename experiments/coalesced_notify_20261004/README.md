@@ -76,7 +76,7 @@ worktrees retain their original native libraries. The source observer derives
 from the prior timing-interference observer, with notifications added after its
 ordinary timing publication.
 
-## Verification scope
+## Initial verification scope
 
 The CPU harness covers partial masks, multiple jobs, out-of-order reports,
 eight concurrent worker processes, notification-before-wait races, cancellation,
@@ -90,3 +90,30 @@ that the actual H2D and native compute publishers signal, and that notifications
 consume neither KV ring records nor ordinary completions. No model is loaded
 and no serving benchmark is run. This verifies the mechanism; throughput and
 net CPU savings, including producer locking costs, remain unmeasured.
+
+## Matched serving comparison
+
+The subsequent CPU replay and twelve GLM TP8 serving cells are documented in
+[AB_REPORT.md](results/AB_REPORT.md). Raw artifacts are under
+`/mnt/localnvme/glm53_coalesced_notify_20261004/ab`.
+
+```bash
+mkdir -p /mnt/localnvme/glm53_coalesced_notify_20261004/cpu-comparison/tmp
+TMPDIR=/mnt/localnvme/glm53_coalesced_notify_20261004/cpu-comparison/tmp \
+  PYTHONPATH="$PWD" .venv/bin/python \
+  experiments/coalesced_notify_20261004/cpu_compare.py
+PYTHONPATH="$PWD" .venv/bin/python \
+  experiments/coalesced_notify_20261004/canary.py \
+  --name gpu --policies bridge,coalesced \
+  --workloads 8192:95:100,61440:95:100 \
+  --requests 64 --repeats 3 --max-model-len 65536 --distinct-fact-probe
+.venv/bin/python experiments/coalesced_notify_20261004/analyze_ab.py
+```
+
+These scripts use fixed artifact locations. Archive the existing `ab` directory
+before a fresh serving comparison; the driver rejects saved measured cells to
+avoid skipping predictor training on a new server. Native build artifacts remain
+in the parent directory. The launch preflight checks vendor dependencies and GPU
+memory cleanup. Fresh worktrees must also restore their ignored precompiled
+vendor sources and libraries; restoration source paths and hashes for this run
+are retained in the artifact directory.

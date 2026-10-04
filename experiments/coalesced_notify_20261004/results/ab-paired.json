@@ -1,0 +1,176 @@
+[
+  {
+    "workload": "p61440_f95_h100",
+    "repeat": 0,
+    "throughput": {
+      "bridge": 6.862261841750207,
+      "coalesced": 6.91991664297389,
+      "change_percent": 0.8401719805110064
+    },
+    "mean_ttft_ms": {
+      "bridge": 3908.637899953125,
+      "coalesced": 3895.2469586875,
+      "change_percent": -0.3425986650179458
+    },
+    "p95_ttft_ms": {
+      "bridge": 5893.6665726,
+      "coalesced": 5879.06435695,
+      "change_percent": -0.2477611427474824
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 1535.293213454965,
+      "coalesced": 1594.3820617619622,
+      "change_percent": 3.848701198517368
+    },
+    "coarse_progress_wakes": {
+      "bridge": 205,
+      "coalesced": 40,
+      "change_percent": -80.48780487804879
+    }
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "repeat": 1,
+    "throughput": {
+      "bridge": 7.1420055264515145,
+      "coalesced": 6.893034098905249,
+      "change_percent": -3.486015610379478
+    },
+    "mean_ttft_ms": {
+      "bridge": 3711.0710586249998,
+      "coalesced": 3885.745651546875,
+      "change_percent": 4.706851207171292
+    },
+    "p95_ttft_ms": {
+      "bridge": 5514.305191899999,
+      "coalesced": 5787.3985082,
+      "change_percent": 4.952451973480709
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 1475.7256088309018,
+      "coalesced": 1514.266665661187,
+      "change_percent": 2.611668226101882
+    },
+    "coarse_progress_wakes": {
+      "bridge": 336,
+      "coalesced": 40,
+      "change_percent": -88.09523809523809
+    }
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "repeat": 2,
+    "throughput": {
+      "bridge": 6.923693281487199,
+      "coalesced": 6.906942850492309,
+      "change_percent": -0.2419291310849614
+    },
+    "mean_ttft_ms": {
+      "bridge": 3870.734069109375,
+      "coalesced": 3872.1203927031247,
+      "change_percent": 0.03581552152636114
+    },
+    "p95_ttft_ms": {
+      "bridge": 5766.70809105,
+      "coalesced": 5799.04598735,
+      "change_percent": 0.5607687399712402
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 1516.2493436660498,
+      "coalesced": 1527.8130673798573,
+      "change_percent": 0.7626531719280738
+    },
+    "coarse_progress_wakes": {
+      "bridge": 248,
+      "coalesced": 43,
+      "change_percent": -82.66129032258065
+    }
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "repeat": 0,
+    "throughput": {
+      "bridge": 35.159635460438665,
+      "coalesced": 31.572318344759328,
+      "change_percent": -10.20294172195203
+    },
+    "mean_ttft_ms": {
+      "bridge": 756.178107796875,
+      "coalesced": 897.1987634374999,
+      "change_percent": 18.6491322859754
+    },
+    "p95_ttft_ms": {
+      "bridge": 978.2937225,
+      "coalesced": 1138.25970665,
+      "change_percent": 16.35152924637111
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 296.327247267679,
+      "coalesced": 323.78020209426563,
+      "change_percent": 9.264404498648005
+    },
+    "coarse_progress_wakes": {
+      "bridge": 84,
+      "coalesced": 23,
+      "change_percent": -72.61904761904762
+    }
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "repeat": 1,
+    "throughput": {
+      "bridge": 34.97919502246229,
+      "coalesced": 36.068088096868735,
+      "change_percent": 3.112973508130179
+    },
+    "mean_ttft_ms": {
+      "bridge": 745.62431296875,
+      "coalesced": 739.341731453125,
+      "change_percent": -0.8425934356419362
+    },
+    "p95_ttft_ms": {
+      "bridge": 996.02160985,
+      "coalesced": 959.9877765,
+      "change_percent": -3.6177762604394315
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 314.95492614166244,
+      "coalesced": 306.46545004543344,
+      "change_percent": -2.6954574739404324
+    },
+    "coarse_progress_wakes": {
+      "bridge": 84,
+      "coalesced": 19,
+      "change_percent": -77.38095238095238
+    }
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "repeat": 2,
+    "throughput": {
+      "bridge": 33.509895717246415,
+      "coalesced": 32.59003185347167,
+      "change_percent": -2.7450514067142273
+    },
+    "mean_ttft_ms": {
+      "bridge": 801.61346725,
+      "coalesced": 855.94031684375,
+      "change_percent": 6.77718773614453
+    },
+    "p95_ttft_ms": {
+      "bridge": 1061.7834846,
+      "coalesced": 1139.2572417,
+      "change_percent": 7.2965682951064315
+    },
+    "server_cpu_ms_per_request": {
+      "bridge": 332.9934044082766,
+      "coalesced": 337.5341325259854,
+      "change_percent": 1.3636090257636235
+    },
+    "coarse_progress_wakes": {
+      "bridge": 66,
+      "coalesced": 32,
+      "change_percent": -51.515151515151516
+    }
+  }
+]

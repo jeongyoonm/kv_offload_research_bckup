@@ -39,6 +39,7 @@ CHECK_IMPORTS = {
             # Trusted engine-generated preparation IPC and its CPU harness.
             "vllm/v1/kv_offload/late_admission_runtime.py",
             "tests/v1/kv_offload/test_late_admission_harness.py",
+            "experiments/coalesced_notify_20261004/cpu_compare.py",
             # pickle
             "vllm/multimodal/hasher.py",
             "vllm/transformers_utils/config.py",

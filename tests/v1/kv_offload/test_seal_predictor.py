@@ -94,3 +94,23 @@ def test_recent_reserve_tracks_changed_cost_and_resists_a_single_outlier():
             [(step, 1, duration + 1, 0, 0, 0, 0, 1, 0)] * 8, shape
         )
     assert estimator.recent_preparation_reserve(10_000_000, shape) == 30_000_000
+
+
+def test_frozen_estimator_preserves_forecast_and_preparation_reserve():
+    """An A/B replay must not retrain the common forecast or reserve."""
+    import numpy as np
+
+    estimator = ComputeEstimator()
+    data = {"step": 1, "request_shapes": [[1024, 30720]]}
+    estimator.coefficients = np.array([100.0, 0.0, 0.0, 0.0])
+    records = [(1, 1, 20_000_001, 0, 0, 0, 0, 1, 0)] * 8
+    estimator.observe_preparation(records, data)
+    forecast = estimator.predict(data)
+    reserve = estimator.preparation_reserve(10_000_000, data)
+    estimator.frozen = True
+    estimator.observe(data, [(1, 1, 1, 1, 1, 1, 700_000_000, 1, 1)] * 8)
+    estimator.observe_preparation([(1, 1, 700_000_001, 0, 0, 0, 0, 1, 0)] * 8, data)
+    assert not estimator.samples
+    assert len(estimator.preparation_ns) == 1
+    assert estimator.predict(data) == forecast
+    assert estimator.preparation_reserve(10_000_000, data) == reserve

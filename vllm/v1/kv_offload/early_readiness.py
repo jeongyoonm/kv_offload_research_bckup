@@ -41,6 +41,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_prediction_to_readiness": False,
     "late_seal_full_prediction_wait": False,
     "late_seal_coalesced_notifications": False,
+    "late_seal_freeze_estimator": False,
     "late_seal_wait_trace": False,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,

@@ -11,14 +11,17 @@ class ComputeEstimator:
     """Fit positive costs for tokens, attention work, and request count."""
 
     def __init__(self):
-        self.samples = deque(maxlen=128)
+        self.frozen = False
+        self.samples: deque[tuple[np.ndarray, float]] = deque(maxlen=128)
         self.coefficients = None
-        self.errors = deque(maxlen=32)
-        self.preparation_ns = deque(maxlen=64)
-        self.preparation_shapes = deque(maxlen=128)
-        self.recent_preparation = deque(maxlen=128)
+        self.errors: deque[float] = deque(maxlen=32)
+        self.preparation_ns: deque[int] = deque(maxlen=64)
+        self.preparation_shapes: deque[tuple[np.ndarray, int]] = deque(maxlen=128)
+        self.recent_preparation: deque[tuple[np.ndarray, int, str]] = deque(maxlen=128)
 
     def observe_preparation(self, records, data=None):
+        if self.frozen:
+            return
         if not records or any(
             not r
             or len(r) != 9
@@ -132,6 +135,8 @@ class ComputeEstimator:
         return max(1_000_000, int(duration * correction * 1_000_000))
 
     def observe(self, data, execution):
+        if self.frozen:
+            return
         features = self.features(data)
         if (
             features is None

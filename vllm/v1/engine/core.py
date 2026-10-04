@@ -2062,6 +2062,10 @@ class EngineCore:
                 self, *args
             )
             self.scheduler._late_admission_records = []
+        if self.deferral_timing is not None:
+            self.deferral_timing.seal_estimator.frozen = options[
+                "late_seal_freeze_estimator"
+            ]
         readiness.configure(early_load_completion, schedule_delay_ms)
         readiness.experiment_options = options
         self.scheduler._kv_experiment_options = options

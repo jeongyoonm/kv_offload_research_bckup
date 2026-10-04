@@ -1,0 +1,49 @@
+{
+  "status": "complete",
+  "planned_cells": 48,
+  "measured_requests": 7360,
+  "policies": [
+    "capped50_fine2",
+    "readiness2",
+    "full_margin50_fine2",
+    "full_margin50_fine5",
+    "full_margin50_fine10",
+    "full_margin0_fine2",
+    "full_margin0_fine5",
+    "full_margin0_fine10"
+  ],
+  "screen_seed": 57,
+  "confirmation_seed": 58,
+  "workloads": [
+    [
+      8192,
+      95,
+      100
+    ],
+    [
+      61440,
+      95,
+      100
+    ],
+    [
+      61440,
+      99,
+      100
+    ]
+  ],
+  "counts": [
+    300,
+    80,
+    80
+  ],
+  "progress_bridge_poll_us": 1000,
+  "load_only_poll_us": 2000,
+  "source": "/mnt/localnvme/vllm_glm53_seal_full_wait_20261004",
+  "cpu_protocol_checks": 99,
+  "cpu_option_checks": 14,
+  "runtime_commit": "721ef7e22daf81f3d8f802e2c8afd50b4abf1a52",
+  "driver_pid": 2902784,
+  "accepted_cells": 48,
+  "missing_execution_timing_steps": {},
+  "gpu_processes_remaining": 0
+}

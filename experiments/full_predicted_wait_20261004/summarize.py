@@ -8,6 +8,7 @@ import importlib.util
 import json
 import math
 import statistics
+import textwrap
 import time
 from collections import defaultdict
 from pathlib import Path
@@ -223,12 +224,14 @@ def summarize(root):
             )
         ),
         "",
+        "<!-- markdownlint-disable MD013 -->",
+        "",
         (
             "| Workload | Policy | Repeats | req/s | Gain | Mean TTFT ms | "
             "p95 TTFT ms | Compute rounds | Accounted polling CPU ms | "
             "Exposed hold ms | Sleep after stop ms | Admission ratio |"
         ),
-        "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|",
+        "| " + " | ".join(["---", "---"] + ["---:"] * 10) + " |",
     ]
     for item in aggregate:
         ratio = (
@@ -247,6 +250,8 @@ def summarize(root):
         )
     text.extend(
         [
+            "",
+            "<!-- markdownlint-enable MD013 -->",
             "",
             "## Timing and CPU limits",
             "",
@@ -268,7 +273,13 @@ def summarize(root):
             ),
         ]
     )
-    (out / "REPORT.md").write_text("\n".join(text) + "\n")
+    (out / "REPORT.md").write_text(
+        "\n".join(
+            line if line.startswith("|") else textwrap.fill(line, width=80)
+            for line in text
+        )
+        + "\n"
+    )
     (root / "checkpoint.json").write_text(
         json.dumps(
             dict(

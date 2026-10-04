@@ -1,0 +1,1706 @@
+{
+  "note": "Two seeds are a repeatability check, not a significance estimate.",
+  "comparisons": [
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "capped50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -1.0756002611518212,
+          "mean_ttft_reduction_percent": -0.557692206271998,
+          "p95_ttft_reduction_percent": -4.223671887763181,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": -25.61067100000001,
+          "exposed_sleep_difference_ms": -0.6619609999999998
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.6857511861224852,
+          "mean_ttft_reduction_percent": -2.0578172743929146,
+          "p95_ttft_reduction_percent": -8.923054662094355,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -157.08878800000002,
+          "exposed_sleep_difference_ms": -2.994268000000001
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.8806757236371532
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.482260002685499,
+          "mean_ttft_reduction_percent": 1.3787614291092987,
+          "p95_ttft_reduction_percent": -3.1974214788647704,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 69.239548,
+          "exposed_sleep_difference_ms": 10.799227
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.039614727899361935,
+          "mean_ttft_reduction_percent": -0.0951959220326648,
+          "p95_ttft_reduction_percent": 0.1995069163269192,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 81.26968499999997,
+          "exposed_sleep_difference_ms": 16.907356999999998
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.2213226373930686
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.3799605464623443,
+          "mean_ttft_reduction_percent": 0.8287584678705384,
+          "p95_ttft_reduction_percent": -7.556141958764062,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 43.62887699999999,
+          "exposed_sleep_difference_ms": 10.137266
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.725094255555403,
+          "mean_ttft_reduction_percent": -2.1549721545536915,
+          "p95_ttft_reduction_percent": -8.705745634568917,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -75.81910300000004,
+          "exposed_sleep_difference_ms": 13.913088999999998
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.3274331454534707
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin50_fine10",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.2733290688868628,
+          "mean_ttft_reduction_percent": -0.5583271781716581,
+          "p95_ttft_reduction_percent": -7.957259997940769,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 9.048596000000003,
+          "exposed_sleep_difference_ms": -1.9414540000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.011365264963525412,
+          "mean_ttft_reduction_percent": -1.2293635122740731,
+          "p95_ttft_reduction_percent": -9.472682878719606,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -105.81936400000006,
+          "exposed_sleep_difference_ms": 11.933822999999997
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.1309819019616687
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.19070429566929725,
+          "mean_ttft_reduction_percent": -0.6330357241840057,
+          "p95_ttft_reduction_percent": -0.3550282750652167,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -4.5216290000000186,
+          "exposed_sleep_difference_ms": 9.990508000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.10787385974220243,
+          "mean_ttft_reduction_percent": -0.5645152791233565,
+          "p95_ttft_reduction_percent": -0.20438864968730375,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 2.8131459999999606,
+          "exposed_sleep_difference_ms": 13.863636999999997
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.04141521796354741
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.6780714957382656,
+          "mean_ttft_reduction_percent": 1.9991418710722964,
+          "p95_ttft_reduction_percent": -2.8323376044584014,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 73.76117700000002,
+          "exposed_sleep_difference_ms": 0.8087189999999995
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.1473296574535321,
+          "mean_ttft_reduction_percent": 0.46668484980816327,
+          "p95_ttft_reduction_percent": 0.40307173314159117,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 78.456539,
+          "exposed_sleep_difference_ms": 3.0437200000000004
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.2653709191423668
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.5736658905844525,
+          "mean_ttft_reduction_percent": 1.4525987232075876,
+          "p95_ttft_reduction_percent": -7.175638139387641,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 48.15050600000001,
+          "exposed_sleep_difference_ms": 0.14675799999999972
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.832070528702511,
+          "mean_ttft_reduction_percent": -1.5815289031284152,
+          "p95_ttft_reduction_percent": -8.4840166178771,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -78.632249,
+          "exposed_sleep_difference_ms": 0.04945199999999961
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.37079768094097076
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.007615338060817933,
+          "mean_ttft_reduction_percent": -0.06070031523872643,
+          "p95_ttft_reduction_percent": -0.15908305577507775,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -16.818077999999986,
+          "exposed_sleep_difference_ms": -1.7755380000000005
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.3350633201908546,
+          "mean_ttft_reduction_percent": -1.82017222029216,
+          "p95_ttft_reduction_percent": -9.565963175707548,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -14.909339999999986,
+          "exposed_sleep_difference_ms": -0.45656499999999944
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.6713393291258363
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.529248365272796,
+          "mean_ttft_reduction_percent": 1.3415663081268292,
+          "p95_ttft_reduction_percent": -2.632947339663061,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 94.659011,
+          "exposed_sleep_difference_ms": 6.03407
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.008805349691898279,
+          "mean_ttft_reduction_percent": 0.03861434094714067,
+          "p95_ttft_reduction_percent": 0.9153896639146009,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 97.95566199999998,
+          "exposed_sleep_difference_ms": -0.5234209999999999
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.2602215077904488
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.4264435020989286,
+          "mean_ttft_reduction_percent": 0.7913559125972358,
+          "p95_ttft_reduction_percent": -6.967826284031187,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 69.04834,
+          "exposed_sleep_difference_ms": 5.372109
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.6944961530244265,
+          "mean_ttft_reduction_percent": -2.018408320867371,
+          "p95_ttft_reduction_percent": -7.925984278097498,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -59.13312600000003,
+          "exposed_sleep_difference_ms": -3.5176890000000007
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.36597367453725105
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin50_fine5",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.5424372090538365,
+          "mean_ttft_reduction_percent": -0.610557942861556,
+          "p95_ttft_reduction_percent": -0.5750474191065003,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 6.903201000000024,
+          "exposed_sleep_difference_ms": 0.3740200000000007
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.06900530722380172,
+          "mean_ttft_reduction_percent": -1.3990999217244449,
+          "p95_ttft_reduction_percent": -5.628689594056557,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 31.797980999999965,
+          "exposed_sleep_difference_ms": -0.8574840000000004
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.3057212581388191
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.14494149363883935,
+          "mean_ttft_reduction_percent": -0.6709895969281954,
+          "p95_ttft_reduction_percent": 0.19389840729119312,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 20.89783399999999,
+          "exposed_sleep_difference_ms": 5.225351000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.13872869627464812,
+          "mean_ttft_reduction_percent": -0.4300776159370079,
+          "p95_ttft_reduction_percent": 0.5143912966876996,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 19.49912299999997,
+          "exposed_sleep_difference_ms": -3.5671410000000003
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.0031063986820956124
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.2029097411148557,
+          "mean_ttft_reduction_percent": 1.9263333645644032,
+          "p95_ttft_reduction_percent": 4.4090027101158284,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 60.190951999999996,
+          "exposed_sleep_difference_ms": 12.740681
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.028252673927098293,
+          "mean_ttft_reduction_percent": 1.1203938767271548,
+          "p95_ttft_reduction_percent": 8.835254184609642,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 187.08904900000005,
+          "exposed_sleep_difference_ms": 4.973534000000002
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.0873285335938787
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.1036149770346615,
+          "mean_ttft_reduction_percent": 1.3793841693334086,
+          "p95_ttft_reduction_percent": 0.37155263035052455,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 34.580280999999985,
+          "exposed_sleep_difference_ms": 12.07872
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.7138101170030109,
+          "mean_ttft_reduction_percent": -0.9143677389292337,
+          "p95_ttft_reduction_percent": 0.7005740829429952,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 30.000261000000023,
+          "exposed_sleep_difference_ms": 1.9792660000000009
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.1949024300158253
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.4703485804447016,
+          "mean_ttft_reduction_percent": -0.13503915562420588,
+          "p95_ttft_reduction_percent": 6.894009608444652,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": -30.388303000000008,
+          "exposed_sleep_difference_ms": 10.156424000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.2174027408658028,
+          "mean_ttft_reduction_percent": -1.1514437086132867,
+          "p95_ttft_reduction_percent": -0.2897715496669617,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 93.72317000000004,
+          "exposed_sleep_difference_ms": 1.4732490000000018
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.8438756606552522
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.685891373507121,
+          "mean_ttft_reduction_percent": 2.0585926141047817,
+          "p95_ttft_reduction_percent": -2.66900860823045,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 90.579255,
+          "exposed_sleep_difference_ms": 2.584257
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 1.2038052247393738,
+          "mean_ttft_reduction_percent": 2.2459764310284402,
+          "p95_ttft_reduction_percent": 9.098660405022041,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 93.36587899999999,
+          "exposed_sleep_difference_ms": 3.500285
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.9448482991232474
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.581401657727599,
+          "mean_ttft_reduction_percent": 1.5123810184005437,
+          "p95_ttft_reduction_percent": -7.005410662261435,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 64.96858399999999,
+          "exposed_sleep_difference_ms": 1.9222960000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.5097989300096195,
+          "mean_ttft_reduction_percent": 0.2343772476120165,
+          "p95_ttft_reduction_percent": 0.9874841843861448,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -63.722909000000016,
+          "exposed_sleep_difference_ms": 0.506016999999999
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.0456002938686093
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.0884384134599374,
+          "mean_ttft_reduction_percent": 1.9402777311870456,
+          "p95_ttft_reduction_percent": -2.046133681628892,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 87.75580999999998,
+          "exposed_sleep_difference_ms": 5.66005
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.06024152738295374,
+          "mean_ttft_reduction_percent": 1.417876750169822,
+          "p95_ttft_reduction_percent": 6.195361585115567,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 66.15768100000001,
+          "exposed_sleep_difference_ms": 0.33406300000000044
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.5743399704214456
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.9796189006674458,
+          "mean_ttft_reduction_percent": 1.3934063026019183,
+          "p95_ttft_reduction_percent": -6.356227542489079,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 62.14513899999997,
+          "exposed_sleep_difference_ms": 4.998089
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.625922765728093,
+          "mean_ttft_reduction_percent": -0.6107632115285089,
+          "p95_ttft_reduction_percent": -2.174877576224521,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -90.931107,
+          "exposed_sleep_difference_ms": -2.6602050000000004
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.6768480674696764
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.39201786590974397,
+          "mean_ttft_reduction_percent": -0.12080169774522087,
+          "p95_ttft_reduction_percent": 0.6066825179722457,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -2.823445000000021,
+          "exposed_sleep_difference_ms": 3.0757929999999996
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.129961165804927,
+          "mean_ttft_reduction_percent": -0.8471259295780742,
+          "p95_ttft_reduction_percent": -3.1939010281283764,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -27.20819799999998,
+          "exposed_sleep_difference_ms": -3.1662219999999994
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.36897164994759146
+    },
+    {
+      "workload": "p61440_f95_h100",
+      "policy": "readiness2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.0872952112838785,
+          "mean_ttft_reduction_percent": 0.554599249481591,
+          "p95_ttft_reduction_percent": 4.0525072771486865,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 25.61067100000001,
+          "exposed_sleep_difference_ms": 0.6619609999999998
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.6904862034526671,
+          "mean_ttft_reduction_percent": 2.016324990431906,
+          "p95_ttft_reduction_percent": 8.192071632379228,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 157.08878800000002,
+          "exposed_sleep_difference_ms": 2.994268000000001
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 0.8888907073682728
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "capped50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -1.038975587345381,
+          "mean_ttft_reduction_percent": -1.8569161123565214,
+          "p95_ttft_reduction_percent": -2.182905091057208,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -23.89694399999999,
+          "exposed_sleep_difference_ms": 3.720548000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.04952146893686393,
+          "mean_ttft_reduction_percent": 0.35597092942583064,
+          "p95_ttft_reduction_percent": 6.846330179188875,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -31.729056,
+          "exposed_sleep_difference_ms": -1.7025909999999982
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.4947270592042585
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.0443715007874887,
+          "mean_ttft_reduction_percent": 0.47578800625304174,
+          "p95_ttft_reduction_percent": 5.545573974736751,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 86.79065899999998,
+          "exposed_sleep_difference_ms": 10.514461
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.911811567672217,
+          "mean_ttft_reduction_percent": -3.3747003252901475,
+          "p95_ttft_reduction_percent": 0.029442597193007902,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 96.697819,
+          "exposed_sleep_difference_ms": 2.578302
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.4337200334423641
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.005454851492259216,
+          "mean_ttft_reduction_percent": -1.372293121954704,
+          "p95_ttft_reduction_percent": 3.4837235003024047,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 62.893714999999986,
+          "exposed_sleep_difference_ms": 14.235009000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.863236855906969,
+          "mean_ttft_reduction_percent": -3.006716443751034,
+          "p95_ttft_reduction_percent": 6.873757038964712,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 64.968763,
+          "exposed_sleep_difference_ms": 0.8757110000000017
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.9343458536996141
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin50_fine10",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -1.0600385632677067,
+          "mean_ttft_reduction_percent": -1.703846560786082,
+          "p95_ttft_reduction_percent": 5.855164186401717,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 32.66496699999996,
+          "exposed_sleep_difference_ms": 1.5567650000000022
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.300381763589975,
+          "mean_ttft_reduction_percent": -2.8801674361861984,
+          "p95_ttft_reduction_percent": 6.129240926733837,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 55.980642999999986,
+          "exposed_sleep_difference_ms": -17.119878999999997
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.1802101634288409
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.4069077082519468,
+          "mean_ttft_reduction_percent": -1.5044740413811653,
+          "p95_ttft_reduction_percent": 6.192345451192471,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 2.2115349999999694,
+          "exposed_sleep_difference_ms": 14.004456000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.14068783225408277,
+          "mean_ttft_reduction_percent": -2.5332486423984335,
+          "p95_ttft_reduction_percent": 6.015025513533335,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 34.63099299999999,
+          "exposed_sleep_difference_ms": -2.0359809999999996
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -0.27379777025301477
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.4572087035796377,
+          "mean_ttft_reduction_percent": 1.9509110966152043,
+          "p95_ttft_reduction_percent": -0.6894655660740323,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 84.57912400000001,
+          "exposed_sleep_difference_ms": -3.4899950000000004
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.773619001543858,
+          "mean_ttft_reduction_percent": -0.8206622671504293,
+          "p95_ttft_reduction_percent": -6.368659404384069,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 62.066826000000006,
+          "exposed_sleep_difference_ms": 4.6142829999999995
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.15820514898211013
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.4030930735473781,
+          "mean_ttft_reduction_percent": 0.13022176674948316,
+          "p95_ttft_reduction_percent": -2.887421036074178,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 60.68218000000002,
+          "exposed_sleep_difference_ms": 0.23055300000000045
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.7249758547899008,
+          "mean_ttft_reduction_percent": -0.4617700186247964,
+          "p95_ttft_reduction_percent": 0.9136902256168922,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 30.337770000000006,
+          "exposed_sleep_difference_ms": 2.9116920000000013
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.6609413906212613
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.0151668161681338,
+          "mean_ttft_reduction_percent": 1.7025463379636507,
+          "p95_ttft_reduction_percent": 1.9198295110769092,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -19.526256999999987,
+          "exposed_sleep_difference_ms": 0.5588920000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.6790456865313654,
+          "mean_ttft_reduction_percent": 2.182566872025793,
+          "p95_ttft_reduction_percent": -5.033955617468955,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -141.82180699999998,
+          "exposed_sleep_difference_ms": 6.284263000000001
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 0.8471062513497496
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.296302098052072,
+          "mean_ttft_reduction_percent": 2.313964585925421,
+          "p95_ttft_reduction_percent": -0.8354707150275864,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 95.73438100000001,
+          "exposed_sleep_difference_ms": 7.981573000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.7749087088212434,
+          "mean_ttft_reduction_percent": -1.6785457227504352,
+          "p95_ttft_reduction_percent": -6.713439767660012,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 89.45648200000001,
+          "exposed_sleep_difference_ms": 8.01135
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.26069669461541434
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.233468492496237,
+          "mean_ttft_reduction_percent": 0.500016854799179,
+          "p95_ttft_reduction_percent": -3.03661333885743,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 71.83743700000002,
+          "exposed_sleep_difference_ms": 11.702121000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.7262662007492713,
+          "mean_ttft_reduction_percent": -1.3165996585145168,
+          "p95_ttft_reduction_percent": 0.5925146644038315,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 57.72742600000001,
+          "exposed_sleep_difference_ms": 6.308759000000003
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.24639885412651719
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin50_fine5",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.8835005604212354,
+          "mean_ttft_reduction_percent": 1.351770727946433,
+          "p95_ttft_reduction_percent": 0.7512256663704586,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 50.58227200000002,
+          "exposed_sleep_difference_ms": 8.375956000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 1.8062005939014858,
+          "mean_ttft_reduction_percent": 1.9573582279107882,
+          "p95_ttft_reduction_percent": -6.147101360555185,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 44.78813900000003,
+          "exposed_sleep_difference_ms": 10.767858000000002
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.3448505771613606
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.8270416712566675,
+          "mean_ttft_reduction_percent": 0.3702772696521084,
+          "p95_ttft_reduction_percent": -0.14500538674300234,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 11.155257000000006,
+          "exposed_sleep_difference_ms": 11.471568000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.0013129948026935345,
+          "mean_ttft_reduction_percent": -0.8509004367843076,
+          "p95_ttft_reduction_percent": -0.3241371708608165,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 27.389656000000002,
+          "exposed_sleep_difference_ms": 3.3970670000000016
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.412864338226987
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.126956624498866,
+          "mean_ttft_reduction_percent": 2.1431191058603583,
+          "p95_ttft_reduction_percent": -0.3288446030942582,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 54.125692000000015,
+          "exposed_sleep_difference_ms": 8.957695999999999
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.6194854802961003,
+          "mean_ttft_reduction_percent": -0.4806882623034969,
+          "p95_ttft_reduction_percent": -6.498081393780919,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 40.71717600000001,
+          "exposed_sleep_difference_ms": 19.698180999999998
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.7537355721013828
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.0658824770715114,
+          "mean_ttft_reduction_percent": 0.3259989174875577,
+          "p95_ttft_reduction_percent": -2.5189280597340824,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 30.228748000000024,
+          "exposed_sleep_difference_ms": 12.678244
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.5702707896689252,
+          "mean_ttft_reduction_percent": -0.12300622240271064,
+          "p95_ttft_reduction_percent": 0.7931288929386215,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 8.98812000000001,
+          "exposed_sleep_difference_ms": 17.99559
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.2478058437012931
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.6819966927331453,
+          "mean_ttft_reduction_percent": 1.8952412226745707,
+          "p95_ttft_reduction_percent": 2.2711052411852117,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -49.97968899999998,
+          "exposed_sleep_difference_ms": 13.006583
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 1.861997357283518,
+          "mean_ttft_reduction_percent": 2.512413787693213,
+          "p95_ttft_reduction_percent": -5.161753632094235,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -163.17145699999998,
+          "exposed_sleep_difference_ms": 21.368161
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.7719970250083317
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.4375995222736684,
+          "mean_ttft_reduction_percent": 0.25266652329110073,
+          "p95_ttft_reduction_percent": -2.6603696385760767,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 104.105381,
+          "exposed_sleep_difference_ms": -4.048887000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -2.4361223046468927,
+          "mean_ttft_reduction_percent": -3.0702391620184066,
+          "p95_ttft_reduction_percent": -1.2707355245917595,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 203.88863299999997,
+          "exposed_sleep_difference_ms": -1.6699800000000011
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.9992613911866122
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.605922617278476,
+          "mean_ttft_reduction_percent": -1.5995577836838804,
+          "p95_ttft_reduction_percent": -4.901348073914691,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 80.208437,
+          "exposed_sleep_difference_ms": -0.3283389999999997
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -2.3878072392603866,
+          "mean_ttft_reduction_percent": -2.7033390737119634,
+          "p95_ttft_reduction_percent": 5.6625934043149195,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 172.15957699999998,
+          "exposed_sleep_difference_ms": -3.3725709999999993
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.4968649282694313
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.4004287418483141,
+          "mean_ttft_reduction_percent": 0.9753787423040672,
+          "p95_ttft_reduction_percent": -1.5987062732525814,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 45.152108999999996,
+          "exposed_sleep_difference_ms": -0.39438300000000126
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -3.5175748449817523,
+          "mean_ttft_reduction_percent": -3.7084924324186197,
+          "p95_ttft_reduction_percent": -0.533541095183665,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 44.66834299999998,
+          "exposed_sleep_difference_ms": -2.756508000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -1.058573051566719
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.34690304175695186,
+          "mean_ttft_reduction_percent": -0.8634254050301049,
+          "p95_ttft_reduction_percent": -3.8165096049396885,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 21.255165000000005,
+          "exposed_sleep_difference_ms": 3.3261649999999996
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -3.4697953307790685,
+          "mean_ttft_reduction_percent": -3.3393203480134304,
+          "p95_ttft_reduction_percent": 6.349317069023142,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 12.939286999999979,
+          "exposed_sleep_difference_ms": -4.459098999999999
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -1.5614461445110583
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.9586342407168935,
+          "mean_ttft_reduction_percent": 0.7245428963589484,
+          "p95_ttft_reduction_percent": 1.0341511228345923,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -58.953272,
+          "exposed_sleep_difference_ms": 3.6545039999999993
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.1084558812962775,
+          "mean_ttft_reduction_percent": -0.6192410880088595,
+          "p95_ttft_reduction_percent": 0.7279441840620127,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -159.22029,
+          "exposed_sleep_difference_ms": -1.086528
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.07491082028969198
+    },
+    {
+      "workload": "p61440_f99_h100",
+      "policy": "readiness2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.0498836218721719,
+          "mean_ttft_reduction_percent": 1.8230633551757913,
+          "p95_ttft_reduction_percent": 2.136272294384256,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 23.89694399999999,
+          "exposed_sleep_difference_ms": -3.720548000000001
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.049496957316519374,
+          "mean_ttft_reduction_percent": -0.35724260926233153,
+          "p95_ttft_reduction_percent": -7.349501305056871,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 31.729056,
+          "exposed_sleep_difference_ms": 1.7025909999999982
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.5001933322778263
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "capped50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -1.4170225148484428,
+          "mean_ttft_reduction_percent": -1.1474927381140976,
+          "p95_ttft_reduction_percent": 7.940658589498895,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -25.147802,
+          "exposed_sleep_difference_ms": -1.8325980000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.4564826729278826,
+          "mean_ttft_reduction_percent": 0.9278034298401128,
+          "p95_ttft_reduction_percent": -2.467729904750837,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -12.125255999999993,
+          "exposed_sleep_difference_ms": 0.2794110000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.4802699209602801
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.8393023485904676,
+          "mean_ttft_reduction_percent": 3.17383335287883,
+          "p95_ttft_reduction_percent": 5.762633192063127,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 131.74739499999998,
+          "exposed_sleep_difference_ms": 0.4071529999999999
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.2560935223199001,
+          "mean_ttft_reduction_percent": -0.7939833774381011,
+          "p95_ttft_reduction_percent": 1.1314038687025296,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 135.773728,
+          "exposed_sleep_difference_ms": 1.5207760000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.7916044131352837
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.3678760550494005,
+          "mean_ttft_reduction_percent": 2.0627601220088554,
+          "p95_ttft_reduction_percent": 13.245700754015155,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 106.599593,
+          "exposed_sleep_difference_ms": -1.4254450000000003
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.1992201280521133,
+          "mean_ttft_reduction_percent": 0.1411866574102527,
+          "p95_ttft_reduction_percent": -1.3084060444368273,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 123.648472,
+          "exposed_sleep_difference_ms": 1.8001870000000002
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.2835480915507569
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin50_fine10",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.4010728007750042,
+          "mean_ttft_reduction_percent": -0.3419158683214185,
+          "p95_ttft_reduction_percent": 5.016936730610322,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 17.24516399999999,
+          "exposed_sleep_difference_ms": -0.6370340000000003
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 5.068377649099665,
+          "mean_ttft_reduction_percent": 4.559184705450859,
+          "p95_ttft_reduction_percent": 4.538489903276988,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": -0.0816120000000069,
+          "exposed_sleep_difference_ms": 1.7817060000000002
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 2.33365242416233
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine10",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.57422665771967,
+          "mean_ttft_reduction_percent": 3.4004060181615614,
+          "p95_ttft_reduction_percent": 16.79482701918773,
+          "compute_round_difference": -2,
+          "polling_cpu_difference_ms": -33.09357600000001,
+          "exposed_sleep_difference_ms": 0.7223769999999998
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 1.1098432934227187,
+          "mean_ttft_reduction_percent": 0.3162791689578559,
+          "p95_ttft_reduction_percent": 3.535592809916066,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -4.386482000000029,
+          "exposed_sleep_difference_ms": -0.6217059999999996
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 2.3420349755711944
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.2559282356476622,
+          "mean_ttft_reduction_percent": -0.23454825837603277,
+          "p95_ttft_reduction_percent": -13.259023966777539,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 164.84097100000002,
+          "exposed_sleep_difference_ms": -0.31522399999999995
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.3509434603499848,
+          "mean_ttft_reduction_percent": -1.1137852170243212,
+          "p95_ttft_reduction_percent": -2.4923067598146,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 140.16021,
+          "exposed_sleep_difference_ms": 2.1424819999999998
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.5475076123511613
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -1.1647208399217734,
+          "mean_ttft_reduction_percent": -1.38473242072239,
+          "p95_ttft_reduction_percent": -4.26551155177699,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 139.693169,
+          "exposed_sleep_difference_ms": -2.147822
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.900627610239646,
+          "mean_ttft_reduction_percent": -0.17564804973961845,
+          "p95_ttft_reduction_percent": -5.021540063795515,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 128.03495400000003,
+          "exposed_sleep_difference_ms": 2.421893
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.0326742250807097
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine2",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.5198287450425609,
+          "mean_ttft_reduction_percent": -1.0910332993060434,
+          "p95_ttft_reduction_percent": -6.677057899240468,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 17.631495,
+          "exposed_sleep_difference_ms": 0.798239
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.9786739902659223,
+          "mean_ttft_reduction_percent": -1.9295824045244991,
+          "p95_ttft_reduction_percent": -1.1160941180686557,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": -18.821187999999978,
+          "exposed_sleep_difference_ms": 1.7358260000000003
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.2492513676542416
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.5162484126296967,
+          "mean_ttft_reduction_percent": 2.5910597920136613,
+          "p95_ttft_reduction_percent": -2.734299046462163,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 146.355118,
+          "exposed_sleep_difference_ms": 2.556528
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.0444279575132942,
+          "mean_ttft_reduction_percent": -1.8293808327677574,
+          "p95_ttft_reduction_percent": -7.632284339711082,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 143.34743500000002,
+          "exposed_sleep_difference_ms": -0.621869
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 1.2359102275582012
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.049399866096291,
+          "mean_ttft_reduction_percent": 1.4732992768531017,
+          "p95_ttft_reduction_percent": 5.423480895132227,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 121.20731600000002,
+          "exposed_sleep_difference_ms": 0.7239300000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.592712917242666,
+          "mean_ttft_reduction_percent": -0.8846043448163865,
+          "p95_ttft_reduction_percent": -10.288358407528575,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 131.222179,
+          "exposed_sleep_difference_ms": -0.34245799999999993
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.7283434744268125
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin50_fine5",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.9843310045471583,
+          "mean_ttft_reduction_percent": 2.7282479105422808,
+          "p95_ttft_reduction_percent": 16.944956735923732,
+          "compute_round_difference": -2,
+          "polling_cpu_difference_ms": 18.969473000000022,
+          "exposed_sleep_difference_ms": 3.52489
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.6393062447278552,
+          "mean_ttft_reduction_percent": 0.43599691783292593,
+          "p95_ttft_reduction_percent": 3.0372370626557954,
+          "compute_round_difference": -2,
+          "polling_cpu_difference_ms": 6.930684000000014,
+          "exposed_sleep_difference_ms": 0.566083
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.8118186246375068
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin0_fine5",
+      "reference": "full_margin0_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.251997397419526,
+          "mean_ttft_reduction_percent": 2.8189961440301947,
+          "p95_ttft_reduction_percent": 9.292614885505824,
+          "compute_round_difference": -2,
+          "polling_cpu_difference_ms": -18.48585299999999,
+          "exposed_sleep_difference_ms": 2.8717520000000003
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.3107130606094577,
+          "mean_ttft_reduction_percent": -0.707713210624572,
+          "p95_ttft_reduction_percent": -5.014988678069021,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 3.1872249999999838,
+          "exposed_sleep_difference_ms": -2.7643509999999996
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 1.7813552290144918
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 4.257450625832115,
+          "mean_ttft_reduction_percent": 3.503769278049229,
+          "p95_ttft_reduction_percent": 0.7850836094197899,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 114.50223100000001,
+          "exposed_sleep_difference_ms": 1.0441870000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -5.067624808295679,
+          "mean_ttft_reduction_percent": -5.608887629855253,
+          "p95_ttft_reduction_percent": -3.569067817094407,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 135.85534,
+          "exposed_sleep_difference_ms": -0.2609300000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.40508709123178166
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 2.7800990770570744,
+          "mean_ttft_reduction_percent": 2.396482037961012,
+          "p95_ttft_reduction_percent": 8.663401389852543,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 89.35442900000001,
+          "exposed_sleep_difference_ms": -0.788411
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -4.634274964546659,
+          "mean_ttft_reduction_percent": -4.629044748209465,
+          "p95_ttft_reduction_percent": -6.124872675688509,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 123.730084,
+          "exposed_sleep_difference_ms": 0.01848099999999997
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.9270879437447923
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine10",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 3.450730798533197,
+          "mean_ttft_reduction_percent": 2.6792274453625753,
+          "p95_ttft_reduction_percent": 6.5508865468341115,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": -32.707245,
+          "exposed_sleep_difference_ms": 2.1576500000000003
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -5.671705093253243,
+          "mean_ttft_reduction_percent": -6.460951800121828,
+          "p95_ttft_reduction_percent": -2.1783969957444027,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -23.126058,
+          "exposed_sleep_difference_ms": -0.6675859999999996
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -1.1104871473600229
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.7798106606612398,
+          "mean_ttft_reduction_percent": 0.8472413556147362,
+          "p95_ttft_reduction_percent": -6.1699921212243325,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 147.209476,
+          "exposed_sleep_difference_ms": -1.1134629999999999
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 0.6404019976771202,
+          "mean_ttft_reduction_percent": 0.800353703267942,
+          "p95_ttft_reduction_percent": -1.3610223513370823,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 158.981398,
+          "exposed_sleep_difference_ms": 0.40665599999999946
+        }
+      ],
+      "throughput_wins": 2,
+      "mean_paired_throughput_gain_percent": 0.71010632916918
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine2",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.6482619468219597,
+          "mean_ttft_reduction_percent": -0.2905293494693817,
+          "p95_ttft_reduction_percent": 2.260604477619965,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 122.06167400000001,
+          "exposed_sleep_difference_ms": -2.9460610000000003
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": 1.0998079947614814,
+          "mean_ttft_reduction_percent": 1.7207314239982896,
+          "p95_ttft_reduction_percent": -3.862338611662186,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 146.856142,
+          "exposed_sleep_difference_ms": 0.6860669999999995
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.22577302396976084
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 0.5165032417009607,
+          "mean_ttft_reduction_percent": -0.1410359282954632,
+          "p95_ttft_reduction_percent": -23.694233377032916,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": 127.385645,
+          "exposed_sleep_difference_ms": -0.968362
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.6730383635065738,
+          "mean_ttft_reduction_percent": -2.2752979796635264,
+          "p95_ttft_reduction_percent": -11.003730792264378,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 136.41675099999998,
+          "exposed_sleep_difference_ms": -1.1879520000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": -0.5782675609028065
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "readiness2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.9078382403723162,
+          "mean_ttft_reduction_percent": -1.290147043444878,
+          "p95_ttft_reduction_percent": -13.87209660966473,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 102.237843,
+          "exposed_sleep_difference_ms": -2.80096
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -1.2241928208195252,
+          "mean_ttft_reduction_percent": -1.3263842571290096,
+          "p95_ttft_reduction_percent": -13.743003052414204,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": 124.291495,
+          "exposed_sleep_difference_ms": -0.9085409999999999
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.0660155305959207
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "full_margin50_fine5",
+      "reference": "full_margin50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": -0.26127000758799923,
+          "mean_ttft_reduction_percent": -0.9967219242529524,
+          "p95_ttft_reduction_percent": -16.505832679915322,
+          "compute_round_difference": 1,
+          "polling_cpu_difference_ms": -19.823831000000013,
+          "exposed_sleep_difference_ms": 0.14510100000000004
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -2.2987193167581688,
+          "mean_ttft_reduction_percent": -3.1004663804257815,
+          "p95_ttft_reduction_percent": -9.513231237451226,
+          "compute_round_difference": 2,
+          "polling_cpu_difference_ms": -22.564647000000008,
+          "exposed_sleep_difference_ms": -1.5946079999999996
+        }
+      ],
+      "throughput_wins": 0,
+      "mean_paired_throughput_gain_percent": -1.279994662173084
+    },
+    {
+      "workload": "p8192_f95_h100",
+      "policy": "readiness2",
+      "reference": "capped50_fine2",
+      "paired": [
+        {
+          "phase": "screen",
+          "throughput_gain_percent": 1.4373906641862888,
+          "mean_ttft_reduction_percent": 1.1344747230513486,
+          "p95_ttft_reduction_percent": -8.625587004898039,
+          "compute_round_difference": -1,
+          "polling_cpu_difference_ms": 25.147802,
+          "exposed_sleep_difference_ms": 1.8325980000000002
+        },
+        {
+          "phase": "confirmation",
+          "throughput_gain_percent": -0.4544083774206342,
+          "mean_ttft_reduction_percent": -0.9364922369345718,
+          "p95_ttft_reduction_percent": 2.40829957591987,
+          "compute_round_difference": 0,
+          "polling_cpu_difference_ms": 12.125255999999993,
+          "exposed_sleep_difference_ms": -0.2794110000000001
+        }
+      ],
+      "throughput_wins": 1,
+      "mean_paired_throughput_gain_percent": 0.4914911433828273
+    }
+  ]
+}

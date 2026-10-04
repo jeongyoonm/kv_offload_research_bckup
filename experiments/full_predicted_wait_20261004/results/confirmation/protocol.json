@@ -1,0 +1,45 @@
+{
+  "name": "confirmation",
+  "workloads": [
+    [
+      8192,
+      95,
+      100
+    ],
+    [
+      61440,
+      95,
+      100
+    ],
+    [
+      61440,
+      99,
+      100
+    ]
+  ],
+  "counts": [
+    300,
+    80,
+    80
+  ],
+  "policies": [
+    "full_margin0_fine10",
+    "full_margin0_fine5",
+    "full_margin0_fine2",
+    "full_margin50_fine10",
+    "full_margin50_fine5",
+    "full_margin50_fine2",
+    "readiness2",
+    "capped50_fine2"
+  ],
+  "repeats": 1,
+  "seed": 58,
+  "distinct_fact_probe": true,
+  "distinct_prefix_len": 11776,
+  "max_model_len": 65536,
+  "source": "/mnt/localnvme/vllm_glm53_seal_full_wait_20261004",
+  "gpu_gib": 96,
+  "cpu_gib": 1984,
+  "concurrency": 32,
+  "shared_server_from": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen"
+}

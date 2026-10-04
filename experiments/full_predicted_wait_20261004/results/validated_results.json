@@ -1,0 +1,1154 @@
+{
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 40.955021479805026,
+    "mean_ttft_ms": 750.4431904633333,
+    "p95_ttft_ms": 938.61683795,
+    "p99_ttft_ms": 1196.91480755,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "de38f7682d41e8d2f880a3385ffb21639f09ca65098ecfffa4f06d8654512b34"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 41.543705135071235,
+    "mean_ttft_ms": 741.9296021566666,
+    "p95_ttft_ms": 1019.57804995,
+    "p99_ttft_ms": 1021.1905512999999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "5ee554dd7c813202890a414a086af7e614eccc01ef74051343db792ad99e1574"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 41.274393103380646,
+    "mean_ttft_ms": 744.0851254033332,
+    "p95_ttft_ms": 996.5294229,
+    "p99_ttft_ms": 996.8255026799999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "d230ae09304ec32b467fd8e808d0eca8aff117b6540deacf676e38ad015810ac"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 41.16655549338754,
+    "mean_ttft_ms": 751.5015849833333,
+    "p95_ttft_ms": 1161.0149020499998,
+    "p99_ttft_ms": 1161.37925899,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "e9e6517a5e9020d4de80456cb595aa11ffe793f29b9b7e7369362b8a3543bf39"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 42.698661298106664,
+    "mean_ttft_ms": 724.1493925066666,
+    "p95_ttft_ms": 931.2479110000003,
+    "p99_ttft_ms": 965.40910189,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "83402c8cbe6869aebb34924a3ddbe832ab4386d50dd4ca25ada17226d4e3ecf9"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 41.05983694368741,
+    "mean_ttft_ms": 752.2033418966666,
+    "p95_ttft_ms": 1063.06826945,
+    "p99_ttft_ms": 1063.3919650999999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "bacd040aad158265974ca4b67fed81cc41d85d358ffcd466fac550fc9206811f"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 42.39510177248082,
+    "mean_ttft_ms": 730.9987586933333,
+    "p95_ttft_ms": 964.2814292,
+    "p99_ttft_ms": 964.7302651699999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "17bee620f89c277790ac50c0c6efad16bd2f53d1fd0403f2a61adbded4552120"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p8192_f95_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed57_n300/manifest.json",
+    "throughput": 42.527408581344915,
+    "mean_ttft_ms": 726.62537419,
+    "p95_ttft_ms": 884.5277924999999,
+    "p99_ttft_ms": 1029.1385250399999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "59814b235bdb212454e0fa6a9aa785726f9fbe5293134ea9df9801498eb0bc6f"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 6.865634448215524,
+    "mean_ttft_ms": 4032.2916968249997,
+    "p95_ttft_ms": 5665.81205035,
+    "p99_ttft_ms": 5665.90261742,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "fdc9510ad51aa01d5cba4db9bf3a200581aa5e66d4b2e388d0d38bc3b1a1f4a5"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 6.940284162795228,
+    "mean_ttft_ms": 4009.9286373375,
+    "p95_ttft_ms": 5436.204604699999,
+    "p99_ttft_ms": 5831.52758406,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "0747b7e49061370048c9e5ab6e2dea286f6648244033b8262f03627665b35f0d"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.050037931596679,
+    "mean_ttft_ms": 3949.283237775,
+    "p95_ttft_ms": 5817.0330617,
+    "p99_ttft_ms": 5817.66383988,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "9d6a51f243a674d789c88428f599de00e8d7b15c83878efb4c5c4032dda1f83a"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.077675339841951,
+    "mean_ttft_ms": 3954.054038975,
+    "p95_ttft_ms": 5781.74213905,
+    "p99_ttft_ms": 5782.09034912,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "f0f69e9866252bcc3b1b104cbd9283b0c913f017aa250df864d14989d5ef21aa"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.016878178264601,
+    "mean_ttft_ms": 3954.6163165124995,
+    "p95_ttft_ms": 5416.0062435,
+    "p99_ttft_ms": 5416.287523439999,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "a264e8ebaeb9efaf40f3aa3052c95fa7b75e68dc6726211c2459f0c0e703ea2a"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.049501047374772,
+    "mean_ttft_ms": 3951.6804651499997,
+    "p95_ttft_ms": 5826.2869756499995,
+    "p99_ttft_ms": 5826.678406739999,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "a6c172af9c4f3915d26d9cdd9dd4f2fd934c5afd52e182343339825f1cb9ce1d"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.039283395262621,
+    "mean_ttft_ms": 3978.195829975,
+    "p95_ttft_ms": 5814.989898,
+    "p99_ttft_ms": 5815.38653948,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "99e93f9ce5e8474bfff6619db13c4a709da6f2f5f6d73db7a9699d6c7a4f5347"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f95_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed57_n80/manifest.json",
+    "throughput": 7.036057346054176,
+    "mean_ttft_ms": 3976.6960142,
+    "p95_ttft_ms": 5846.9719417999995,
+    "p99_ttft_ms": 5847.187364029999,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "35a951ba47d764da335cf2311edbdb2073d8f9e1e473a01d4e529e595917e361"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.446290872237672,
+    "mean_ttft_ms": 2534.2501369375,
+    "p95_ttft_ms": 3674.328979799999,
+    "p99_ttft_ms": 4000.03140836,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "9488b7b9cc0af6b0c34ae65089bc60347ffa74d6c9fccaff7e6f84910a68525d"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.566463605417145,
+    "mean_ttft_ms": 2488.0491513625,
+    "p95_ttft_ms": 3595.8353078,
+    "p99_ttft_ms": 3668.1797890199978,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "536b82ca7e6772dbfe2ecad44dffd885023689ba6842c48ba151c237a9ceb287"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.49637978641264,
+    "mean_ttft_ms": 2527.846935225,
+    "p95_ttft_ms": 3772.0797124,
+    "p99_ttft_ms": 3772.28058701,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "6a28af19305a4a9c7c6b7a4b2fba015d92f89d69acd019b9f27dcd743658aaf3"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.606588019488047,
+    "mean_ttft_ms": 2509.531599825,
+    "p95_ttft_ms": 3733.0707076999997,
+    "p99_ttft_ms": 3733.2247515999998,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "b1b26f1d2e96231cf636ff89f70bc28f18df084f25050e8d1786fd0e7c4ba797"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.68974851420414,
+    "mean_ttft_ms": 2479.9381380625,
+    "p95_ttft_ms": 3686.4118123499998,
+    "p99_ttft_ms": 3686.6057164,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "8985aea136325c3781e986a281bc7961c0940a988a80e703f7abacd7d3ebd494"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.61308721906496,
+    "mean_ttft_ms": 2484.8091698000003,
+    "p95_ttft_ms": 3699.6622128999998,
+    "p99_ttft_ms": 3700.30287598,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "3dcd44ee153df1b72c55cd0dc76ca8e011dc5e8d87ae5413c7c9a12425d702aa"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.709132289686009,
+    "mean_ttft_ms": 2475.6084862499997,
+    "p95_ttft_ms": 3705.0269224,
+    "p99_ttft_ms": 3705.3483520799996,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "b985149b6ccd74f730ddfbf5a4b452c19fd3622ad046f1aeaace804234e2b8a8"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/screen/p61440_f99_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed57_n80/manifest.json",
+    "throughput": 11.565832672004563,
+    "mean_ttft_ms": 2522.1924787375,
+    "p95_ttft_ms": 3470.56634815,
+    "p99_ttft_ms": 3974.01595084,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "fd9cd9ba069851a1d4a34db1c85d0a85f97ca870902dd6987a1099b1f7404caa"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.48671334256994,
+    "mean_ttft_ms": 727.4275170133333,
+    "p95_ttft_ms": 948.9579673000003,
+    "p99_ttft_ms": 970.8875696399999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "8d164db61b7a03c4ed0463eb38485cb19a278c68b7e6d0a6cdc3d3e235b57684"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.150915995654984,
+    "mean_ttft_ms": 734.8999531133334,
+    "p95_ttft_ms": 1033.0733697,
+    "p99_ttft_ms": 1033.52372815,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "0e6211120fafeab758c8078948da0b094ad0ecece407b9697c39dac1a1317452"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.02035326993108,
+    "mean_ttft_ms": 729.7355184466667,
+    "p95_ttft_ms": 983.7389716499999,
+    "p99_ttft_ms": 984.2540108,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "6e554b234844d739ea1c1294a5bb0b85ac2aba8cc2bf8578108d39331b1f73d9"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 40.43720317493073,
+    "mean_ttft_ms": 762.1765538866666,
+    "p95_ttft_ms": 994.0739113999999,
+    "p99_ttft_ms": 994.45769396,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "6f2ad22c0b4331a4feb64c004ba6e7711831e15c1e1e869d4f573a4b3558945a"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 41.88315437425138,
+    "mean_ttft_ms": 738.1181253899999,
+    "p95_ttft_ms": 1065.43309865,
+    "p99_ttft_ms": 1065.81269564,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "6d1c25bce3ae093e81759cc5ca1e992ae55fcf4410aaefc5998c407c5a4c1b3e"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.8685827671401,
+    "mean_ttft_ms": 715.9212283933333,
+    "p95_ttft_ms": 972.8807072999999,
+    "p99_ttft_ms": 973.49112545,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "73c4b7dab89950481232deb3c4ae1defcb6477a836b0106b921ae38e077c23ff"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.40223954664815,
+    "mean_ttft_ms": 728.45599969,
+    "p95_ttft_ms": 936.7021004,
+    "p99_ttft_ms": 975.74266226,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "5cf8aa44e45b3d04b186fc8dcc255fcf80f5f9e24e1d71afa798a3f0d735e47c"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p8192_f95_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p8192_f95_h100_seed58_n300/manifest.json",
+    "throughput": 42.59579842311197,
+    "mean_ttft_ms": 721.6973599400001,
+    "p95_ttft_ms": 959.8173782499999,
+    "p99_ttft_ms": 961.8972085599999,
+    "cached_distribution": {
+      "7744": 300
+    },
+    "expected_cached_distribution": {
+      "7744": 300
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 886533120000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 2323200.0,
+    "outputs_sha256": "b24fb66e3cd624e2c28adf1d327c011540fc2da477184b6c83396213d58f2261"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.026482366825074,
+    "mean_ttft_ms": 3987.3047427499996,
+    "p95_ttft_ms": 5860.6706723,
+    "p99_ttft_ms": 5861.122027619999,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "ec68b0bb82df59e3fdf55a94a04c1dc8a3aaf428b6ef5f063f9599ad22c73858"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.028648040277796,
+    "mean_ttft_ms": 3981.9743940625,
+    "p95_ttft_ms": 5818.6312705499995,
+    "p99_ttft_ms": 5819.05642325,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "bf9e7b657e2afd87afcabfb2c1b0a3bc46a84ff3f041699d1786c12274690b99"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.018910796836664,
+    "mean_ttft_ms": 3964.9221514,
+    "p95_ttft_ms": 5848.7165595,
+    "p99_ttft_ms": 5848.9710076599995,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "b4e2dc0956499c36571e6babe7e28228665606de3f70f5d5230ec60cfa372c95"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.027281035934539,
+    "mean_ttft_ms": 3938.8815699375,
+    "p95_ttft_ms": 5353.5462164499995,
+    "p99_ttft_ms": 5358.51116769,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "7a17e89883049576a3358218bad04b63c5cd67271adc626ba35d48b96cfeb74a"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.033501529616899,
+    "mean_ttft_ms": 3927.0313021875,
+    "p95_ttft_ms": 5508.5709128,
+    "p99_ttft_ms": 5508.6488546400005,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "6a6b4ff3e69260d973d7c72e73fcdce1c4f39a79e9eac945f6f71c7dc5d1fef8"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.1138856751255775,
+    "mean_ttft_ms": 3894.04384705,
+    "p95_ttft_ms": 5338.077985149999,
+    "p99_ttft_ms": 5346.18022417,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "a2ddbf387d2ad0208bcb40735de30bbd6edb26f01b4332d13f311c2e3147bc3c"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.077803110599553,
+    "mean_ttft_ms": 3903.192041125,
+    "p95_ttft_ms": 5391.31638175,
+    "p99_ttft_ms": 5391.40502076,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "3f1bd9191b14bb30a097c15f7f790067aa0a653d1657f93ff4c47bdec32ed07a"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f95_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f95_h100_seed58_n80/manifest.json",
+    "throughput": 7.029266991817202,
+    "mean_ttft_ms": 3983.5126011999996,
+    "p95_ttft_ms": 5872.3864895,
+    "p99_ttft_ms": 5872.64855733,
+    "cached_distribution": {
+      "58368": 80
+    },
+    "expected_cached_distribution": {
+      "58368": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1781858304000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4669440.0,
+    "outputs_sha256": "841e100bf88edca339255d73393d2f0c5b40fed732eb8ce1895b636fb840e976"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.441852581839504,
+    "mean_ttft_ms": 2569.1634173249995,
+    "p95_ttft_ms": 3447.494131049999,
+    "p99_ttft_ms": 3978.17909271,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "12f3fffd0914ce5b44ff94a8bf4a1c8bca760024a7aa12f0e0f5292498a1b3ce"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.457822112463326,
+    "mean_ttft_ms": 2527.0090184124997,
+    "p95_ttft_ms": 3680.023067399999,
+    "p99_ttft_ms": 4008.48889573,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "d516a29a0f6c622850e21bf1c2a7d0b65d90ca1c251c0acd084ad7913ff9c31b"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin0_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.457972555047467,
+    "mean_ttft_ms": 2505.6881073625,
+    "p95_ttft_ms": 3668.1332839499996,
+    "p99_ttft_ms": 3668.29936827,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "9d122335da15c5facae45fc835e809c2c44cea7384c0899384f0b8501e52a30b"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine10": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine10",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.592600646573358,
+    "mean_ttft_ms": 2497.2387597624997,
+    "p95_ttft_ms": 3672.5964135,
+    "p99_ttft_ms": 3672.75962335,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "65bdf5fbbf9850cd9e17fdf1c5bb19f575a5f30a8d6656ca10a7634061b3d19f"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine5": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine5",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.254542499005394,
+    "mean_ttft_ms": 2577.4591266999996,
+    "p95_ttft_ms": 3466.9086769499995,
+    "p99_ttft_ms": 3956.3676916799996,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "b64eda9927b9b286c32f871fc185e520216e1171f5578d7b5260fef4c8741dc9"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_full_margin50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.38069245384225,
+    "mean_ttft_ms": 2561.596667625,
+    "p95_ttft_ms": 3492.3308966,
+    "p99_ttft_ms": 4018.4581564699997,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "89cdaa74c593d5c4d0057cf5116aa78c55f94de6515d95e316334f9594e49724"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_readiness2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_readiness2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.65908902562801,
+    "mean_ttft_ms": 2494.1707745124995,
+    "p95_ttft_ms": 3701.9577096999997,
+    "p99_ttft_ms": 3702.1032187899996,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "d895af4765679bdf565f89768d0425975dd4aa6bf7309225de1795041356b890"
+  },
+  "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_capped50_fine2": {
+    "path": "/mnt/localnvme/glm53_full_predicted_wait_20261004/confirmation/p61440_f99_h100/r0_capped50_fine2",
+    "workload_manifest": "/mnt/localnvme/glm53_full_predicted_wait_20261004/workloads/p61440_f99_h100_seed58_n80/manifest.json",
+    "throughput": 11.664862777778158,
+    "mean_ttft_ms": 2485.292251625,
+    "p95_ttft_ms": 3448.5094617999994,
+    "p99_ttft_ms": 3921.78736927,
+    "cached_distribution": {
+      "60800": 80
+    },
+    "expected_cached_distribution": {
+      "60800": 80
+    },
+    "gpu_hits": 0.0,
+    "preemptions": 0.0,
+    "h2d_bytes": 1856102400000.0,
+    "measurement_jit_lines": [],
+    "runtime_error_lines": [],
+    "unexpected_gpu_pids": [],
+    "accepted": true,
+    "validation_errors": [],
+    "external_hit_tokens": 4864000.0,
+    "outputs_sha256": "0927021edf2a15376941faebacd4ae6f96d94c80cc6a614a3784a8d86354da75"
+  }
+}

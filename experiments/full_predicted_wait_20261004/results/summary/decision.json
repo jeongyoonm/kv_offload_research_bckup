@@ -1,0 +1,65 @@
+{
+  "status": "experiment_not_promoted",
+  "time": 1791073605.2463758,
+  "accepted_cells": 48,
+  "measured_requests": 7360,
+  "polling_intervals_ms": [
+    2,
+    5,
+    10
+  ],
+  "margins_ms": [
+    0,
+    50
+  ],
+  "maximum_requested_coarse_wait_ms": 1432.571375,
+  "maximum_actual_coarse_wait_ms": 77.108139,
+  "total_exposed_coarse_sleep_estimate_ms": 2.004194,
+  "total_exposed_fine_sleep_estimate_ms": 256.691985,
+  "throughput_wins_by_workload_vs_capped_control": {
+    "full_margin0_fine10": [
+      1,
+      1,
+      1
+    ],
+    "full_margin0_fine2": [
+      1,
+      1,
+      1
+    ],
+    "full_margin0_fine5": [
+      1,
+      1,
+      1
+    ],
+    "full_margin50_fine10": [
+      1,
+      1,
+      1
+    ],
+    "full_margin50_fine2": [
+      2,
+      1,
+      2
+    ],
+    "full_margin50_fine5": [
+      2,
+      1,
+      1
+    ]
+  },
+  "reason": "No uncapped variant beat its matched capped control in both seeds on all three workloads; the bridge increases accounted polling CPU.",
+  "comparison_limit": "Cap-versus-full changes both the cap and the progress bridge. It does not isolate cap removal alone. Margin/fine comparisons share the bridge.",
+  "timing_limit": "ACK observations and GPU end upper endpoints make exposed sleep a diagnostic estimate, not an exact causal bound.",
+  "focused_cpu_tests_passed": 113,
+  "broader_cpu_tests": {
+    "passed": 469,
+    "skipped": 14,
+    "inherited_failures": [
+      "test_completed_timing_survives_collection: constructor-bypassing fixture lacks seal_estimator",
+      "test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selection: missing old analysis artifact"
+    ]
+  },
+  "next_target": "Coalesce partial rank progress notices or add native completion notifications before further timer tuning.",
+  "default_enabled": false
+}

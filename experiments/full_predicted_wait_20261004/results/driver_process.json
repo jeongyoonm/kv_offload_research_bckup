@@ -1,0 +1,25 @@
+{
+  "pid": 2902784,
+  "command": [
+    "/mnt/localnvme/vllm_glm53_seal_full_wait_20261004/.venv/bin/python",
+    "experiments/full_predicted_wait_20261004/run.py",
+    "--name",
+    "screen",
+    "--policies",
+    "capped50_fine2,readiness2,full_margin50_fine2,full_margin50_fine5,full_margin50_fine10,full_margin0_fine2,full_margin0_fine5,full_margin0_fine10",
+    "--workloads",
+    "8192:95:100,61440:95:100,61440:99:100",
+    "--workload-request-counts",
+    "300,80,80",
+    "--requests",
+    "300",
+    "--max-model-len",
+    "65536",
+    "--distinct-fact-probe",
+    "--continuation-file",
+    "/mnt/localnvme/glm53_full_predicted_wait_20261004/continuation.json"
+  ],
+  "time": 1791063969.9598625,
+  "runtime_commit": "721ef7e22daf81f3d8f802e2c8afd50b4abf1a52",
+  "source": "/mnt/localnvme/vllm_glm53_seal_full_wait_20261004"
+}

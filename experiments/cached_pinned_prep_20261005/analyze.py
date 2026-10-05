@@ -4,12 +4,17 @@
 
 import importlib.util
 import json
+import os
 import statistics
 from collections import defaultdict
 from pathlib import Path
 
 SOURCE = Path(__file__).resolve().parents[2]
-ROOT = Path("/mnt/localnvme/glm53_cached_pinned_20261005")
+ROOT = Path(
+    os.environ.get(
+        "CACHED_PINNED_ARTIFACT_ROOT", "/mnt/localnvme/glm53_cached_pinned_20261005"
+    )
+)
 
 
 def read(path):
@@ -50,6 +55,9 @@ def main():
         for p in (ROOT / "canary/gpu/server/timing/late_admission").glob("*.json")
         if read(p).get("role") == "worker"
     ]
+    stage_exports = [
+        read(p) for p in (ROOT / "canary/gpu/server/timing/queue_stages").glob("*.json")
+    ]
     for path in sorted((ROOT / "canary/gpu").glob("p*/*/result.json")):
         if not read(path).get("accepted"):
             continue
@@ -84,6 +92,33 @@ def main():
                         (max(r[3] for r in execution) - d["dispatch_ns"]) / 1e6
                     )
         late = read(directory / "late.json")
+        phase_events = defaultdict(dict)
+        for export in stage_exports:
+            if export["generation"] != late["generation"] or export["rank"] < 0:
+                continue
+            assert not export["overflow"]
+            for event in export["events"]:
+                if event.get("step") in prefill:
+                    phase_events[(event["step"], export["rank"])][event["event"]] = (
+                        event["time_ns"]
+                    )
+        phases = {}
+        for name, begin, end in (
+            ("request_state", "worker_entry", "request_state_updated"),
+            ("inputs", "request_state_updated", "input_preparation_return"),
+            ("attention", "input_preparation_return", "attention_metadata_ready"),
+            ("pre_forward", "attention_metadata_ready", "forward_submission_begin"),
+        ):
+            values = []
+            for step in prefill:
+                spans = []
+                for rank in range(8):
+                    event = phase_events[(step, rank)]
+                    if begin in event and end in event:
+                        spans.append((event[end] - event[begin]) / 1e6)
+                if len(spans) == 8:
+                    values.append(max(spans))
+            phases[name] = summary(values)
         generations = [w for w in workers if w["generation"] == late["generation"]]
         assert len(generations) == 8 and {w["rank"] for w in generations} == set(
             range(8)
@@ -121,6 +156,7 @@ def main():
             workload=directory.parent.name,
             mode=mode,
             prefill_setup_ms=summary(setup),
+            prefill_host_phases_max_rank_ms=phases,
             prefill_dispatch_to_entry_ms=summary(handoff),
             prefill_dispatch_to_gpu_ms=summary(gpu_start),
             reference_requests=reference_count,

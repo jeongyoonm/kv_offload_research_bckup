@@ -14,7 +14,15 @@ from pathlib import Path
 import psutil
 
 SOURCE = Path(__file__).resolve().parents[2]
-ROOT = Path("/mnt/localnvme/glm53_cached_pinned_20261005/canary")
+ROOT = (
+    Path(
+        os.environ.get(
+            "CACHED_PINNED_ARTIFACT_ROOT",
+            "/mnt/localnvme/glm53_cached_pinned_20261005",
+        )
+    )
+    / "canary"
+)
 HELPERS = SOURCE / "experiments/adaptive_seal_20261002"
 ROOT.mkdir(parents=True, exist_ok=True)
 shutil.copytree(

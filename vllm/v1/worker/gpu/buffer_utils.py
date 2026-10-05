@@ -250,23 +250,31 @@ class StagedWriteTensor:
             self._pinned_inflight.pop(0)[0].synchronize()
         indices = self.write_indices.copy_to_uva([w[0] for w in writes])
         starts = self.write_starts.copy_to_uva([w[1] for w in writes])
-        lengths = self.write_cu_lens.copy_to_uva([w[2].numel() for w in writes])
-        for j, (_, _, tokens) in enumerate(writes):
-            contents = tokens.to(self.device, non_blocking=True)
-            _apply_write_kernel[(1,)](
-                self.gpu,
-                self.gpu.stride(0),
-                indices[j : j + 1],
-                starts[j : j + 1],
-                contents,
-                lengths[j : j + 1],
-                None,
-                BLOCK_SIZE=1024,
-                MULTI_GROUP=False,
-            )
+        cumulative, total = [], 0
+        for _, _, tokens in writes:
+            total += tokens.numel()
+            cumulative.append(total)
+        lengths = self.write_cu_lens.copy_to_uva(cumulative)
+        if len(writes) == 1:
+            packed = writes[0][2]
+        else:
+            packed = torch.empty(total, dtype=self.dtype, pin_memory=True)
+            torch.cat([w[2] for w in writes], out=packed)
+        contents = packed.to(self.device, non_blocking=True)
+        _apply_write_kernel[(len(writes),)](
+            self.gpu,
+            self.gpu.stride(0),
+            indices,
+            starts,
+            contents,
+            lengths,
+            None,
+            BLOCK_SIZE=1024,
+            MULTI_GROUP=False,
+        )
         fence = torch.Event(device=self.device)
         fence.record()
-        self._pinned_inflight.append((fence, [w[2] for w in writes]))
+        self._pinned_inflight.append((fence, [packed]))
         self._staged_pinned_writes = []
 
     def drain_pinned_writes(self) -> None:

@@ -1,0 +1,33 @@
+{
+  "base_commit": "0b1297d",
+  "serving_commit": "c478aeb",
+  "harness_cpu_passed": 138,
+  "explicit_gpu_tests_passed": 2,
+  "focused_integration_passed": 12,
+  "original_broader_suite": {
+    "passed": 499,
+    "skipped": 14,
+    "failed": 3,
+    "failures_reproduced_on_unmodified_base": true
+  },
+  "native_observer_sha256": "58fcf5e4af6008e9780b7b4d75b2199eb9f785b739cca5841d02c2aa8a48890e",
+  "first_performance_attempt": "no benchmark requests: Unix IPC path too long",
+  "source_model_correctness": {
+    "known_answers_per_policy": 16,
+    "distinct_facts_per_policy": 16,
+    "policies": 3
+  },
+  "hardened_cpu_harness": {
+    "passed": 138,
+    "skipped": 4
+  },
+  "hardened_gpu_mechanisms": {
+    "passed": 4
+  },
+  "hardened_fallback_cpu": {
+    "passed": 6
+  },
+  "accepted_performance_cells": 12,
+  "rejected_jit_cells": 1,
+  "precommit_passed": true
+}

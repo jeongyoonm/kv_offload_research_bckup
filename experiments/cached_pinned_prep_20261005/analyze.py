@@ -51,7 +51,7 @@ def main():
         if read(p).get("role") == "worker"
     ]
     for path in sorted((ROOT / "canary/gpu").glob("p*/*/result.json")):
-        if "warmretry" in path.parent.name:
+        if not read(path).get("accepted"):
             continue
         directory = path.parent
         item = analyzer.analyze(directory)
@@ -103,7 +103,7 @@ def main():
             )
             for w in generations
         }
-        mode = directory.name.split("_", 1)[1]
+        mode = directory.name.split("_", 1)[1].split("_warmretry", 1)[0]
         reference_count = late["counts"].get("cached_request_references_references", 0)
         if mode in ("references", "cached_pinned"):
             assert reference_count > 0 and all(

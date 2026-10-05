@@ -1,0 +1,17 @@
+{
+  "samples": [
+    {
+      "time": 1791217443.2764988,
+      "used_mib": {
+        "GPU-cfae694a-4504-caf8-3fb8-f8ba095ed6ec": 0,
+        "GPU-c0ea5149-64a7-7fac-8cef-beb32b4187e8": 0,
+        "GPU-f5599760-ad42-5896-dd5f-22ff94df931e": 0,
+        "GPU-bf553d48-0bda-da95-cbfc-b0ea3a5f3fad": 0,
+        "GPU-58a3ba00-1997-571c-d44a-cd6deec3645e": 0,
+        "GPU-eada1440-7115-25ee-2669-fcc8e60cfc8d": 0,
+        "GPU-ac1e478f-9f47-7da4-349c-c7b52e49a04e": 0,
+        "GPU-ce716549-ca25-c145-d5df-33875b57edd7": 0
+      }
+    }
+  ]
+}

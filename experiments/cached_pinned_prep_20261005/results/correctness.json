@@ -1,0 +1,77 @@
+{
+  "current": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368
+    ],
+    "passed": true
+  },
+  "references": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368
+    ],
+    "passed": true
+  },
+  "cached_pinned": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368,
+      58368
+    ],
+    "passed": true
+  }
+}

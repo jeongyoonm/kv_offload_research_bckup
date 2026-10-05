@@ -1845,7 +1845,10 @@ def test_cached_reference_rejects_stale_or_missing_preparation(failure):
 def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
     from dataclasses import replace
 
-    from vllm.v1.kv_offload.late_admission_runtime import cache_references
+    from vllm.v1.kv_offload.late_admission_runtime import (
+        cache_references,
+        resolve_references,
+    )
 
     source = _cache_request("a")
     changed = replace(source, prefill_token_ids=[17, 23, 99])
@@ -1854,6 +1857,15 @@ def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
     result = cache_references(scheduler, [changed, unacked])
     assert result[0] is changed and result[1] is unacked
     assert all(r.late_cached_key is None for r in result)
+    lane = PreparationLane(0, 3, cached_requests=True)
+    try:
+        prepared = {"a": lane._prepare_data(source, 7)}
+        output = SimpleNamespace(scheduled_new_reqs=result, readiness_timeline_step=7)
+        resolve_references(output, prepared, 3)
+        assert output.scheduled_new_reqs[0] is changed
+        assert prepared == {}
+    finally:
+        lane.close()
 
 
 def test_partial_rank_ack_keeps_candidate_payload_and_caches_base():
@@ -1891,9 +1903,13 @@ def test_private_preparation_options_require_mode_four(cached, pinned):
 
 
 @pytest.mark.parametrize("length", [8192, 61440])
-def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(length):
+@pytest.mark.parametrize("changed", [False, True])
+def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(
+    length, changed
+):
     """No live writes before execute; selected slots match ordinary runner state."""
     import os
+    from dataclasses import replace
 
     if os.environ.get("CACHED_PINNED_GPU_TEST") != "1":
         pytest.skip("explicit idle-GPU mechanism test")
@@ -1933,6 +1949,11 @@ def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(length)
         # Preparation creates CPU tensors only, leaving the live UVA store unchanged.
         assert torch.all(optimized.req_states.all_token_ids.gpu == -1).item()
         selected = [requests[4], requests[1]]
+        if changed:
+            tokens = [99] * length
+            selected[0] = replace(
+                selected[0], prompt_token_ids=tokens, prefill_token_ids=tokens
+            )
         scheduler = SimpleNamespace(
             _late_reference_requests={r.req_id: ((3, 7), r) for r in requests}
         )
@@ -1941,7 +1962,9 @@ def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(length)
             readiness_timeline_step=7,
         )
         resolve_references(output, prepared, 3)
-        optimized._late_prepared = {r.req_id: prepared[r.req_id] for r in selected}
+        optimized._late_prepared = {
+            r.req_id: prepared[r.req_id] for r in selected if r.req_id in prepared
+        }
         optimized.add_requests(output)
         ordinary.add_requests(SimpleNamespace(scheduled_new_reqs=selected))
         optimized.req_states.all_token_ids.drain_pinned_writes()

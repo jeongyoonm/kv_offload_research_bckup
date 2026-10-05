@@ -1006,6 +1006,15 @@ def resolve_references(output, prepared, generation):
                 prefill_token_ids=data.source.prefill_token_ids,
                 late_cached_key=None,
             )
+        else:
+            data = prepared.get(request.req_id)
+            if data is not None and data.source is not None:
+                source = data.source
+                if (
+                    request.prompt_token_ids != source.prompt_token_ids
+                    or request.prefill_token_ids != source.prefill_token_ids
+                ):
+                    prepared.pop(request.req_id)
         resolved.append(request)
     output.scheduled_new_reqs = resolved
 

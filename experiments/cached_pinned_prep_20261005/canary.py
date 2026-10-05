@@ -184,6 +184,9 @@ original_cells = runner.run_cells
 
 
 def cells(run, server_dir, workloads, counts, policies, repeats, seed=55):
+    startup_log = (server_dir / "server.log").read_text()
+    if "Failed to initialize FlashInfer All Reduce workspace" in startup_log:
+        raise RuntimeError("FlashInfer AllReduce startup failed; reject serving cells")
     # Train the common predictor on both workloads, then freeze compute and
     # preparation histories before any measured A/B cells or their priming.
     original_cells(

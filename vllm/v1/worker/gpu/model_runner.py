@@ -22,7 +22,7 @@ import gc
 import time
 from contextlib import AbstractContextManager
 from copy import deepcopy
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
 
 import numpy as np
 import torch
@@ -169,6 +169,12 @@ from vllm.v1.worker.utils import (
 )
 from vllm.v1.worker.workspace import use_workspace_lane
 
+if TYPE_CHECKING:
+    from vllm.v1.kv_offload.late_admission_runtime import (
+        PreparationLane,
+        PreparedRequest,
+    )
+
 logger = init_logger(__name__)
 
 
@@ -176,6 +182,8 @@ class GPUModelRunner(LoRAModelRunnerMixin):
     _late_mode: int = 0
     _late_generation: int = 0
     _late_record_enabled: bool = False
+    _late_lane: "PreparationLane | None" = None
+    _late_prepared: dict[str, "PreparedRequest"]
 
     def __init__(self, vllm_config: VllmConfig, device: torch.device):
         self.vllm_config = vllm_config
@@ -1022,11 +1030,28 @@ class GPUModelRunner(LoRAModelRunnerMixin):
 
             prepared = getattr(self, "_late_prepared", {}).pop(req_id, None)
             if prepared is not None:
-                if not np.array_equal(
-                    prepared.token_ids, new_req_data.prefill_token_ids
+                source_tokens = (
+                    prepared.source.prefill_token_ids
+                    if prepared.source is not None
+                    else None
+                )
+                if (
+                    source_tokens is not None
+                    and source_tokens is not new_req_data.prefill_token_ids
+                    and source_tokens != new_req_data.prefill_token_ids
+                ) or (
+                    source_tokens is None
+                    and not np.array_equal(
+                        prepared.token_ids, new_req_data.prefill_token_ids
+                    )
                 ):
                     raise RuntimeError("late candidate token identity changed")
-                prepared_token_ids = prepared.token_ids
+                # Cached lists avoid NumPy-to-Python scalar expansion.
+                prepared_token_ids = (
+                    prepared.source.prefill_token_ids
+                    if prepared.source is not None
+                    else prepared.token_ids
+                )
             else:
                 prepared_token_ids = new_req_data.prefill_token_ids
 
@@ -1043,6 +1068,9 @@ class GPUModelRunner(LoRAModelRunnerMixin):
                 all_token_ids=prepared_token_ids,
                 num_computed_tokens=new_req_data.num_computed_tokens,
                 max_tokens=sampling_params.max_tokens if sampling_params else 1,  # type: ignore[arg-type]
+                pinned_token_ids=prepared.pinned_tokens
+                if prepared is not None
+                else None,
             )
             req_index = self.req_states.req_id_to_index[req_id]
             if self.adaptive_verification is not None:

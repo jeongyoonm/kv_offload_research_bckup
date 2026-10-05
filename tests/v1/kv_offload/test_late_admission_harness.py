@@ -1748,3 +1748,211 @@ def test_coalesced_preparation_preserves_nonready_and_failure_status(
     else:
         assert channel.wait(ticket, 0) == "timer"
     channel.disarm()
+
+
+def _cache_request(req_id, tokens=None):
+    from vllm.sampling_params import SamplingParams
+    from vllm.v1.core.sched.output import NewRequestData
+
+    tokens = [17, 23, 41] if tokens is None else tokens
+    return NewRequestData(
+        req_id=req_id,
+        prompt_token_ids=tokens,
+        mm_features=[],
+        sampling_params=SamplingParams(max_tokens=2),
+        pooling_params=None,
+        block_ids=([1],),
+        num_computed_tokens=1,
+        lora_request=None,
+        prefill_token_ids=list(tokens),
+    )
+
+
+def test_cached_reference_hydrates_tokens_and_preserves_final_allocation(tmp_path):
+    """The sealed output remains authoritative for blocks and computed tokens."""
+    from dataclasses import replace
+
+    from vllm.v1.kv_offload.late_admission_runtime import (
+        cache_references,
+        resolve_references,
+    )
+
+    lane = PreparationLane(0, 3, cached_requests=True)
+    source = _cache_request("a", list(range(61440)))
+    control, payload = tmp_path / "control", tmp_path / "payload"
+    control.write_bytes(struct.pack("<QQ", 7, 1) + bytes(2))
+    with payload.open("wb") as stream:
+        pickle.dump((3, 7, [], [source], str(control)), stream)
+    try:
+        lane._prepare_path(str(payload))
+        assert control.read_bytes()[16:] == b"\1\1"
+        prepared = lane.consume(7, {"a"})
+        final = replace(source, block_ids=([7, 8],), num_computed_tokens=61400)
+        scheduler = SimpleNamespace(_late_reference_requests={"a": ((3, 7), source)})
+        referenced = cache_references(scheduler, [final])
+        assert referenced[0].prompt_token_ids is None
+        assert referenced[0].prefill_token_ids is None
+        assert len(pickle.dumps(referenced)) < len(pickle.dumps([final])) / 10
+        output = SimpleNamespace(
+            scheduled_new_reqs=referenced, readiness_timeline_step=7
+        )
+        resolve_references(output, prepared, 3)
+        restored = output.scheduled_new_reqs[0]
+        assert restored.prefill_token_ids == source.prefill_token_ids
+        assert restored.prompt_len == 61440
+        assert restored.block_ids == ([7, 8],)
+        assert restored.num_computed_tokens == 61400
+        assert lane.consume(7, {"a"}) == {}
+    finally:
+        lane.close()
+
+
+@pytest.mark.parametrize("failure", ["missing", "generation", "step", "revision"])
+def test_cached_reference_rejects_stale_or_missing_preparation(failure):
+    from dataclasses import replace
+
+    from vllm.v1.kv_offload.late_admission_runtime import resolve_references
+
+    lane = PreparationLane(0, 3, cached_requests=True)
+    try:
+        prepared = {"a": lane._prepare_data(_cache_request("a"), 7)}
+        output = SimpleNamespace(
+            scheduled_new_reqs=[
+                replace(
+                    _cache_request("a"),
+                    prompt_token_ids=None,
+                    prefill_token_ids=None,
+                    late_cached_key=(3, 7),
+                )
+            ],
+            readiness_timeline_step=7,
+        )
+        generation = 3
+        if failure == "missing":
+            prepared = {}
+        if failure == "generation":
+            generation = 4
+        if failure == "step":
+            output.readiness_timeline_step = 8
+        if failure == "revision":
+            prepared["a"] = replace(prepared["a"], cache_key=(3, 6))
+        with pytest.raises(RuntimeError, match="missing or stale"):
+            resolve_references(output, prepared, generation)
+    finally:
+        lane.close()
+
+
+def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
+    from dataclasses import replace
+
+    from vllm.v1.kv_offload.late_admission_runtime import cache_references
+
+    source = _cache_request("a")
+    changed = replace(source, prefill_token_ids=[17, 23, 99])
+    unacked = _cache_request("b")
+    scheduler = SimpleNamespace(_late_reference_requests={"a": ((3, 7), source)})
+    result = cache_references(scheduler, [changed, unacked])
+    assert result[0] is changed and result[1] is unacked
+    assert all(r.late_cached_key is None for r in result)
+
+
+def test_partial_rank_ack_keeps_candidate_payload_and_caches_base():
+    from vllm.v1.kv_offload.late_admission_runtime import cache_references
+
+    executor = ControlledExecutor()
+    core = _core(executor)
+    core.scheduler._late_cached_requests = True
+    base, candidate = _cache_request("base"), _cache_request("a")
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            result = pool.submit(stage_rpc, core, 9, [base], [candidate])
+            assert executor.published.wait(5)
+            for rank in range(7):
+                executor.release_base[rank].set()
+                executor.release_candidate[rank].set()
+                assert executor.prepared_candidate[rank].wait(5)
+            executor.release_base[7].set()
+            assert result.result(timeout=5) == []
+        refs = cache_references(core.scheduler, [base, candidate])
+        assert refs[0].late_cached_key == (1, 9)
+        assert refs[1] is candidate
+    finally:
+        executor.finish()
+
+
+@pytest.mark.parametrize("cached,pinned", [(True, False), (False, True), (True, True)])
+def test_private_preparation_options_require_mode_four(cached, pinned):
+    from vllm.v1.kv_offload.early_readiness import validate_experiment_options
+
+    with pytest.raises(ValueError, match="requires admission mode 4"):
+        validate_experiment_options(
+            dict(late_cached_requests=cached, late_pinned_packing=pinned)
+        )
+
+
+@pytest.mark.parametrize("length", [8192, 61440])
+def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(length):
+    """No live writes before execute; selected slots match ordinary runner state."""
+    import os
+
+    if os.environ.get("CACHED_PINNED_GPU_TEST") != "1":
+        pytest.skip("explicit idle-GPU mechanism test")
+    import numpy as np
+    import torch
+
+    from vllm.v1.kv_offload.late_admission_runtime import (
+        cache_references,
+        resolve_references,
+    )
+    from vllm.v1.worker.gpu.model_runner import GPUModelRunner
+    from vllm.v1.worker.gpu.states import RequestState
+
+    def runner():
+        obj = object.__new__(GPUModelRunner)
+        obj.req_states = RequestState(
+            8, length + 8, 4096, 1, 1024, torch.device("cuda:0")
+        )
+        obj.req_states.all_token_ids.gpu.fill_(-1)
+        obj._remove_request = obj.req_states.remove_request
+        obj.adaptive_verification = obj.pooling_runner = obj.encoder_cache = None
+        obj.model_state = MagicMock()
+        obj.block_tables = MagicMock()
+        obj.lora_state = MagicMock()
+        obj.is_last_pp_rank = False
+        obj.sampler = None
+        return obj
+
+    optimized, ordinary = runner(), runner()
+    requests = [
+        _cache_request(f"r{i}", (np.arange(length) + i).tolist()) for i in range(5)
+    ]
+    lane = PreparationLane(0, 3, cached_requests=True, pinned_packing=True)
+    try:
+        prepared = {r.req_id: lane._prepare_data(r, 7) for r in requests}
+        assert all(p.pinned_tokens.is_pinned() for p in prepared.values())
+        # Preparation creates CPU tensors only, leaving the live UVA store unchanged.
+        assert torch.all(optimized.req_states.all_token_ids.gpu == -1).item()
+        selected = [requests[4], requests[1]]
+        scheduler = SimpleNamespace(
+            _late_reference_requests={r.req_id: ((3, 7), r) for r in requests}
+        )
+        output = SimpleNamespace(
+            scheduled_new_reqs=cache_references(scheduler, selected),
+            readiness_timeline_step=7,
+        )
+        resolve_references(output, prepared, 3)
+        optimized._late_prepared = {r.req_id: prepared[r.req_id] for r in selected}
+        optimized.add_requests(output)
+        ordinary.add_requests(SimpleNamespace(scheduled_new_reqs=selected))
+        optimized.req_states.all_token_ids.drain_pinned_writes()
+        torch.accelerator.synchronize()
+        assert torch.equal(
+            optimized.req_states.all_token_ids.gpu,
+            ordinary.req_states.all_token_ids.gpu,
+        )
+        assert (
+            optimized.req_states.req_id_to_index == ordinary.req_states.req_id_to_index
+        )
+        assert not optimized._late_prepared
+    finally:
+        lane.close()

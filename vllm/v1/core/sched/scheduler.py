@@ -790,6 +790,8 @@ class Scheduler(SchedulerInterface):
                         for req in scheduled_new_reqs + scheduled_resumed_reqs
                     ]
                     if late_mode not in (3, 4)
+                    or getattr(self, "_late_cached_requests", False)
+                    or getattr(self, "_late_pinned_packing", False)
                     else []
                 )
                 self._late_base_request_shapes = [
@@ -1460,6 +1462,13 @@ class Scheduler(SchedulerInterface):
 
         # Connector-only block state must not be dispatched to workers.
         scheduler_output.kv_connector_block_state = None
+
+        if getattr(self, "_late_cached_requests", False):
+            from vllm.v1.kv_offload.late_admission_runtime import cache_references
+
+            scheduler_output.scheduled_new_reqs = cache_references(
+                self, scheduler_output.scheduled_new_reqs
+            )
 
         # Advance the fence only for non-empty steps (those that actually
         # write KV and have their output processed later in update_from_output).

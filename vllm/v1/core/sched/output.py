@@ -48,6 +48,9 @@ class NewRequestData:
     # Only used for v2 model runner.
     prefill_token_ids: list[int] | None = None
 
+    # Experiment-only immutable prompt reference, resolved before runner entry.
+    late_cached_key: tuple[int, int] | None = None
+
     @classmethod
     def from_request(
         cls,

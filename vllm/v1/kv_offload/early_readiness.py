@@ -26,6 +26,8 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "zero_token_queue_credit": 0,
     "late_admission_mode": 0,
     "late_admission_markers": False,
+    "late_cached_requests": False,
+    "late_pinned_packing": False,
     "late_seal_delay_us": 0,
     "late_seal_extension_us": 0,
     "late_seal_policy": "fixed",
@@ -113,6 +115,10 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         raise ValueError(
             "zero-token credit requires cooperative progress without holds"
         )
+    if (result["late_cached_requests"] or result["late_pinned_packing"]) and (
+        result["late_admission_mode"] != 4
+    ):
+        raise ValueError("cached/pinned preparation requires admission mode 4")
     if result["late_seal_policy"] not in ("fixed", "predictive", "event") or (
         result["late_seal_policy"] == "predictive"
         and (

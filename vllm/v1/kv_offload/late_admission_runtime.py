@@ -10,8 +10,12 @@ import tempfile
 import threading
 import time
 from contextlib import suppress
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import torch
 
 import numpy as np
 
@@ -43,6 +47,10 @@ class CandidateNotice:
 def prepare_candidates(scheduler, token_budget, base_reqs):
     """Stage bounded old in-flight loads after ordinary ready work is selected."""
     mode = getattr(scheduler, "_late_admission_mode", 0)
+    scheduler._late_reference_requests = {}
+    materialize = getattr(scheduler, "_late_cached_requests", False) or getattr(
+        scheduler, "_late_pinned_packing", False
+    )
     if not mode or scheduler.has_mamba_layers:
         return set()
     if (
@@ -64,15 +72,24 @@ def prepare_candidates(scheduler, token_budget, base_reqs):
         or getattr(connector, "_sliding_window_groups", True)
     ):
         return set()
+    if materialize:
+        base_reqs = [
+            r
+            for r in base_reqs
+            if r.prefill_token_ids == r.prompt_token_ids
+            and r.prompt_token_ids is not None
+        ]
     slots = getattr(scheduler, "_late_candidate_slots", 4)
     capacity = min(slots, scheduler.max_num_running_reqs - len(scheduler.running))
     capacity = max(capacity, 0)
     pending_now = set(connector._current_batch_load_jobs)
-    candidates = []
+    candidates: list[CandidateNotice | NewRequestData] = []
     remaining = token_budget
     for request in sorted(
         scheduler.requests.values(), key=lambda r: (r.arrival_time, r.request_id)
     ):
+        if len(candidates) >= capacity:
+            break
         if (
             request.status != RequestStatus.WAITING_FOR_REMOTE_KVS
             or request.prompt_token_ids is None
@@ -97,7 +114,7 @@ def prepare_candidates(scheduler, token_budget, base_reqs):
             continue
         candidates.append(
             CandidateNotice(request.request_id)
-            if mode == 4
+            if mode == 4 and not materialize
             else NewRequestData.from_request(
                 request,
                 scheduler.kv_cache_manager.get_blocks(
@@ -159,6 +176,9 @@ class PreparedRequest:
     prompt_len: int
     ready: threading.Event
     prepared_ns: int
+    source: NewRequestData | None = None
+    cache_key: tuple[int, int] | None = None
+    pinned_tokens: "torch.Tensor | None" = None
 
 
 class PreparationLane:
@@ -170,10 +190,16 @@ class PreparationLane:
         generation: int,
         notice_only: bool = False,
         candidate_slots: int = 4,
+        cached_requests: bool = False,
+        pinned_packing: bool = False,
+        device: "torch.device | None" = None,
     ):
         self.rank = rank
         self.generation = generation
         self.notice_only = notice_only
+        self.cached_requests = cached_requests
+        self.pinned_packing = pinned_packing
+        self.device = device
         self.candidate_slots = candidate_slots
         self.directory = tempfile.TemporaryDirectory(prefix="vllm-late-worker-")
         self.path = str(Path(self.directory.name) / "prepare.fifo")
@@ -187,6 +213,10 @@ class PreparationLane:
         self.thread.start()
 
     def _run(self):
+        if self.pinned_packing and self.device is not None:
+            import torch
+
+            torch.accelerator.set_device_index(self.device)
         pending = bytearray()
         while not self.closed:
             ready, _, _ = select.select([self.pipe], [], [], 0.1)
@@ -210,7 +240,7 @@ class PreparationLane:
                 raise RuntimeError("late preparation generation or capacity mismatch")
             staged = {}
             for request in base:
-                staged[request.req_id] = self._prepare_request(request)
+                staged[request.req_id] = self._prepare_data(request, step)
             with self.lock:
                 if step > self.discarded_through:
                     if len(self.prepared) >= 2 or step in self.prepared:
@@ -222,7 +252,7 @@ class PreparationLane:
                 prepared = (
                     self._prepare_notice(request)
                     if self.notice_only
-                    else self._prepare_request(request)
+                    else self._prepare_data(request, step)
                 )
                 with self.lock:
                     if step > self.discarded_through:
@@ -236,6 +266,43 @@ class PreparationLane:
             if control is not None and step is not None:
                 with suppress(OSError, RuntimeError):
                     signal_prepared(control, step, self.rank, 3, current_slot)
+
+    def _prepare_data(self, request, step):
+        if not (self.cached_requests or self.pinned_packing):
+            return self._prepare_request(request)
+        if (
+            request.prefill_token_ids is None
+            or request.prompt_token_ids is None
+            or request.prefill_token_ids != request.prompt_token_ids
+            or request.mm_features
+            or request.prompt_embeds is not None
+            or request.lora_request is not None
+            or request.pooling_params is not None
+        ):
+            raise RuntimeError("cached preparation requires immutable text prefill")
+        tokens = np.asarray(request.prefill_token_ids, dtype=np.int32)
+        pinned = None
+        if self.pinned_packing:
+            import torch
+
+            pinned = torch.empty(tokens.size, dtype=torch.int32, pin_memory=True)
+            np.copyto(pinned.numpy(), tokens)
+            tokens = pinned.numpy()
+        else:
+            tokens = tokens.copy()
+        tokens.flags.writeable = False
+        ready = threading.Event()
+        ready.set()
+        return PreparedRequest(
+            request.req_id,
+            tokens,
+            request.prompt_len,
+            ready,
+            time.monotonic_ns(),
+            request,
+            (self.generation, step),
+            pinned,
+        )
 
     @staticmethod
     def _prepare_request(request):
@@ -296,7 +363,7 @@ class PreparationLane:
 
     def close(self):
         self.closed = True
-        self.thread.join(timeout=1)
+        self.thread.join()
         os.close(self.pipe)
         with self.lock:
             self.prepared.clear()
@@ -309,6 +376,7 @@ def stage_rpc(core, step, base, candidates):
 
     world = core.vllm_config.parallel_config.world_size
     queued = getattr(core, "batch_queue", None)
+    core.scheduler._late_reference_requests = {}
     core.scheduler._late_kv_snapshot = set()
     core.scheduler._late_cancelled = set()
     core.scheduler._late_transport = dict(path="ordinary", start_ns=time.monotonic_ns())
@@ -865,6 +933,16 @@ def stage_rpc(core, step, base, candidates):
             progress_bridge_notifications=wakeup.notifications if wakeup else 0,
             adaptive_waits=waits,
         )
+        if getattr(core.scheduler, "_late_cached_requests", False):
+            key = (core.scheduler._late_generation, step)
+            core.scheduler._late_reference_requests = {r.req_id: (key, r) for r in base}
+            core.scheduler._late_reference_requests.update(
+                (c.req_id, (key, c))
+                for slot, c in enumerate(candidates)
+                if all(
+                    s == 1 for s in statuses[world * (slot + 1) : world * (slot + 2)]
+                )
+            )
         return [
             c.req_id
             for slot, c in enumerate(candidates)
@@ -881,6 +959,55 @@ def stage_rpc(core, step, base, candidates):
         os.close(fd)
         os.unlink(path)
         os.unlink(data_path)
+
+
+def cache_references(scheduler, requests):
+    """Strip prompts only for the all-rank ACK snapshot and unchanged data."""
+    cached = getattr(scheduler, "_late_reference_requests", {})
+    result = []
+    for request in requests:
+        entry = cached.get(request.req_id)
+        if entry is not None:
+            key, source = entry
+            if (
+                request.prompt_token_ids == source.prompt_token_ids
+                and request.prefill_token_ids == source.prefill_token_ids
+            ):
+                request = replace(
+                    request,
+                    prompt_token_ids=None,
+                    prefill_token_ids=None,
+                    late_cached_key=key,
+                )
+        result.append(request)
+    references = [r.req_id for r in result if r.late_cached_key is not None]
+    if references:
+        record(scheduler, "cached_request_references", references=references)
+    return result
+
+
+def resolve_references(output, prepared, generation):
+    """Hydrate private prompt data, preserving the final allocation fields."""
+    resolved = []
+    for request in output.scheduled_new_reqs:
+        key = request.late_cached_key
+        if key is not None:
+            data = prepared.get(request.req_id)
+            if (
+                key != (generation, output.readiness_timeline_step)
+                or data is None
+                or data.cache_key != key
+                or data.source is None
+            ):
+                raise RuntimeError("acknowledged cached request is missing or stale")
+            request = replace(
+                request,
+                prompt_token_ids=data.source.prompt_token_ids,
+                prefill_token_ids=data.source.prefill_token_ids,
+                late_cached_key=None,
+            )
+        resolved.append(request)
+    output.scheduled_new_reqs = resolved
 
 
 def cancelled_candidates(core, candidates):
@@ -903,7 +1030,7 @@ def record(owner, event, **fields):
     if counts is None:
         counts = owner._late_counts = {}
     counts[event] = counts.get(event, 0) + 1
-    for key in ("candidates", "staged", "eligible", "activated"):
+    for key in ("candidates", "staged", "eligible", "activated", "references"):
         if key in fields:
             name = event + "_" + key
             counts[name] = counts.get(name, 0) + len(fields[key])

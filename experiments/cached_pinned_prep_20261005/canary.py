@@ -84,6 +84,9 @@ def launch(command, *args, **kwargs):
         env["VLLM_CACHE_ROOT"] = str(ROOT.parent / "vllm-cache")
         env["TRITON_CACHE_DIR"] = str(ROOT.parent / "triton-cache")
         env["CUDA_CACHE_PATH"] = str(ROOT.parent / "cuda-cache")
+        server_tmp = Path("/mnt/localnvme/cached-pinned-server-tmp")
+        server_tmp.mkdir(exist_ok=True)
+        env["TMPDIR"] = str(server_tmp)
         kwargs["env"] = env
         (ROOT / "actual-launch.json").write_text(
             json.dumps(
@@ -98,6 +101,7 @@ def launch(command, *args, **kwargs):
                             "CUDA_CACHE_PATH",
                             "CUDA_VISIBLE_DEVICES",
                             "VLLM_DEFERRAL_NATIVE_OBSERVER",
+                            "TMPDIR",
                         )
                     },
                 ),

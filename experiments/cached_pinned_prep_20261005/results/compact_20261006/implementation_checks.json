@@ -1,0 +1,16 @@
+{
+  "commit": "e45616d04a617454a02f0aafd7036c40e2b514d6",
+  "branch": "experiment/glm53-compact-preparation-tokens-20261006",
+  "cpu_tests": {
+    "passed": 146,
+    "skipped_explicit_gpu": 8
+  },
+  "gpu_adoption_tests": {
+    "passed": 8
+  },
+  "focused_interference_repeats": 12,
+  "pre_commit": "passed",
+  "source_hashes": "match TP8 launch provenance",
+  "native_libraries": "reused unchanged from measured parent",
+  "artifact_root": "/mnt/localnvme/glm53_compact_prep_20261006"
+}

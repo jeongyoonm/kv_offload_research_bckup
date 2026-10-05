@@ -1,0 +1,41 @@
+[
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "cached_pinned",
+    "repeats": 3,
+    "throughput": 6.954469262427424,
+    "mean_ttft_ms": 4007.8205797708333,
+    "p95_ttft_ms": 5428.156590199999,
+    "compute_rounds": 14,
+    "prefill_setup_median_ms": 79.2413665,
+    "prefill_handoff_median_ms": 95.49079333333333,
+    "prefill_dispatch_to_gpu_median_ms": 314.7106745,
+    "referenced_requests": 237
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "compact_pinned",
+    "repeats": 3,
+    "throughput": 7.122028727114597,
+    "mean_ttft_ms": 3915.4623646166665,
+    "p95_ttft_ms": 5683.446989183332,
+    "compute_rounds": 14,
+    "prefill_setup_median_ms": 53.863982,
+    "prefill_handoff_median_ms": 48.448299666666664,
+    "prefill_dispatch_to_gpu_median_ms": 334.295488,
+    "referenced_requests": 239
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "current",
+    "repeats": 3,
+    "throughput": 7.071851787717752,
+    "mean_ttft_ms": 3945.2271793375,
+    "p95_ttft_ms": 5783.320525816666,
+    "compute_rounds": 14,
+    "prefill_setup_median_ms": 44.7345915,
+    "prefill_handoff_median_ms": 198.87228816666666,
+    "prefill_dispatch_to_gpu_median_ms": 463.00580833333333,
+    "referenced_requests": 0
+  }
+]

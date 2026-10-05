@@ -179,4 +179,42 @@ export CACHED_PINNED_ARTIFACT_ROOT=/mnt/localnvme/glm53_compact_prep_20261006
 .venv/bin/python experiments/cached_pinned_prep_20261005/analyze.py
 .venv/bin/python experiments/cached_pinned_prep_20261005/compare_compact.py \
   "$CACHED_PINNED_ARTIFACT_ROOT"
+.venv/bin/python experiments/cached_pinned_prep_20261005/verify_compact.py \
+  "$CACHED_PINNED_ARTIFACT_ROOT"
 ```
+
+All nine measured cells were accepted: 720 requests, with the same 245,760 suffix
+tokens and 14 compute rounds per cell. All-rank coverage shows 239 of 240 requests
+adopted compact pinned state on each rank. Source hashes, unique request IDs,
+frozen settings, CPU sampler health, timing coverage, expected CPU hits and equal
+KV bytes were verified. There were no GPU prefix hits, preemptions, measured JIT,
+runtime errors or foreign GPU processes. Every policy passes 16/16 known-answer
+and 16/16 distinct-fact checks. Exact distinct-fact text matches against the cold
+reference are 14/16 for current, 16/16 for cached/pinned and 14/16 for compact;
+the factual answers all match.
+
+| Policy | Mean req/s | Mean TTFT (ms) | Mean cell p95 TTFT (ms) |
+| --- | ---: | ---: | ---: |
+| Existing prototype | 7.072 | 3945 | 5783 |
+| Cached references + batched pinned transfer | 6.954 | 4008 | 5428 |
+| Compact tokens + cached/pinned | 7.122 | 3915 | 5683 |
+
+Compact improves the mean throughput by 2.41% against old cached/pinned and 0.71%
+against the existing prototype. The latter paired 95% interval is -0.62% to
++2.06%; against old cached/pinned it is -1.05% to +6.00%. These three-repeat
+intervals include no gain, while excluding a 2% slowdown against current. The
+observed mean throughput gap is closed on this workload. Mean TTFT improves by
+2.30% against old cached/pinned and 0.75% against current. Compact p95 improves
+against current, but is 4.70% higher than old cached/pinned.
+
+Mean summed GPU execution spans per cell change from 10.806s for old cached/pinned
+to 10.536s for compact, versus 10.437s for current. Mean intercompute gap bounds
+are 475–488ms, 493–505ms and 677–689ms respectively. Compact removes about 270ms
+of the old path's execution-span inflation while retaining shorter gaps than
+current. The spans include host submission, connector work and output
+synchronization; they are not isolated kernel times, and batch membership shapes
+can also affect them.
+
+Full artifacts are under `/mnt/localnvme/glm53_compact_prep_20261006`; compact
+evidence is committed in `results/compact_20261006`. The measured implementation
+is `e45616d`. The new option remains disabled by default.

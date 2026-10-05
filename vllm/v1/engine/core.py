@@ -2036,6 +2036,15 @@ class EngineCore:
             self.scheduler._late_seal_prediction_to_readiness = options[
                 "late_seal_prediction_to_readiness"
             ]
+            self.scheduler._late_seal_compute_deadline = options[
+                "late_seal_compute_deadline"
+            ]
+            self.scheduler._late_seal_compute_deadline_shadow = options[
+                "late_seal_compute_deadline_shadow"
+            ]
+            self.scheduler._late_seal_compute_deadline_lead_us = options[
+                "late_seal_compute_deadline_lead_us"
+            ]
             self.scheduler._late_seal_full_prediction_wait = options[
                 "late_seal_full_prediction_wait"
             ]

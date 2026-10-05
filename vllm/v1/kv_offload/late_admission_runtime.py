@@ -448,6 +448,9 @@ def stage_rpc(core, step, base, candidates):
     repeated_intervals = 0
     prediction = None
     predicted_deadline_ns = None
+    compute_seal_deadline_ns = None
+    compute_seal_deadline_armed_ns = None
+    effective_seal_expiry_ns = None
     adaptive_poll_us = getattr(core.scheduler, "_late_seal_adaptive_poll_us", 1000)
     progress_polls = 0
     poll_cpu_ns = 0
@@ -459,6 +462,15 @@ def stage_rpc(core, step, base, candidates):
     hybrid_guard_us = getattr(core.scheduler, "_late_seal_hybrid_guard_us", 50_000)
     prediction_to_readiness = getattr(
         core.scheduler, "_late_seal_prediction_to_readiness", False
+    )
+    compute_deadline = (
+        getattr(core.scheduler, "_late_seal_compute_deadline", False) is True
+    )
+    compute_deadline_shadow = (
+        getattr(core.scheduler, "_late_seal_compute_deadline_shadow", False) is True
+    )
+    compute_deadline_lead_us = getattr(
+        core.scheduler, "_late_seal_compute_deadline_lead_us", 0
     )
     hybrid_transition_ns = None
     hybrid_polling_ns = None
@@ -515,6 +527,11 @@ def stage_rpc(core, step, base, candidates):
                     safety_remaining,
                 )
                 coarse = True
+        if compute_deadline and has_compute:
+            expiry = effective_seal_expiry_ns or (
+                base_ready_ns + core.scheduler._late_seal_safety_us * 1000
+            )
+            requested = min(requested, max(0, expiry - before))
         if full_prediction_wait and coarse and wakeup is None:
             from vllm.v1.kv_offload.seal_wakeup import TransportWakeup
 
@@ -722,6 +739,14 @@ def stage_rpc(core, step, base, candidates):
                     from vllm.v1.kv_offload.execution_timing import valid_snapshot
 
                     has_compute, compute_finished = compute_progress(core, queued)
+                    if (
+                        has_compute
+                        and (compute_deadline or compute_deadline_shadow)
+                        and effective_seal_expiry_ns is None
+                    ):
+                        effective_seal_expiry_ns = (
+                            base_ready_ns + core.scheduler._late_seal_safety_us * 1000
+                        )
                     if prediction_to_readiness:
                         cancelled = cancelled_candidates(core, candidates)
                         active = {c.req_id for c in candidates} - cancelled
@@ -783,6 +808,32 @@ def stage_rpc(core, step, base, candidates):
                                     step=step,
                                     **prediction,
                                 )
+                    if (
+                        has_compute
+                        and prediction
+                        and (compute_deadline or compute_deadline_shadow)
+                        and compute_seal_deadline_ns is None
+                    ):
+                        compute_seal_deadline_ns = (
+                            prediction["gpu_start_upper_ns"]
+                            + prediction["predicted_duration_ns"]
+                            - compute_deadline_lead_us * 1000
+                        )
+                        compute_seal_deadline_armed_ns = time.monotonic_ns()
+                        effective_seal_expiry_ns = min(
+                            compute_seal_deadline_ns,
+                            base_ready_ns + core.scheduler._late_seal_safety_us * 1000,
+                        )
+                        record(
+                            core.scheduler,
+                            "compute_seal_deadline_armed",
+                            step=step,
+                            deadline_ns=compute_seal_deadline_ns,
+                            effective_expiry_ns=effective_seal_expiry_ns,
+                            armed_ns=compute_seal_deadline_armed_ns,
+                            lead_us=compute_deadline_lead_us,
+                            shadow=compute_deadline_shadow,
+                        )
                     if (
                         prediction
                         and timing is not None
@@ -859,6 +910,18 @@ def stage_rpc(core, step, base, candidates):
                             and len(ready_acked) == len(candidates)
                         ):
                             seal_reason = "all_candidates_ready"
+                            break
+                        if (
+                            compute_deadline
+                            and compute_seal_deadline_ns is not None
+                            and effective_seal_expiry_ns is not None
+                            and time.monotonic_ns() >= effective_seal_expiry_ns
+                        ):
+                            seal_reason = (
+                                "compute_seal_deadline"
+                                if compute_seal_deadline_ns <= effective_seal_expiry_ns
+                                else "adaptive_safety_deadline"
+                            )
                             break
                         if (
                             now_ns
@@ -986,6 +1049,17 @@ def stage_rpc(core, step, base, candidates):
             hybrid_wait_us=hybrid_wait_us,
             hybrid_guard_us=hybrid_guard_us,
             prediction_to_readiness=prediction_to_readiness,
+            compute_seal_deadline_enabled=compute_deadline,
+            compute_seal_deadline_shadow=compute_deadline_shadow,
+            compute_seal_deadline_lead_us=compute_deadline_lead_us,
+            compute_seal_deadline_ns=compute_seal_deadline_ns,
+            compute_seal_deadline_armed_ns=compute_seal_deadline_armed_ns,
+            effective_seal_expiry_ns=effective_seal_expiry_ns,
+            compute_seal_deadline_overshoot_ns=(
+                max(0, sealed_ns - effective_seal_expiry_ns)
+                if effective_seal_expiry_ns is not None
+                else None
+            ),
             hybrid_transition_ns=hybrid_transition_ns,
             hybrid_polling_ns=hybrid_polling_ns,
             full_prediction_wait=full_prediction_wait,

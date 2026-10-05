@@ -118,10 +118,206 @@ def _request(req_id):
     return SimpleNamespace(req_id=req_id, prefill_token_ids=[1, 2, 3], prompt_len=3)
 
 
+@pytest.fixture
+def deadline_core(monkeypatch):
+    """Drive the real seal loop with deterministic clocks and rank acknowledgments."""
+    import numpy as np
+
+    from vllm.v1.kv_offload import late_admission_runtime as late
+
+    clock = SimpleNamespace(now=1_001_000_000, sleeps=[])
+
+    def sleep(seconds):
+        ns = round(seconds * 1e9)
+        assert ns >= 0
+        clock.sleeps.append(ns)
+        clock.now += ns
+
+    monkeypatch.setattr(
+        late,
+        "time",
+        SimpleNamespace(
+            monotonic=lambda: clock.now / 1e9,
+            monotonic_ns=lambda: clock.now,
+            thread_time_ns=lambda: 0,
+            sleep=sleep,
+        ),
+    )
+
+    def make(predicted=120_000_000, lead_us=0, shadow=False):
+        path = []
+
+        def publish(data_path):
+            with open(data_path, "rb") as stream:
+                _, step, _, candidates, ack_path = pickle.load(stream)
+            path.append(ack_path)
+            for rank in range(8):
+                if rank != 7 or clock.base_at is None:
+                    signal_prepared(ack_path, step, rank, 1)
+                for slot, candidate in enumerate(candidates):
+                    if rank != 7 or candidate.req_id != "partial":
+                        signal_prepared(ack_path, step, rank, 1, slot)
+
+        core = _core(SimpleNamespace(publish_late_preparation=publish))
+        scheduler = core.scheduler
+        scheduler._late_seal_policy = "predictive"
+        scheduler._late_seal_prediction_to_readiness = True
+        scheduler._late_seal_compute_deadline = not shadow
+        scheduler._late_seal_compute_deadline_shadow = shadow
+        scheduler._late_seal_compute_deadline_lead_us = lead_us
+        scheduler._late_seal_target_candidates = 16
+        scheduler._late_seal_repeat_us = 25_000
+        scheduler._late_seal_prediction_scale_percent = 100
+        scheduler._late_seal_prediction_reserve_us = 10_000
+        scheduler._late_seal_safety_us = 1_000_000
+        scheduler._late_seal_adaptive_poll_us = 2000
+        clock.ready_at = {}
+        clock.complete_at = None
+        clock.base_at = None
+        scheduler.requests = {}
+        output = core.batch_queue[-1][1]
+        output.total_num_scheduled_tokens = 1024
+        output.readiness_timeline_step = 8
+
+        def records(step):
+            end = clock.complete_at
+            completed = end is not None and clock.now >= end
+            return [
+                [
+                    step,
+                    1_000_000_000,
+                    1_000_000_000,
+                    1_000_000_000,
+                    clock.now,
+                    1,
+                    end - 1_000_000_000 if completed else 0,
+                    end if completed else 0,
+                    end if completed else 0,
+                ]
+            ] * 8
+
+        core.deferral_timing = SimpleNamespace(
+            steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+            read_execution=records,
+            seal_estimator=SimpleNamespace(
+                predict=lambda data: predicted,
+                features=lambda data: np.ones(4),
+                samples=[0] * 8,
+                preparation_reserve=lambda extra: extra,
+                preparation_ns=[],
+            ),
+        )
+
+        def refresh(**kwargs):
+            scheduler.finished_recving_kv_req_ids.update(
+                req for req, at in clock.ready_at.items() if at <= clock.now
+            )
+            if clock.base_at is not None and clock.now >= clock.base_at:
+                signal_prepared(path[0], 9, 7, 1)
+
+        core._refresh_early_load_readiness.side_effect = refresh
+        return core, clock
+
+    return make
+
+
+@pytest.mark.parametrize("lead_us", [0, 5000, 10_000, 20_000])
+def test_compute_deadline_seals_while_a_is_held_and_clips_sleep(deadline_core, lead_us):
+    """A deadline is an enforced seal, rather than a transition to more polling."""
+    core, clock = deadline_core(lead_us=lead_us)
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    transport = core.scheduler._late_transport
+    expected = 1_120_000_000 - lead_us * 1000
+    assert transport["seal_reason"] == "compute_seal_deadline"
+    assert transport["seal_ns"] == expected
+    assert transport["compute_seal_deadline_ns"] == expected
+    assert transport["compute_seal_deadline_overshoot_ns"] == 0
+    assert max(clock.sleeps) <= 2_000_000
+    assert not core.batch_queue[-1][0].poll()
+
+
+def test_compute_deadline_freezes_kv_ack_and_cancellation_snapshot(deadline_core):
+    """After-deadline readiness cannot expand the sealed membership snapshot."""
+    core, clock = deadline_core()
+    clock.ready_at = {
+        "a": 1_119_999_999,
+        "late": 1_120_000_001,
+        "partial": 1_119_999_999,
+        "cancelled": 1_119_999_999,
+    }
+    core.aborts_queue.put(["cancelled"])
+    acknowledged = stage_rpc(
+        core,
+        9,
+        [_request("base")],
+        [_request(req) for req in clock.ready_at],
+    )
+    scheduler = core.scheduler
+    eligible = (
+        set(acknowledged) & scheduler._late_kv_snapshot
+    ) - scheduler._late_cancelled
+    assert eligible == {"a"}
+    clock.now += 1
+    core._refresh_early_load_readiness()
+    assert "late" in scheduler.finished_recving_kv_req_ids
+    assert "late" not in scheduler._late_kv_snapshot
+    assert scheduler._late_transport["seal_reason"] == "compute_seal_deadline"
+
+
+@pytest.mark.parametrize("predicted", [None, 2_000_000_000])
+def test_compute_deadline_uses_maximum_wait_when_prediction_is_missing_or_late(
+    deadline_core, predicted
+):
+    core, _ = deadline_core(predicted=predicted)
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    transport = core.scheduler._late_transport
+    assert transport["seal_reason"] == "adaptive_safety_deadline"
+    assert transport["seal_ns"] == transport["base_ready_ns"] + 1_000_000_000
+    assert transport["effective_seal_expiry_ns"] == transport["seal_ns"]
+
+
+def test_compute_deadline_waits_for_all_base_acknowledgments(deadline_core):
+    core, clock = deadline_core()
+    clock.base_at = 1_170_000_000
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    transport = core.scheduler._late_transport
+    assert transport["seal_ns"] >= clock.base_at
+    assert transport["seal_reason"] == "compute_seal_deadline"
+    assert transport["statuses"][:8] == [1] * 8
+
+
+@pytest.mark.parametrize("shadow", [False, True])
+def test_compute_deadline_preserves_earlier_compute_completion(deadline_core, shadow):
+    core, clock = deadline_core(shadow=shadow)
+    clock.complete_at = 1_060_000_000
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    transport = core.scheduler._late_transport
+    assert transport["seal_reason"] == "predecessor_compute_finished"
+    assert transport["seal_ns"] < transport["compute_seal_deadline_ns"]
+
+
+def test_compute_deadline_shadow_does_not_enforce_expiry(deadline_core):
+    core, clock = deadline_core(shadow=True)
+    clock.ready_at = {"a": 1_150_000_000}
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    transport = core.scheduler._late_transport
+    assert transport["seal_reason"] == "candidate_target_ready"
+    assert transport["seal_ns"] > transport["compute_seal_deadline_ns"]
+
+
+def test_compute_deadline_preserves_load_only_readiness_policy(deadline_core):
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    clock.ready_at = {"a": 1_150_000_000}
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    assert core.scheduler._late_transport["seal_reason"] == "candidate_target_ready"
+    assert core.scheduler._late_transport["compute_seal_deadline_ns"] is None
+
+
 @pytest.mark.parametrize("coalesced", [False, True])
 @pytest.mark.parametrize("guard_us", [0, 50_000])
 @pytest.mark.parametrize("poll_us", [2000, 5000, 10000])
-@pytest.mark.parametrize("event", ["compute", "kv", "cancel", "fine"])
+@pytest.mark.parametrize("event", ["compute", "kv", "cancel", "fine", "deadline"])
 def test_full_prediction_wait_is_interrupted_before_its_timer(
     tmp_path, monkeypatch, guard_us, poll_us, event, coalesced, coalesced_channel
 ):
@@ -136,6 +332,8 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
     scheduler = core.scheduler
     scheduler._late_seal_policy = "predictive"
     scheduler._late_seal_prediction_to_readiness = True
+    scheduler._late_seal_compute_deadline = event == "deadline"
+    scheduler._late_seal_compute_deadline_lead_us = 5000
     scheduler._late_seal_full_prediction_wait = True
     scheduler._late_seal_coalesced_notifications = coalesced
     scheduler._late_seal_wait_trace = True
@@ -152,7 +350,7 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
     core.batch_queue[-1][1].total_num_scheduled_tokens = 1024
     core.batch_queue[-1][1].readiness_timeline_step = 8
     started = time.monotonic_ns()
-    predicted = 120_000_000 if event == "fine" else 500_000_000
+    predicted = 120_000_000 if event in {"fine", "deadline"} else 500_000_000
     ranks = [RankFile(str(tmp_path / f"rank-{i}"), create=True) for i in range(8)]
     paths = [str(tmp_path / f"ring-{i}") for i in range(8)]
     for path in paths:
@@ -273,7 +471,15 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
             w["phase"] == "coarse" and w["requested_ns"] > 50_000_000
             for w in transport["adaptive_waits"]
         )
-        if event == "fine":
+        if event == "deadline":
+            assert transport["seal_reason"] == "compute_seal_deadline"
+            assert transport["seal_ns"] >= started + predicted - 5_000_000
+            expiry = transport["effective_seal_expiry_ns"]
+            assert all(
+                w["requested_ns"] <= max(0, expiry - w["decision_ns"])
+                for w in transport["adaptive_waits"]
+            )
+        elif event == "fine":
             assert transport["seal_ns"] >= transport["hybrid_transition_ns"]
             assert any(
                 w["phase"] == "fine" and w["requested_ns"] == poll_us * 1000
@@ -297,7 +503,7 @@ def test_full_prediction_wait_is_interrupted_before_its_timer(
         elif event in ("kv", "fine"):
             assert transport["seal_reason"] == "candidate_target_ready"
             assert scheduler._late_kv_snapshot == {"a"}
-        else:
+        elif event == "cancel":
             assert scheduler._late_cancelled == {"a"}
     finally:
         executor.finish()
@@ -808,7 +1014,10 @@ def test_partial_ready_seal_does_not_count_cancelled_candidate():
     executor.finish()
 
 
-def test_execute_b_is_enqueued_while_a_main_rpc_is_held(monkeypatch):
+@pytest.mark.parametrize("deadline", [False, True])
+def test_execute_b_is_enqueued_while_a_main_rpc_is_held(monkeypatch, deadline):
+    import numpy as np
+
     from vllm.v1.kv_offload import queue_stages
 
     monkeypatch.setattr(queue_stages, "active", False)
@@ -842,9 +1051,42 @@ def test_execute_b_is_enqueued_while_a_main_rpc_is_held(monkeypatch):
     core.scheduler._late_partial_ready_percent = 0
     core.scheduler.finished_recving_kv_req_ids = set()
     core.scheduler.has_requests.return_value = True
+    if deadline:
+        scheduler = core.scheduler
+        scheduler._late_seal_policy = "predictive"
+        scheduler._late_seal_prediction_to_readiness = True
+        scheduler._late_seal_compute_deadline = True
+        scheduler._late_seal_compute_deadline_lead_us = 5000
+        scheduler._late_seal_target_candidates = 16
+        scheduler._late_seal_prediction_scale_percent = 100
+        scheduler._late_seal_prediction_reserve_us = 10_000
+        scheduler._late_seal_safety_us = 1_000_000
+        scheduler._late_seal_adaptive_poll_us = 2000
+        scheduler._late_seal_hybrid_wait_us = 0
+        scheduler._late_seal_full_prediction_wait = False
+        scheduler._late_seal_coalesced_notifications = False
+        scheduler._late_seal_condition_preparation = False
+        scheduler._late_cached_requests = False
+        scheduler._late_seal_when_all_candidates_ready = False
+        a_output.total_num_scheduled_tokens = 1024
+        started = time.monotonic_ns()
+        core.deferral_timing = SimpleNamespace(
+            steps={8: {"step": 8, "request_shapes": [[1024, 8192]]}},
+            read_execution=lambda step: (
+                [[step, started, started, started, time.monotonic_ns(), 1, 0, 0, 0]] * 8
+            ),
+            seal_estimator=SimpleNamespace(
+                predict=lambda data: 50_000_000,
+                features=lambda data: np.ones(4),
+                samples=[0] * 8,
+                preparation_reserve=lambda extra: extra,
+                preparation_ns=[],
+            ),
+        )
 
     def schedule(*_):
-        assert stage_rpc(core, 9, [_request("base")], []) == []
+        candidates = [_request("a")] if deadline else []
+        assert stage_rpc(core, 9, [_request("base")], candidates) == []
         output = SchedulerOutput.make_empty()
         output.readiness_timeline_step = 9
         return output
@@ -858,6 +1100,8 @@ def test_execute_b_is_enqueued_while_a_main_rpc_is_held(monkeypatch):
             release.set()
         assert progress.result(timeout=5) == (None, False)
     executor.execute_model.assert_called_once()
+    if deadline:
+        assert core.scheduler._late_transport["seal_reason"] == "compute_seal_deadline"
     assert not predecessor.release.is_set()
     executor.finish()
 
@@ -1958,6 +2202,21 @@ def test_compact_tokens_require_private_preparation():
 
     with pytest.raises(ValueError, match="compact tokens require"):
         validate_experiment_options(dict(late_compact_tokens=True))
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        {"late_seal_compute_deadline": True},
+        {"late_seal_compute_deadline_shadow": True},
+        {"late_seal_compute_deadline_lead_us": 5000},
+    ],
+)
+def test_compute_deadline_rejects_options_without_readiness_policy(options):
+    from vllm.v1.kv_offload.early_readiness import validate_experiment_options
+
+    with pytest.raises(ValueError, match="compute seal"):
+        validate_experiment_options(options)
 
 
 @pytest.mark.parametrize("cached,pinned", [(True, False), (False, True), (True, True)])

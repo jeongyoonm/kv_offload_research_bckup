@@ -42,6 +42,9 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_hybrid_wait_us": 0,
     "late_seal_hybrid_guard_us": 50_000,
     "late_seal_prediction_to_readiness": False,
+    "late_seal_compute_deadline": False,
+    "late_seal_compute_deadline_shadow": False,
+    "late_seal_compute_deadline_lead_us": 0,
     "late_seal_full_prediction_wait": False,
     "late_seal_coalesced_notifications": False,
     "late_seal_freeze_estimator": False,
@@ -90,6 +93,7 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         ("late_seal_safety_us", 5_000_000),
         ("late_seal_hybrid_wait_us", 50_000),
         ("late_seal_hybrid_guard_us", 100_000),
+        ("late_seal_compute_deadline_lead_us", 100_000),
         ("late_seal_target_candidates", 16),
         ("late_seal_load_only_target_candidates", 16),
         ("late_seal_repeat_us", 100_000),
@@ -156,6 +160,19 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         or not result["late_seal_repeat_us"]
     ):
         raise ValueError("prediction-to-readiness requires predictive seal and target")
+    deadline_options = (
+        result["late_seal_compute_deadline"]
+        or result["late_seal_compute_deadline_shadow"]
+    )
+    if deadline_options and not result["late_seal_prediction_to_readiness"]:
+        raise ValueError("compute seal deadline requires prediction-to-readiness")
+    if (
+        result["late_seal_compute_deadline"]
+        and result["late_seal_compute_deadline_shadow"]
+    ):
+        raise ValueError("compute seal deadline and shadow are mutually exclusive")
+    if result["late_seal_compute_deadline_lead_us"] and not deadline_options:
+        raise ValueError("compute seal lead requires deadline or shadow")
     if result["late_seal_full_prediction_wait"] and (
         not result["late_seal_prediction_to_readiness"]
         or not result["late_seal_condition_preparation"]

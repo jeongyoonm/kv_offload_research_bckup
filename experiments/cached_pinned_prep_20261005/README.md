@@ -142,3 +142,41 @@ export TMPDIR=/mnt/localnvme/glm53_prep_contention_20261006
 
 Committed compact summaries are in `results/contention_20261006`. Production
 serving code and default flags are unchanged in this diagnostic branch.
+
+## Compact preparation packets (2026-10-06)
+
+Branch: `experiment/glm53-compact-preparation-tokens-20261006`.
+`late_compact_tokens` defaults to false and requires the existing mode-4 cached
+or pinned preparation option. The engine validates immutable text prefills and
+encodes tokens once into contiguous int32 bytes. Worker decoding retains small
+request metadata and creates read-only NumPy views without reconstructing Python
+token lists. Selected cached references resolve to these arrays or their prepared
+pinned copies privately in the V2 runner. Final allocation and accounting still
+come from the sealed scheduler output. Unselected buffers and generation resets
+use the existing bounded ownership and drain paths.
+
+The focused interference probe uses both packet formats in the same run, with
+twelve alternating warmed repeats. Graph GPU spans are 71.54ms for idle, 93.33ms
+for the old pinned packet, and 71.55ms for compact pinned preparation. The CPU
+harness passes 146 cases; eight explicit GPU adoption cases cover 8K/60K prompts,
+selected slot ordering and changed-prompt fallback against ordinary runner state.
+
+The matched GLM5.3 TP8 comparison uses 60K prompts, 95% CPU prefix lengths, 100%
+CPU hits, concurrency 32, one output token, and three alternating repeats of
+80 requests per policy. `current` is the existing complete prototype, without
+cached references or pinned preparation; `cached_pinned` is the measured earlier
+optimization; `compact_pinned` adds this wire-format fix. All policies share a
+trained frozen predictor and coalesced notifications. Known-answer and distinct
+fact correctness checks are rerun. Model weights and KV precision are unchanged.
+
+```bash
+export PYTHONPATH=$PWD
+export CACHED_PINNED_ARTIFACT_ROOT=/mnt/localnvme/glm53_compact_prep_20261006
+.venv/bin/python experiments/cached_pinned_prep_20261005/canary.py \
+  --name gpu --policies current,cached_pinned,compact_pinned \
+  --workloads 61440:95:100 --requests 80 --repeats 3 \
+  --max-model-len 65536 --distinct-fact-probe
+.venv/bin/python experiments/cached_pinned_prep_20261005/analyze.py
+.venv/bin/python experiments/cached_pinned_prep_20261005/compare_compact.py \
+  "$CACHED_PINNED_ARTIFACT_ROOT"
+```

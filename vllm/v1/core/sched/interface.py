@@ -41,6 +41,7 @@ class SchedulerInterface(ABC):
     _late_admission_mode: int
     _late_cached_requests: bool
     _late_pinned_packing: bool
+    _late_compact_tokens: bool
     _late_seal_delay_us: int
     _late_seal_extension_us: int
     _late_seal_policy: str

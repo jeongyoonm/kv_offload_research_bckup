@@ -1768,12 +1768,18 @@ def _cache_request(req_id, tokens=None):
     )
 
 
-def test_cached_reference_hydrates_tokens_and_preserves_final_allocation(tmp_path):
+@pytest.mark.parametrize("compact", [False, True])
+def test_cached_reference_hydrates_tokens_and_preserves_final_allocation(
+    tmp_path, compact
+):
     """The sealed output remains authoritative for blocks and computed tokens."""
     from dataclasses import replace
 
+    import numpy as np
+
     from vllm.v1.kv_offload.late_admission_runtime import (
         cache_references,
+        compact_preparation_request,
         resolve_references,
     )
 
@@ -1782,7 +1788,8 @@ def test_cached_reference_hydrates_tokens_and_preserves_final_allocation(tmp_pat
     control, payload = tmp_path / "control", tmp_path / "payload"
     control.write_bytes(struct.pack("<QQ", 7, 1) + bytes(2))
     with payload.open("wb") as stream:
-        pickle.dump((3, 7, [], [source], str(control)), stream)
+        wire = compact_preparation_request(source) if compact else source
+        pickle.dump((3, 7, [], [wire], str(control)), stream)
     try:
         lane._prepare_path(str(payload))
         assert control.read_bytes()[16:] == b"\1\1"
@@ -1798,7 +1805,13 @@ def test_cached_reference_hydrates_tokens_and_preserves_final_allocation(tmp_pat
         )
         resolve_references(output, prepared, 3)
         restored = output.scheduled_new_reqs[0]
-        assert restored.prefill_token_ids == source.prefill_token_ids
+        np.testing.assert_array_equal(
+            restored.prefill_token_ids, source.prefill_token_ids
+        )
+        if compact:
+            assert not restored.prefill_token_ids.flags.writeable
+            assert restored.prefill_token_ids is prepared["a"].token_ids
+            assert prepared["a"].source.prefill_token_ids is None
         assert restored.prompt_len == 61440
         assert restored.block_ids == ([7, 8],)
         assert restored.num_computed_tokens == 61400
@@ -1842,11 +1855,13 @@ def test_cached_reference_rejects_stale_or_missing_preparation(failure):
         lane.close()
 
 
-def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
+@pytest.mark.parametrize("compact", [False, True])
+def test_cached_reference_falls_back_for_unacked_or_changed_prompts(compact):
     from dataclasses import replace
 
     from vllm.v1.kv_offload.late_admission_runtime import (
         cache_references,
+        compact_preparation_request,
         resolve_references,
     )
 
@@ -1859,7 +1874,8 @@ def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
     assert all(r.late_cached_key is None for r in result)
     lane = PreparationLane(0, 3, cached_requests=True)
     try:
-        prepared = {"a": lane._prepare_data(source, 7)}
+        wire = compact_preparation_request(source) if compact else source
+        prepared = {"a": lane._prepare_data(wire, 7)}
         output = SimpleNamespace(scheduled_new_reqs=result, readiness_timeline_step=7)
         resolve_references(output, prepared, 3)
         assert output.scheduled_new_reqs[0] is changed
@@ -1868,12 +1884,14 @@ def test_cached_reference_falls_back_for_unacked_or_changed_prompts():
         lane.close()
 
 
-def test_partial_rank_ack_keeps_candidate_payload_and_caches_base():
+@pytest.mark.parametrize("compact", [False, True])
+def test_partial_rank_ack_keeps_candidate_payload_and_caches_base(compact):
     from vllm.v1.kv_offload.late_admission_runtime import cache_references
 
     executor = ControlledExecutor()
     core = _core(executor)
     core.scheduler._late_cached_requests = True
+    core.scheduler._late_compact_tokens = compact
     base, candidate = _cache_request("base"), _cache_request("a")
     try:
         with ThreadPoolExecutor(max_workers=1) as pool:
@@ -1892,6 +1910,56 @@ def test_partial_rank_ack_keeps_candidate_payload_and_caches_base():
         executor.finish()
 
 
+def test_compact_preparation_snapshots_tokens_without_worker_lists():
+    """Later engine mutations cannot change the acknowledged worker snapshot."""
+    import numpy as np
+
+    from vllm.v1.kv_offload.late_admission_runtime import compact_preparation_request
+
+    source = _cache_request("a")
+    wire = compact_preparation_request(source)
+    source.prompt_token_ids[0] = 99
+    source.prefill_token_ids[1] = 100
+    decoded = pickle.loads(pickle.dumps(wire, protocol=pickle.HIGHEST_PROTOCOL))
+    assert decoded.source.prompt_token_ids is None
+    assert decoded.source.prefill_token_ids is None
+    lane = PreparationLane(0, 3, cached_requests=True)
+    try:
+        prepared = lane._prepare_data(decoded, 7)
+        np.testing.assert_array_equal(prepared.token_ids, [17, 23, 41])
+        assert not prepared.token_ids.flags.writeable
+    finally:
+        lane.close()
+
+
+@pytest.mark.parametrize("failure", ["length", "metadata", "mutable_bytes"])
+def test_compact_preparation_rejects_invalid_descriptor(failure):
+    from dataclasses import replace
+
+    from vllm.v1.kv_offload.late_admission_runtime import compact_preparation_request
+
+    wire = compact_preparation_request(_cache_request("a"))
+    if failure == "length":
+        wire = replace(wire, token_bytes=wire.token_bytes[:-1])
+    elif failure == "metadata":
+        wire = replace(wire, source=_cache_request("a"))
+    else:
+        wire = replace(wire, token_bytes=bytearray(wire.token_bytes))
+    lane = PreparationLane(0, 3, cached_requests=True)
+    try:
+        with pytest.raises(RuntimeError, match="invalid compact"):
+            lane._prepare_data(wire, 7)
+    finally:
+        lane.close()
+
+
+def test_compact_tokens_require_private_preparation():
+    from vllm.v1.kv_offload.early_readiness import validate_experiment_options
+
+    with pytest.raises(ValueError, match="compact tokens require"):
+        validate_experiment_options(dict(late_compact_tokens=True))
+
+
 @pytest.mark.parametrize("cached,pinned", [(True, False), (False, True), (True, True)])
 def test_private_preparation_options_require_mode_four(cached, pinned):
     from vllm.v1.kv_offload.early_readiness import validate_experiment_options
@@ -1904,8 +1972,9 @@ def test_private_preparation_options_require_mode_four(cached, pinned):
 
 @pytest.mark.parametrize("length", [8192, 61440])
 @pytest.mark.parametrize("changed", [False, True])
+@pytest.mark.parametrize("compact", [False, True])
 def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(
-    length, changed
+    length, changed, compact
 ):
     """No live writes before execute; selected slots match ordinary runner state."""
     import os
@@ -1918,6 +1987,7 @@ def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(
 
     from vllm.v1.kv_offload.late_admission_runtime import (
         cache_references,
+        compact_preparation_request,
         resolve_references,
     )
     from vllm.v1.worker.gpu.model_runner import GPUModelRunner
@@ -1944,7 +2014,12 @@ def test_pinned_preparation_adopts_selected_tokens_through_actual_runner(
     ]
     lane = PreparationLane(0, 3, cached_requests=True, pinned_packing=True)
     try:
-        prepared = {r.req_id: lane._prepare_data(r, 7) for r in requests}
+        prepared = {
+            r.req_id: lane._prepare_data(
+                compact_preparation_request(r) if compact else r, 7
+            )
+            for r in requests
+        }
         assert all(p.pinned_tokens.is_pinned() for p in prepared.values())
         # Preparation creates CPU tensors only, leaving the live UVA store unchanged.
         assert torch.all(optimized.req_states.all_token_ids.gpu == -1).item()

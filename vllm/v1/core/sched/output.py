@@ -35,7 +35,8 @@ else:
 @dataclass
 class NewRequestData:
     req_id: str
-    prompt_token_ids: list[int] | None
+    # Compact experimental references resolve to arrays privately in V2 workers.
+    prompt_token_ids: "list[int] | np.ndarray | None"
     mm_features: list[MultiModalFeatureSpec]
     sampling_params: SamplingParams | None
     pooling_params: PoolingParams | None
@@ -46,7 +47,7 @@ class NewRequestData:
     prompt_is_token_ids: list[bool] | None = None
 
     # Only used for v2 model runner.
-    prefill_token_ids: list[int] | None = None
+    prefill_token_ids: "list[int] | np.ndarray | None" = None
 
     # Experiment-only immutable prompt reference, resolved before runner entry.
     late_cached_key: tuple[int, int] | None = None

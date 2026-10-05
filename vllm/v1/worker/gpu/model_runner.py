@@ -1046,10 +1046,12 @@ class GPUModelRunner(LoRAModelRunnerMixin):
                     )
                 ):
                     raise RuntimeError("late candidate token identity changed")
-                # Cached lists avoid NumPy-to-Python scalar expansion.
+                # Compact packets keep arrays through adoption; legacy packets
+                # retain lists to avoid NumPy-to-Python scalar expansion.
                 prepared_token_ids = (
                     prepared.source.prefill_token_ids
                     if prepared.source is not None
+                    and prepared.source.prefill_token_ids is not None
                     else prepared.token_ids
                 )
             else:

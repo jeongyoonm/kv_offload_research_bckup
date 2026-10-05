@@ -44,6 +44,44 @@ class CandidateNotice:
     req_id: str
 
 
+@dataclass(frozen=True)
+class CompactPreparationRequest:
+    """Immutable token bytes and small metadata, encoded in the engine process."""
+
+    source: NewRequestData
+    token_bytes: bytes
+    prompt_len: int
+
+    @property
+    def req_id(self):
+        return self.source.req_id
+
+
+def _immutable_text_prefill(request):
+    return (
+        request.prefill_token_ids is not None
+        and request.prompt_token_ids is not None
+        and request.prefill_token_ids == request.prompt_token_ids
+        and not request.mm_features
+        and request.prompt_embeds is None
+        and request.lora_request is None
+        and request.pooling_params is None
+        and request.prompt_is_token_ids is None
+    )
+
+
+def compact_preparation_request(request):
+    """Snapshot text tokens without retaining token lists in worker metadata."""
+    if not _immutable_text_prefill(request):
+        raise RuntimeError("compact preparation requires immutable text prefill")
+    tokens = np.asarray(request.prefill_token_ids, dtype=np.int32)
+    return CompactPreparationRequest(
+        replace(request, prompt_token_ids=None, prefill_token_ids=None),
+        tokens.tobytes(),
+        request.prompt_len,
+    )
+
+
 def prepare_candidates(scheduler, token_budget, base_reqs):
     """Stage bounded old in-flight loads after ordinary ready work is selected."""
     mode = getattr(scheduler, "_late_admission_mode", 0)
@@ -270,17 +308,30 @@ class PreparationLane:
     def _prepare_data(self, request, step):
         if not (self.cached_requests or self.pinned_packing):
             return self._prepare_request(request)
-        if (
-            request.prefill_token_ids is None
-            or request.prompt_token_ids is None
-            or request.prefill_token_ids != request.prompt_token_ids
-            or request.mm_features
-            or request.prompt_embeds is not None
-            or request.lora_request is not None
-            or request.pooling_params is not None
-        ):
-            raise RuntimeError("cached preparation requires immutable text prefill")
-        tokens = np.asarray(request.prefill_token_ids, dtype=np.int32)
+        compact = isinstance(request, CompactPreparationRequest)
+        if compact:
+            source = request.source
+            if (
+                type(request.token_bytes) is not bytes
+                or request.prompt_len < 0
+                or len(request.token_bytes) != request.prompt_len * 4
+                or source.prompt_token_ids is not None
+                or source.prefill_token_ids is not None
+                or source.mm_features
+                or source.prompt_embeds is not None
+                or source.lora_request is not None
+                or source.pooling_params is not None
+                or source.prompt_is_token_ids is not None
+            ):
+                raise RuntimeError("invalid compact preparation descriptor")
+            tokens = np.frombuffer(request.token_bytes, dtype=np.int32)
+            prompt_len = request.prompt_len
+        else:
+            if not _immutable_text_prefill(request):
+                raise RuntimeError("cached preparation requires immutable text prefill")
+            source = request
+            tokens = np.asarray(request.prefill_token_ids, dtype=np.int32)
+            prompt_len = request.prompt_len
         pinned = None
         if self.pinned_packing:
             import torch
@@ -288,7 +339,7 @@ class PreparationLane:
             pinned = torch.empty(tokens.size, dtype=torch.int32, pin_memory=True)
             np.copyto(pinned.numpy(), tokens)
             tokens = pinned.numpy()
-        else:
+        elif not compact:
             tokens = tokens.copy()
         tokens.flags.writeable = False
         ready = threading.Event()
@@ -296,10 +347,10 @@ class PreparationLane:
         return PreparedRequest(
             request.req_id,
             tokens,
-            request.prompt_len,
+            prompt_len,
             ready,
             time.monotonic_ns(),
-            request,
+            source,
             (self.generation, step),
             pinned,
         )
@@ -514,8 +565,19 @@ def stage_rpc(core, step, base, candidates):
             struct.pack("<QQ", step, world) + bytes(world * (1 + len(candidates))),
         )
         with os.fdopen(data_fd, "wb") as destination:
+            if getattr(core.scheduler, "_late_compact_tokens", False) is True:
+                wire_base = [compact_preparation_request(r) for r in base]
+                wire_candidates = [compact_preparation_request(r) for r in candidates]
+            else:
+                wire_base, wire_candidates = base, candidates
             pickle.dump(
-                (core.scheduler._late_generation, step, base, candidates, path),
+                (
+                    core.scheduler._late_generation,
+                    step,
+                    wire_base,
+                    wire_candidates,
+                    path,
+                ),
                 destination,
                 protocol=pickle.HIGHEST_PROTOCOL,
             )
@@ -1002,18 +1064,26 @@ def resolve_references(output, prepared, generation):
                 raise RuntimeError("acknowledged cached request is missing or stale")
             request = replace(
                 request,
-                prompt_token_ids=data.source.prompt_token_ids,
-                prefill_token_ids=data.source.prefill_token_ids,
+                prompt_token_ids=data.source.prompt_token_ids
+                if data.source.prompt_token_ids is not None
+                else data.token_ids,
+                prefill_token_ids=data.source.prefill_token_ids
+                if data.source.prefill_token_ids is not None
+                else data.token_ids,
                 late_cached_key=None,
             )
         else:
             data = prepared.get(request.req_id)
             if data is not None and data.source is not None:
                 source = data.source
-                if (
-                    request.prompt_token_ids != source.prompt_token_ids
-                    or request.prefill_token_ids != source.prefill_token_ids
-                ):
+                matches = (
+                    np.array_equal(request.prompt_token_ids, data.token_ids)
+                    and np.array_equal(request.prefill_token_ids, data.token_ids)
+                    if source.prefill_token_ids is None
+                    else request.prompt_token_ids == source.prompt_token_ids
+                    and request.prefill_token_ids == source.prefill_token_ids
+                )
+                if not matches:
                     prepared.pop(request.req_id)
         resolved.append(request)
     output.scheduled_new_reqs = resolved

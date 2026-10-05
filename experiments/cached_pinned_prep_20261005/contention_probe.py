@@ -96,6 +96,7 @@ def main():
         )
         for r in requests
     ]
+    compact_requests = [runtime.compact_preparation_request(r) for r in requests]
     pool = [torch.empty(length, dtype=torch.int32, pin_memory=True) for _ in requests]
     state = dict(mode="idle", stages=[], pool_index=0)
     original_load, original_array = pickle.load, np.asarray
@@ -170,6 +171,8 @@ def main():
         "references",
         "pinned",
         "pinned_reuse",
+        "compact_references",
+        "compact_pinned",
     ]
     launch_modes = args.launch_modes.split(",")
     try:
@@ -185,6 +188,8 @@ def main():
                     )
                     if mode == "decode_arrays":
                         candidates = array_requests
+                    if mode in ["compact_references", "compact_pinned"]:
+                        candidates = compact_requests
                     path = args.root / "packet.pkl"
                     path.write_bytes(
                         pickle.dumps(
@@ -194,7 +199,11 @@ def main():
                     )
                     state.update(mode=mode, stages=[], pool_index=0)
                     lane.notice_only = mode == "notice"
-                    lane.pinned_packing = mode in ["pinned", "pinned_reuse"]
+                    lane.pinned_packing = mode in [
+                        "pinned",
+                        "pinned_reuse",
+                        "compact_pinned",
+                    ]
                     lane.lock.rows.clear()
                     done.clear()
                     torch.accelerator.synchronize()

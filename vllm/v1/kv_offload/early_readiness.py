@@ -28,6 +28,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_admission_markers": False,
     "late_cached_requests": False,
     "late_pinned_packing": False,
+    "late_compact_tokens": False,
     "late_seal_delay_us": 0,
     "late_seal_extension_us": 0,
     "late_seal_policy": "fixed",
@@ -119,6 +120,10 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         result["late_admission_mode"] != 4
     ):
         raise ValueError("cached/pinned preparation requires admission mode 4")
+    if result["late_compact_tokens"] and not (
+        result["late_cached_requests"] or result["late_pinned_packing"]
+    ):
+        raise ValueError("compact tokens require cached/pinned preparation")
     if result["late_seal_policy"] not in ("fixed", "predictive", "event") or (
         result["late_seal_policy"] == "predictive"
         and (

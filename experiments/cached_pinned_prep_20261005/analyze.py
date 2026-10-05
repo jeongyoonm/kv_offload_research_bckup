@@ -135,19 +135,30 @@ def main():
                     for e in w["records"]
                     if e["event"] == "worker_entry"
                 ),
+                compact=sum(
+                    e.get("compact_tokens", 0)
+                    for e in w["records"]
+                    if e["event"] == "worker_entry"
+                ),
             )
             for w in generations
         }
         mode = directory.name.split("_", 1)[1].split("_warmretry", 1)[0]
         reference_count = late["counts"].get("cached_request_references_references", 0)
-        if mode in ("references", "cached_pinned"):
+        if mode in ("references", "cached_pinned", "compact_pinned"):
             assert reference_count > 0 and all(
                 v["cached"] >= reference_count for v in coverage.values()
             ), directory
-        if mode == "cached_pinned":
+        if mode in ("cached_pinned", "compact_pinned"):
             assert all(v["pinned"] > 0 for v in coverage.values()), directory
         else:
             assert all(v["pinned"] == 0 for v in coverage.values()), directory
+        if mode == "compact_pinned":
+            assert all(v["compact"] >= reference_count for v in coverage.values()), (
+                directory
+            )
+        else:
+            assert all(v["compact"] == 0 for v in coverage.values()), directory
         sampled = read(directory / "server_cpu.json")["samples"]
         cpu_stats = cpu.cpu_deltas(
             directory, sampled[0]["time_ns"], sampled[-1]["time_ns"]

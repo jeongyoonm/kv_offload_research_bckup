@@ -1278,6 +1278,10 @@ class Worker(WorkerBase):
                     pinned_tokens=sum(
                         p.pinned_tokens is not None for p in prepared.values()
                     ),
+                    compact_tokens=sum(
+                        p.source is not None and p.source.prefill_token_ids is None
+                        for p in prepared.values()
+                    ),
                 )
         self._deferral_rpc_timing = scheduler_output.deferral_rpc_timing
         timing = None

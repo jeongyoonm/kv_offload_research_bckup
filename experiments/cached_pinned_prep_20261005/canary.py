@@ -61,6 +61,13 @@ runner.POLICIES = {
         late_cached_requests=True,
         late_pinned_packing=True,
     ),
+    "compact_pinned": dict(
+        policy,
+        late_seal_coalesced_notifications=True,
+        late_cached_requests=True,
+        late_pinned_packing=True,
+        late_compact_tokens=True,
+    ),
 }
 original_config = runner.early.config
 

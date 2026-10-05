@@ -2008,6 +2008,7 @@ class EngineCore:
             self._timing_diagnostic_failed = False
             self.scheduler._late_cached_requests = options["late_cached_requests"]
             self.scheduler._late_pinned_packing = options["late_pinned_packing"]
+            self.scheduler._late_compact_tokens = options["late_compact_tokens"]
             self.scheduler._late_admission_mode = options["late_admission_mode"]
             self.scheduler._late_seal_delay_us = options["late_seal_delay_us"]
             self.scheduler._late_seal_extension_us = options["late_seal_extension_us"]

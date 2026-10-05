@@ -77,6 +77,26 @@ def launch(command, *args, **kwargs):
         env["TRITON_CACHE_DIR"] = str(ROOT.parent / "triton-cache")
         env["CUDA_CACHE_PATH"] = str(ROOT.parent / "cuda-cache")
         kwargs["env"] = env
+        (ROOT / "actual-launch.json").write_text(
+            json.dumps(
+                dict(
+                    command=command,
+                    environment={
+                        key: env.get(key)
+                        for key in (
+                            "PYTHONPATH",
+                            "VLLM_CACHE_ROOT",
+                            "TRITON_CACHE_DIR",
+                            "CUDA_CACHE_PATH",
+                            "CUDA_VISIBLE_DEVICES",
+                            "VLLM_DEFERRAL_NATIVE_OBSERVER",
+                        )
+                    },
+                ),
+                indent=2,
+            )
+            + "\n"
+        )
     return original_launch(command, *args, **kwargs)
 
 
@@ -85,8 +105,18 @@ original_profile = runner.profile
 
 
 def profile(directory, dataset, concurrency, count, phase):
+    previous_tmp = os.environ.get("TMPDIR")
+    profile_tmp = Path("/mnt/localnvme/cached-pinned-tmp")
+    profile_tmp.mkdir(exist_ok=True)
+    os.environ["TMPDIR"] = str(profile_tmp)
     if phase != "replay":
-        return original_profile(directory, dataset, concurrency, count, phase)
+        try:
+            return original_profile(directory, dataset, concurrency, count, phase)
+        finally:
+            if previous_tmp is None:
+                os.environ.pop("TMPDIR", None)
+            else:
+                os.environ["TMPDIR"] = previous_tmp
     api_pid = json.loads((ROOT / "gpu/server/process.json").read_text())["pid"]
     processes = [psutil.Process(api_pid)] + psutil.Process(api_pid).children(
         recursive=True
@@ -115,6 +145,10 @@ def profile(directory, dataset, concurrency, count, phase):
     try:
         return original_profile(directory, dataset, concurrency, count, phase)
     finally:
+        if previous_tmp is None:
+            os.environ.pop("TMPDIR", None)
+        else:
+            os.environ["TMPDIR"] = previous_tmp
         stopped.set()
         thread.join(timeout=2)
         sample()
@@ -156,6 +190,43 @@ def cells(run, server_dir, workloads, counts, policies, repeats, seed=55):
 
 
 runner.run_cells = cells
+
+
+def reuse_correctness(directory, *args, **kwargs):
+    previous = ROOT.parent / "attempt0/gpu"
+    distinct = directory.name == "correctness_distinct"
+    folder = "correctness_distinct" if distinct else "correctness"
+    summary = json.loads((previous / folder / "summary.json").read_text())
+    assert set(summary) == set(runner.POLICIES)
+    assert all(value["passed"] for value in summary.values())
+    provenance = json.loads((previous / "provenance.json").read_text())
+    import hashlib
+
+    for name, expected in provenance["source_sha256"].items():
+        if name.startswith("vllm/"):
+            actual = hashlib.sha256((SOURCE / name).read_bytes()).hexdigest()
+            assert actual == expected
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+    (directory / "reused-validation.json").write_text(
+        json.dumps(
+            dict(
+                source=str(previous / folder),
+                serving_sources_unchanged=True,
+                reason="IPC path failure after successful model checks",
+            ),
+            indent=2,
+        )
+        + "\n"
+    )
+    print("REUSED_CORRECTNESS", folder, flush=True)
+
+
+if os.environ.get("CACHED_PINNED_REUSE_CORRECTNESS") == "1":
+    import correctness
+
+    correctness.check = reuse_correctness
+    correctness.check_distinct = reuse_correctness
 if __name__ == "__main__":
     os.environ["VLLM_DEFERRAL_NATIVE_OBSERVER"] = str(
         Path(

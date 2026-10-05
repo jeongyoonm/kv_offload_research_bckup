@@ -1,0 +1,38 @@
+[
+  {
+    "cell": "r0_cached_pinned",
+    "rank_windows": 96,
+    "prep_completed_during_a_host_submission": 88,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 88
+  },
+  {
+    "cell": "r1_cached_pinned",
+    "rank_windows": 88,
+    "prep_completed_during_a_host_submission": 80,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 80
+  },
+  {
+    "cell": "r2_cached_pinned",
+    "rank_windows": 88,
+    "prep_completed_during_a_host_submission": 88,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 74
+  },
+  {
+    "cell": "r3_cached_pinned",
+    "rank_windows": 88,
+    "prep_completed_during_a_host_submission": 88,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 72
+  },
+  {
+    "cell": "r4_cached_pinned",
+    "rank_windows": 88,
+    "prep_completed_during_a_host_submission": 80,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 69
+  },
+  {
+    "cell": "r5_cached_pinned",
+    "rank_windows": 104,
+    "prep_completed_during_a_host_submission": 104,
+    "prep_completed_during_gpu_execution_before_host_submission_finished": 96
+  }
+]

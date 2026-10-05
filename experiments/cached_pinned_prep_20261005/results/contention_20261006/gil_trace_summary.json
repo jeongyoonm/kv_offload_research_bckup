@@ -1,0 +1,470 @@
+[
+  {
+    "launch_mode": "eager",
+    "mode": "idle",
+    "repeat": 2,
+    "main_gil_wait_ms": 0,
+    "main_max_gil_wait_ms": 0,
+    "preparation_gil_hold_ms": 0,
+    "max_cuda_launch_api_ms": 0.019914,
+    "cuda_launch_api_total_ms": 6.194835,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "notice",
+    "repeat": 2,
+    "main_gil_wait_ms": 0.14938200000000001,
+    "main_max_gil_wait_ms": 0.101525,
+    "preparation_gil_hold_ms": 0.17430600000000002,
+    "max_cuda_launch_api_ms": 0.012206,
+    "cuda_launch_api_total_ms": 6.122042,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "decode",
+    "repeat": 2,
+    "main_gil_wait_ms": 23.914883,
+    "main_max_gil_wait_ms": 6.409632,
+    "preparation_gil_hold_ms": 24.044407,
+    "max_cuda_launch_api_ms": 0.019495,
+    "cuda_launch_api_total_ms": 6.124926,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "references",
+    "repeat": 2,
+    "main_gil_wait_ms": 33.397343,
+    "main_max_gil_wait_ms": 1.7711,
+    "preparation_gil_hold_ms": 33.602743,
+    "max_cuda_launch_api_ms": 0.02423,
+    "cuda_launch_api_total_ms": 6.17555,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned",
+    "repeat": 2,
+    "main_gil_wait_ms": 31.854921,
+    "main_max_gil_wait_ms": 1.78872,
+    "preparation_gil_hold_ms": 32.043529,
+    "max_cuda_launch_api_ms": 0.214988,
+    "cuda_launch_api_total_ms": 6.714704,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned_reuse",
+    "repeat": 2,
+    "main_gil_wait_ms": 30.627378,
+    "main_max_gil_wait_ms": 1.772388,
+    "preparation_gil_hold_ms": 30.822281,
+    "max_cuda_launch_api_ms": 0.018539,
+    "cuda_launch_api_total_ms": 6.258621,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned_reuse",
+    "repeat": 3,
+    "main_gil_wait_ms": 28.513666,
+    "main_max_gil_wait_ms": 1.757063,
+    "preparation_gil_hold_ms": 28.704007999999998,
+    "max_cuda_launch_api_ms": 0.017168,
+    "cuda_launch_api_total_ms": 6.142242,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned",
+    "repeat": 3,
+    "main_gil_wait_ms": 26.687602,
+    "main_max_gil_wait_ms": 1.579665,
+    "preparation_gil_hold_ms": 26.929763,
+    "max_cuda_launch_api_ms": 0.017876,
+    "cuda_launch_api_total_ms": 6.135697,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "references",
+    "repeat": 3,
+    "main_gil_wait_ms": 26.817663,
+    "main_max_gil_wait_ms": 1.643827,
+    "preparation_gil_hold_ms": 27.003037,
+    "max_cuda_launch_api_ms": 0.018409,
+    "cuda_launch_api_total_ms": 6.122398,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "decode",
+    "repeat": 3,
+    "main_gil_wait_ms": 16.472151,
+    "main_max_gil_wait_ms": 5.235343,
+    "preparation_gil_hold_ms": 16.697565,
+    "max_cuda_launch_api_ms": 0.017764,
+    "cuda_launch_api_total_ms": 6.121815,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "notice",
+    "repeat": 3,
+    "main_gil_wait_ms": 0.085723,
+    "main_max_gil_wait_ms": 0.037978,
+    "preparation_gil_hold_ms": 0.130338,
+    "max_cuda_launch_api_ms": 0.04394,
+    "cuda_launch_api_total_ms": 6.14277,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "idle",
+    "repeat": 3,
+    "main_gil_wait_ms": 0,
+    "main_max_gil_wait_ms": 0,
+    "preparation_gil_hold_ms": 0,
+    "max_cuda_launch_api_ms": 0.01631,
+    "cuda_launch_api_total_ms": 6.0518,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "idle",
+    "repeat": 4,
+    "main_gil_wait_ms": 0,
+    "main_max_gil_wait_ms": 0,
+    "preparation_gil_hold_ms": 0,
+    "max_cuda_launch_api_ms": 0.014977,
+    "cuda_launch_api_total_ms": 6.072468,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "notice",
+    "repeat": 4,
+    "main_gil_wait_ms": 0.11310300000000001,
+    "main_max_gil_wait_ms": 0.064962,
+    "preparation_gil_hold_ms": 0.128751,
+    "max_cuda_launch_api_ms": 0.014315,
+    "cuda_launch_api_total_ms": 6.054601,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "decode",
+    "repeat": 4,
+    "main_gil_wait_ms": 16.969242,
+    "main_max_gil_wait_ms": 5.176509,
+    "preparation_gil_hold_ms": 17.163025,
+    "max_cuda_launch_api_ms": 0.015747,
+    "cuda_launch_api_total_ms": 6.089365,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "references",
+    "repeat": 4,
+    "main_gil_wait_ms": 26.343751,
+    "main_max_gil_wait_ms": 1.836963,
+    "preparation_gil_hold_ms": 26.529313000000002,
+    "max_cuda_launch_api_ms": 0.01668,
+    "cuda_launch_api_total_ms": 6.069258,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned",
+    "repeat": 4,
+    "main_gil_wait_ms": 30.321825999999998,
+    "main_max_gil_wait_ms": 5.674111,
+    "preparation_gil_hold_ms": 30.500899,
+    "max_cuda_launch_api_ms": 0.016914,
+    "cuda_launch_api_total_ms": 6.064743,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "eager",
+    "mode": "pinned_reuse",
+    "repeat": 4,
+    "main_gil_wait_ms": 25.934057,
+    "main_max_gil_wait_ms": 1.63422,
+    "preparation_gil_hold_ms": 26.086441,
+    "max_cuda_launch_api_ms": 0.029581,
+    "cuda_launch_api_total_ms": 6.078186,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "idle",
+    "repeat": 2,
+    "main_gil_wait_ms": 0,
+    "main_max_gil_wait_ms": 0,
+    "preparation_gil_hold_ms": 0.006652,
+    "max_cuda_launch_api_ms": 0.041391,
+    "cuda_launch_api_total_ms": 34.158379000000004,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "notice",
+    "repeat": 2,
+    "main_gil_wait_ms": 0.092846,
+    "main_max_gil_wait_ms": 0.070239,
+    "preparation_gil_hold_ms": 0.140479,
+    "max_cuda_launch_api_ms": 0.04189,
+    "cuda_launch_api_total_ms": 34.101653999999996,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "decode",
+    "repeat": 2,
+    "main_gil_wait_ms": 14.634817,
+    "main_max_gil_wait_ms": 4.946665,
+    "preparation_gil_hold_ms": 15.556526999999999,
+    "max_cuda_launch_api_ms": 0.040727,
+    "cuda_launch_api_total_ms": 32.070934,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "references",
+    "repeat": 2,
+    "main_gil_wait_ms": 24.694182,
+    "main_max_gil_wait_ms": 1.518614,
+    "preparation_gil_hold_ms": 25.786003,
+    "max_cuda_launch_api_ms": 0.044176,
+    "cuda_launch_api_total_ms": 32.04399,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned",
+    "repeat": 2,
+    "main_gil_wait_ms": 24.912257,
+    "main_max_gil_wait_ms": 1.604489,
+    "preparation_gil_hold_ms": 26.036643,
+    "max_cuda_launch_api_ms": 0.043015,
+    "cuda_launch_api_total_ms": 31.907861,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned_reuse",
+    "repeat": 2,
+    "main_gil_wait_ms": 24.927734,
+    "main_max_gil_wait_ms": 1.563863,
+    "preparation_gil_hold_ms": 26.061482,
+    "max_cuda_launch_api_ms": 0.050302,
+    "cuda_launch_api_total_ms": 31.997598,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned_reuse",
+    "repeat": 3,
+    "main_gil_wait_ms": 25.056117,
+    "main_max_gil_wait_ms": 1.533784,
+    "preparation_gil_hold_ms": 26.221775,
+    "max_cuda_launch_api_ms": 0.060581,
+    "cuda_launch_api_total_ms": 31.992621,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned",
+    "repeat": 3,
+    "main_gil_wait_ms": 25.076811,
+    "main_max_gil_wait_ms": 1.530597,
+    "preparation_gil_hold_ms": 26.196243,
+    "max_cuda_launch_api_ms": 0.039894,
+    "cuda_launch_api_total_ms": 32.032266,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "references",
+    "repeat": 3,
+    "main_gil_wait_ms": 24.792465,
+    "main_max_gil_wait_ms": 1.511507,
+    "preparation_gil_hold_ms": 25.555808,
+    "max_cuda_launch_api_ms": 0.039395,
+    "cuda_launch_api_total_ms": 31.782371,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "decode",
+    "repeat": 3,
+    "main_gil_wait_ms": 14.656863999999999,
+    "main_max_gil_wait_ms": 4.881174,
+    "preparation_gil_hold_ms": 15.609455,
+    "max_cuda_launch_api_ms": 0.042051,
+    "cuda_launch_api_total_ms": 32.218293,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "notice",
+    "repeat": 3,
+    "main_gil_wait_ms": 0.09069,
+    "main_max_gil_wait_ms": 0.059596,
+    "preparation_gil_hold_ms": 0.128024,
+    "max_cuda_launch_api_ms": 0.042677,
+    "cuda_launch_api_total_ms": 34.095666,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "idle",
+    "repeat": 3,
+    "main_gil_wait_ms": 0.012175,
+    "main_max_gil_wait_ms": 0.012175,
+    "preparation_gil_hold_ms": 0.00759,
+    "max_cuda_launch_api_ms": 0.506453,
+    "cuda_launch_api_total_ms": 33.998433,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "idle",
+    "repeat": 4,
+    "main_gil_wait_ms": 0.012455,
+    "main_max_gil_wait_ms": 0.012455,
+    "preparation_gil_hold_ms": 0.007707,
+    "max_cuda_launch_api_ms": 0.051138,
+    "cuda_launch_api_total_ms": 33.636051,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "notice",
+    "repeat": 4,
+    "main_gil_wait_ms": 0.09323600000000001,
+    "main_max_gil_wait_ms": 0.062506,
+    "preparation_gil_hold_ms": 0.135553,
+    "max_cuda_launch_api_ms": 0.040165,
+    "cuda_launch_api_total_ms": 34.081026,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "decode",
+    "repeat": 4,
+    "main_gil_wait_ms": 14.839089,
+    "main_max_gil_wait_ms": 5.033003,
+    "preparation_gil_hold_ms": 15.725635,
+    "max_cuda_launch_api_ms": 0.042354,
+    "cuda_launch_api_total_ms": 32.152023,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "references",
+    "repeat": 4,
+    "main_gil_wait_ms": 24.908109,
+    "main_max_gil_wait_ms": 1.514474,
+    "preparation_gil_hold_ms": 25.974453,
+    "max_cuda_launch_api_ms": 0.048916,
+    "cuda_launch_api_total_ms": 31.794478,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned",
+    "repeat": 4,
+    "main_gil_wait_ms": 25.149604,
+    "main_max_gil_wait_ms": 1.54343,
+    "preparation_gil_hold_ms": 26.249809,
+    "max_cuda_launch_api_ms": 0.038825,
+    "cuda_launch_api_total_ms": 32.064483,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  },
+  {
+    "launch_mode": "graph",
+    "mode": "pinned_reuse",
+    "repeat": 4,
+    "main_gil_wait_ms": 25.297623,
+    "main_max_gil_wait_ms": 1.661704,
+    "preparation_gil_hold_ms": 26.363974,
+    "max_cuda_launch_api_ms": 0.057293,
+    "cuda_launch_api_total_ms": 32.031345,
+    "sync_api_names": [
+      "cudaEventSynchronize_v3020"
+    ]
+  }
+]

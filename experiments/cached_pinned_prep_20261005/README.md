@@ -85,3 +85,60 @@ The analyzer also separates request-state updates, input preparation, attention
 metadata, and the interval from metadata completion to forward submission.
 Each phase reports the slowest rank per prefill dispatch. These are host wall
 times and can include CUDA or connector waits; they are not isolated CPU costs.
+
+## Preparation contention diagnosis (2026-10-06)
+
+Diagnostic branch: `experiment/glm53-preparation-contention-20261006`, based on
+the measured batched-transfer implementation `17c9739`. Full artifacts, including
+the Nsight Systems report and exported SQLite trace, are under
+`/mnt/localnvme/glm53_prep_contention_20261006`.
+
+`contention_probe.py` drives the actual independent preparation lane with ten
+60K text prompts while one GPU receives a fixed sequence of eager kernels or
+CUDA graph replays. It measures the lane mutex and adoption call. Notification
+publication is replaced with a no-op to isolate decoding, conversion and pinned
+allocation; this is not a serving benchmark. Twelve warmed alternating repeats
+are used per mode. A separate three-repeat Nsight run traces CUDA and Python GIL
+ownership. Its absolute timings are not substituted for unprofiled results.
+
+The direct trace shows the main submission thread waiting for the GIL while the
+preparation thread owns it. In graph mode, full pinned preparation produces about
+25ms of main-thread GIL wait per packet. CUDA launch API durations remain short;
+the preparation thread issues no device/stream synchronization. Warm pinned
+allocation takes about 0.09ms per packet and lane-mutex waits remain below 0.01ms
+in this probe. Reusing pinned tensors does not remove the submission delay.
+
+The unprofiled graph GPU span increases from 71.64ms without preparation to
+92.67ms with full pinned preparation. If GPU work is queued before preparation
+starts, the same span stays at 71.64ms, with every treatment verified to begin
+while GPU work remains pending. This separates host-submission interference from
+slowing already queued GPU kernels in the tested sequence.
+
+A separate decode-only treatment publishes NumPy arrays in the packet instead
+of Python token lists. Within that matched run, array decoding adds about 0.07ms
+to the GPU span versus about 11.49ms for list decoding. This is a representation
+experiment, not an integrated replacement for the cached-request wire contract.
+
+The saved TP8 traces also show preparation completion before A's worker step has
+finished submitting in 528 of 552 rank/window instances. That boundary includes
+sampling and output submission; it does not locate each individual model kernel.
+GIL contention is therefore a demonstrated mechanism with a relevant serving
+overlap window, but its share of the observed 1.55% throughput loss remains
+unmeasured. KV-transfer contention, changed batch shapes and ordered writer-fence
+waits require a matched model trace to separate.
+
+Reproduction (idle GPU 0; no model weights are loaded):
+
+```bash
+export CUDA_VISIBLE_DEVICES=0
+export PYTHONPATH=$PWD
+export TMPDIR=/mnt/localnvme/glm53_prep_contention_20261006
+.venv/bin/python experiments/cached_pinned_prep_20261005/contention_probe.py \
+  --root "$TMPDIR/probe" --repeats 12 --launches 2048
+.venv/bin/python experiments/cached_pinned_prep_20261005/contention_probe.py \
+  --root "$TMPDIR/prequeued" --repeats 12 --launches 2048 \
+  --launch-modes graph --prequeue
+```
+
+Committed compact summaries are in `results/contention_20261006`. Production
+serving code and default flags are unchanged in this diagnostic branch.

@@ -40,6 +40,8 @@ CHECK_IMPORTS = {
             "vllm/v1/kv_offload/late_admission_runtime.py",
             "tests/v1/kv_offload/test_late_admission_harness.py",
             "experiments/coalesced_notify_20261004/cpu_compare.py",
+            # Locally generated preparation packets in a contention diagnostic.
+            "experiments/cached_pinned_prep_20261005/contention_probe.py",
             # pickle
             "vllm/multimodal/hasher.py",
             "vllm/transformers_utils/config.py",

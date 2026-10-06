@@ -1,0 +1,14 @@
+{
+  "completed_at": 1791259376.8059673,
+  "session_exit_code": 0,
+  "analysis_exit_code": 0,
+  "measured_cells": 8,
+  "measured_requests_per_policy": 300,
+  "estimator_training_skipped": true,
+  "model_state_identical_in_all_cells": true,
+  "correctness_passed": true,
+  "audits_passed": true,
+  "gpu_memory_csv": "0, 0 MiB\n1, 0 MiB\n2, 0 MiB\n3, 0 MiB\n4, 0 MiB\n5, 0 MiB\n6, 0 MiB\n7, 0 MiB\n",
+  "gpu_compute_apps_csv": "",
+  "normal_cleanup": true
+}

@@ -1,0 +1,42 @@
+{
+  "r0_legacy5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r0_shape5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r1_legacy5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r1_shape5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r2_legacy5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r2_shape5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r3_legacy5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  },
+  "r3_shape5": {
+    "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+    "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+    "frozen_state_unchanged": true
+  }
+}

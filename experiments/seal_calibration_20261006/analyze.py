@@ -54,6 +54,7 @@ def main():
     )
     groups = defaultdict(list)
     all_errors, issued_errors = defaultdict(list), defaultdict(list)
+    live_population = []
     for cell in report["cells"]:
         directory = Path(cell["path"])
         setting = json.loads((directory / "policy_setting.json").read_text())
@@ -79,6 +80,7 @@ def main():
             step: (model.predict(e) - max(r[6] for r in e["execution_ranks"])) / 1e6
             for step, e in done.items()
         }
+        live_population.extend(done.values())
         all_errors[mode].extend(errors.values())
         for r in json.loads((directory / "late.json").read_text())["records"]:
             if r["event"] == "seal_prediction":
@@ -126,12 +128,23 @@ def main():
                 issued_predictions=accuracy(issued_errors[mode]),
             )
         )
+    common_accuracy = {}
+    for mode in ("legacy", "raw", "shape"):
+        model = ComputeEstimator.from_state_dict(state, state["context"])
+        model.calibration_mode = mode
+        common_accuracy[mode] = accuracy(
+            [
+                (model.predict(e) - max(r[6] for r in e["execution_ranks"])) / 1e6
+                for e in live_population
+            ]
+        )
     output = dict(
         source_commit=report["source_commit"],
         model=str(args.model),
         state_sha256=digest,
         no_gpu_estimator_training=True,
         aggregate=aggregate,
+        common_live_population_accuracy=common_accuracy,
         scope=(
             "Four paired 75-request episodes per mode; 300 requests per mode. "
             "CPU cache priming and server initialization are excluded. "

@@ -130,7 +130,9 @@ if __name__ == "__main__":
     group.add_argument("--trained-model", type=Path)
     group.add_argument("--save-trained-model", type=Path)
     args, remaining = parser.parse_known_args()
-    if "--policies" not in remaining:
+    if not any(
+        arg == "--policies" or arg.startswith("--policies=") for arg in remaining
+    ):
         remaining += ["--policies", "legacy5,shape5"]
     reuse_model = args.trained_model is not None
     model_path = args.trained_model or args.save_trained_model

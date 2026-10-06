@@ -1,0 +1,117 @@
+{
+  "source_commit": "b048e95dc6368aba05ed2f8d7f1b27228a9d2f76",
+  "model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+  "state_sha256": "a59916425e50094e6778284749198f56b3587f3028bb86852cacade9343ee55b",
+  "no_gpu_estimator_training": true,
+  "aggregate": [
+    {
+      "mode": "legacy",
+      "episodes": 4,
+      "requests": 300,
+      "throughput": 7.087851017071668,
+      "mean_ttft_ms": 3927.921704,
+      "mean_cell_p95_ttft_ms": 5645.584785225,
+      "compute_rounds": 52,
+      "late_admissions": 274,
+      "recovered_compute_opportunities": 250,
+      "kv_ready_during_compute": 272,
+      "mean_gap_lower_ms": 519.87113375,
+      "mean_gap_upper_ms": 531.15935375,
+      "mean_non_load_late_enqueue_lower_ms": 0.0,
+      "pair_gains_pct": [
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_95pct_gain_bounds": [
+        0.0,
+        0.0
+      ],
+      "all_compute_prediction": {
+        "count": 52,
+        "bias_ms": -6.978985403846154,
+        "mae_ms": 67.84098132692307,
+        "stddev_ms": 81.79389079146986,
+        "p95_absolute_error_ms": 158.88773919999997,
+        "underpredicted": 24
+      },
+      "issued_predictions": {
+        "count": 44,
+        "bias_ms": -16.681999954545454,
+        "mae_ms": 71.7415970909091,
+        "stddev_ms": 85.44474118771149,
+        "p95_absolute_error_ms": 162.0216016,
+        "underpredicted": 24
+      }
+    },
+    {
+      "mode": "shape",
+      "episodes": 4,
+      "requests": 300,
+      "throughput": 7.145725381731066,
+      "mean_ttft_ms": 3886.3698008266665,
+      "mean_cell_p95_ttft_ms": 5579.4376107749995,
+      "compute_rounds": 52,
+      "late_admissions": 271,
+      "recovered_compute_opportunities": 250,
+      "kv_ready_during_compute": 273,
+      "mean_gap_lower_ms": 466.55217774999994,
+      "mean_gap_upper_ms": 477.797062,
+      "mean_non_load_late_enqueue_lower_ms": 26.143622,
+      "pair_gains_pct": [
+        2.4501614966194962,
+        -0.7414547313793651,
+        2.2177767112685265,
+        -0.6296382039090331
+      ],
+      "paired_95pct_gain_bounds": [
+        -1.9280055426990739,
+        3.630339263037863
+      ],
+      "all_compute_prediction": {
+        "count": 52,
+        "bias_ms": 30.399316846153845,
+        "mae_ms": 47.86494376923077,
+        "stddev_ms": 57.75286841485368,
+        "p95_absolute_error_ms": 141.23517359999994,
+        "underpredicted": 14
+      },
+      "issued_predictions": {
+        "count": 44,
+        "bias_ms": 29.876154863636362,
+        "mae_ms": 50.51735031818182,
+        "stddev_ms": 62.82116651926245,
+        "p95_absolute_error_ms": 146.7113768,
+        "underpredicted": 14
+      }
+    }
+  ],
+  "common_live_population_accuracy": {
+    "legacy": {
+      "count": 104,
+      "bias_ms": -3.4501896634615385,
+      "mae_ms": 68.05978035576923,
+      "stddev_ms": 82.13843751610807,
+      "p95_absolute_error_ms": 155.87813405,
+      "underpredicted": 45
+    },
+    "raw": {
+      "count": 104,
+      "bias_ms": -3.4069606826923082,
+      "mae_ms": 68.07540754807692,
+      "stddev_ms": 82.15076144310287,
+      "p95_absolute_error_ms": 155.86101804999998,
+      "underpredicted": 45
+    },
+    "shape": {
+      "count": 104,
+      "bias_ms": 20.51150880769231,
+      "mae_ms": 50.263964615384616,
+      "stddev_ms": 63.20793732523191,
+      "p95_absolute_error_ms": 134.53325729999997,
+      "underpredicted": 33
+    }
+  },
+  "scope": "Four paired 75-request episodes per mode; 300 requests per mode. CPU cache priming and server initialization are excluded. All modes reuse identical frozen coefficients and training histories. Intervals use Student t on four log ratios."
+}

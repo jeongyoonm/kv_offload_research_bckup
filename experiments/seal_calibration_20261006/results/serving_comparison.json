@@ -1,0 +1,1006 @@
+{
+  "source_commit": "b048e95dc6368aba05ed2f8d7f1b27228a9d2f76",
+  "cells": [
+    {
+      "cell": "r0_legacy5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r0_legacy5",
+      "requests": 75,
+      "throughput": 6.897534378915481,
+      "mean_ttft_ms": 4050.1363411866664,
+      "p95_ttft_ms": 5839.7052102,
+      "compute_rounds": 13,
+      "late_admissions": 67,
+      "recovered_compute_opportunities": 61,
+      "kv_ready_during_compute": 69,
+      "missed_ready_at_worker_entry_with_seal_ack": 6,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 10182.254152,
+      "gap_lower_ms": 619.542415,
+      "gap_upper_ms": 631.1439809999999,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 8,
+        "candidate_target_ready": 9,
+        "deadline": 3,
+        "compute_seal_deadline": 4
+      },
+      "deadline_overshoot_ms": {
+        "count": 4,
+        "mean": 9.0015535,
+        "median": 0.14954450000000002,
+        "min": 0.137358,
+        "max": 35.569767
+      },
+      "deadline_firings": [
+        {
+          "step": 306,
+          "actual_seal_lead_lower_ms": 7.231312,
+          "actual_seal_lead_upper_ms": 7.793449,
+          "actual_enqueue_lead_lower_ms": 3.024607,
+          "actual_enqueue_lead_upper_ms": 3.586744,
+          "last_wait_requested_ms": 0.720774,
+          "last_wait_actual_ms": 0.773248
+        },
+        {
+          "step": 307,
+          "actual_seal_lead_lower_ms": 164.335531,
+          "actual_seal_lead_upper_ms": 164.897845,
+          "actual_enqueue_lead_lower_ms": 157.809999,
+          "actual_enqueue_lead_upper_ms": 158.372313,
+          "last_wait_requested_ms": 0.560703,
+          "last_wait_actual_ms": 0.614603
+        },
+        {
+          "step": 311,
+          "actual_seal_lead_lower_ms": 109.653842,
+          "actual_seal_lead_upper_ms": 110.216856,
+          "actual_enqueue_lead_lower_ms": 84.416664,
+          "actual_enqueue_lead_upper_ms": 84.979678,
+          "last_wait_requested_ms": 0.046041,
+          "last_wait_actual_ms": 0.097964
+        },
+        {
+          "step": 312,
+          "actual_seal_lead_lower_ms": 93.636098,
+          "actual_seal_lead_upper_ms": 94.191089,
+          "actual_enqueue_lead_lower_ms": 83.567725,
+          "actual_enqueue_lead_upper_ms": 84.122716,
+          "last_wait_requested_ms": 2.0,
+          "last_wait_actual_ms": 2.052913
+        }
+      ],
+      "worker_coverage": {
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 0.0,
+      "mean_ttft_reduction_pct": 0.0
+    },
+    {
+      "cell": "r0_shape5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r0_shape5",
+      "requests": 75,
+      "throughput": 7.066535110483761,
+      "mean_ttft_ms": 3917.7513363733333,
+      "p95_ttft_ms": 5747.4574638,
+      "compute_rounds": 13,
+      "late_admissions": 70,
+      "recovered_compute_opportunities": 63,
+      "kv_ready_during_compute": 67,
+      "missed_ready_at_worker_entry_with_seal_ack": 1,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9880.274874,
+      "gap_lower_ms": 529.359031,
+      "gap_upper_ms": 540.374972,
+      "non_load_late_enqueue_lower_ms": 42.578473,
+      "seal_reasons": {
+        "ordinary": 10,
+        "candidate_target_ready": 10,
+        "deadline": 3,
+        "compute_seal_deadline": 1,
+        "predecessor_compute_finished": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 1,
+        "mean": 0.143162,
+        "median": 0.143162,
+        "min": 0.143162,
+        "max": 0.143162
+      },
+      "deadline_firings": [
+        {
+          "step": 413,
+          "actual_seal_lead_lower_ms": 16.349719,
+          "actual_seal_lead_upper_ms": 16.910285,
+          "actual_enqueue_lead_lower_ms": 13.136002,
+          "actual_enqueue_lead_upper_ms": 13.696568,
+          "last_wait_requested_ms": 1.75508,
+          "last_wait_actual_ms": 1.809063
+        }
+      ],
+      "worker_coverage": {
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 2.4501614966194962,
+      "mean_ttft_reduction_pct": 3.2686555133239037
+    },
+    {
+      "cell": "r1_legacy5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r1_legacy5",
+      "requests": 75,
+      "throughput": 7.1567813637280455,
+      "mean_ttft_ms": 3887.2175159333333,
+      "p95_ttft_ms": 5580.8947493,
+      "compute_rounds": 13,
+      "late_admissions": 69,
+      "recovered_compute_opportunities": 63,
+      "kv_ready_during_compute": 67,
+      "missed_ready_at_worker_entry_with_seal_ack": 2,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9831.989913,
+      "gap_lower_ms": 496.156433,
+      "gap_upper_ms": 507.40837600000003,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 9,
+        "candidate_target_ready": 11,
+        "deadline": 3,
+        "compute_seal_deadline": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 0.1229575,
+        "median": 0.1229575,
+        "min": 0.090541,
+        "max": 0.155374
+      },
+      "deadline_firings": [
+        {
+          "step": 626,
+          "actual_seal_lead_lower_ms": 20.735306,
+          "actual_seal_lead_upper_ms": 21.290736,
+          "actual_enqueue_lead_lower_ms": 17.247615,
+          "actual_enqueue_lead_upper_ms": 17.803045,
+          "last_wait_requested_ms": 2.0,
+          "last_wait_actual_ms": 2.053977
+        },
+        {
+          "step": 627,
+          "actual_seal_lead_lower_ms": 155.628456,
+          "actual_seal_lead_upper_ms": 156.191181,
+          "actual_enqueue_lead_lower_ms": 150.243654,
+          "actual_enqueue_lead_upper_ms": 150.806379,
+          "last_wait_requested_ms": 0.800123,
+          "last_wait_actual_ms": 0.8531
+        }
+      ],
+      "worker_coverage": {
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 0.0,
+      "mean_ttft_reduction_pct": 0.0
+    },
+    {
+      "cell": "r1_shape5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r1_shape5",
+      "requests": 75,
+      "throughput": 7.103717069692207,
+      "mean_ttft_ms": 3911.4801886666664,
+      "p95_ttft_ms": 5706.927043,
+      "compute_rounds": 13,
+      "late_admissions": 69,
+      "recovered_compute_opportunities": 61,
+      "kv_ready_during_compute": 66,
+      "missed_ready_at_worker_entry_with_seal_ack": 1,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9812.451858,
+      "gap_lower_ms": 569.907487,
+      "gap_upper_ms": 581.256586,
+      "non_load_late_enqueue_lower_ms": 33.703236000000004,
+      "seal_reasons": {
+        "ordinary": 8,
+        "candidate_target_ready": 10,
+        "deadline": 3,
+        "compute_seal_deadline": 1,
+        "predecessor_compute_finished": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 1,
+        "mean": 0.139326,
+        "median": 0.139326,
+        "min": 0.139326,
+        "max": 0.139326
+      },
+      "deadline_firings": [
+        {
+          "step": 520,
+          "actual_seal_lead_lower_ms": 18.578934,
+          "actual_seal_lead_upper_ms": 19.138437,
+          "actual_enqueue_lead_lower_ms": 15.299298,
+          "actual_enqueue_lead_upper_ms": 15.858801,
+          "last_wait_requested_ms": 0.037793,
+          "last_wait_actual_ms": 0.090525
+        }
+      ],
+      "worker_coverage": {
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": -0.7414547313793651,
+      "mean_ttft_reduction_pct": -0.6241655537381874
+    },
+    {
+      "cell": "r2_legacy5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r2_legacy5",
+      "requests": 75,
+      "throughput": 7.152920174787833,
+      "mean_ttft_ms": 3888.66189856,
+      "p95_ttft_ms": 5576.8164557,
+      "compute_rounds": 13,
+      "late_admissions": 69,
+      "recovered_compute_opportunities": 63,
+      "kv_ready_during_compute": 68,
+      "missed_ready_at_worker_entry_with_seal_ack": 2,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9859.623642,
+      "gap_lower_ms": 469.748331,
+      "gap_upper_ms": 480.765691,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 7,
+        "candidate_target_ready": 11,
+        "deadline": 3,
+        "compute_seal_deadline": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 0.4662545,
+        "median": 0.4662545,
+        "min": 0.155682,
+        "max": 0.776827
+      },
+      "deadline_firings": [
+        {
+          "step": 733,
+          "actual_seal_lead_lower_ms": 13.378659,
+          "actual_seal_lead_upper_ms": 13.937981,
+          "actual_enqueue_lead_lower_ms": 9.602384,
+          "actual_enqueue_lead_upper_ms": 10.161706,
+          "last_wait_requested_ms": 2.0,
+          "last_wait_actual_ms": 4.532776
+        },
+        {
+          "step": 734,
+          "actual_seal_lead_lower_ms": 159.993036,
+          "actual_seal_lead_upper_ms": 160.554708,
+          "actual_enqueue_lead_lower_ms": 149.06161,
+          "actual_enqueue_lead_upper_ms": 149.623282,
+          "last_wait_requested_ms": 0.880998,
+          "last_wait_actual_ms": 0.935748
+        }
+      ],
+      "worker_coverage": {
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 0.0,
+      "mean_ttft_reduction_pct": 0.0
+    },
+    {
+      "cell": "r2_shape5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r2_shape5",
+      "requests": 75,
+      "throughput": 7.311555972599906,
+      "mean_ttft_ms": 3802.9599976666664,
+      "p95_ttft_ms": 5152.3898611,
+      "compute_rounds": 13,
+      "late_admissions": 66,
+      "recovered_compute_opportunities": 65,
+      "kv_ready_during_compute": 73,
+      "missed_ready_at_worker_entry_with_seal_ack": 3,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9803.286714,
+      "gap_lower_ms": 241.632568,
+      "gap_upper_ms": 252.346905,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 10,
+        "candidate_target_ready": 10,
+        "deadline": 3,
+        "compute_seal_deadline": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 1.7543805,
+        "median": 1.7543805,
+        "min": 0.19569,
+        "max": 3.313071
+      },
+      "deadline_firings": [
+        {
+          "step": 837,
+          "actual_seal_lead_lower_ms": 134.645607,
+          "actual_seal_lead_upper_ms": 134.662417,
+          "actual_enqueue_lead_lower_ms": 130.793842,
+          "actual_enqueue_lead_upper_ms": 130.810652,
+          "last_wait_requested_ms": 1.645352,
+          "last_wait_actual_ms": 4.791262
+        },
+        {
+          "step": 839,
+          "actual_seal_lead_lower_ms": 51.392967,
+          "actual_seal_lead_upper_ms": 51.950792,
+          "actual_enqueue_lead_lower_ms": 43.750339,
+          "actual_enqueue_lead_upper_ms": 44.308164,
+          "last_wait_requested_ms": 0.79382,
+          "last_wait_actual_ms": 0.849197
+        }
+      ],
+      "worker_coverage": {
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 2.2177767112685265,
+      "mean_ttft_reduction_pct": 2.2038918046608624
+    },
+    {
+      "cell": "r3_legacy5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r3_legacy5",
+      "requests": 75,
+      "throughput": 7.151237020970352,
+      "mean_ttft_ms": 3885.67106032,
+      "p95_ttft_ms": 5584.922725699999,
+      "compute_rounds": 13,
+      "late_admissions": 69,
+      "recovered_compute_opportunities": 63,
+      "kv_ready_during_compute": 68,
+      "missed_ready_at_worker_entry_with_seal_ack": 2,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9824.780838,
+      "gap_lower_ms": 494.037356,
+      "gap_upper_ms": 505.319367,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 11,
+        "candidate_target_ready": 11,
+        "deadline": 3,
+        "compute_seal_deadline": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 0.1473625,
+        "median": 0.1473625,
+        "min": 0.14216,
+        "max": 0.152565
+      },
+      "deadline_firings": [
+        {
+          "step": 1051,
+          "actual_seal_lead_lower_ms": 11.418687,
+          "actual_seal_lead_upper_ms": 11.982234,
+          "actual_enqueue_lead_lower_ms": 5.280741,
+          "actual_enqueue_lead_upper_ms": 5.844288,
+          "last_wait_requested_ms": 0.137963,
+          "last_wait_actual_ms": 0.190064
+        },
+        {
+          "step": 1052,
+          "actual_seal_lead_lower_ms": 158.397264,
+          "actual_seal_lead_upper_ms": 158.958927,
+          "actual_enqueue_lead_lower_ms": 146.173952,
+          "actual_enqueue_lead_upper_ms": 146.735615,
+          "last_wait_requested_ms": 1.067775,
+          "last_wait_actual_ms": 1.122632
+        }
+      ],
+      "worker_coverage": {
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": 0.0,
+      "mean_ttft_reduction_pct": 0.0
+    },
+    {
+      "cell": "r3_shape5",
+      "path": "/mnt/localnvme/glm53_seal_calibration_20261006/canary/gpu/p61440_f95_h100/r3_shape5",
+      "requests": 75,
+      "throughput": 7.106210100634236,
+      "mean_ttft_ms": 3913.2876806,
+      "p95_ttft_ms": 5710.976075199999,
+      "compute_rounds": 13,
+      "late_admissions": 66,
+      "recovered_compute_opportunities": 61,
+      "kv_ready_during_compute": 67,
+      "missed_ready_at_worker_entry_with_seal_ack": 2,
+      "h2d_bytes": 1670492160000.0,
+      "compute_span_ms": 9835.640336,
+      "gap_lower_ms": 525.309625,
+      "gap_upper_ms": 537.209785,
+      "non_load_late_enqueue_lower_ms": 28.292779,
+      "seal_reasons": {
+        "ordinary": 8,
+        "candidate_target_ready": 10,
+        "deadline": 3,
+        "compute_seal_deadline": 2,
+        "predecessor_compute_finished": 1
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 0.161792,
+        "median": 0.161792,
+        "min": 0.14879,
+        "max": 0.174794
+      },
+      "deadline_firings": [
+        {
+          "step": 943,
+          "actual_seal_lead_lower_ms": 19.187888,
+          "actual_seal_lead_upper_ms": 19.749881,
+          "actual_enqueue_lead_lower_ms": 14.802563,
+          "actual_enqueue_lead_upper_ms": 15.364556,
+          "last_wait_requested_ms": 1.523725,
+          "last_wait_actual_ms": 1.578554
+        },
+        {
+          "step": 948,
+          "actual_seal_lead_lower_ms": 0.794584,
+          "actual_seal_lead_upper_ms": 1.35661,
+          "actual_enqueue_lead_lower_ms": -21.029097,
+          "actual_enqueue_lead_upper_ms": -20.467071,
+          "last_wait_requested_ms": 0.718873,
+          "last_wait_actual_ms": 0.771586
+        }
+      ],
+      "worker_coverage": {
+        "2": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 75,
+          "pinned": 75
+        }
+      },
+      "throughput_gain_pct": -0.6296382039090331,
+      "mean_ttft_reduction_pct": -0.7107297517285449
+    }
+  ],
+  "excluded_jit_warmups": [],
+  "correctness": {
+    "correctness": {
+      "legacy5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "shape5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      }
+    },
+    "correctness_distinct": {
+      "legacy5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 13,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "shape5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      }
+    }
+  },
+  "scope": "Cell gains use the control from the same repeat. CUDA execution spans include output-copy and host gaps, not just model kernels. One cell per lead does not establish a repeatable speedup."
+}

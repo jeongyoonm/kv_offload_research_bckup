@@ -100,6 +100,8 @@ def _gpu_device_holders() -> set[int]:
         if not path.name.isdigit():
             continue
         try:
+            if (path / "comm").read_text().strip() == "nvidia-smi":
+                continue
             for fd in (path / "fd").iterdir():
                 target = os.readlink(fd)
                 if target.startswith("/dev/nvidia") and target[11:].isdigit():
@@ -369,15 +371,18 @@ def main():
         for process in processes:
             process.start()
         last_check = time.monotonic()
+        previous_device_holders: set[int] = set()
         while len(records) < args.workers:
             if time.monotonic() - run_start > args.timeout:
                 raise TimeoutError("initialization harness timed out")
             if time.monotonic() - last_check > 15:
-                other = sorted(
+                observed = (
                     _gpu_device_holders()
                     - initial_device_holders
                     - {p.pid for p in processes}
                 )
+                other = sorted(observed & previous_device_holders)
+                previous_device_holders = observed
                 if other:
                     raise RuntimeError(
                         f"other GPU work started: {other}; stopping cell"

@@ -153,8 +153,7 @@ class CPUOffloadingSpec(OffloadingSpec):
             )
             self.num_blocks = int(cpu_bytes_to_use) // aligned_kv_bytes_per_chunk
             if self.memory_layout != "block":
-                # Keep the same logical capacity; only rank-boundary padding
-                # changes. Small caches can need one fewer block to fit.
+                # Rank-boundary padding can reduce very small caches.
                 while num_copies * round_up(
                     self.num_blocks * self.cpu_page_size_per_worker,
                     self.BLOCK_SIZE_ALIGNMENT,

@@ -150,6 +150,16 @@ class SharedOffloadRegion:
 
         suffix = f"_rank_{rank}" if memory_layout == "private" else ""
         self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}{suffix}.mmap"
+        logger.info(
+            "CPU cache layout=%s rank=%s blocks=%d worker_block_bytes=%d "
+            "cache_bytes=%d mapping_bytes=%d",
+            memory_layout,
+            rank,
+            num_blocks,
+            cpu_page_size,
+            self.cache_size_bytes,
+            self.total_size_bytes,
+        )
         self._creator = False  # set True only if this worker creates the file
         self.rank = rank
         if rank is not None:

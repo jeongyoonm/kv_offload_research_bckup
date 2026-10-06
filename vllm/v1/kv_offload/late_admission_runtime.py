@@ -817,11 +817,16 @@ def stage_rpc(core, step, base, candidates):
                             model = getattr(
                                 timing.seal_estimator, "latency_surface", None
                             )
-                            prediction_data = data
+                            prediction_data = dict(
+                                data,
+                                native_predictor=getattr(
+                                    core.scheduler, "_late_seal_native_predictor", False
+                                ),
+                            )
                             forecast_ns = time.monotonic_ns()
                             if model is not None and model.requires_forecast:
                                 prediction_data = dict(
-                                    data,
+                                    prediction_data,
                                     execution_snapshot=records,
                                     forecast_ns=forecast_ns,
                                     forecast_load_features=(
@@ -867,6 +872,13 @@ def stage_rpc(core, step, base, candidates):
                                     ),
                                     preparation_reserve_ns=reserve_ns,
                                     prediction_cost_ns=prediction_cost_ns,
+                                    predictor_backend=(
+                                        "native"
+                                        if prediction_data["native_predictor"]
+                                        else "numpy"
+                                    )
+                                    if point_features is not None
+                                    else "legacy",
                                     predictor_target=(
                                         model.target_schema
                                         if model is not None
@@ -927,6 +939,9 @@ def stage_rpc(core, step, base, candidates):
                             forecast_ns = time.monotonic_ns()
                             refined_data = dict(
                                 timing.steps[a_step],
+                                native_predictor=getattr(
+                                    core.scheduler, "_late_seal_native_predictor", False
+                                ),
                                 primary_snapshot=primary,
                                 execution_snapshot=execution,
                                 forecast_ns=forecast_ns,

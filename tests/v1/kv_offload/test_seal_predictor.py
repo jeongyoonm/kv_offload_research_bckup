@@ -82,11 +82,16 @@ def test_refinement_requires_all_cpu_submissions_and_round_trips_separately():
         assert restored.predict(dict(data, primary_snapshot=primary)) == 100_000_000
 
 
-def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
+@pytest.mark.parametrize("native_backend", [False, True])
+def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback(native_backend):
     """A reusable point model changes with loads; cold/decode keep old estimates."""
     import json
+    import os
 
     from vllm.v1.kv_offload.latency_surface import LatencySurface
+
+    if native_backend and not os.environ.get("VLLM_DEFERRAL_FAST_FOREST"):
+        pytest.skip("native evaluator requires the optional CPU library")
 
     model = ComputeEstimator()
     model.coefficients = np.array([20.0, 0.0, 0.0, 0.0])
@@ -94,7 +99,11 @@ def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
     state = json.loads(json.dumps(model.state_dict({"model": "test"})))
     restored = ComputeEstimator.from_state_dict(state, state["context"])
     restored.frozen = True
-    warm = {"request_shapes": [[3072, 58368]], "load_state": [0, 0]}
+    warm = {
+        "request_shapes": [[3072, 58368]],
+        "load_state": [0, 0],
+        "native_predictor": native_backend,
+    }
     busy = dict(warm, load_state=[3, 175104])
     assert restored.predict(warm) == 100_000_000
     assert restored.predict(busy) == 150_000_000

@@ -3,9 +3,25 @@
 """Bounded, JSON-persisted latency trees with NumPy-only serving inference."""
 
 import copy
+import ctypes
+import functools
 import math
+import os
 
 import numpy as np
+
+
+@functools.lru_cache(maxsize=1)
+def native_walk(path):
+    library = ctypes.CDLL(path)
+    library.predictor_forest_abi.restype = ctypes.c_int
+    if library.predictor_forest_abi() != 1:
+        raise ValueError("incompatible native predictor forest ABI")
+    walk = library.predictor_forest_walk
+    walk.argtypes = [ctypes.c_size_t] * 3 + [ctypes.c_void_p] * 6
+    walk.restype = ctypes.c_double
+    return walk
+
 
 FEATURE_NAMES = [
     "suffix_tokens",
@@ -240,6 +256,20 @@ class LatencySurface:
                 self.value[tree_index, node_index] = value
         self._state = copy.deepcopy(state)
         self.tree_indices = np.arange(len(trees))
+        self.native = None
+        native_path = os.environ.get("VLLM_DEFERRAL_FAST_FOREST")
+        if native_path:
+            self.native = functools.partial(
+                native_walk(native_path),
+                len(trees),
+                width,
+                self.feature_count,
+                self.left.ctypes.data,
+                self.right.ctypes.data,
+                self.feature.ctypes.data,
+                self.threshold.ctypes.data,
+                self.value.ctypes.data,
+            )
 
     def state_dict(self):
         return copy.deepcopy(self._state)
@@ -335,6 +365,13 @@ class LatencySurface:
             return None
         # Training libraries compare float32 inputs with float64 thresholds.
         features = features.astype(np.float32)
+        if data.get("native_predictor", False) is True:
+            if self.native is None:
+                raise RuntimeError("native predictor library was not configured")
+            value = self.native(features.ctypes.data)
+            if not math.isfinite(value) or value <= 0:
+                raise RuntimeError("native forest walk exceeded validated bounds")
+            return max(1_000_000, int(value * 1e6))
         nodes = np.zeros(len(self.tree_indices), dtype=np.int32)
         for _ in range(33):
             left = self.left[self.tree_indices, nodes]

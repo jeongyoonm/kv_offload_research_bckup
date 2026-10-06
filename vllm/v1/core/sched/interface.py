@@ -58,6 +58,7 @@ class SchedulerInterface(ABC):
     _late_seal_compute_deadline: bool
     _late_seal_compute_deadline_shadow: bool
     _late_seal_compute_deadline_lead_us: int
+    _late_seal_native_predictor: bool
     _late_seal_full_prediction_wait: bool
     _late_seal_coalesced_notifications: bool
     _late_seal_wait_trace: bool

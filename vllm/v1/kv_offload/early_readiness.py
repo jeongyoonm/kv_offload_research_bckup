@@ -48,6 +48,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_full_prediction_wait": False,
     "late_seal_coalesced_notifications": False,
     "late_seal_freeze_estimator": False,
+    "late_seal_native_predictor": False,
     "late_seal_calibration": "legacy",
     "late_seal_wait_trace": False,
     "late_seal_prediction_reserve_us": 10_000,
@@ -167,6 +168,11 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         result["late_seal_compute_deadline"]
         or result["late_seal_compute_deadline_shadow"]
     )
+    if (
+        result["late_seal_native_predictor"]
+        and result["late_seal_policy"] != "predictive"
+    ):
+        raise ValueError("native predictor requires predictive seal")
     if deadline_options and not result["late_seal_prediction_to_readiness"]:
         raise ValueError("compute seal deadline requires prediction-to-readiness")
     if (

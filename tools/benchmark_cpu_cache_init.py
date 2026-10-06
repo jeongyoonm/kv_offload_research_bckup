@@ -190,8 +190,9 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
         if args.cuda:
             # Disjoint contiguous transfer ranges, one per rank. Rank layout
             # uses the same boundaries; all ranges are inside registrations.
-            transfer_bytes = min(64 * 1024**2, region.total_size_bytes // args.workers)
-            offset = rank * (region.total_size_bytes // args.workers)
+            rank_bytes = region.cache_size_bytes // args.workers
+            transfer_bytes = min(64 * 1024**2, rank_bytes)
+            offset = 0 if args.layout == "private" else rank * rank_bytes
             host = region._base[offset : offset + transfer_bytes]
             source = torch.full(
                 (transfer_bytes,), rank + 17, dtype=torch.int8, device="cuda"
@@ -247,7 +248,9 @@ def main():
     # GLM-like mixed-page geometry; override with measured model geometry.
     parser.add_argument("--worker-block-bytes", type=int, default=3052800)
     parser.add_argument("--population", choices=("rank", "contiguous"), default="rank")
-    parser.add_argument("--layout", choices=("block", "worker"), default="block")
+    parser.add_argument(
+        "--layout", choices=("block", "worker", "private"), default="block"
+    )
     parser.add_argument(
         "--thp", choices=("default", "disabled", "enabled"), default="default"
     )
@@ -270,7 +273,7 @@ def main():
     row_bytes = (args.workers * args.worker_block_bytes + 4095) // 4096 * 4096
     num_blocks = capacity // row_bytes
     total_bytes = num_blocks * row_bytes
-    if args.layout == "worker":
+    if args.layout != "block":
         while (
             args.workers
             * ((num_blocks * args.worker_block_bytes + 4095) // 4096 * 4096)
@@ -404,6 +407,10 @@ def main():
                     process.kill()
                     process.join(10)
         Path(f"/dev/shm/vllm_offload_{engine_id}.mmap").unlink(missing_ok=True)
+        for rank in range(args.workers):
+            Path(f"/dev/shm/vllm_offload_{engine_id}_rank_{rank}.mmap").unlink(
+                missing_ok=True
+            )
 
 
 if __name__ == "__main__":

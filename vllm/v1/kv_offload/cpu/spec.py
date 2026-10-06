@@ -102,9 +102,9 @@ class CPUOffloadingSpec(OffloadingSpec):
 
         world_size = config.parallel.world_size
         self.memory_layout = self.extra_config.get("cpu_cache_layout", "block")
-        if self.memory_layout not in ("block", "worker"):
-            raise ValueError("cpu_cache_layout must be block or worker")
-        if self.memory_layout == "worker" and (
+        if self.memory_layout not in ("block", "worker", "private"):
+            raise ValueError("cpu_cache_layout must be block, worker or private")
+        if self.memory_layout != "block" and (
             config.replicated_layout
             or config.canonical_layout
             or type(self) is not CPUOffloadingSpec
@@ -152,7 +152,7 @@ class CPUOffloadingSpec(OffloadingSpec):
                 kv_bytes_per_chunk, self.BLOCK_SIZE_ALIGNMENT
             )
             self.num_blocks = int(cpu_bytes_to_use) // aligned_kv_bytes_per_chunk
-            if self.memory_layout == "worker":
+            if self.memory_layout != "block":
                 # Keep the same logical capacity; only rank-boundary padding
                 # changes. Small caches can need one fewer block to fit.
                 while num_copies * round_up(
@@ -250,7 +250,7 @@ class CPUOffloadingSpec(OffloadingSpec):
             else:
                 world_size = self.config.parallel.world_size
                 rank = torch.accelerator.current_device_index() % world_size
-                if self.memory_layout == "worker":
+                if self.memory_layout != "block":
                     rank = self.config.parallel.rank
             mmap_region = SharedOffloadRegion(
                 engine_id=self.config.engine_id,

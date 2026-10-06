@@ -112,8 +112,9 @@ def _transfer(handler, num_blocks: int, gpu_to_cpu: bool) -> None:
 
 @pytest.mark.parametrize("async_h2d", [False, True])
 @pytest.mark.parametrize("rank", [0, 1])
+@pytest.mark.parametrize("layout", ["worker", "private"])
 @pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA required")
-def test_worker_layout_roundtrip_mixed_pages_and_reused_blocks(rank, async_h2d):
+def test_worker_layout_roundtrip_mixed_pages_and_reused_blocks(rank, async_h2d, layout):
     """Rank-local registration supports mixed pages, chunking and block reuse."""
     page_sizes = (8448, 36864)
     blocks_per_chunk = 2
@@ -127,7 +128,7 @@ def test_worker_layout_roundtrip_mixed_pages_and_reused_blocks(rank, async_h2d):
         kv_bytes_per_block=row,
         cpu_page_size=slot,
         num_workers=2,
-        memory_layout="worker",
+        memory_layout=layout,
     )
     handlers = []
     cpu = []

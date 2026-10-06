@@ -115,13 +115,14 @@ def test_cpu_spec_registered():
 
 
 @pytest.mark.parametrize("budget", [4096, 65536, 2130300354560])
-def test_worker_layout_respects_budget_and_preserves_logical_capacity(budget):
+@pytest.mark.parametrize("layout", ["worker", "private"])
+def test_worker_layout_respects_budget_and_preserves_logical_capacity(budget, layout):
     """Rank-boundary padding fits the budget even for tiny, unaligned slots."""
     config = _make_offloading_config(
         cpu_bytes_to_use=budget,
         worker_kv_bytes_per_block=4224,
         world_size=8,
-        extra_config={"cpu_cache_layout": "worker"},
+        extra_config={"cpu_cache_layout": layout},
     )
     worker = CPUOffloadingSpec(config)
     block = CPUOffloadingSpec(

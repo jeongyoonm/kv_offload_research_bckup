@@ -115,10 +115,16 @@ class SharedOffloadRegion:
             population_barrier = True
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
-        if memory_layout not in ("block", "worker"):
-            raise ValueError("memory_layout must be block or worker")
-        if memory_layout == "worker" and (rank is None or not 0 <= rank < num_workers):
+        if memory_layout not in ("block", "worker", "private"):
+            raise ValueError("memory_layout must be block, worker or private")
+        if memory_layout != "block" and (rank is None or not 0 <= rank < num_workers):
             raise ValueError("worker layout requires a valid worker rank")
+        if (
+            memory_layout == "private"
+            and population_mode == "contiguous"
+            and (population_workers != num_workers)
+        ):
+            raise ValueError("private layout requires one initializer per worker")
         self.memory_layout = memory_layout
 
         self.num_blocks = num_blocks
@@ -131,14 +137,19 @@ class SharedOffloadRegion:
             // self.page_size
             * self.page_size
         )
-        if memory_layout == "worker":
+        if memory_layout != "block":
             assert rank is not None
             self._row_stride = cpu_page_size
             self.total_size_bytes = self._worker_span * num_workers
             self.registration_offset = rank * self._worker_span
             self.registration_size_bytes = self._worker_span
+        self.cache_size_bytes = self.total_size_bytes
+        if memory_layout == "private":
+            self.total_size_bytes = self._worker_span
+            self.registration_offset = 0
 
-        self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}.mmap"
+        suffix = f"_rank_{rank}" if memory_layout == "private" else ""
+        self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}{suffix}.mmap"
         self._creator = False  # set True only if this worker creates the file
         self.rank = rank
         if rank is not None:
@@ -146,7 +157,7 @@ class SharedOffloadRegion:
             self._worker_offset = rank * cpu_page_size
             # exclusive upper bound for this worker's area within each row
             self._worker_area_end = (rank + 1) * cpu_page_size
-            if memory_layout == "worker":
+            if memory_layout != "block":
                 self._worker_offset = self.registration_offset
                 self._worker_area_end = self._worker_offset + cpu_page_size
         try:
@@ -242,7 +253,10 @@ class SharedOffloadRegion:
                     owner = process_rank // step
                     start_block = num_blocks * owner // population_workers
                     end_block = num_blocks * (owner + 1) // population_workers
-                    if memory_layout == "worker":
+                    if memory_layout == "private":
+                        start = 0
+                        end = self.total_size_bytes
+                    elif memory_layout == "worker":
                         start = self.total_size_bytes * owner // population_workers
                         end = self.total_size_bytes * (owner + 1) // population_workers
                     else:
@@ -256,7 +270,7 @@ class SharedOffloadRegion:
                         populate_write_fn(self.mmap_obj, offset, length)
                         populate_calls += 1
                         populate_bytes += length
-            elif memory_layout == "worker":
+            elif memory_layout != "block":
                 start = self.registration_offset
                 end = start + self.registration_size_bytes
                 chunk_bytes = population_chunk_bytes // self.page_size * self.page_size
@@ -397,7 +411,7 @@ class SharedOffloadRegion:
         Args:
             tensor_page_size: Canonical bytes per block for this tensor.
         """
-        if self.memory_layout == "worker":
+        if self.memory_layout != "block":
             raise ValueError("canonical views require block layout")
         new_offset = self._canonical_offset + tensor_page_size
         assert new_offset <= self._row_stride
@@ -417,7 +431,7 @@ class SharedOffloadRegion:
         Shape: (num_blocks, row_stride_bytes). Secondary tiers address
         block *b* as ``view[b]``.
         """
-        if self.memory_layout == "worker":
+        if self.memory_layout != "block":
             raise ValueError("secondary-tier memoryviews require block layout")
         kv_tensor = self._base.view(self.num_blocks, self._row_stride)
         np_arr = kv_tensor.numpy()

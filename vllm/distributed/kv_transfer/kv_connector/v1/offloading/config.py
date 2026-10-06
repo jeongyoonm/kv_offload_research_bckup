@@ -39,7 +39,7 @@ def build_offloading_config(
 
     parallel_config = vllm_config.parallel_config
     if (
-        extra_config.get("cpu_cache_layout", "block") == "worker"
+        extra_config.get("cpu_cache_layout", "block") in ("worker", "private")
         or extra_config.get("cpu_cache_population", "rank") == "contiguous"
     ) and not (
         parallel_config.distributed_executor_backend == "mp"

@@ -57,6 +57,30 @@ def dense(root):
     if not decision.is_file() or not json.loads(decision.read_text())["ran"]:
         return
     options = json.loads(decision.read_text())
+    results = json.loads(
+        (root / "realized_augmentation/serving_results.json").read_text()
+    )
+    count = len(results)
+    if "expected_cells" in options:
+        assert count == options["expected_cells"]
+    else:
+        # Preserve the completed legacy driver's explicit counts-list truncation.
+        assert count == 2 * options["repeats"]
+        assert {Path(p).parent.name for p in results} == {"p16384_f95_h100"}
+        (root / "realized_augmentation/validation_scope.json").write_text(
+            json.dumps(
+                dict(
+                    planned_cells=8 * options["repeats"],
+                    completed_cells=count,
+                    actual_workloads=["p16384_f95_h100"],
+                    source_commit="8b2fd6e",
+                    bug="One counts entry zip-truncated four planned workloads",
+                    corrected_separate_branch="experiment/glm53-predictor-dense-countfix-20261006",
+                ),
+                indent=2,
+            )
+            + "\n"
+        )
     actual = root / "dense_realized/validation"
     (actual / "provenance.json").symlink_to(
         root / "dense_realized/canary/gpu/provenance.json"
@@ -64,7 +88,7 @@ def dense(root):
     alias = root / "dense_validation/canary"
     alias.mkdir(parents=True)
     (alias / "gpu").symlink_to(actual)
-    phase(root, "dense_validation", 8 * options["repeats"], "control")
+    phase(root, "dense_validation", count, "control")
 
 
 def online(root):

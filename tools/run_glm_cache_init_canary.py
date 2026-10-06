@@ -81,6 +81,14 @@ def main():
         raise RuntimeError(f"GPUs are occupied: {existing}")
     cache = args.output / "vllm_cache"
     shutil.copytree("/mnt/localnvme/glm53-compat-cache", cache, dirs_exist_ok=True)
+    flashinfer_base = args.output / "flashinfer_workspace"
+    flashinfer_cache = Path.home() / ".cache" / "flashinfer"
+    if flashinfer_cache.exists():
+        shutil.copytree(
+            flashinfer_cache,
+            flashinfer_base / ".cache" / "flashinfer",
+            dirs_exist_ok=True,
+        )
     env = dict(os.environ)
     env.update(
         PYTHONPATH=str(source),
@@ -88,6 +96,9 @@ def main():
         VLLM_CACHE_ROOT=str(cache),
         PYTHONHASHSEED="0",
         CUDA_HOME="/usr/local/cuda-13.0",
+        PATH=f"{Path(sys.executable).parent}:/usr/local/cuda-13.0/bin:"
+        + os.environ.get("PATH", ""),
+        FLASHINFER_WORKSPACE_BASE=str(flashinfer_base),
         VLLM_KV_OFFLOAD_MAX_BATCH_DESCRIPTORS="0",
         TORCHINDUCTOR_CACHE_DIR=str(args.output / "inductor_cache"),
         TRITON_CACHE_DIR=str(args.output / "triton_cache"),

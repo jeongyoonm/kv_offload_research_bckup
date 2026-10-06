@@ -14,6 +14,7 @@ class ComputeEstimator:
     def __init__(self):
         self.frozen = False
         self.calibration_mode = "legacy"
+        self.latency_surface = None
         self.samples: deque[tuple[np.ndarray, float]] = deque(maxlen=128)
         self.coefficients = None
         self.errors: deque[float] = deque(maxlen=32)
@@ -129,6 +130,10 @@ class ComputeEstimator:
         )
 
     def predict(self, data):
+        if self.latency_surface is not None:
+            duration = self.latency_surface.predict(data)
+            if duration is not None:
+                return duration
         features = self.features(data)
         if self.coefficients is None or features is None:
             return None
@@ -226,7 +231,7 @@ class ComputeEstimator:
         """Export bounded training state as JSON data without runtime flags."""
         if self.coefficients is None:
             raise ValueError("seal estimator has no trained coefficients")
-        return dict(
+        state = dict(
             schema=1,
             feature_schema="tokens8192_attention1e8_requests8.v1",
             context=context,
@@ -243,6 +248,9 @@ class ComputeEstimator:
                 [s.tolist(), n, regime] for s, n, regime in self.recent_preparation
             ],
         )
+        if self.latency_surface is not None:
+            state.update(schema=2, latency_surface=self.latency_surface.state_dict())
+        return state
 
     @classmethod
     def from_state_dict(cls, state, context):
@@ -259,11 +267,13 @@ class ComputeEstimator:
             "preparation_shapes",
             "recent_preparation",
         }
+        if isinstance(state, dict) and state.get("schema") == 2:
+            keys.add("latency_surface")
         if (
             not isinstance(state, dict)
             or set(state) != keys
             or type(state["schema"]) is not int
-            or state["schema"] != 1
+            or state["schema"] not in (1, 2)
             or state["feature_schema"] != "tokens8192_attention1e8_requests8.v1"
             or state["context"] != context
         ):
@@ -329,6 +339,10 @@ class ComputeEstimator:
             estimator.recent_preparation.append(
                 (vector(shape, 3), duration(n), regime(r))
             )
+        if state["schema"] == 2:
+            from vllm.v1.kv_offload.latency_surface import LatencySurface
+
+            estimator.latency_surface = LatencySurface(state["latency_surface"])
         return estimator
 
 

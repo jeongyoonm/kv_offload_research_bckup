@@ -8,6 +8,70 @@ import pytest
 from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
 
 
+def transfer_surface_state():
+    from vllm.v1.kv_offload.latency_surface import FEATURE_NAMES
+
+    return dict(
+        schema=1,
+        feature_names=FEATURE_NAMES,
+        provenance={},
+        trees=[
+            [
+                [1, 2, 9, 2.5, 125.0],
+                [-1, -1, -2, -2.0, 100.0],
+                [-1, -1, -2, -2.0, 150.0],
+            ]
+        ],
+    )
+
+
+def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
+    """A reusable point model changes with loads; cold/decode keep old estimates."""
+    import json
+
+    from vllm.v1.kv_offload.latency_surface import LatencySurface
+
+    model = ComputeEstimator()
+    model.coefficients = np.array([20.0, 0.0, 0.0, 0.0])
+    model.latency_surface = LatencySurface(transfer_surface_state())
+    state = json.loads(json.dumps(model.state_dict({"model": "test"})))
+    restored = ComputeEstimator.from_state_dict(state, state["context"])
+    restored.frozen = True
+    warm = {"request_shapes": [[3072, 58368]], "load_state": [0, 0]}
+    busy = dict(warm, load_state=[3, 175104])
+    assert restored.predict(warm) == 100_000_000
+    assert restored.predict(busy) == 150_000_000
+    assert restored.predict({"request_shapes": [[3072, 0]]}) == 20_000_000
+    assert restored.predict({"request_shapes": [[1, 58368]]}) == 20_000_000
+    assert restored.state_dict(state["context"]) == state
+    state["latency_surface"]["trees"][0][1][4] = 999
+    assert restored.predict(warm) == 100_000_000
+    assert (
+        restored.state_dict(state["context"])["latency_surface"]
+        == transfer_surface_state()
+    )
+
+
+@pytest.mark.parametrize("mutation", ["cycle", "shared_child", "nan", "huge", "leaf"])
+def test_surface_rejects_invalid_graphs_before_estimator_publication(mutation):
+    """Untrusted saved graphs cannot hang inference or publish invalid costs."""
+    from vllm.v1.kv_offload.latency_surface import LatencySurface
+
+    state = transfer_surface_state()
+    if mutation == "cycle":
+        state["trees"][0][0][0] = 0
+    elif mutation == "shared_child":
+        state["trees"][0][0][1] = 1
+    elif mutation == "nan":
+        state["trees"][0][1][4] = float("nan")
+    elif mutation == "huge":
+        state["trees"][0][0][3] = 10**1000
+    else:
+        state["trees"][0][1][4] = -10
+    with pytest.raises(ValueError):
+        LatencySurface(state)
+
+
 def test_predictor_learns_uncached_tokens_and_attention_cost():
     estimator = ComputeEstimator()
     assert estimator.predict({"request_shapes": [[1024, 4096]]}) is None

@@ -305,6 +305,42 @@ def test_compute_deadline_shadow_does_not_enforce_expiry(deadline_core):
     assert transport["seal_ns"] > transport["compute_seal_deadline_ns"]
 
 
+def test_submission_diagnostics_capture_only_observed_changes_without_moving_seal(
+    deadline_core, monkeypatch
+):
+    """Tracing sees CPU submission when published, with no extra scheduler waits."""
+    monkeypatch.setenv("VLLM_DEFERRAL_PREDICTOR_PROGRESS", "1")
+    core, clock = deadline_core()
+    core.scheduler._late_record_enabled = True
+    at = 1_030_000_000
+
+    def primary(step):
+        submitted = at if clock.now >= at else 0
+        return (
+            True,
+            False,
+            [[step, 1_000_000_000, 1_000_000_000, submitted, 0, 0, clock.now, 1, 0]]
+            * 8,
+        )
+
+    core.deferral_timing.read = primary
+    core.deferral_timing.loads = SimpleNamespace(
+        forecast_features=lambda data, now: [0] * 10
+    )
+    stage_rpc(core, 9, [_request("base")], [_request("a")])
+    events = [
+        r
+        for r in core.scheduler._late_admission_records
+        if r["event"] == "predictor_submission_progress"
+    ]
+    assert len(events) == 2
+    assert all(r[3] == 0 for r in events[0]["primary_snapshot"])
+    assert events[1]["observed_ns"] >= at
+    assert all(r[3] == at for r in events[1]["primary_snapshot"])
+    assert core.scheduler._late_transport["seal_ns"] == 1_120_000_000
+    assert max(clock.sleeps) <= 2_000_000
+
+
 def test_compute_deadline_preserves_load_only_readiness_policy(deadline_core):
     core, clock = deadline_core()
     core.batch_queue[-1][1].total_num_scheduled_tokens = 0

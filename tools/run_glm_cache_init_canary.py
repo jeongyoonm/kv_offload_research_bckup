@@ -8,6 +8,7 @@ import json
 import os
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -65,6 +66,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--port", type=int, default=18387)
+    parser.add_argument("--flashinfer-workspace", type=Path)
     parser.add_argument(
         "--layout", choices=("block", "worker", "private"), default="private"
     )
@@ -72,6 +74,8 @@ def main():
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[1]
     args.output.mkdir(parents=True, exist_ok=True)
+    with socket.socket() as port_check:
+        port_check.bind(("127.0.0.1", args.port))
     existing = subprocess.check_output(
         ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"],
         text=True,
@@ -81,9 +85,9 @@ def main():
         raise RuntimeError(f"GPUs are occupied: {existing}")
     cache = args.output / "vllm_cache"
     shutil.copytree("/mnt/localnvme/glm53-compat-cache", cache, dirs_exist_ok=True)
-    flashinfer_base = args.output / "flashinfer_workspace"
+    flashinfer_base = args.flashinfer_workspace or args.output / "flashinfer_workspace"
     flashinfer_cache = Path.home() / ".cache" / "flashinfer"
-    if flashinfer_cache.exists():
+    if flashinfer_cache.exists() and not flashinfer_base.exists():
         shutil.copytree(
             flashinfer_cache,
             flashinfer_base / ".cache" / "flashinfer",
@@ -95,6 +99,7 @@ def main():
         HF_HOME="/mnt/localnvme/huggingface",
         VLLM_CACHE_ROOT=str(cache),
         PYTHONHASHSEED="0",
+        VLLM_SERVER_DEV_MODE="1",
         CUDA_HOME="/usr/local/cuda-13.0",
         PATH=f"{Path(sys.executable).parent}:/usr/local/cuda-13.0/bin:"
         + os.environ.get("PATH", ""),
@@ -238,23 +243,27 @@ def main():
                     json.dumps({"probe": index, "passed": True, "delta": delta}),
                     flush=True,
                 )
-            raw_log = (args.output / "server.log").read_text()
-            summary.update(
-                probes_passed=len(probes),
-                population_seconds=[
-                    float(v)
-                    for v in re.findall(
-                        r"CPU cache population .*seconds=([0-9.]+)", raw_log
-                    )
-                ],
-                registration_seconds=[
-                    float(v)
-                    for v in re.findall(
-                        r"CPU cache registration rank=.*seconds=([0-9.]+)", raw_log
-                    )
-                ],
-            )
+            summary["probes_passed"] = len(probes)
+    except Exception as exc:
+        summary["error"] = f"{type(exc).__name__}: {exc}"
+        raise
     finally:
+        log_path = args.output / "server.log"
+        raw_log = log_path.read_text() if log_path.exists() else ""
+        summary.update(
+            population_seconds=[
+                float(v)
+                for v in re.findall(
+                    r"CPU cache population .*seconds=([0-9.]+)", raw_log
+                )
+            ],
+            registration_seconds=[
+                float(v)
+                for v in re.findall(
+                    r"CPU cache registration rank=.*seconds=([0-9.]+)", raw_log
+                )
+            ],
+        )
         (args.output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
         if proc is not None and proc.poll() is None:
             os.killpg(proc.pid, signal.SIGTERM)

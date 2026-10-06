@@ -225,6 +225,85 @@ def iid():
     return str(uuid.uuid4())
 
 
+@pytest.mark.parametrize("initializers", [1, 2, 4, 8])
+def test_contiguous_population_prepares_every_rank_before_return(iid, initializers):
+    """Uneven row partitions must be resident before any worker can use them."""
+    workers = 8
+    blocks = 11
+    slot = PAGE_SIZE + 128
+    row = ((slot * workers + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    barrier = threading.Barrier(workers)
+    regions = [None] * workers
+    failures = []
+
+    def construct(rank):
+        try:
+            regions[rank] = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                barrier=lambda: barrier.wait(10),
+                population_mode="contiguous",
+                population_workers=initializers,
+                population_chunk_bytes=3 * PAGE_SIZE,
+                num_workers=workers,
+                process_rank=rank,
+            )
+        except Exception as error:
+            failures.append(error)
+            barrier.abort()
+
+    threads = [threading.Thread(target=construct, args=(r,)) for r in range(workers)]
+    try:
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(15)
+        assert not any(thread.is_alive() for thread in threads)
+        assert not failures
+        assert all(_page_residency(regions[0].mmap_obj, blocks * row))
+        assert sum(r.init_stats["populate_bytes"] for r in regions) == blocks * row
+        for rank, region in enumerate(regions):
+            view = region.create_next_worker_view(slot)
+            view[:, :] = rank + 1
+            del view
+        for rank, region in enumerate(regions):
+            # Check the shared backing bytes, including unaligned slot ends.
+            for block in range(blocks):
+                start = block * row + rank * slot
+                assert region.mmap_obj[start : start + slot] == bytes([rank + 1]) * slot
+    finally:
+        for region in regions:
+            if region is not None:
+                region.cleanup()
+        _cleanup_file(f"/dev/shm/vllm_offload_{iid}.mmap")
+
+
+def test_contiguous_population_failure_releases_mapping(iid, monkeypatch):
+    """A failed initializer must not leak its named shared-memory allocation."""
+    import vllm.v1.kv_offload.cpu.shared_offload_region as module
+
+    def fail(*args):
+        raise OSError(errno.ENOMEM, "injected population failure")
+
+    monkeypatch.setattr(module, "_get_populate_write_fn", lambda _: fail)
+    before = len(os.listdir("/proc/self/fd"))
+    with pytest.raises(OSError, match="injected population failure"):
+        SharedOffloadRegion(
+            engine_id=iid,
+            num_blocks=3,
+            rank=0,
+            kv_bytes_per_block=PAGE_SIZE,
+            cpu_page_size=PAGE_SIZE,
+            population_mode="contiguous",
+            process_rank=0,
+        )
+    assert not os.path.exists(f"/dev/shm/vllm_offload_{iid}.mmap")
+    assert len(os.listdir("/proc/self/fd")) == before
+
+
 # ---------------------------------------------------------------------------
 # create_next_worker_view — shape, stride and storage offset
 # ---------------------------------------------------------------------------

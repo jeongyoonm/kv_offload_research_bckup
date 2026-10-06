@@ -87,9 +87,31 @@ class SharedOffloadRegion:
         kv_bytes_per_block: int,
         cpu_page_size: int,
         barrier: Callable[[], None] | None = None,
+        population_mode: str = "rank",
+        population_workers: int | None = None,
+        population_chunk_bytes: int = 256 * 1024 * 1024,
+        num_workers: int = 1,
+        process_rank: int | None = None,
+        population_barrier: bool = False,
     ) -> None:
         init_start = time.perf_counter()
         self.init_stats: dict[str, int | float] = {}
+        if population_mode not in ("rank", "contiguous"):
+            raise ValueError("population_mode must be rank or contiguous")
+        if population_chunk_bytes < mmap.PAGESIZE:
+            raise ValueError("population_chunk_bytes must be at least one page")
+        if population_workers is None:
+            population_workers = num_workers
+        if not 1 <= population_workers <= num_workers:
+            raise ValueError("population_workers must be within num_workers")
+        if num_workers % population_workers:
+            raise ValueError("population_workers must divide num_workers")
+        if population_mode == "contiguous":
+            if process_rank is None or not 0 <= process_rank < num_workers:
+                raise ValueError("contiguous population needs a valid process_rank")
+            if num_workers > 1 and barrier is None:
+                raise ValueError("contiguous population needs a worker barrier")
+            population_barrier = True
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
 
@@ -186,51 +208,83 @@ class SharedOffloadRegion:
         self.init_stats["mapping_barrier_seconds"] = time.perf_counter() - barrier_start
         populate_start = time.perf_counter()
         self.init_stats["populate_start_ns"] = time.monotonic_ns()
-        populate_write_fn = _get_populate_write_fn(self.mmap_obj)
-        populate_calls = 0
-        populate_bytes = 0
+        try:
+            populate_write_fn = _get_populate_write_fn(self.mmap_obj)
+            populate_calls = 0
+            populate_bytes = 0
 
-        if rank is not None:
-            # Populate only this worker's pages (one slot per block row).
-            worker_offset = rank * cpu_page_size
-            _t0 = time.perf_counter()
-            page_size = self.page_size
-            for block in range(num_blocks):
-                raw_offset = block * self._row_stride + worker_offset
-                aligned_offset = (raw_offset // page_size) * page_size
-                end = raw_offset + cpu_page_size
-                aligned_length = end - aligned_offset
-                populate_write_fn(self.mmap_obj, aligned_offset, aligned_length)
-                populate_calls += 1
-                populate_bytes += aligned_length
-            logger.debug(
-                "MADV_POPULATE_WRITE loop: %d blocks in %.3f s",
-                num_blocks,
-                time.perf_counter() - _t0,
-            )
-        else:
-            # No rank — populate the entire shared region in one call.
-            _t0 = time.perf_counter()
-            populate_write_fn(self.mmap_obj, 0, self.total_size_bytes)
-            populate_calls = 1
-            populate_bytes = self.total_size_bytes
-            logger.debug(
-                "MADV_POPULATE_WRITE entire region: %.3f s", time.perf_counter() - _t0
-            )
+            if population_mode == "contiguous":
+                assert process_rank is not None
+                step = num_workers // population_workers
+                if process_rank % step == 0:
+                    owner = process_rank // step
+                    start_block = num_blocks * owner // population_workers
+                    end_block = num_blocks * (owner + 1) // population_workers
+                    start = start_block * self._row_stride
+                    end = end_block * self._row_stride
+                    chunk_bytes = (
+                        population_chunk_bytes // self.page_size * self.page_size
+                    )
+                    for offset in range(start, end, chunk_bytes):
+                        length = min(chunk_bytes, end - offset)
+                        populate_write_fn(self.mmap_obj, offset, length)
+                        populate_calls += 1
+                        populate_bytes += length
+            elif rank is not None:
+                # Populate only this worker's pages (one slot per block row).
+                worker_offset = rank * cpu_page_size
+                _t0 = time.perf_counter()
+                page_size = self.page_size
+                for block in range(num_blocks):
+                    raw_offset = block * self._row_stride + worker_offset
+                    aligned_offset = (raw_offset // page_size) * page_size
+                    end = raw_offset + cpu_page_size
+                    aligned_length = end - aligned_offset
+                    populate_write_fn(self.mmap_obj, aligned_offset, aligned_length)
+                    populate_calls += 1
+                    populate_bytes += aligned_length
+                logger.debug(
+                    "MADV_POPULATE_WRITE loop: %d blocks in %.3f s",
+                    num_blocks,
+                    time.perf_counter() - _t0,
+                )
+            else:
+                # No rank — populate the entire shared region in one call.
+                _t0 = time.perf_counter()
+                populate_write_fn(self.mmap_obj, 0, self.total_size_bytes)
+                populate_calls = 1
+                populate_bytes = self.total_size_bytes
+                logger.debug(
+                    "MADV_POPULATE_WRITE entire region: %.3f s",
+                    time.perf_counter() - _t0,
+                )
 
-        self.init_stats.update(
-            populate_end_ns=time.monotonic_ns(),
-            populate_seconds=time.perf_counter() - populate_start,
-            populate_calls=populate_calls,
-            populate_bytes=populate_bytes,
-        )
-        logger.info(
-            "CPU cache population rank=%s total_bytes=%d calls=%d seconds=%.3f",
-            rank,
-            self.total_size_bytes,
-            populate_calls,
-            self.init_stats["populate_seconds"],
-        )
+            self.init_stats.update(
+                populate_end_ns=time.monotonic_ns(),
+                populate_seconds=time.perf_counter() - populate_start,
+                populate_calls=populate_calls,
+                populate_bytes=populate_bytes,
+            )
+            population_wait_start = time.perf_counter()
+            if population_barrier and barrier is not None:
+                barrier()
+            self.init_stats["population_barrier_seconds"] = (
+                time.perf_counter() - population_wait_start
+            )
+            logger.info(
+                "CPU cache population rank=%s total_bytes=%d calls=%d seconds=%.3f",
+                rank,
+                self.total_size_bytes,
+                populate_calls,
+                self.init_stats["populate_seconds"],
+            )
+        except Exception:
+            self.mmap_obj.close()
+            os.close(self.fd)
+            if self._creator:
+                os.unlink(self.mmap_path)
+                self._creator = False
+            raise
         self._base = torch.frombuffer(memoryview(self.mmap_obj), dtype=torch.int8)
         self._views: list[torch.Tensor] = []
         self._canonical_offset = 0

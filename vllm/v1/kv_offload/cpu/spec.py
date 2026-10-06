@@ -101,6 +101,31 @@ class CPUOffloadingSpec(OffloadingSpec):
             )
 
         world_size = config.parallel.world_size
+        self.population_mode = self.extra_config.get("cpu_cache_population", "rank")
+        self.population_workers = self.extra_config.get(
+            "cpu_cache_population_workers", world_size
+        )
+        self.population_chunk_bytes = self.extra_config.get(
+            "cpu_cache_population_chunk_bytes", 256 * 1024 * 1024
+        )
+        self.population_barrier = self.extra_config.get(
+            "cpu_cache_population_barrier", False
+        )
+        if self.population_mode not in ("rank", "contiguous"):
+            raise ValueError("cpu_cache_population must be rank or contiguous")
+        if (
+            type(self.population_workers) is not int
+            or not 1 <= self.population_workers <= world_size
+            or world_size % self.population_workers
+        ):
+            raise ValueError("cpu_cache_population_workers must divide world_size")
+        if (
+            type(self.population_chunk_bytes) is not int
+            or self.population_chunk_bytes < self.BLOCK_SIZE_ALIGNMENT
+        ):
+            raise ValueError("cpu_cache_population_chunk_bytes must be at least a page")
+        if type(self.population_barrier) is not bool:
+            raise ValueError("cpu_cache_population_barrier must be a boolean")
         self.num_blocks = 0
         self.kv_bytes_per_chunk = 0
         self.cpu_page_size_per_worker = 0
@@ -215,6 +240,12 @@ class CPUOffloadingSpec(OffloadingSpec):
                 kv_bytes_per_block=self.kv_bytes_per_chunk,
                 cpu_page_size=self.cpu_page_size_per_worker,
                 barrier=_all_workers_barrier,
+                population_mode=self.population_mode,
+                population_workers=self.population_workers,
+                population_chunk_bytes=self.population_chunk_bytes,
+                num_workers=self.config.parallel.world_size,
+                process_rank=self.config.parallel.rank,
+                population_barrier=self.population_barrier,
             )
         try:
             return CPUOffloadingWorker(

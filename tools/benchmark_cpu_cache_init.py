@@ -93,10 +93,38 @@ def _external_gpu_pids(allowed: set[int]) -> list[int]:
     ]
 
 
+def _gpu_device_holders() -> set[int]:
+    """Inspect device FDs without issuing ioctls during host registration."""
+    holders = set()
+    for path in Path("/proc").iterdir():
+        if not path.name.isdigit():
+            continue
+        try:
+            for fd in (path / "fd").iterdir():
+                target = os.readlink(fd)
+                if target.startswith("/dev/nvidia") and target[11:].isdigit():
+                    holders.add(int(path.name))
+                    break
+        except (FileNotFoundError, PermissionError):
+            continue
+    return holders
+
+
+def _thp_policy(policy: str) -> int:
+    lib = ctypes.CDLL(None, use_errno=True)
+    if policy != "default":
+        disabled = 1 if policy == "disabled" else 0
+        if lib.prctl(41, disabled, 0, 0, 0):
+            raise OSError(ctypes.get_errno(), "PR_SET_THP_DISABLE failed")
+    return lib.prctl(42, 0, 0, 0, 0)
+
+
 def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, out):
     region = None
     try:
+        thp = _thp_policy(args.thp)
         binding = _bind(rank, args.workers, args.numa)
+        binding["thp_disable"] = thp
         import torch
 
         from vllm.v1.kv_offload.cpu.shared_offload_region import SharedOffloadRegion
@@ -122,12 +150,20 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
             num_workers=args.workers,
             process_rank=rank,
             population_barrier=args.synchronize_population,
+            memory_layout=args.layout,
         )
         before = _mapping_snapshot(engine_id)
         if args.cuda:
             from vllm.v1.kv_offload.cpu.gpu_worker import pin_mmap_region
 
             wait_start = time.perf_counter()
+            out.put(
+                {
+                    "event": "register_queued",
+                    "rank": rank,
+                    "stats": dict(region.init_stats),
+                }
+            )
             with semaphore:
                 region.init_stats["registration_queue_seconds"] = (
                     time.perf_counter() - wait_start
@@ -211,6 +247,10 @@ def main():
     # GLM-like mixed-page geometry; override with measured model geometry.
     parser.add_argument("--worker-block-bytes", type=int, default=3052800)
     parser.add_argument("--population", choices=("rank", "contiguous"), default="rank")
+    parser.add_argument("--layout", choices=("block", "worker"), default="block")
+    parser.add_argument(
+        "--thp", choices=("default", "disabled", "enabled"), default="default"
+    )
     parser.add_argument("--population-workers", type=int, default=8)
     parser.add_argument("--chunk-mib", type=int, default=256)
     parser.add_argument("--synchronize-population", action="store_true")
@@ -230,6 +270,16 @@ def main():
     row_bytes = (args.workers * args.worker_block_bytes + 4095) // 4096 * 4096
     num_blocks = capacity // row_bytes
     total_bytes = num_blocks * row_bytes
+    if args.layout == "worker":
+        while (
+            args.workers
+            * ((num_blocks * args.worker_block_bytes + 4095) // 4096 * 4096)
+            > capacity
+        ):
+            num_blocks -= 1
+        total_bytes = args.workers * (
+            (num_blocks * args.worker_block_bytes + 4095) // 4096 * 4096
+        )
     if num_blocks < 1:
         parser.error("capacity must hold at least one block")
     shm = os.statvfs("/dev/shm")
@@ -243,6 +293,7 @@ def main():
     other = _external_gpu_pids(set())
     if other:
         parser.error(f"other GPU work is running: {other}; leaving it undisturbed")
+    initial_device_holders = _gpu_device_holders()
     ctx = mp.get_context("spawn")
     barrier = ctx.Barrier(args.workers)
     semaphore = ctx.Semaphore(args.registration_concurrency)
@@ -276,7 +327,11 @@ def main():
             if time.monotonic() - run_start > args.timeout:
                 raise TimeoutError("initialization harness timed out")
             if time.monotonic() - last_check > 15:
-                other = _external_gpu_pids({p.pid for p in processes})
+                other = sorted(
+                    _gpu_device_holders()
+                    - initial_device_holders
+                    - {p.pid for p in processes}
+                )
                 if other:
                     raise RuntimeError(
                         f"other GPU work started: {other}; stopping cell"

@@ -101,6 +101,15 @@ class CPUOffloadingSpec(OffloadingSpec):
             )
 
         world_size = config.parallel.world_size
+        self.memory_layout = self.extra_config.get("cpu_cache_layout", "block")
+        if self.memory_layout not in ("block", "worker"):
+            raise ValueError("cpu_cache_layout must be block or worker")
+        if self.memory_layout == "worker" and (
+            config.replicated_layout
+            or config.canonical_layout
+            or type(self) is not CPUOffloadingSpec
+        ):
+            raise ValueError("worker layout supports direct sharded CPU caching only")
         self.population_mode = self.extra_config.get("cpu_cache_population", "rank")
         self.population_workers = self.extra_config.get(
             "cpu_cache_population_workers", world_size
@@ -143,6 +152,14 @@ class CPUOffloadingSpec(OffloadingSpec):
                 kv_bytes_per_chunk, self.BLOCK_SIZE_ALIGNMENT
             )
             self.num_blocks = int(cpu_bytes_to_use) // aligned_kv_bytes_per_chunk
+            if self.memory_layout == "worker":
+                # Keep the same logical capacity; only rank-boundary padding
+                # changes. Small caches can need one fewer block to fit.
+                while num_copies * round_up(
+                    self.num_blocks * self.cpu_page_size_per_worker,
+                    self.BLOCK_SIZE_ALIGNMENT,
+                ) > int(cpu_bytes_to_use):
+                    self.num_blocks -= 1
 
             # Expose aligned_kv_bytes_per_chunk as
             # kv_bytes_per_chunk. Note that this might contain
@@ -233,6 +250,8 @@ class CPUOffloadingSpec(OffloadingSpec):
             else:
                 world_size = self.config.parallel.world_size
                 rank = torch.accelerator.current_device_index() % world_size
+                if self.memory_layout == "worker":
+                    rank = self.config.parallel.rank
             mmap_region = SharedOffloadRegion(
                 engine_id=self.config.engine_id,
                 num_blocks=self.num_blocks,
@@ -246,6 +265,7 @@ class CPUOffloadingSpec(OffloadingSpec):
                 num_workers=self.config.parallel.world_size,
                 process_rank=self.config.parallel.rank,
                 population_barrier=self.population_barrier,
+                memory_layout=self.memory_layout,
             )
         try:
             return CPUOffloadingWorker(

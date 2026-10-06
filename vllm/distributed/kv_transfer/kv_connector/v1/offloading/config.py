@@ -38,6 +38,17 @@ def build_offloading_config(
     engine_id = kv_transfer_config.engine_id
 
     parallel_config = vllm_config.parallel_config
+    if (
+        extra_config.get("cpu_cache_layout", "block") == "worker"
+        or extra_config.get("cpu_cache_population", "rank") == "contiguous"
+    ) and not (
+        parallel_config.distributed_executor_backend == "mp"
+        and parallel_config.nnodes_within_dp == 1
+        and parallel_config.world_size == parallel_config.tensor_parallel_size
+    ):
+        raise ValueError(
+            "experimental CPU cache initialization requires single-node TP"
+        )
     groups = tuple(
         OffloadingGroupConfig(
             tokens_per_block=(

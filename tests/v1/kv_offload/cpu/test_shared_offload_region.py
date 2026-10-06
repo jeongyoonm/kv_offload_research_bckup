@@ -233,7 +233,7 @@ def test_contiguous_population_prepares_every_rank_before_return(iid, initialize
     slot = PAGE_SIZE + 128
     row = ((slot * workers + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
     barrier = threading.Barrier(workers)
-    regions = [None] * workers
+    regions: list[SharedOffloadRegion | None] = [None] * workers
     failures = []
 
     def construct(rank):
@@ -306,6 +306,60 @@ def test_contiguous_population_failure_releases_mapping(iid, monkeypatch):
         )
     assert not os.path.exists(f"/dev/shm/vllm_offload_{iid}.mmap")
     assert len(os.listdir("/proc/self/fd")) == before
+
+
+def test_worker_layout_keeps_strided_blocks_inside_disjoint_registrations(iid):
+    """Packed tensor slots stay within each rank's page-aligned transfer range."""
+    workers, blocks, slot = 8, 11, PAGE_SIZE + 128
+    row = ((workers * slot + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    regions = []
+    try:
+        for rank in range(workers):
+            region = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                num_workers=workers,
+                memory_layout="worker",
+            )
+            regions.append(region)
+            first = region.create_next_worker_view(PAGE_SIZE)
+            second = region.create_next_worker_view(128)
+            assert first.stride() == second.stride() == (slot, 1)
+            assert region.registration_offset % PAGE_SIZE == 0
+            assert region.registration_size_bytes % PAGE_SIZE == 0
+            first[:, :] = rank + 1
+            second[:, :] = rank + 17
+            assert second[-1].data_ptr() + 128 <= (
+                region._base.data_ptr()
+                + region.registration_offset
+                + region.registration_size_bytes
+            )
+            del first, second
+        observer = regions[0]
+        for rank, region in enumerate(regions):
+            for block in range(blocks):
+                offset = region.registration_offset + block * slot
+                assert observer.mmap_obj[offset : offset + PAGE_SIZE] == (
+                    bytes([rank + 1]) * PAGE_SIZE
+                )
+                assert observer.mmap_obj[offset + PAGE_SIZE : offset + slot] == (
+                    bytes([rank + 17]) * 128
+                )
+            if rank + 1 < workers:
+                assert region.registration_offset + region.registration_size_bytes == (
+                    regions[rank + 1].registration_offset
+                )
+        with pytest.raises(ValueError, match="canonical"):
+            observer.create_next_canonical_view(128)
+        with pytest.raises(ValueError, match="secondary-tier"):
+            observer.create_kv_memoryview()
+    finally:
+        for region in regions:
+            region.cleanup()
+        _cleanup_file(f"/dev/shm/vllm_offload_{iid}.mmap")
 
 
 # ---------------------------------------------------------------------------

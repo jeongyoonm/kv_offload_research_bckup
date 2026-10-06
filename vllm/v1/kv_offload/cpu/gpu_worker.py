@@ -202,7 +202,7 @@ def _canonical_block_sizes(
 
 
 def pin_mmap_region(region: SharedOffloadRegion) -> None:
-    """Register the entire mmap as CUDA pinned memory via cudaHostRegister."""
+    """Register this worker's transfer range with CUDA."""
     if not current_platform.is_cuda_alike():
         logger.info(
             "Skipping mmap host registration on %s; cudaHostRegister is only "
@@ -213,20 +213,27 @@ def pin_mmap_region(region: SharedOffloadRegion) -> None:
 
     rank = region.rank
 
-    base_ptr = region._base.data_ptr()
+    base_ptr = region._base.data_ptr() + region.registration_offset
     register_start = time.perf_counter()
     region.init_stats["register_start_ns"] = time.monotonic_ns()
-    result = torch.cuda.cudart().cudaHostRegister(base_ptr, region.total_size_bytes, 0)
+    logger.info(
+        "CPU cache registration begin rank=%s bytes=%d",
+        rank,
+        region.registration_size_bytes,
+    )
+    result = torch.cuda.cudart().cudaHostRegister(
+        base_ptr, region.registration_size_bytes, 0
+    )
     region.init_stats.update(
         register_end_ns=time.monotonic_ns(),
         register_seconds=time.perf_counter() - register_start,
-        register_bytes=region.total_size_bytes,
+        register_bytes=region.registration_size_bytes,
         register_result=result.value,
     )
     logger.info(
         "CPU cache registration rank=%s bytes=%d seconds=%.3f result=%d",
         rank,
-        region.total_size_bytes,
+        region.registration_size_bytes,
         region.init_stats["register_seconds"],
         result.value,
     )
@@ -241,7 +248,7 @@ def pin_mmap_region(region: SharedOffloadRegion) -> None:
         logger.debug(
             "cudaHostRegister rank=%d %.2f GB",
             rank,
-            region.total_size_bytes / 1e9,
+            region.registration_size_bytes / 1e9,
         )
         region.is_pinned = True
 

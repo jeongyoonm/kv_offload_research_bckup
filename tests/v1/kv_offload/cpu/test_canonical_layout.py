@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 import torch
 
+from vllm.platforms import current_platform
 from vllm.v1.kv_offload.base import (
     CanonicalKVCacheRef,
     CanonicalPageMapping,
@@ -107,6 +108,92 @@ def _transfer(handler, num_blocks: int, gpu_to_cpu: bool) -> None:
             return
         time.sleep(0.001)
     raise TimeoutError("transfer did not complete")
+
+
+@pytest.mark.parametrize("async_h2d", [False, True])
+@pytest.mark.parametrize("rank", [0, 1])
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA required")
+def test_worker_layout_roundtrip_mixed_pages_and_reused_blocks(rank, async_h2d):
+    """Rank-local registration supports mixed pages, chunking and block reuse."""
+    page_sizes = (8448, 36864)
+    blocks_per_chunk = 2
+    blocks = 3
+    slot = sum(page_sizes) * blocks_per_chunk
+    row = ((2 * slot + 4095) // 4096) * 4096
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=blocks,
+        rank=rank,
+        kv_bytes_per_block=row,
+        cpu_page_size=slot,
+        num_workers=2,
+        memory_layout="worker",
+    )
+    handlers = []
+    cpu = []
+    try:
+        pin_mmap_region(region)
+        assert region.is_pinned
+        gpu = [
+            torch.empty(
+                (blocks * blocks_per_chunk, page), dtype=torch.int8, device="cuda"
+            )
+            for page in page_sizes
+        ]
+        cpu = [
+            region.create_next_worker_view(page * blocks_per_chunk)
+            for page in page_sizes
+        ]
+        refs = [
+            [
+                CanonicalKVCacheRef(tensor_idx=i, page_size_bytes=page)
+                for i, page in enumerate(page_sizes)
+            ]
+        ]
+        store = SingleDirectionOffloadingHandler(
+            gpu_tensors=gpu,
+            cpu_tensors=cpu,
+            blocks_per_chunk=blocks_per_chunk,
+            layer_refs_per_group=refs,
+            gpu_to_cpu=True,
+        )
+        handlers.append(store)
+        load = SingleDirectionOffloadingHandler(
+            gpu_tensors=gpu,
+            cpu_tensors=cpu,
+            blocks_per_chunk=blocks_per_chunk,
+            layer_refs_per_group=refs,
+            gpu_to_cpu=False,
+            async_h2d_submission=async_h2d,
+        )
+        handlers.append(load)
+        gpu_spec = GPULoadStoreSpec(
+            [5, 2, 1, 4, 0, 3], group_sizes=(6,), block_indices=(0,)
+        )
+        cpu_spec = CPULoadStoreSpec([2, 0, 1])
+        for generation in range(2):
+            for tensor in gpu:
+                tensor.random_(-128, 128)
+            expected = [tensor.clone() for tensor in gpu]
+            job = generation * 2
+            assert store.transfer_async(job, gpu_spec, cpu_spec)
+            store.wait({job})
+            assert store.get_finished()[0].success
+            for tensor in gpu:
+                tensor.zero_()
+            assert load.transfer_async(job + 1, cpu_spec, gpu_spec)
+            load.wait({job + 1})
+            results = load.get_finished()
+            assert len(results) == 1 and results[0].success
+            for actual, original in zip(gpu, expected):
+                assert torch.equal(actual, original)
+    finally:
+        for handler in handlers:
+            handler.shutdown()
+            handler.src_tensors.clear()
+            handler.dst_tensors.clear()
+        cpu.clear()
+        region.cleanup()
 
 
 def _canonical_handler(gpu_tensor, cpu_tensor, mapping, gpu_to_cpu, async_h2d=False):

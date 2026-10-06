@@ -93,6 +93,7 @@ class SharedOffloadRegion:
         num_workers: int = 1,
         process_rank: int | None = None,
         population_barrier: bool = False,
+        memory_layout: str = "block",
     ) -> None:
         init_start = time.perf_counter()
         self.init_stats: dict[str, int | float] = {}
@@ -114,10 +115,28 @@ class SharedOffloadRegion:
             population_barrier = True
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
+        if memory_layout not in ("block", "worker"):
+            raise ValueError("memory_layout must be block or worker")
+        if memory_layout == "worker" and (rank is None or not 0 <= rank < num_workers):
+            raise ValueError("worker layout requires a valid worker rank")
+        self.memory_layout = memory_layout
 
         self.num_blocks = num_blocks
         self._row_stride = kv_bytes_per_block
         self.total_size_bytes = self.num_blocks * self._row_stride
+        self.registration_offset = 0
+        self.registration_size_bytes = self.total_size_bytes
+        self._worker_span = (
+            (num_blocks * cpu_page_size + self.page_size - 1)
+            // self.page_size
+            * self.page_size
+        )
+        if memory_layout == "worker":
+            assert rank is not None
+            self._row_stride = cpu_page_size
+            self.total_size_bytes = self._worker_span * num_workers
+            self.registration_offset = rank * self._worker_span
+            self.registration_size_bytes = self._worker_span
 
         self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}.mmap"
         self._creator = False  # set True only if this worker creates the file
@@ -127,6 +146,9 @@ class SharedOffloadRegion:
             self._worker_offset = rank * cpu_page_size
             # exclusive upper bound for this worker's area within each row
             self._worker_area_end = (rank + 1) * cpu_page_size
+            if memory_layout == "worker":
+                self._worker_offset = self.registration_offset
+                self._worker_area_end = self._worker_offset + cpu_page_size
         try:
             try:
                 self.fd: int | None = os.open(
@@ -220,8 +242,12 @@ class SharedOffloadRegion:
                     owner = process_rank // step
                     start_block = num_blocks * owner // population_workers
                     end_block = num_blocks * (owner + 1) // population_workers
-                    start = start_block * self._row_stride
-                    end = end_block * self._row_stride
+                    if memory_layout == "worker":
+                        start = self.total_size_bytes * owner // population_workers
+                        end = self.total_size_bytes * (owner + 1) // population_workers
+                    else:
+                        start = start_block * self._row_stride
+                        end = end_block * self._row_stride
                     chunk_bytes = (
                         population_chunk_bytes // self.page_size * self.page_size
                     )
@@ -230,6 +256,15 @@ class SharedOffloadRegion:
                         populate_write_fn(self.mmap_obj, offset, length)
                         populate_calls += 1
                         populate_bytes += length
+            elif memory_layout == "worker":
+                start = self.registration_offset
+                end = start + self.registration_size_bytes
+                chunk_bytes = population_chunk_bytes // self.page_size * self.page_size
+                for offset in range(start, end, chunk_bytes):
+                    length = min(chunk_bytes, end - offset)
+                    populate_write_fn(self.mmap_obj, offset, length)
+                    populate_calls += 1
+                    populate_bytes += length
             elif rank is not None:
                 # Populate only this worker's pages (one slot per block row).
                 worker_offset = rank * cpu_page_size
@@ -362,6 +397,8 @@ class SharedOffloadRegion:
         Args:
             tensor_page_size: Canonical bytes per block for this tensor.
         """
+        if self.memory_layout == "worker":
+            raise ValueError("canonical views require block layout")
         new_offset = self._canonical_offset + tensor_page_size
         assert new_offset <= self._row_stride
         view = torch.as_strided(
@@ -380,6 +417,8 @@ class SharedOffloadRegion:
         Shape: (num_blocks, row_stride_bytes). Secondary tiers address
         block *b* as ``view[b]``.
         """
+        if self.memory_layout == "worker":
+            raise ValueError("secondary-tier memoryviews require block layout")
         kv_tensor = self._base.view(self.num_blocks, self._row_stride)
         np_arr = kv_tensor.numpy()
         assert np_arr.ctypes.data == self._base.data_ptr(), (
@@ -391,7 +430,7 @@ class SharedOffloadRegion:
     def cleanup(self) -> None:
         if self.is_pinned and self._base is not None:
             if current_platform.is_cuda_alike():
-                base_ptr = self._base.data_ptr()
+                base_ptr = self._base.data_ptr() + self.registration_offset
                 result = torch.cuda.cudart().cudaHostUnregister(base_ptr)
                 if result.value != 0:
                     logger.warning(

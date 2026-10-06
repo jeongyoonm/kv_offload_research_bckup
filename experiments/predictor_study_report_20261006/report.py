@@ -15,7 +15,13 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
 
-PHASES = ["submission_progress", "transfer_progress", "mixed"]
+PHASES = [
+    "submission_progress",
+    "transfer_progress",
+    "mixed",
+    "online_live",
+    "generalization",
+]
 LABELS = {
     "glm53_seal_calibration_20261006/trained_model": "Original predictor",
     "expanded/model": "Expanded forest",
@@ -23,6 +29,8 @@ LABELS = {
     "boosted_residual/model": "Boosted residual",
     "boosted_base/model": "Boosted base + residual",
     "dense_augmentation/model": "Dense cached coverage",
+    "realized_augmentation/model": "Realized cached coverage forest",
+    "boosted/model": "Realized cached coverage residual",
 }
 
 
@@ -39,6 +47,9 @@ def gather(root):
             root / "boosted_residual" / f"{phase}.json",
             root / "dense_augmentation" / f"{phase}.json",
             root / "boosted_base" / f"{phase}.json",
+            root / "realized_augmentation" / f"{phase}.json",
+            root / phase / "analysis/frozen_accuracy.json",
+            root / phase / "frozen_evaluation/final_models_accuracy.json",
         ]
         models, sources, count, episodes, digest = {}, [], None, None, None
         for path in score_paths:
@@ -69,6 +80,11 @@ def gather(root):
             serving=(
                 json.loads(serving.read_text())["grouped"] if serving.is_file() else []
             ),
+            issued_accuracy=(
+                json.loads((root / phase / "issued_accuracy.json").read_text())
+                if (root / phase / "issued_accuracy.json").is_file()
+                else None
+            ),
         )
     return phases
 
@@ -96,8 +112,8 @@ def main():
             "A lower MAE does not establish a throughput gain.",
         ],
     )
-    decision = args.root / "dense_augmentation/serving_decision.json"
-    results = args.root / "dense_augmentation/serving_results.json"
+    decision = args.root / "realized_augmentation/serving_decision.json"
+    results = args.root / "realized_augmentation/serving_results.json"
     if decision.is_file():
         summary["fresh_serving_decision"] = json.loads(decision.read_text())
     if results.is_file():
@@ -108,7 +124,7 @@ def main():
         for name in LABELS
         if all(name in p["initial_models"] for p in phases.values())
     ]
-    colors = ["#757575", "#9ecae1", "#4292c6", "#08519c", "#31a354", "#74c476"]
+    colors = plt.get_cmap("tab10").colors
     fig, ax = plt.subplots(figsize=(max(8, 2.4 * len(phases)), 4.6))
     centers = np.arange(len(phases))
     width = 0.8 / len(names)
@@ -160,6 +176,40 @@ def main():
                 )
                 + "</tr>"
             )
+    issued_table = []
+    for phase, values in phases.items():
+        issued = values["issued_accuracy"]
+        if not issued:
+            continue
+        for group in issued["groups"]:
+            if group["workload"] != "ALL":
+                continue
+            issued_table.append(
+                "<tr>"
+                + "".join(
+                    f"<td>{html.escape(str(v))}</td>"
+                    for v in [
+                        phase,
+                        group["policy"],
+                        group["samples"],
+                        f"{group['issued']['mae_ms']:.3f}",
+                        f"{group['frozen_same_frames']['mae_ms']:.3f}",
+                        group["nonzero_corrections"],
+                        group["max_history"],
+                    ]
+                )
+                + "</tr>"
+            )
+    issued_html = ""
+    if issued_table:
+        issued_html = (
+            "<h2>Actual issued predictions</h2>"
+            "<p>Online history is transient; static checkpoint scores exclude it. "
+            "Each row compares issuance with the frozen model on those same frames.</p>"
+            "<table><tr><th>Phase</th><th>Policy</th><th>Frames</th>"
+            "<th>Issued MAE</th><th>Frozen MAE</th><th>Corrections</th>"
+            "<th>Max history</th></tr>" + "".join(issued_table) + "</table>"
+        )
     body = (
         "<!doctype html><meta charset='utf-8'><title>GLM5.3 predictor study</title>"
         "<style>body{font:16px sans-serif;max-width:1100px;margin:40px auto}"
@@ -171,7 +221,9 @@ def main():
         "<th>MAE (ms)</th><th>Bias (ms)</th><th>p95 absolute (ms)</th>"
         "</tr></thead><tbody>"
         + "".join(table)
-        + "</tbody></table><h2>Scope</h2><ul>"
+        + "</tbody></table>"
+        + issued_html
+        + "<h2>Scope</h2><ul>"
         + "".join(f"<li>{html.escape(limit)}</li>" for limit in summary["limits"])
         + "</ul><p>See summary.json for full scores and source hashes.</p>"
     )

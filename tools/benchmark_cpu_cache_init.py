@@ -132,6 +132,8 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
         torch.set_num_threads(1)
         torch.set_num_interop_threads(1)
         if args.cuda:
+            from vllm.v1.kv_offload.cpu.gpu_worker import pin_mmap_region
+
             torch.accelerator.set_device_index(rank)
             torch.empty(1, device="cuda")
             torch.accelerator.synchronize()
@@ -154,8 +156,6 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
         )
         before = _mapping_snapshot(engine_id)
         if args.cuda:
-            from vllm.v1.kv_offload.cpu.gpu_worker import pin_mmap_region
-
             wait_start = time.perf_counter()
             out.put(
                 {
@@ -184,35 +184,77 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
         barrier.wait(args.timeout)
         for block in selected:
             assert bool(torch.all(view[block, :16] == rank + 1))
-        del view
         barrier.wait(args.timeout)
         bandwidth = {}
         if args.cuda:
-            # Disjoint contiguous transfer ranges, one per rank. Rank layout
-            # uses the same boundaries; all ranges are inside registrations.
-            rank_bytes = region.cache_size_bytes // args.workers
-            transfer_bytes = min(64 * 1024**2, rank_bytes)
-            offset = 0 if args.layout == "private" else rank * rank_bytes
-            host = region._base[offset : offset + transfer_bytes]
+            from vllm.v1.kv_offload.base import CanonicalKVCacheRef, GPULoadStoreSpec
+            from vllm.v1.kv_offload.cpu.common import CPULoadStoreSpec
+            from vllm.v1.kv_offload.cpu.gpu_worker import (
+                SingleDirectionOffloadingHandler,
+            )
+
+            transfer_blocks = min(
+                num_blocks, max(1, 64 * 1024**2 // args.worker_block_bytes)
+            )
+            transfer_bytes = transfer_blocks * args.worker_block_bytes
             source = torch.full(
-                (transfer_bytes,), rank + 17, dtype=torch.int8, device="cuda"
+                (transfer_blocks, args.worker_block_bytes),
+                rank + 17,
+                dtype=torch.int8,
+                device="cuda",
             )
             restored = torch.empty_like(source)
-            for direction, destination, origin in (
-                ("d2h", host, source),
-                ("h2d", restored, host),
+            refs = [
+                [
+                    CanonicalKVCacheRef(
+                        tensor_idx=0, page_size_bytes=args.worker_block_bytes
+                    )
+                ]
+            ]
+            gpu_spec = GPULoadStoreSpec(
+                list(range(transfer_blocks)),
+                group_sizes=(transfer_blocks,),
+                block_indices=(0,),
+            )
+            cpu_spec = CPULoadStoreSpec(list(range(transfer_blocks)))
+            store = SingleDirectionOffloadingHandler(
+                gpu_tensors=[source],
+                cpu_tensors=[view],
+                blocks_per_chunk=1,
+                layer_refs_per_group=refs,
+                gpu_to_cpu=True,
+            )
+            load = SingleDirectionOffloadingHandler(
+                gpu_tensors=[restored],
+                cpu_tensors=[view],
+                blocks_per_chunk=1,
+                layer_refs_per_group=refs,
+                gpu_to_cpu=False,
+                async_h2d_submission=args.async_h2d,
+            )
+            for direction, handler, origin, destination in (
+                ("d2h", store, gpu_spec, cpu_spec),
+                ("h2d", load, cpu_spec, gpu_spec),
             ):
-                destination.copy_(origin, non_blocking=True)
-                torch.accelerator.synchronize()
+                assert handler.transfer_async(0, origin, destination)
+                handler.wait({0})
+                assert handler.get_finished()[0].success
                 begin = time.perf_counter()
-                for _ in range(8):
-                    destination.copy_(origin, non_blocking=True)
-                torch.accelerator.synchronize()
+                for job in range(1, 9):
+                    assert handler.transfer_async(job, origin, destination)
+                handler.wait(set(range(1, 9)))
+                results = handler.get_finished()
+                assert len(results) == 8 and all(r.success for r in results)
                 bandwidth[direction + "_gbps"] = (
                     8 * transfer_bytes / (time.perf_counter() - begin) / 1e9
                 )
             assert torch.equal(source, restored)
-            del host, source, restored, destination, origin
+            for handler in (store, load):
+                handler.shutdown()
+                handler.src_tensors.clear()
+                handler.dst_tensors.clear()
+            del source, restored, store, load, handler
+        del view
         barrier.wait(args.timeout)
         stats = dict(region.init_stats)
         cleanup_start = time.perf_counter()
@@ -258,6 +300,7 @@ def main():
     parser.add_argument("--chunk-mib", type=int, default=256)
     parser.add_argument("--synchronize-population", action="store_true")
     parser.add_argument("--cuda", action="store_true")
+    parser.add_argument("--async-h2d", action="store_true")
     parser.add_argument("--registration-concurrency", type=int, default=8)
     parser.add_argument(
         "--numa", choices=("first-touch", "local", "interleave"), default="local"

@@ -67,6 +67,8 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--port", type=int, default=18387)
     parser.add_argument("--flashinfer-workspace", type=Path)
+    parser.add_argument("--dma-audit", action="store_true")
+    parser.add_argument("--diagnose-only", action="store_true")
     parser.add_argument(
         "--layout", choices=("block", "worker", "private"), default="private"
     )
@@ -119,6 +121,11 @@ def main():
             "async_h2d_chunk_bytes": 134217728,
         },
     }
+    if args.dma_audit:
+        config["kv_connector"] = "AuditedOffloadingConnector"
+        config["kv_connector_module_path"] = "cache_init_dma_audit"
+        env["PYTHONPATH"] += os.pathsep + str(source / "tools")
+        env["CACHE_INIT_DMA_AUDIT_DIR"] = str(args.output / "dma_audit")
     command = [
         sys.executable,
         str(Path(__file__).resolve()),
@@ -251,17 +258,27 @@ def main():
                 assert delta.get("vllm:external_prefix_cache_hits_total", 0) > 0
                 assert delta.get("vllm:prefix_cache_hits_total", 0) == 0
                 assert gpu_delta.get("vllm:prefix_cache_hits_total", 0) > 0
-                assert gpu_delta.get("vllm:external_prefix_cache_hits_total", 0) == 0
                 assert (
                     gpu_cached["usage"]["prompt_tokens_details"]["cached_tokens"]
                     == restored["usage"]["prompt_tokens_details"]["cached_tokens"]
                 )
-                assert probe["text_equal"], "GPU-cache/CPU-restore text mismatch"
+                if not args.diagnose_only:
+                    assert probe["text_equal"], (
+                        "Cached-repeat/CPU-restore text mismatch"
+                    )
                 print(
-                    json.dumps({"probe": index, "passed": True, "delta": delta}),
+                    json.dumps(
+                        {
+                            "probe": index,
+                            "text_equal": probe["text_equal"],
+                            "delta": delta,
+                        }
+                    ),
                     flush=True,
                 )
-            summary["probes_passed"] = len(probes)
+            summary["probes_completed"] = len(probes)
+            summary["probes_passed"] = sum(probe["text_equal"] for probe in probes)
+            summary["diagnostic_only"] = args.diagnose_only
     except Exception as exc:
         summary["error"] = f"{type(exc).__name__}: {exc}"
         raise

@@ -263,13 +263,17 @@ def test_contiguous_population_prepares_every_rank_before_return(iid, initialize
             thread.join(15)
         assert not any(thread.is_alive() for thread in threads)
         assert not failures
-        assert all(_page_residency(regions[0].mmap_obj, blocks * row))
-        assert sum(r.init_stats["populate_bytes"] for r in regions) == blocks * row
-        for rank, region in enumerate(regions):
+        ready_regions = [r for r in regions if r is not None]
+        assert len(ready_regions) == workers
+        assert all(_page_residency(ready_regions[0].mmap_obj, blocks * row))
+        assert (
+            sum(r.init_stats["populate_bytes"] for r in ready_regions) == blocks * row
+        )
+        for rank, region in enumerate(ready_regions):
             view = region.create_next_worker_view(slot)
             view[:, :] = rank + 1
             del view
-        for rank, region in enumerate(regions):
+        for rank, region in enumerate(ready_regions):
             # Check the shared backing bytes, including unaligned slot ends.
             for block in range(blocks):
                 start = block * row + rank * slot

@@ -104,9 +104,9 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
         torch.set_num_threads(1)
         torch.set_num_interop_threads(1)
         if args.cuda:
-            torch.cuda.set_device(rank)
+            torch.accelerator.set_device_index(rank)
             torch.empty(1, device="cuda")
-            torch.cuda.synchronize()
+            torch.accelerator.synchronize()
         barrier.wait(args.timeout)
         start_ns = time.monotonic_ns()
         region = SharedOffloadRegion(
@@ -166,11 +166,11 @@ def _worker(rank, args, engine_id, num_blocks, row_bytes, barrier, semaphore, ou
                 ("h2d", restored, host),
             ):
                 destination.copy_(origin, non_blocking=True)
-                torch.cuda.synchronize()
+                torch.accelerator.synchronize()
                 begin = time.perf_counter()
                 for _ in range(8):
                     destination.copy_(origin, non_blocking=True)
-                torch.cuda.synchronize()
+                torch.accelerator.synchronize()
                 bandwidth[direction + "_gbps"] = (
                     8 * transfer_bytes / (time.perf_counter() - begin) / 1e9
                 )

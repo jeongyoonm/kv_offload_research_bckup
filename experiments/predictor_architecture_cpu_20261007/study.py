@@ -47,7 +47,7 @@ MODELS = [
     "tree_direct",
 ]
 LABELS = {
-    "trees_fixed": "Current tree architecture, fixed recipe",
+    "trees_fixed": "Current tree architecture, refitted recipe",
     "trees_tuned": "Tree base + tree correction, tuned",
     "tree_base_only": "Tree base only",
     "mlp_base_only": "MLP base only",

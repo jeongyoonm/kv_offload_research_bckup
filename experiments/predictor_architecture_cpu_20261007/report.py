@@ -270,6 +270,8 @@ def figure(output, groups, runtime):
 def markdown(output, report):
     groups, runtime = report["evaluations"], report["runtime"]
     checks = report["audit"]
+    archived = report["archived_reproduction"]
+    old_scores = archived["archived_scores"]
     lines = [
         "# CPU predictor model and architecture comparison",
         "",
@@ -336,6 +338,23 @@ def markdown(output, report):
         "is not a new blind test.",
         "",
         *accuracy_table(groups["historical_wide"]["scores"]),
+        "",
+        "### Archived checkpoint reproduction",
+        "",
+        f"The unchanged archived serving checkpoint gives {old_scores['mae_ms']:.5f}",
+        f"ms MAE and {old_scores['mape_percent']:.5f}% MAPE, reproducing the previous",
+        "report. Refitting with the legacy arithmetic matches that checkpoint",
+        f"within {archived['legacy_refit_max_difference_ms']:.8f} ms.",
+        "",
+        "The comparison runner uses NumPy summation for weight normalization;",
+        "the old trainer used Python summation. The normalized weights differ",
+        f"by at most {archived['weight_max_difference']:.2e}, but this changes some",
+        "tied Extra Trees splits and the freshly refitted historical-replay MAE.",
+        "Features and labels are identical. Every newly fitted architecture in",
+        "this comparison uses the same NumPy-normalized weights. The archived",
+        "checkpoint is kept separate; it would be contaminated as a reference",
+        "for pooled episode/workload holdouts because it saw their training rows.",
+        "This sensitivity also cautions against interpreting tiny ranking gaps.",
         "",
         "## Paired uncertainty",
         "",
@@ -473,6 +492,8 @@ def markdown(output, report):
         "equal candidate count rather than equal training time, parameter",
         "count, or an exhaustive neural architecture search. A single inner",
         "validation split and one initialization seed limit tuning stability.",
+        "Two-stage designs have separate base and correction searches; a direct",
+        "model has only one search. The current fixed recipe is not retuned.",
         "Convergence warnings indicate a fixed optimizer budget may leave",
         "some MLP candidates short of their optimum.",
         "",
@@ -530,9 +551,11 @@ def main():
             array = load_predictions(output, [task["name"]])
             details[task["workload"]] = {"scores": scores(array)}
     reproduction = groups["historical_wide"]["scores"]["trees_fixed"]
-    assert abs(reproduction["mae_ms"] - 19.6244341373) < 0.001
-    assert abs(reproduction["mape_percent"] - 5.0368601527) < 0.001
-    checks["previous_fixed_recipe_reproduced"] = True
+    archived = json.loads((output / "reproduction.json").read_text())
+    assert abs(reproduction["mae_ms"] - archived["new_refit_scores"]["mae_ms"]) < 1e-9
+    checks["archived_checkpoint_reproduced"] = (
+        archived["legacy_refit_max_difference_ms"] < 3e-6
+    )
     runtime = json.loads((output / "runtime.json").read_text())
     assert len(runtime) == 30
     assert all(r["max_equivalence_error_ms"] < 1e-4 for r in runtime)
@@ -541,6 +564,7 @@ def main():
         "workload_details": details,
         "runtime": runtime,
         "audit": checks,
+        "archived_reproduction": archived,
         "environment": {
             "python": platform.python_version(),
             "sklearn": sklearn.__version__,
@@ -564,7 +588,7 @@ def main():
             name: hashlib.sha256(
                 Path(__file__).with_name(name).read_bytes()
             ).hexdigest()
-            for name in ["study.py", "report.py", "verify.py"]
+            for name in ["study.py", "report.py", "verify.py", "reproduce.py"]
         },
         "inventory": json.loads((output / "inventory.json").read_text()),
     }

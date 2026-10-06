@@ -35,3 +35,18 @@ exports must match the fitted predictions within 0.0001 ms.
 
 The report rechecks coverage, episode exclusion, finite predictions, paired
 metrics, and export agreement before generating summary tables and plots.
+
+## Archived reference audit
+
+The unchanged serving checkpoint reproduces the prior result: 19.624434 ms MAE,
+5.036860% mean absolute percentage error on the 670-forecast replay. The new
+fixed-recipe fit yields 19.032901 ms MAE. A controlled reproduction identifies
+NumPy versus Python summation when normalizing weights as the cause. A weight
+change of at most 9.4147e-14 changes tied Extra Trees splits. Identical features,
+targets, seed, and hyperparameters with legacy arithmetic recover the archived
+predictions within 0.00000253 ms.
+
+All new architectures use the same NumPy-normalized weights. The archived
+checkpoint is reported separately from grouped refits, since it already saw
+some rows used in pooled holdout tests. This numerical sensitivity is included
+when interpreting small differences, and no serving checkpoint is modified.

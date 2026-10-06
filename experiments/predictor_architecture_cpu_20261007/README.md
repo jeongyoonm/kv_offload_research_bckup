@@ -82,6 +82,10 @@ Generate the audited report and figures after the runner completes:
 
 ```bash
 /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
+experiments/predictor_architecture_cpu_20261007/reproduce.py \
+--output /mnt/localnvme/glm53_predictor_architecture_cpu_20261007
+
+/mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
 experiments/predictor_architecture_cpu_20261007/report.py \
 --output /mnt/localnvme/glm53_predictor_architecture_cpu_20261007
 ```

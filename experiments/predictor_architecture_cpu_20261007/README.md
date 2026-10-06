@@ -66,6 +66,11 @@ be inferred reliably from these traces.
 
 ## Run
 
+The existing evaluation environment is used below. Exact CPU package versions
+are listed in `requirements-cpu.txt`; the study uses Python 3.12. The native
+inference comparison also reuses the existing CPU forest library under the
+previous study's `fast_forest/build` directory.
+
 ```bash
 CUDA_VISIBLE_DEVICES='' OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
 MKL_NUM_THREADS=1 \

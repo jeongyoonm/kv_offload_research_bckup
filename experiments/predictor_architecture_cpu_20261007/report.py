@@ -36,7 +36,7 @@ def scores(array):
     return {name: metrics(array["y"], array[name], rows) for name in MODELS}
 
 
-def paired_bootstrap(array, reference, repeats=2000):
+def paired_bootstrap(array, reference, repeats=2000, models=None):
     """Resample episodes, preserving paired forecasts and their sample counts."""
     episodes, inverse = np.unique(array["episode"], return_inverse=True)
     count = np.bincount(inverse)
@@ -45,7 +45,7 @@ def paired_bootstrap(array, reference, repeats=2000):
     draws = rng.integers(0, len(episodes), (repeats, len(episodes)))
     denominator = count[draws].sum(axis=1)
     result = {}
-    for name in MODELS:
+    for name in MODELS if models is None else models:
         delta = np.abs(array[name] - array["y"]) - reference_error
         numerator = np.bincount(inverse, weights=delta)
         boot = numerator[draws].sum(axis=1) / denominator
@@ -195,11 +195,32 @@ def accuracy_table(values):
     return lines
 
 
+def data_control_table(control):
+    lines = [
+        "### Effect of additional base-training batches",
+        "",
+        "Same held-out forecasts and correction/direct training rows; only the",
+        "base-training corpus changes. Each regime tunes on training data.",
+        "",
+        "| Design | Wide MAE (ms) | Matched MAE (ms) | Wide minus matched, 95% CI |",
+        "|---|---:|---:|---:|",
+    ]
+    for name in MODELS:
+        v = control[name]
+        lines.append(
+            f"| {LABELS[name]} | {v['wide_mae_ms']:.2f} | "
+            f"{v['matched_mae_ms']:.2f} | {v['difference_ms']:+.2f} "
+            f"[{v['lower95_ms']:+.2f}, {v['upper95_ms']:+.2f}] |"
+        )
+    return lines
+
+
 def figure(output, groups, runtime):
     names = [
         "trees_fixed",
         "trees_tuned",
         "tree_base_only",
+        "mlp_base_only",
         "tree_mlp",
         "mlp_tree",
         "mlp_mlp",
@@ -210,6 +231,7 @@ def figure(output, groups, runtime):
         "Current trees",
         "Tuned trees",
         "Tree base",
+        "MLP base",
         "Tree + MLP",
         "MLP + tree",
         "MLP + MLP",
@@ -220,13 +242,14 @@ def figure(output, groups, runtime):
         "#4477AA",
         "#4477AA",
         "#66CCEE",
+        "#EE6677",
         "#228833",
         "#228833",
         "#EE6677",
         "#EE6677",
         "#66CCEE",
     ]
-    fig, axes = plt.subplots(1, 3, figsize=(14, 4.5), layout="constrained")
+    fig, axes = plt.subplots(1, 3, figsize=(14, 5), layout="constrained")
     for ax, group, title in zip(
         axes[:2],
         ["episode_wide", "workload_holdout"],
@@ -293,6 +316,8 @@ def markdown(output, report):
         "direct models. This removes the extra-base-data advantage.",
         "",
         *accuracy_table(groups["episode_matched"]["scores"]),
+        "",
+        *data_control_table(report["data_control"]),
         "",
         "## Workload-held-out comparison",
         "",
@@ -559,12 +584,27 @@ def main():
     runtime = json.loads((output / "runtime.json").read_text())
     assert len(runtime) == 30
     assert all(r["max_equivalence_error_ms"] < 1e-4 for r in runtime)
+    wide = load_predictions(output, definition["episode_wide"])
+    matched = load_predictions(output, definition["episode_matched"])
+    for field in ["y", "episode", "workload", "features"]:
+        np.testing.assert_array_equal(wide[field], matched[field])
+    control = {}
+    for name in MODELS:
+        wide["matched_prediction"] = matched[name]
+        control[name] = {
+            **paired_bootstrap(wide, "matched_prediction", models=[name])[name],
+            "wide_mae_ms": groups["episode_wide"]["scores"][name]["mae_ms"],
+            "matched_mae_ms": groups["episode_matched"]["scores"][name]["mae_ms"],
+        }
+    for name in ["mlp_direct", "tree_direct"]:
+        np.testing.assert_array_equal(wide[name], matched[name])
     report = {
         "evaluations": groups,
         "workload_details": details,
         "runtime": runtime,
         "audit": checks,
         "archived_reproduction": archived,
+        "data_control": control,
         "environment": {
             "python": platform.python_version(),
             "sklearn": sklearn.__version__,

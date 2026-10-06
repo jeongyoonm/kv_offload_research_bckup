@@ -13,13 +13,14 @@ SOURCE = Path(__file__).resolve().parents[2]
 ROOT = Path(
     os.environ.get(
         "PREDICTOR_COMPARISON_ROOT",
-        "/mnt/localnvme/glm53_predictor_overnight_20261006/live_comparison",
+        "/mnt/localnvme/glm53_predictor_overnight_20261006/submission_progress",
     )
 )
 os.environ["CACHED_PINNED_ARTIFACT_ROOT"] = str(ROOT)
 os.environ["VLLM_DEFERRAL_NATIVE_OBSERVER"] = (
     "/mnt/localnvme/glm53_coalesced_notify_20261004/build/libseal_execution_observer.so"
 )
+os.environ["VLLM_DEFERRAL_PREDICTOR_PROGRESS"] = "1"
 spec = importlib.util.spec_from_file_location(
     "calibration_run", SOURCE / "experiments/seal_calibration_20261006/run.py"
 )
@@ -34,6 +35,7 @@ MODEL_FILES = {
     "dispatch": ARTIFACT / "portable/dispatch_model.json",
     "causal": ARTIFACT / "causal_portable/causal_aligned_model.json",
     "two_stage": ARTIFACT / "two_stage/model.json",
+    "expanded": ARTIFACT / "expanded/model.json",
 }
 MODELS = {
     name: json.loads(path.read_text())["state"] for name, path in MODEL_FILES.items()
@@ -65,7 +67,7 @@ runner.configure = configure
 
 def cells(run, server_dir, workloads, counts, policies, repeats, seed=55):
     return calibration.prep.original_cells(
-        run, server_dir, workloads, counts, policies, repeats, seed=87
+        run, server_dir, workloads, counts, policies, repeats, seed=91
     )
 
 

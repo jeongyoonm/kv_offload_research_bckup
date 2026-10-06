@@ -450,6 +450,9 @@ def stage_rpc(core, step, base, candidates):
     predicted_deadline_ns = None
     compute_seal_deadline_ns = None
     compute_seal_deadline_armed_ns = None
+    submission_trace = os.environ.get("VLLM_DEFERRAL_PREDICTOR_PROGRESS") == "1"
+    progress_read_ns = 0
+    progress_signature = None
     effective_seal_expiry_ns = None
     adaptive_poll_us = getattr(core.scheduler, "_late_seal_adaptive_poll_us", 1000)
     progress_polls = 0
@@ -766,6 +769,34 @@ def stage_rpc(core, step, base, candidates):
                         None,
                     )
                     a_step = getattr(a_output, "readiness_timeline_step", None)
+                    if timing and a_step and submission_trace:
+                        progress_now = time.monotonic_ns()
+                        if progress_now - progress_read_ns >= 10_000_000:
+                            progress_read_ns = progress_now
+                            data = timing.steps.get(a_step)
+                            primary_valid, _, primary = timing.read(a_step)
+                            signature = tuple(r[3] if r else 0 for r in primary)
+                            if (
+                                data
+                                and primary_valid
+                                and signature != progress_signature
+                            ):
+                                execution = timing.read_execution(a_step)
+                                observed_ns = time.monotonic_ns()
+                                if valid_snapshot(execution, a_step, observed_ns):
+                                    progress_signature = signature
+                                    record(
+                                        core.scheduler,
+                                        "predictor_submission_progress",
+                                        step=step,
+                                        predecessor_step=a_step,
+                                        observed_ns=observed_ns,
+                                        primary_snapshot=primary,
+                                        execution_snapshot=execution,
+                                        forecast_load_features=timing.loads.forecast_features(
+                                            data, observed_ns
+                                        ),
+                                    )
                     if timing and a_step and predicted_deadline_ns is None:
                         data = timing.steps.get(a_step)
                         records = timing.read_execution(a_step)

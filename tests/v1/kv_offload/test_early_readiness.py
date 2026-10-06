@@ -279,6 +279,67 @@ def test_endpoint_delay_validation(delay, valid):
             KVLoadSchedulingRequest(schedule_delay_ms=delay)
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("host", ["127.0.0.1", "192.0.2.1"])
+async def test_estimator_endpoint_preserves_loopback_guard_and_forwards_state(host):
+    from unittest.mock import AsyncMock
+
+    from fastapi import HTTPException
+    from starlette.requests import Request
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        KVLoadSchedulingRequest,
+        set_kv_load_scheduling,
+    )
+
+    rpc = AsyncMock(return_value={"seal_estimator": {"loaded": True}})
+    app = SimpleNamespace(
+        state=SimpleNamespace(
+            engine_client=SimpleNamespace(set_kv_load_scheduling=rpc),
+            vllm_config=SimpleNamespace(
+                kv_transfer_config=SimpleNamespace(
+                    kv_connector_extra_config={"early_load_completion": True}
+                )
+            ),
+        )
+    )
+    raw = Request({"type": "http", "client": (host, 1234), "app": app})
+    settings = KVLoadSchedulingRequest(seal_estimator={"action": "load", "state": {}})
+    if host == "127.0.0.1":
+        await set_kv_load_scheduling(settings, raw)
+        rpc.assert_awaited_once_with(False, 0, None, settings.seal_estimator)
+    else:
+        with pytest.raises(HTTPException) as exc:
+            await set_kv_load_scheduling(settings, raw)
+        assert exc.value.status_code == 403
+        rpc.assert_not_awaited()
+
+
+@pytest.mark.parametrize("pending", [False, True])
+def test_estimator_restore_rejection_does_not_replace_live_model(monkeypatch, pending):
+    from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
+
+    core = EngineCore.__new__(EngineCore)
+    original = ComputeEstimator()
+    options = dict(early.EXPERIMENT_DEFAULTS)
+    core.early_load_readiness = SimpleNamespace(
+        experiment_options=options, configure=MagicMock()
+    )
+    core._refresh_early_load_readiness = MagicMock()
+    core.scheduler = SimpleNamespace(has_requests=lambda: pending)
+    core.batch_queue = deque()
+    core.deferral_timing = SimpleNamespace(seal_estimator=original, collect=MagicMock())
+    core.vllm_config = SimpleNamespace()
+    monkeypatch.setattr(
+        "vllm.v1.kv_offload.seal_predictor.estimator_context", lambda _: {}
+    )
+    with pytest.raises(RuntimeError if pending else ValueError):
+        core.set_kv_load_scheduling(True, 0, {}, {"action": "load", "state": {}})
+    assert core.deferral_timing.seal_estimator is original
+    assert core.early_load_readiness.experiment_options == options
+    core.early_load_readiness.configure.assert_not_called()
+
+
 def test_completion_during_delay_is_ready_for_immediate_successor(monkeypatch):
     """A completed predecessor must not prevent the post-delay readiness drain."""
     records: dict[int, deque] = {rank: deque() for rank in range(8)}

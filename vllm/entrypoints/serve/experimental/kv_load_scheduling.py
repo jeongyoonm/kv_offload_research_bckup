@@ -20,6 +20,7 @@ class KVLoadSchedulingRequest(BaseModel):
     early_load_completion: bool = False
     schedule_delay_ms: float = Field(default=0, ge=0, le=120)
     experiment_options: dict[str, Any] | None = None
+    seal_estimator: dict[str, Any] | None = None
 
 
 @router.post("/experimental/kv-load-scheduling")
@@ -43,6 +44,13 @@ async def set_kv_load_scheduling(
 
     engine: EngineClient = raw_request.app.state.engine_client
     try:
+        if settings.seal_estimator is not None:
+            return await engine.set_kv_load_scheduling(
+                settings.early_load_completion,
+                settings.schedule_delay_ms,
+                settings.experiment_options,
+                settings.seal_estimator,
+            )
         if settings.experiment_options is not None:
             return await engine.set_kv_load_scheduling(
                 settings.early_load_completion,
@@ -64,6 +72,16 @@ async def set_kv_load_scheduling(
             "and connector work to be drained"
         ) in str(error):
             raise HTTPException(status_code=409, detail=str(error)) from error
+        if any(
+            message in str(error)
+            for message in (
+                "invalid seal estimator",
+                "incompatible seal estimator",
+                "seal estimator requires execution timing",
+                "seal estimator has no trained coefficients",
+            )
+        ):
+            raise HTTPException(status_code=422, detail=str(error)) from error
         raise
 
 

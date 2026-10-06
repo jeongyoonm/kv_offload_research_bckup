@@ -48,6 +48,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_full_prediction_wait": False,
     "late_seal_coalesced_notifications": False,
     "late_seal_freeze_estimator": False,
+    "late_seal_calibration": "legacy",
     "late_seal_wait_trace": False,
     "late_seal_prediction_reserve_us": 10_000,
     "late_seal_prediction_scale_percent": 100,
@@ -83,6 +84,8 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         if key not in result or type(value) is not type(result[key]):
             raise ValueError(f"invalid experimental option: {key}")
         result[key] = value
+    if result["late_seal_calibration"] not in ("legacy", "raw", "shape"):
+        raise ValueError("invalid experimental option: late_seal_calibration")
     for key, upper in (
         ("zero_token_queue_credit", 1),
         ("late_admission_mode", 4),

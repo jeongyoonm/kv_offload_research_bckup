@@ -1045,9 +1045,14 @@ class AsyncLLM(EngineClient):
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
+        if seal_estimator is None:
+            return await self.engine_core.set_kv_load_scheduling_async(
+                early_load_completion, schedule_delay_ms, experiment_options
+            )
         return await self.engine_core.set_kv_load_scheduling_async(
-            early_load_completion, schedule_delay_ms, experiment_options
+            early_load_completion, schedule_delay_ms, experiment_options, seal_estimator
         )
 
     async def reset_encoder_cache(self) -> None:

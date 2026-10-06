@@ -1751,7 +1751,8 @@ class EngineCore:
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
         readiness = self.early_load_readiness
         if readiness is None:
             raise RuntimeError("the early KV readiness experiment is not enabled")
@@ -1764,6 +1765,38 @@ class EngineCore:
         from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 
         options = validate_experiment_options(experiment_options or {})
+        estimator_result = {}
+        restored_estimator = None
+        if seal_estimator is not None:
+            from vllm.v1.kv_offload.seal_predictor import (
+                ComputeEstimator,
+                estimator_context,
+            )
+
+            action = seal_estimator.get("action")
+            expected_keys = {"action", "state"} if action == "load" else {"action"}
+            if (
+                action not in ("status", "export", "load")
+                or set(seal_estimator) != expected_keys
+            ):
+                raise ValueError("invalid seal estimator action")
+            if self.deferral_timing is None:
+                raise ValueError("seal estimator requires execution timing")
+            context = estimator_context(self.vllm_config)
+            self.deferral_timing.collect()
+            estimator = self.deferral_timing.seal_estimator
+            if action == "load":
+                restored_estimator = ComputeEstimator.from_state_dict(
+                    seal_estimator["state"], context
+                )
+                estimator_result = {"loaded": True, "context": context}
+            elif action == "export":
+                estimator_result = {"state": estimator.state_dict(context)}
+            else:
+                estimator_result = {
+                    "context": context,
+                    "trained": estimator.coefficients is not None,
+                }
         diagnostic_mode = options["timing_diagnostic_mode"]
         if options["cooperative_response_progress"]:
             from vllm.v1.executor.multiproc_executor import MultiprocExecutor
@@ -2077,8 +2110,13 @@ class EngineCore:
             )
             self.scheduler._late_admission_records = []
         if self.deferral_timing is not None:
+            if restored_estimator is not None:
+                self.deferral_timing.seal_estimator = restored_estimator
             self.deferral_timing.seal_estimator.frozen = options[
                 "late_seal_freeze_estimator"
+            ]
+            self.deferral_timing.seal_estimator.calibration_mode = options[
+                "late_seal_calibration"
             ]
         readiness.configure(early_load_completion, schedule_delay_ms)
         readiness.experiment_options = options
@@ -2109,6 +2147,11 @@ class EngineCore:
                 replay_result = timing_replay.replay(self)
                 self._timing_diagnostic_failed = False
         return {
+            **(
+                {"seal_estimator": estimator_result}
+                if seal_estimator is not None
+                else {}
+            ),
             **({"timing_replay_result": replay_result} if action != "none" else {}),
             "early_load_completion": readiness.enabled,
             "schedule_delay_ms": readiness.schedule_delay_ms,

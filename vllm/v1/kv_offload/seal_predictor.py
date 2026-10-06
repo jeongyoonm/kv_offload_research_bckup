@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Online compute duration estimates for experimental late sealing."""
 
+import math
 from collections import deque
 
 import numpy as np
@@ -12,12 +13,16 @@ class ComputeEstimator:
 
     def __init__(self):
         self.frozen = False
+        self.calibration_mode = "legacy"
         self.samples: deque[tuple[np.ndarray, float]] = deque(maxlen=128)
         self.coefficients = None
         self.errors: deque[float] = deque(maxlen=32)
         self.preparation_ns: deque[int] = deque(maxlen=64)
         self.preparation_shapes: deque[tuple[np.ndarray, int]] = deque(maxlen=128)
         self.recent_preparation: deque[tuple[np.ndarray, int, str]] = deque(maxlen=128)
+        self.calibration_samples: deque[tuple[np.ndarray, np.ndarray, str, float]] = (
+            deque(maxlen=128)
+        )
 
     def observe_preparation(self, records, data=None):
         if self.frozen:
@@ -128,11 +133,43 @@ class ComputeEstimator:
         if self.coefficients is None or features is None:
             return None
         duration = float(features @ self.coefficients)
-        # Online residuals compensate systematic underestimation without a floor.
-        correction = (
-            max(1.0, float(np.quantile(self.errors, 0.75))) if self.errors else 1.0
-        )
+        correction = self.calibration_factor(data)
         return max(1_000_000, int(duration * correction * 1_000_000))
+
+    @staticmethod
+    def compute_regime(data):
+        shapes = data.get("request_shapes", [])
+        if shapes and all(n == 1 for n, _ in shapes):
+            return "decode"
+        return ComputeEstimator.preparation_regime(data)
+
+    def calibration_factor(self, data):
+        """Calibrate raw fitted costs, optionally using nearby execution shapes."""
+        if self.calibration_mode == "legacy":
+            return (
+                max(1.0, float(np.quantile(self.errors, 0.75))) if self.errors else 1.0
+            )
+        samples = list(self.calibration_samples)
+        if not samples or self.coefficients is None:
+            return 1.0
+        if self.calibration_mode == "shape":
+            regime = self.compute_regime(data)
+            samples = [s for s in samples if s[2] == regime]
+            query = self.preparation_shape(data)
+            if query is None or not samples:
+                return 1.0
+            distances = [
+                float(np.linalg.norm(np.log1p(query) - np.log1p(s[1]))) for s in samples
+            ]
+            near = [i for i in np.argsort(distances)[:8] if distances[i] <= 0.5]
+            if len(near) >= 2:
+                samples = [samples[i] for i in near]
+        ratios = [
+            duration / raw
+            for features, _, _, duration in samples
+            if (raw := float(features @ self.coefficients)) > 0
+        ]
+        return float(np.quantile(ratios, 0.75)) if ratios else 1.0
 
     def observe(self, data, execution):
         if self.frozen:
@@ -148,10 +185,25 @@ class ComputeEstimator:
         ):
             return
         duration_ms = max(r[6] for r in execution) / 1_000_000
-        estimate = self.predict(data)
+        estimate = None
+        if self.coefficients is not None:
+            correction = (
+                max(1.0, float(np.quantile(self.errors, 0.75))) if self.errors else 1.0
+            )
+            estimate = max(
+                1_000_000, int(float(features @ self.coefficients) * correction * 1e6)
+            )
         if estimate:
             self.errors.append(duration_ms / (estimate / 1_000_000))
         self.samples.append((features, duration_ms))
+        self.calibration_samples.append(
+            (
+                features,
+                self.preparation_shape(data),
+                self.compute_regime(data),
+                duration_ms,
+            )
+        )
         if len(self.samples) < 8:
             return
         x = np.vstack([sample[0] for sample in self.samples])
@@ -169,3 +221,149 @@ class ComputeEstimator:
                     / max(float(x[:, column] @ x[:, column]), 1e-12),
                 )
         self.coefficients = coefficients
+
+    def state_dict(self, context):
+        """Export bounded training state as JSON data without runtime flags."""
+        if self.coefficients is None:
+            raise ValueError("seal estimator has no trained coefficients")
+        return dict(
+            schema=1,
+            feature_schema="tokens8192_attention1e8_requests8.v1",
+            context=context,
+            coefficients=self.coefficients.tolist(),
+            samples=[[f.tolist(), y] for f, y in self.samples],
+            errors=list(self.errors),
+            calibration_samples=[
+                [f.tolist(), shape.tolist(), regime, y]
+                for f, shape, regime, y in self.calibration_samples
+            ],
+            preparation_ns=list(self.preparation_ns),
+            preparation_shapes=[[s.tolist(), n] for s, n in self.preparation_shapes],
+            recent_preparation=[
+                [s.tolist(), n, regime] for s, n, regime in self.recent_preparation
+            ],
+        )
+
+    @classmethod
+    def from_state_dict(cls, state, context):
+        """Validate completely before publishing a restored estimator."""
+        keys = {
+            "schema",
+            "feature_schema",
+            "context",
+            "coefficients",
+            "samples",
+            "errors",
+            "calibration_samples",
+            "preparation_ns",
+            "preparation_shapes",
+            "recent_preparation",
+        }
+        if (
+            not isinstance(state, dict)
+            or set(state) != keys
+            or type(state["schema"]) is not int
+            or state["schema"] != 1
+            or state["feature_schema"] != "tokens8192_attention1e8_requests8.v1"
+            or state["context"] != context
+        ):
+            raise ValueError("incompatible seal estimator snapshot")
+
+        def number(value, *, positive=False):
+            try:
+                finite = type(value) in (int, float) and math.isfinite(value)
+            except OverflowError:
+                finite = False
+            if not finite or value < 0 or (positive and value == 0):
+                raise ValueError("invalid seal estimator numeric value")
+            return value
+
+        def vector(value, size):
+            if not isinstance(value, list) or len(value) != size:
+                raise ValueError("invalid seal estimator vector")
+            return np.array([number(v) for v in value], dtype=float)
+
+        def rows(key, bound, size=None):
+            values = state[key]
+            if (
+                not isinstance(values, list)
+                or len(values) > bound
+                or (
+                    size is not None
+                    and any(not isinstance(v, list) or len(v) != size for v in values)
+                )
+            ):
+                raise ValueError("invalid seal estimator history")
+            return values
+
+        def duration(value):
+            if type(value) is not int:
+                raise ValueError("invalid seal estimator preparation duration")
+            return number(value)
+
+        def regime(value):
+            if value not in ("cached", "cold", "mixed", "decode"):
+                raise ValueError("invalid seal estimator regime")
+            return value
+
+        estimator = cls()
+        estimator.coefficients = vector(state["coefficients"], 4)
+        for features, y in rows("samples", 128, 2):
+            estimator.samples.append((vector(features, 4), number(y, positive=True)))
+        for error in rows("errors", 32):
+            estimator.errors.append(number(error, positive=True))
+        for features, shape, r, y in rows("calibration_samples", 128, 4):
+            estimator.calibration_samples.append(
+                (
+                    vector(features, 4),
+                    vector(shape, 3),
+                    regime(r),
+                    number(y, positive=True),
+                )
+            )
+        for n in rows("preparation_ns", 64):
+            estimator.preparation_ns.append(duration(n))
+        for shape, n in rows("preparation_shapes", 128, 2):
+            estimator.preparation_shapes.append((vector(shape, 3), duration(n)))
+        for shape, n, r in rows("recent_preparation", 128, 3):
+            estimator.recent_preparation.append(
+                (vector(shape, 3), duration(n), regime(r))
+            )
+        return estimator
+
+
+def estimator_context(config):
+    """Identify the model and execution environment for snapshot compatibility."""
+    import torch
+
+    from vllm.platforms import current_platform
+
+    model = config.model_config
+    parallel = config.parallel_config
+    scheduler = config.scheduler_config
+    extra = config.kv_transfer_config.kv_connector_extra_config
+    capability = current_platform.get_device_capability()
+    if capability is None:
+        raise ValueError("invalid seal estimator GPU capability")
+    return dict(
+        model=model.model,
+        revision=model.revision,
+        dtype=str(model.dtype),
+        quantization=model.quantization,
+        kv_dtype=config.cache_config.cache_dtype,
+        block_size=config.cache_config.block_size,
+        tensor_parallel=parallel.tensor_parallel_size,
+        pipeline_parallel=parallel.pipeline_parallel_size,
+        expert_parallel=parallel.enable_expert_parallel,
+        max_batch_tokens=scheduler.max_num_batched_tokens,
+        max_sequences=scheduler.max_num_seqs,
+        chunked_prefill=scheduler.enable_chunked_prefill,
+        enforce_eager=model.enforce_eager,
+        cudagraph_mode=str(config.compilation_config.cudagraph_mode),
+        torch_version=str(torch.__version__),
+        gpu_name=current_platform.get_device_name(),
+        gpu_capability=list(capability),
+        async_h2d=extra.get("async_h2d_submission", False),
+        h2d_chunk_bytes=extra.get("async_h2d_chunk_bytes", 0),
+        execution_schema="cuda_event_start_to_finish.v1",
+    )

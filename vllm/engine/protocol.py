@@ -184,7 +184,8 @@ class EngineClient(ABC):
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
         """Configure the experiment-only KV readiness scheduling policy."""
         raise NotImplementedError
 

@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Check estimates against synthetic compute costs and cold start fallback."""
 
+import numpy as np
 import pytest
 
 from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
@@ -114,3 +115,86 @@ def test_frozen_estimator_preserves_forecast_and_preparation_reserve():
     assert len(estimator.preparation_ns) == 1
     assert estimator.predict(data) == forecast
     assert estimator.preparation_reserve(10_000_000, data) == reserve
+
+
+def test_raw_calibration_does_not_dampen_its_previous_correction():
+    """A constant raw underestimate must receive the full measured correction."""
+    estimator = ComputeEstimator()
+    estimator.coefficients = np.array([100.0, 0.0, 0.0, 0.0])
+    estimator.calibration_mode = "raw"
+    data = {"step": 1, "request_shapes": [[3072, 58368]] * 2}
+    execution = [(1, 1, 2, 3, 10, 1, 200_000_000, 8, 9)] * 8
+    for _ in range(6):
+        estimator.observe(data, execution)
+        assert estimator.predict(data) == 200_000_000
+
+
+def test_shape_calibration_separates_small_cached_batches_and_cold_work():
+    """Global residuals must not hide a repeatable small cached-batch cost."""
+    estimator = ComputeEstimator()
+    estimator.coefficients = np.array([100.0, 0.0, 0.0, 0.0])
+    for size, context, duration in [(2, 58368, 180), (8, 58368, 100), (1, 0, 1000)]:
+        for _ in range(2):
+            data = {"step": 1, "request_shapes": [[3072, context]] * size}
+            estimator.observe(
+                data, [(1, 1, 2, 3, 10, 1, duration * 1_000_000, 8, 9)] * 8
+            )
+    estimator.calibration_mode = "shape"
+    assert estimator.predict({"request_shapes": [[3072, 58368]] * 2}) == 180_000_000
+    assert estimator.predict({"request_shapes": [[3072, 58368]] * 8}) == 100_000_000
+    assert estimator.predict({"request_shapes": [[3072, 0]]}) == 1_000_000_000
+
+
+@pytest.mark.parametrize("mode", ["legacy", "raw", "shape"])
+def test_json_snapshot_preserves_predictions_and_reserves_without_retraining(mode):
+    import json
+
+    estimator = ComputeEstimator()
+    for step in range(1, 25):
+        data = {"step": step, "request_shapes": [[512 * (1 + step % 8), 8192]]}
+        f = estimator.features(data)
+        n = int((5 + 90 * f[1] + 15 * f[2]) * 1e6)
+        estimator.observe(data, [(step, 1, 2, 3, 10, 1, n, 8, 9)] * 8)
+        estimator.observe_preparation(
+            [(step, 1, 20_000_001, 0, 0, 0, 0, 1, 0)] * 8, data
+        )
+    context = {"model": "test-model", "tp": 8, "kv_dtype": "fp8"}
+    state = json.loads(json.dumps(estimator.state_dict(context), allow_nan=False))
+    restored = ComputeEstimator.from_state_dict(state, context)
+    estimator.calibration_mode = restored.calibration_mode = mode
+    estimator.frozen = restored.frozen = True
+    query = {"step": 100, "request_shapes": [[2048, 8192]]}
+    restored.observe(query, [(100, 1, 2, 3, 10, 1, 900_000_000, 8, 9)] * 8)
+    restored.observe_preparation([(100, 1, 900_000_001, 0, 0, 0, 0, 1, 0)] * 8, query)
+    assert restored.state_dict(context) == state
+    assert restored.predict(query) == estimator.predict(query)
+    assert restored.preparation_reserve(
+        10_000_000, query
+    ) == estimator.preparation_reserve(10_000_000, query)
+    assert restored.recent_preparation_reserve(
+        10_000_000, query
+    ) == estimator.recent_preparation_reserve(10_000_000, query)
+
+
+@pytest.mark.parametrize(
+    "corruption", ["context", "schema", "nan", "vector", "overflow", "regime"]
+)
+def test_snapshot_rejects_incompatible_or_corrupt_training_state(corruption):
+    estimator = ComputeEstimator()
+    estimator.coefficients = np.array([100.0, 0.0, 0.0, 0.0])
+    context = {"model": "test-model", "tp": 8}
+    state = estimator.state_dict(context)
+    if corruption == "context":
+        state["context"] = {"model": "other-model", "tp": 8}
+    elif corruption == "schema":
+        state["schema"] = 99
+    elif corruption == "nan":
+        state["coefficients"][0] = float("nan")
+    elif corruption == "vector":
+        state["coefficients"] = [100.0]
+    elif corruption == "overflow":
+        state["errors"] = [1.0] * 33
+    else:
+        state["calibration_samples"] = [[[1, 1, 1, 1], [1, 1, 1], "invalid", 100]]
+    with pytest.raises(ValueError):
+        ComputeEstimator.from_state_dict(state, context)

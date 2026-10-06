@@ -32,6 +32,7 @@ def stats(values):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("root", type=Path)
+    parser.add_argument("--control", default="compact_shadow")
     args = parser.parse_args()
     run = args.root / "canary/gpu"
     provenance = read(run / "provenance.json")
@@ -217,7 +218,7 @@ def main():
         )
     assert len({r["h2d_bytes"] for r in cells}) == 1
     controls = {
-        r["cell"].split("_")[0]: r for r in cells if "_compact_shadow" in r["cell"]
+        r["cell"].split("_")[0]: r for r in cells if f"_{args.control}" in r["cell"]
     }
     for r in cells:
         control = controls[r["cell"].split("_")[0]]

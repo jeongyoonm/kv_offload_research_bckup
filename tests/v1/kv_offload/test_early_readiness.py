@@ -2152,6 +2152,35 @@ def test_dispatch_load_ledger_exact_tokens_and_reclamation():
     assert ledger.snapshot() is None
 
 
+def test_forecast_load_age_uses_received_completions_and_resets(monkeypatch):
+    """Future receipts cannot change a forecast snapshot already returned."""
+    from vllm.v1.kv_offload import scheduling_deferral as module
+
+    now = [1_000_000]
+    monkeypatch.setattr(module.time, "monotonic_ns", lambda: now[0])
+    ledger = module.OutstandingLoads()
+    ledger.dispatch(
+        {
+            1: SimpleNamespace(external_tokens=100),
+            2: SimpleNamespace(external_tokens=200),
+        }
+    )
+    now[0] = 3_000_000
+    ledger.dispatch({3: SimpleNamespace(external_tokens=300)})
+    now[0] = 4_000_000
+    ledger.complete(1)
+    ledger.complete(1)
+    data = {"dispatch_ns": 2_000_000}
+    snapshot = ledger.forecast_features(data, 5_000_000)
+    assert snapshot == [2, 500, 2.0, 4.0, 2.8, 1, 200, 1, 300, 100]
+    now[0] = 6_000_000
+    ledger.complete(2)
+    assert snapshot == [2, 500, 2.0, 4.0, 2.8, 1, 200, 1, 300, 100]
+    assert len(ledger.completed) == 2
+    ledger.reset()
+    assert ledger.forecast_features(data, 7_000_000) == [0] * 10
+
+
 def test_fill_exits_on_execution_completion_before_primary_channel(monkeypatch):
     core, timing, clock, outstanding = _fill_core(monkeypatch)
     assert core._defer_fill_scheduling(dict(a=False), outstanding, 1, True)

@@ -52,6 +52,62 @@ def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
     )
 
 
+def test_causal_surface_uses_current_receipts_and_validated_start_generation():
+    from vllm.v1.kv_offload.latency_surface import (
+        FEATURE_NAMES,
+        FORECAST_NAMES,
+        LatencySurface,
+    )
+
+    state = transfer_surface_state()
+    state.update(
+        schema=2,
+        target_schema="critical_end_after_all_rank_start.v1",
+        feature_names=FEATURE_NAMES + FORECAST_NAMES,
+    )
+    state["trees"][0][0][2] = 11
+    model = LatencySurface(state)
+    data = dict(
+        step=1,
+        request_shapes=[[3072, 58368]],
+        load_state=[3, 300],
+        dispatch_ns=1_000_000,
+        forecast_ns=7_000_000,
+        execution_snapshot=[[1, 4_000_000, 4_000_000, 4_000_000, 5_000_000, 1, 0, 0, 0]]
+        * 8,
+        forecast_load_features=[1, 100, 3.0, 3.0, 3.0, 1, 100, 0, 0, 0],
+    )
+    assert model.input_features(data)[11:].tolist() == [
+        1,
+        100,
+        3.0,
+        3.0,
+        3.0,
+        1,
+        100,
+        0,
+        0,
+        0,
+        3.0,
+        3.0,
+    ]
+    assert model.predict(data) == 100_000_000
+    records = data["execution_snapshot"]
+    assert isinstance(records, list)
+    records[-1] = [
+        2,
+        4_000_000,
+        4_000_000,
+        4_000_000,
+        5_000_000,
+        1,
+        0,
+        0,
+        0,
+    ]
+    assert model.predict(data) is None
+
+
 @pytest.mark.parametrize("mutation", ["cycle", "shared_child", "nan", "huge", "leaf"])
 def test_surface_rejects_invalid_graphs_before_estimator_publication(mutation):
     """Untrusted saved graphs cannot hang inference or publish invalid costs."""

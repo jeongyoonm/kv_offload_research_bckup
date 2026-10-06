@@ -774,7 +774,32 @@ def stage_rpc(core, step, base, candidates):
                             and len(records) == world
                             and valid_snapshot(records, a_step, time.monotonic_ns())
                         ):
-                            predicted = timing.seal_estimator.predict(data)
+                            model = getattr(
+                                timing.seal_estimator, "latency_surface", None
+                            )
+                            prediction_data = data
+                            forecast_ns = time.monotonic_ns()
+                            if model is not None and model.requires_forecast:
+                                prediction_data = dict(
+                                    data,
+                                    execution_snapshot=records,
+                                    forecast_ns=forecast_ns,
+                                    forecast_load_features=(
+                                        timing.loads.forecast_features(
+                                            data, forecast_ns
+                                        )
+                                        if model.requires_load_progress
+                                        else None
+                                    ),
+                                )
+                            prediction_begin_ns = time.monotonic_ns()
+                            predicted = timing.seal_estimator.predict(prediction_data)
+                            prediction_cost_ns = (
+                                time.monotonic_ns() - prediction_begin_ns
+                            )
+                            point_features = (
+                                model.input_features(prediction_data) if model else None
+                            )
                             if predicted:
                                 predicted = (
                                     predicted
@@ -801,6 +826,19 @@ def stage_rpc(core, step, base, candidates):
                                         timing.seal_estimator.preparation_ns
                                     ),
                                     preparation_reserve_ns=reserve_ns,
+                                    prediction_cost_ns=prediction_cost_ns,
+                                    predictor_target=(
+                                        model.target_schema
+                                        if model is not None
+                                        and point_features is not None
+                                        else "cuda_span_max.v1"
+                                    ),
+                                    predictor_input=(
+                                        point_features.tolist()
+                                        if point_features is not None
+                                        else None
+                                    ),
+                                    forecast_ns=forecast_ns,
                                 )
                                 record(
                                     core.scheduler,

@@ -31,14 +31,52 @@ def main():
     parser.add_argument("--corpus", type=Path, required=True)
     parser.add_argument("--base-model", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--mode", choices=["shape", "dispatch"], default="dispatch")
+    parser.add_argument(
+        "--mode",
+        choices=[
+            "shape",
+            "dispatch",
+            "dispatch_skew",
+            "causal",
+            "causal_skew",
+            "causal_offsets",
+        ],
+        default="dispatch",
+    )
+    parser.add_argument("--target", choices=["raw", "aligned"], default="raw")
     parser.add_argument("--leaf", type=int, default=5)
     args = parser.parse_args()
     rows = [json.loads(line) for line in args.corpus.read_text().splitlines()]
+    if args.target == "aligned" or args.mode not in ("shape", "dispatch"):
+        rows = [
+            r
+            for r in rows
+            if all(
+                0 < e[2] <= e[3] and e[3] - e[2] <= 2_000_000
+                for e in r["execution_ranks"]
+            )
+        ]
     x = np.stack([features(r) for r in rows])
+    names = list(production.FEATURE_NAMES)
+    starts = np.array([[e[3] for e in r["execution_ranks"]] for r in rows])
+    offsets = (starts - starts.min(axis=1)[:, None]) / 1e6
+    skew = offsets.max(axis=1)
     if args.mode == "shape":
         x = x[:, :9]
+        names = names[:9]
+    if args.mode.startswith("causal"):
+        x = np.column_stack((x, [r["forecast_features"] for r in rows]))
+        names += production.FORECAST_NAMES
+    if args.mode.endswith("skew"):
+        x = np.column_stack((x, skew))
+        names += production.SKEW_NAMES
+    if args.mode == "causal_offsets":
+        x = np.column_stack((x, offsets))
+        names += production.OFFSET_NAMES
     y = np.array([r["duration_ms"] for r in rows])
+    if args.target == "aligned":
+        durations = np.array([[e[6] / 1e6 for e in r["execution_ranks"]] for r in rows])
+        y = (offsets + durations).max(axis=1) - skew
     counts = Counter(r["workload"] for r in rows)
     weight = np.array([1 / max(counts[r["workload"]], 50) for r in rows])
     weight *= len(weight) / sum(weight)
@@ -65,8 +103,13 @@ def main():
             ]
         )
     surface = dict(
-        schema=1,
-        feature_names=production.FEATURE_NAMES[: x.shape[1]],
+        schema=2,
+        target_schema=(
+            "cuda_span_max.v1"
+            if args.target == "raw"
+            else "critical_end_after_all_rank_start.v1"
+        ),
+        feature_names=names,
         trees=trees,
         provenance=dict(
             corpus=str(args.corpus),
@@ -76,9 +119,13 @@ def main():
             sklearn_version=sklearn.__version__,
             seed=17,
             min_samples_leaf=args.leaf,
-            features_available_at="dispatch",
+            features_available_at=(
+                "forecast issuance"
+                if args.mode not in ("shape", "dispatch")
+                else "dispatch"
+            ),
             repeated_training_required=False,
-            target="slowest rank CUDA event span after input preparation",
+            target=args.target,
         ),
     )
     restored = production.LatencySurface(json.loads(json.dumps(surface)))
@@ -86,8 +133,17 @@ def main():
     errors = []
     reference = model.predict(x)
     for row, expected in zip(rows, reference):
+        prediction_data = dict(row)
+        if restored.requires_forecast:
+            prediction_data.update(
+                execution_snapshot=row["execution_ranks"],
+                forecast_ns=row.get(
+                    "forecast_time_ns", max(e[3] for e in row["execution_ranks"])
+                ),
+                forecast_load_features=row.get("forecast_features", [])[:10],
+            )
         begin = time.perf_counter_ns()
-        actual = restored.predict(row)
+        actual = restored.predict(prediction_data)
         timings.append(time.perf_counter_ns() - begin)
         errors.append(abs(actual - expected * 1e6))
     assert max(errors) <= 2, f"Production prediction differs by {max(errors)}ns"
@@ -96,6 +152,7 @@ def main():
     base["provenance"] = dict(
         training_source=str(args.corpus),
         mode=args.mode,
+        target=args.target,
         frozen_model=True,
         base_snapshot=str(args.base_model),
     )

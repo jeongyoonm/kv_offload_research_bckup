@@ -90,4 +90,6 @@ Run the GLM TP8 startup and CPU-restore canary:
 The canary retains the 2.13 TB CPU budget and disables THP only in its server
 process and descendants. It uses an isolated cache directory and port, resets
 GPU prefix state while retaining CPU entries, and checks external cache hits and
-cold/restore outputs. It stops its own server when finished.
+GPU-cached/CPU-restored outputs with equal cached token counts. Cold outputs are
+also recorded. It stops its own server when finished. Use
+`--flashinfer-workspace PATH` to reuse an existing isolated kernel cache.

@@ -75,6 +75,7 @@ def main():
     source = Path(__file__).resolve().parents[1]
     args.output.mkdir(parents=True, exist_ok=True)
     with socket.socket() as port_check:
+        port_check.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         port_check.bind(("127.0.0.1", args.port))
     existing = subprocess.check_output(
         ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"],
@@ -217,6 +218,13 @@ def main():
                     "ignore_eos": True,
                 }
                 cold = json.loads(_call(base, "/v1/completions", payload))
+                gpu_before = _counters(_call(base, "/metrics"))
+                gpu_cached = json.loads(_call(base, "/v1/completions", payload))
+                gpu_after = _counters(_call(base, "/metrics"))
+                gpu_delta = {
+                    key: gpu_after.get(key, 0) - gpu_before.get(key, 0)
+                    for key in gpu_after
+                }
                 _reset(base, False)
                 before = _counters(_call(base, "/metrics"))
                 restored = json.loads(_call(base, "/v1/completions", payload))
@@ -227,9 +235,13 @@ def main():
                 probe = {
                     "index": index,
                     "cold": cold,
+                    "gpu_cached": gpu_cached,
                     "restored": restored,
+                    "gpu_counter_delta": gpu_delta,
                     "counter_delta": delta,
-                    "text_equal": cold["choices"][0]["text"]
+                    "text_equal": gpu_cached["choices"][0]["text"]
+                    == restored["choices"][0]["text"],
+                    "cold_text_equal": cold["choices"][0]["text"]
                     == restored["choices"][0]["text"],
                 }
                 probes.append(probe)
@@ -238,7 +250,13 @@ def main():
                 )
                 assert delta.get("vllm:external_prefix_cache_hits_total", 0) > 0
                 assert delta.get("vllm:prefix_cache_hits_total", 0) == 0
-                assert probe["text_equal"], "cold/restore text mismatch"
+                assert gpu_delta.get("vllm:prefix_cache_hits_total", 0) > 0
+                assert gpu_delta.get("vllm:external_prefix_cache_hits_total", 0) == 0
+                assert (
+                    gpu_cached["usage"]["prompt_tokens_details"]["cached_tokens"]
+                    == restored["usage"]["prompt_tokens_details"]["cached_tokens"]
+                )
+                assert probe["text_equal"], "GPU-cache/CPU-restore text mismatch"
                 print(
                     json.dumps({"probe": index, "passed": True, "delta": delta}),
                     flush=True,

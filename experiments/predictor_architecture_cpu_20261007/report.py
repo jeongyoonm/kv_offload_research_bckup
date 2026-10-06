@@ -6,6 +6,7 @@ import argparse
 import csv
 import hashlib
 import json
+import os
 import platform
 from pathlib import Path
 
@@ -13,6 +14,7 @@ import matplotlib
 import numpy as np
 import sklearn
 from study import LABELS, MODELS, dump, metrics
+from threadpoolctl import threadpool_info, threadpool_limits
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
@@ -359,6 +361,32 @@ def markdown(output, report):
         lines.append(f"| {LABELS[name]} | " + " | ".join(cells) + " |")
     lines += [
         "",
+        "### Architecture contrasts on matched data",
+        "",
+        "Each pair uses the same available training rows. Values are the MAE",
+        "of the first design minus the second, with episode-bootstrap intervals.",
+        "A negative difference favors the first design.",
+        "",
+        "| Designs | MAE difference (ms), 95% interval |",
+        "|---|---:|",
+    ]
+    contrasts = [
+        ("trees_tuned", "tree_direct"),
+        ("trees_tuned", "tree_base_only"),
+        ("tree_mlp", "tree_base_only"),
+        ("mlp_mlp", "mlp_direct"),
+        ("mlp_mlp", "mlp_base_only"),
+        ("mlp_tree", "mlp_base_only"),
+    ]
+    for alternative, reference in contrasts:
+        v = groups["episode_matched"]["paired_by_reference"][reference][alternative]
+        lines.append(
+            f"| {LABELS[alternative]} vs {LABELS[reference]} | "
+            f"{v['difference_ms']:+.2f} [{v['lower95_ms']:+.2f}, "
+            f"{v['upper95_ms']:+.2f}] |"
+        )
+    lines += [
+        "",
         "## Frozen CPU inference",
         "",
         "Historical-wide checkpoints; 3,350 randomized single-row calls per",
@@ -485,6 +513,15 @@ def main():
         groups[name] = {
             "scores": scores(array),
             "paired_vs_current": paired_bootstrap(array, "trees_fixed"),
+            "paired_by_reference": {
+                reference: paired_bootstrap(array, reference)
+                for reference in [
+                    "tree_direct",
+                    "tree_base_only",
+                    "mlp_direct",
+                    "mlp_base_only",
+                ]
+            },
             "folds": folders,
         }
     details = {}
@@ -492,6 +529,10 @@ def main():
         if task.get("workload"):
             array = load_predictions(output, [task["name"]])
             details[task["workload"]] = {"scores": scores(array)}
+    reproduction = groups["historical_wide"]["scores"]["trees_fixed"]
+    assert abs(reproduction["mae_ms"] - 19.6244341373) < 0.001
+    assert abs(reproduction["mape_percent"] - 5.0368601527) < 0.001
+    checks["previous_fixed_recipe_reproduced"] = True
     runtime = json.loads((output / "runtime.json").read_text())
     assert len(runtime) == 30
     assert all(r["max_equivalence_error_ms"] < 1e-4 for r in runtime)
@@ -505,6 +546,19 @@ def main():
             "sklearn": sklearn.__version__,
             "numpy": np.__version__,
             "cpu_only": True,
+            "platform": platform.platform(),
+            "cpu_affinity_count": len(os.sched_getaffinity(0)),
+            "cpu_model": next(
+                line.split(":", 1)[1].strip()
+                for line in Path("/proc/cpuinfo").read_text().splitlines()
+                if line.startswith("model name")
+            ),
+            "native_tree_sha256": hashlib.sha256(
+                Path(
+                    "/mnt/localnvme/glm53_predictor_overnight_20261006/"
+                    "fast_forest/build/libpredictor_forest_walk.so"
+                ).read_bytes()
+            ).hexdigest(),
         },
         "code_sha256": {
             name: hashlib.sha256(
@@ -514,6 +568,8 @@ def main():
         },
         "inventory": json.loads((output / "inventory.json").read_text()),
     }
+    with threadpool_limits(limits=1):
+        report["environment"]["single_thread_libraries"] = threadpool_info()
     dump(output / "summary.json", report)
     write_csv(output, groups, runtime)
     figure(output, groups, runtime)

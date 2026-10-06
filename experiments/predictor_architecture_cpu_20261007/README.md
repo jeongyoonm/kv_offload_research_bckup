@@ -8,8 +8,9 @@ under `/mnt/localnvme/glm53_predictor_architecture_cpu_20261007`.
 
 Compare the existing fixed tree recipe, tuned tree base plus tree correction,
 tree and MLP bases alone, both crossed combinations of tree/MLP base and
-correction, a two-stage MLP, and direct boosted-tree/MLP regressors. All models
-use the same 11 workload inputs and 12 causal runtime inputs. Two-stage
+correction, a two-stage MLP, and direct boosted-tree/MLP regressors. Base-only
+models use the same 11 workload inputs; complete predictors also receive 12
+causal runtime inputs. Two-stage
 corrections additionally receive an out-of-fold base prediction. Actual durations,
 GPU end markers, phase names, episode identity, and workload labels never enter
 the feature matrix. Workload labels are used only for sampling weights and splits.
@@ -76,3 +77,15 @@ experiments/predictor_architecture_cpu_20261007/study.py \
 The runner persists per-fold audits, tuning records, paired predictions, and
 checkpoints, and resumes completed folds. Re-run the CPU latency benchmark
 sequentially after all fitting processes exit.
+
+Generate the audited report and figures after the runner completes:
+
+```bash
+/mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
+experiments/predictor_architecture_cpu_20261007/report.py \
+--output /mnt/localnvme/glm53_predictor_architecture_cpu_20261007
+```
+
+Three CPU contract checks in `verify.py` cover frozen MLP inference with
+training-only scaling, signed boosted-tree export, and selecting signed
+corrections by their complete forecast error.

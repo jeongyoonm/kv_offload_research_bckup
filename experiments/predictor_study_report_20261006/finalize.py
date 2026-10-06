@@ -78,8 +78,8 @@ def main():
             for p in root.glob("*/decision.json")
         },
         layer_outcomes=(
-            json.loads((root / "online_live/analysis/outcomes.json").read_text())
-            if (root / "online_live/analysis/outcomes.json").is_file()
+            json.loads((root / "layer_joint/analysis/outcomes.json").read_text())
+            if (root / "layer_joint/analysis/outcomes.json").is_file()
             else None
         ),
     )

@@ -19,6 +19,7 @@ PHASES = [
     "submission_progress",
     "transfer_progress",
     "mixed",
+    "dense_validation",
     "online_live",
     "generalization",
 ]

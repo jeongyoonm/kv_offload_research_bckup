@@ -50,3 +50,29 @@ All new architectures use the same NumPy-normalized weights. The archived
 checkpoint is reported separately from grouped refits, since it already saw
 some rows used in pooled holdout tests. This numerical sensitivity is included
 when interpreting small differences, and no serving checkpoint is modified.
+
+## Completed evaluation
+
+- All 16 outer tasks completed, including 3 disjoint episode folds in both
+  data regimes and 8 workload holdouts. The runner completed the inference
+  benchmark after all fitting workers exited.
+- 1,536 tuning fits; 240 inner/full cross-fit splits with zero episode overlap.
+- All nine exported architectures passed numerical agreement checks in all
+  outer tasks. Maximum fitted/exported discrepancy: 0.000001991 ms.
+- 30 runtime benchmark entries, each with 3,350 single-row calls, covering both
+  data regimes and both tree inference implementations. Native and NumPy
+  predictions passed agreement checks on all replay samples.
+- Refitted current-tree episode MAE: 13.629 ms; two-stage MLP: 14.681 ms;
+  direct MLP: 16.238 ms. The MLP-base/tree-correction combination is close at
+  13.883 ms, with a paired interval that includes zero versus current trees.
+- Workload holdouts favor different designs: current trees have better macro
+  MAE (38.788 versus direct MLP's 45.927 ms), but direct MLP has better
+  sample-weighted MAE (43.444 versus 51.737 ms), driven by the 60k holdouts.
+- Current native-tree frozen inference averages 31.53 microseconds; direct MLP
+  averages 7.55 microseconds. These use historical-replay checkpoints, distinct
+  from the models retrained in each accuracy fold.
+- 332 tuning trials had optimizer warnings, including 17 selected trials.
+  The report records the fixed optimizer budget and initialization/split limits.
+- The CPU-only report, paired bootstrap intervals, CSVs, summary JSON, and
+  PNG/PDF plots are in the artifact directory. The experiment branch preserves
+  code, protocol, process log, and compact results. Serving remains unchanged.

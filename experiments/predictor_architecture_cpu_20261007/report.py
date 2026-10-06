@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import platform
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -215,6 +216,56 @@ def data_control_table(control):
     return lines
 
 
+def findings(report):
+    episode = report["evaluations"]["episode_wide"]["scores"]
+    held = report["evaluations"]["workload_holdout"]["scores"]
+    matched = report["evaluations"]["episode_matched"]["scores"]
+    current = episode["trees_fixed"]
+    hybrid = report["evaluations"]["episode_wide"]["paired_vs_current"]["mlp_tree"]
+    return [
+        "## Findings",
+        "",
+        "1. With the normal wide-base data, the refitted current architecture",
+        f"   achieves {current['mae_ms']:.2f} ms MAE. The direct MLP achieves",
+        f"   {episode['mlp_direct']['mae_ms']:.2f} ms; the two-stage MLP achieves",
+        f"   {episode['mlp_mlp']['mae_ms']:.2f} ms. These support the existing",
+        "   design under this bounded configuration search.",
+        "2. An MLP base with tree correction is competitive at",
+        f"   {episode['mlp_tree']['mae_ms']:.2f} ms. Its paired difference versus",
+        f"   current trees is {hybrid['difference_ms']:+.2f} ms, with a 95%",
+        f"   interval [{hybrid['lower95_ms']:+.2f}, {hybrid['upper95_ms']:+.2f}].",
+        "   The interval includes zero, supporting both designs in this",
+        "   episode evaluation.",
+        "3. Additional base-training batches account for a substantial part of",
+        "   the advantage: current-tree MAE changes from",
+        f"   {matched['trees_fixed']['mae_ms']:.2f} ms on matched data to",
+        f"   {current['mae_ms']:.2f} ms on wide data; macro MAE changes from",
+        f"   {matched['trees_fixed']['workload_macro_mae_ms']:.2f} to",
+        f"   {current['workload_macro_mae_ms']:.2f} ms. Matched-data contrasts",
+        "   separate this data benefit from the structure of two-stage models.",
+        "4. Unseen-workload macro MAE is",
+        f"   {held['trees_fixed']['workload_macro_mae_ms']:.2f} ms for current trees,",
+        f"   {held['mlp_mlp']['workload_macro_mae_ms']:.2f} ms for two-stage MLP, and",
+        f"   {held['mlp_direct']['workload_macro_mae_ms']:.2f} ms for direct MLP.",
+        "   The per-workload table shows whether one difficult case dominates.",
+        "   Sample-weighted held-workload MAE favors direct MLP instead:",
+        f"   {held['mlp_direct']['mae_ms']:.2f} ms versus",
+        f"   {held['trees_fixed']['mae_ms']:.2f} ms for current trees, driven by",
+        "   improvements on both large 60k workload holdouts. Results favor",
+        "   different designs depending on workload and error metric.",
+        "5. CPU costs are measured independently on historical-replay checkpoints",
+        "   selected in that split, rather than assigning one split's timing to",
+        "   another split's fitted model. Both tree and MLP deployments reuse",
+        "   frozen parameters and need no inference-time training library.",
+        "",
+        "Keep the current serving architecture while interpreting the full",
+        "accuracy, robustness, and timing results together. The study provides",
+        "no new evidence of serving throughput or admission gains from changing",
+        "the regression architecture.",
+        "",
+    ]
+
+
 def figure(output, groups, runtime):
     names = [
         "trees_fixed",
@@ -276,7 +327,7 @@ def figure(output, groups, runtime):
     axes[2].barh(short, y, color=colors)
     axes[2].invert_yaxis()
     axes[2].set_xlabel("Mean CPU inference (µs), lower is better")
-    axes[2].set_title("Frozen inference, one CPU thread")
+    axes[2].set_title("Replay checkpoints, one CPU thread")
     axes[2].grid(axis="x", alpha=0.2)
     axes[2].set_axisbelow(True)
     for i, value in enumerate(y):
@@ -301,6 +352,7 @@ def markdown(output, report):
         "GLM5.3 TP8; existing cached-prefill traces only. All fitting and inference",
         "ran on CPU. No serving predictor was changed and no GPU cells were run.",
         "",
+        *findings(report),
         "## Episode-held-out comparison",
         "",
         "Three disjoint outer episode folds predict each of 3,759 forecasts once.",
@@ -475,6 +527,26 @@ def markdown(output, report):
         )
     lines += [
         "",
+        "## CPU tuning cost",
+        "",
+        "Historical-wide split. Each component searches 12 configurations.",
+        "Shared bases are tuned once and reused across correction designs.",
+        "Times include fitting only. Selected-fit times and warnings describe",
+        "the inner tuning fit, not the later full-training refit. Final-refit",
+        "optimizer warnings were not retained by this runner.",
+        "",
+        "| Component | Search (s) | Selected fit (s) | Iterations | Warning |",
+        "|---|---:|---:|---:|---|",
+    ]
+    for component, v in checks["fold_details"]["historical_wide"]["components"].items():
+        lines.append(
+            f"| {component} | {v['tuning_seconds']:.2f} | "
+            f"{v['selected_tuning_fit_seconds']:.2f} | "
+            f"{v['selected_iterations'] or '—'} | "
+            f"{'Yes' if v['selected_convergence_warnings'] else 'No'} |"
+        )
+    lines += [
+        "",
         "## Training and verification",
         "",
         (
@@ -536,7 +608,33 @@ def markdown(output, report):
         "Code and protocol: `experiments/predictor_architecture_cpu_20261007`.",
         "",
     ]
-    (output / "REPORT.md").write_text("\n".join(lines))
+    formatted, in_table = [], False
+    for line in lines:
+        table_row = line.startswith("|")
+        if table_row and not in_table:
+            formatted.append("<!-- markdownlint-disable MD013 -->")
+        elif in_table and not table_row:
+            formatted.extend(["", "<!-- markdownlint-enable MD013 -->", ""])
+        in_table = table_row
+        if table_row:
+            formatted.append(
+                "| "
+                + " | ".join(cell.strip() for cell in line.strip("|").split("|"))
+                + " |"
+            )
+        elif line:
+            formatted.extend(
+                textwrap.wrap(
+                    line,
+                    width=80,
+                    break_long_words=False,
+                    break_on_hyphens=False,
+                    subsequent_indent="  " if line.startswith("- ") else "",
+                )
+            )
+        elif not formatted or formatted[-1] != "":
+            formatted.append("")
+    (output / "REPORT.md").write_text("\n".join(formatted))
 
 
 def main():
@@ -544,8 +642,12 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     output = args.output
+    inventory = json.loads((output / "inventory.json").read_text())
+    for source, expected in inventory["sources_sha256"].items():
+        assert hashlib.sha256(Path(source).read_bytes()).hexdigest() == expected
     tasks = json.loads((output / "tasks.json").read_text())
     checks = audit(output, tasks)
+    checks["source_hashes_verified"] = len(inventory["sources_sha256"])
     definition = {
         "historical_wide": ["historical_wide"],
         "historical_matched": ["historical_matched"],
@@ -630,7 +732,7 @@ def main():
             ).hexdigest()
             for name in ["study.py", "report.py", "verify.py", "reproduce.py"]
         },
-        "inventory": json.loads((output / "inventory.json").read_text()),
+        "inventory": inventory,
     }
     with threadpool_limits(limits=1):
         report["environment"]["single_thread_libraries"] = threadpool_info()

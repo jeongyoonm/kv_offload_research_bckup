@@ -1,0 +1,14 @@
+{
+  "analysis_exit_code": 0,
+  "repository_hooks_exit_code": 0,
+  "runtime_source_unchanged": true,
+  "training_cells": 6,
+  "training_compute_batches": 84,
+  "balanced_batches_per_path": 36,
+  "held_out_cells": 8,
+  "held_out_compute_batches": 104,
+  "verified_rank_marker_orderings": 1504,
+  "selection_order_seeds": 128,
+  "new_gpu_run": false,
+  "analysis_sha256": "31a95b58e5e4ae0e6cc170adf8c2f8dcaabdfff91c78c98b7b5dc35cee00acab"
+}

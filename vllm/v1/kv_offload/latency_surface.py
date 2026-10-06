@@ -38,6 +38,14 @@ FORECAST_NAMES = [
 SKEW_NAMES = ["rank_start_skew_ms"]
 OFFSET_NAMES = [f"rank_{rank}_start_offset_ms" for rank in range(8)]
 BASE_PREDICTION_NAMES = ["cached_base_prediction_ms"]
+SUBMISSION_NAMES = [
+    "cpu_submitted_ranks",
+    "cpu_submit_min_offset_ms",
+    "cpu_submit_max_offset_ms",
+    "cpu_submit_median_offset_ms",
+    "cpu_submit_offset_std_ms",
+    "cpu_last_submit_age_ms",
+]
 FEATURE_SCHEMAS = [
     FEATURE_NAMES[:9],
     FEATURE_NAMES,
@@ -46,6 +54,8 @@ FEATURE_SCHEMAS = [
     FEATURE_NAMES + FORECAST_NAMES + SKEW_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + OFFSET_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES,
+    FEATURE_NAMES + FORECAST_NAMES + SUBMISSION_NAMES,
+    FEATURE_NAMES + FORECAST_NAMES + SUBMISSION_NAMES + BASE_PREDICTION_NAMES,
 ]
 
 
@@ -128,7 +138,13 @@ class LatencySurface:
             if (
                 self.base.feature_names != FEATURE_NAMES
                 or self.residual.feature_names
-                != FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES
+                not in (
+                    FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES,
+                    FEATURE_NAMES
+                    + FORECAST_NAMES
+                    + SUBMISSION_NAMES
+                    + BASE_PREDICTION_NAMES,
+                )
                 or self.base.target_schema != self.residual.target_schema
                 or state["target_schema"] != self.base.target_schema
                 or sum(
@@ -264,6 +280,29 @@ class LatencySurface:
                     (now - max(starts)) / 1e6,
                     (max(starts) - data["dispatch_ns"]) / 1e6,
                 ]
+            if "cpu_submitted_ranks" in self.feature_names:
+                primary = data.get("primary_snapshot") or []
+                if len(primary) != 8 or any(
+                    not p
+                    or len(p) != 9
+                    or p[0] != data.get("step")
+                    or p[7] != 1
+                    or not 0 < p[3] <= p[6] <= now
+                    for p in primary
+                ):
+                    return None
+                submitted = np.array([p[3] for p in primary], dtype=np.int64)
+                offsets_ms = (submitted - max(starts)) / 1e6
+                extra.extend(
+                    [
+                        len(submitted),
+                        min(offsets_ms),
+                        max(offsets_ms),
+                        np.median(offsets_ms),
+                        np.std(offsets_ms),
+                        (now - max(submitted)) / 1e6,
+                    ]
+                )
             if self.feature_names[-1:] == BASE_PREDICTION_NAMES:
                 value = data.get("cached_base_prediction_ms")
                 if type(value) not in (int, float):

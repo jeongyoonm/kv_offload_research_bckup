@@ -15,6 +15,7 @@ class ComputeEstimator:
         self.frozen = False
         self.calibration_mode = "legacy"
         self.latency_surface = None
+        self.refinement_surface = None
         self.samples: deque[tuple[np.ndarray, float]] = deque(maxlen=128)
         self.coefficients = None
         self.errors: deque[float] = deque(maxlen=32)
@@ -250,6 +251,12 @@ class ComputeEstimator:
         )
         if self.latency_surface is not None:
             state.update(schema=2, latency_surface=self.latency_surface.state_dict())
+        if self.refinement_surface is not None:
+            if self.latency_surface is None:
+                raise ValueError("refinement requires an initial latency surface")
+            state.update(
+                schema=3, refinement_surface=self.refinement_surface.state_dict()
+            )
         return state
 
     @classmethod
@@ -267,13 +274,15 @@ class ComputeEstimator:
             "preparation_shapes",
             "recent_preparation",
         }
-        if isinstance(state, dict) and state.get("schema") == 2:
+        if isinstance(state, dict) and state.get("schema") in (2, 3):
             keys.add("latency_surface")
+        if isinstance(state, dict) and state.get("schema") == 3:
+            keys.add("refinement_surface")
         if (
             not isinstance(state, dict)
             or set(state) != keys
             or type(state["schema"]) is not int
-            or state["schema"] not in (1, 2)
+            or state["schema"] not in (1, 2, 3)
             or state["feature_schema"] != "tokens8192_attention1e8_requests8.v1"
             or state["context"] != context
         ):
@@ -339,10 +348,25 @@ class ComputeEstimator:
             estimator.recent_preparation.append(
                 (vector(shape, 3), duration(n), regime(r))
             )
-        if state["schema"] == 2:
+        if state["schema"] in (2, 3):
             from vllm.v1.kv_offload.latency_surface import LatencySurface
 
             estimator.latency_surface = LatencySurface(state["latency_surface"])
+            if state["schema"] == 3:
+                estimator.refinement_surface = LatencySurface(
+                    state["refinement_surface"]
+                )
+                model = estimator.refinement_surface
+                names = (
+                    model.residual.feature_names
+                    if model.base is not None
+                    else model.feature_names
+                )
+                if (
+                    "cpu_submitted_ranks" not in names
+                    or model.target_schema != "critical_end_after_all_rank_start.v1"
+                ):
+                    raise ValueError("incompatible refinement surface")
         return estimator
 
 

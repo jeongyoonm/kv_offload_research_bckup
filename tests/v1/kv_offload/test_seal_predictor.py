@@ -25,6 +25,63 @@ def transfer_surface_state():
     )
 
 
+def test_refinement_requires_all_cpu_submissions_and_round_trips_separately():
+    """An incomplete or future submission cannot update the initial predictor."""
+    from vllm.v1.kv_offload.latency_surface import (
+        FEATURE_NAMES,
+        FORECAST_NAMES,
+        SUBMISSION_NAMES,
+        LatencySurface,
+    )
+
+    state = transfer_surface_state()
+    state.update(
+        schema=2,
+        target_schema="critical_end_after_all_rank_start.v1",
+        feature_names=FEATURE_NAMES + FORECAST_NAMES + SUBMISSION_NAMES,
+    )
+    state["trees"][0][0][2:4] = [25, 5.0]
+    model = ComputeEstimator()
+    model.coefficients = np.ones(4)
+    model.latency_surface = LatencySurface(transfer_surface_state())
+    model.refinement_surface = LatencySurface(state)
+    snapshot = model.state_dict({"model": "test"})
+    restored = ComputeEstimator.from_state_dict(snapshot, snapshot["context"])
+    assert restored.state_dict(snapshot["context"]) == snapshot
+    data = dict(
+        step=1,
+        request_shapes=[[3072, 58368]],
+        load_state=[0, 0],
+        dispatch_ns=1_000_000,
+        forecast_ns=10_000_000,
+        forecast_load_features=[0] * 10,
+        execution_snapshot=[[1, 2_000_000, 2_000_000, 2_000_000, 3_000_000, 1, 0, 0, 0]]
+        * 8,
+        primary_snapshot=[[1, 1_000_000, 1_500_000, 6_000_000, 0, 0, 6_000_000, 1, 0]]
+        * 8,
+    )
+    assert restored.predict(data) == 100_000_000
+    assert restored.refinement_surface.predict(data) == 100_000_000
+    assert restored.refinement_surface.input_features(data)[23:].tolist() == [
+        8,
+        4,
+        4,
+        4,
+        0,
+        4,
+    ]
+    for index, value in [(0, 2), (3, 0), (6, 11_000_000), (7, 0)]:
+        records = data["primary_snapshot"]
+        assert isinstance(records, list)
+        primary = [r.copy() for r in records]
+        primary[-1][index] = value
+        assert (
+            restored.refinement_surface.predict(dict(data, primary_snapshot=primary))
+            is None
+        )
+        assert restored.predict(dict(data, primary_snapshot=primary)) == 100_000_000
+
+
 def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
     """A reusable point model changes with loads; cold/decode keep old estimates."""
     import json

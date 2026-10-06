@@ -453,6 +453,8 @@ def stage_rpc(core, step, base, candidates):
     submission_trace = os.environ.get("VLLM_DEFERRAL_PREDICTOR_PROGRESS") == "1"
     progress_read_ns = 0
     progress_signature = None
+    progress_frame = None
+    refinement = None
     effective_seal_expiry_ns = None
     adaptive_poll_us = getattr(core.scheduler, "_late_seal_adaptive_poll_us", 1000)
     progress_polls = 0
@@ -769,7 +771,12 @@ def stage_rpc(core, step, base, candidates):
                         None,
                     )
                     a_step = getattr(a_output, "readiness_timeline_step", None)
-                    if timing and a_step and submission_trace:
+                    refinement_model = (
+                        getattr(timing.seal_estimator, "refinement_surface", None)
+                        if timing
+                        else None
+                    )
+                    if timing and a_step and (submission_trace or refinement_model):
                         progress_now = time.monotonic_ns()
                         if progress_now - progress_read_ns >= 10_000_000:
                             progress_read_ns = progress_now
@@ -785,18 +792,20 @@ def stage_rpc(core, step, base, candidates):
                                 observed_ns = time.monotonic_ns()
                                 if valid_snapshot(execution, a_step, observed_ns):
                                     progress_signature = signature
-                                    record(
-                                        core.scheduler,
-                                        "predictor_submission_progress",
-                                        step=step,
-                                        predecessor_step=a_step,
-                                        observed_ns=observed_ns,
-                                        primary_snapshot=primary,
-                                        execution_snapshot=execution,
-                                        forecast_load_features=timing.loads.forecast_features(
-                                            data, observed_ns
-                                        ),
-                                    )
+                                    progress_frame = (primary, execution)
+                                    if submission_trace:
+                                        record(
+                                            core.scheduler,
+                                            "predictor_submission_progress",
+                                            step=step,
+                                            predecessor_step=a_step,
+                                            observed_ns=observed_ns,
+                                            primary_snapshot=primary,
+                                            execution_snapshot=execution,
+                                            forecast_load_features=timing.loads.forecast_features(
+                                                data, observed_ns
+                                            ),
+                                        )
                     if timing and a_step and predicted_deadline_ns is None:
                         data = timing.steps.get(a_step)
                         records = timing.read_execution(a_step)
@@ -903,6 +912,75 @@ def stage_rpc(core, step, base, candidates):
                             lead_us=compute_deadline_lead_us,
                             shadow=compute_deadline_shadow,
                         )
+                    if (
+                        refinement_model is not None
+                        and timing is not None
+                        and prediction is not None
+                        and refinement is None
+                        and progress_frame is not None
+                        and compute_seal_deadline_ns is not None
+                        and effective_seal_expiry_ns is not None
+                        and time.monotonic_ns() < effective_seal_expiry_ns
+                    ):
+                        primary, execution = progress_frame
+                        if all(p[3] > 0 for p in primary):
+                            forecast_ns = time.monotonic_ns()
+                            refined_data = dict(
+                                timing.steps[a_step],
+                                primary_snapshot=primary,
+                                execution_snapshot=execution,
+                                forecast_ns=forecast_ns,
+                                forecast_load_features=timing.loads.forecast_features(
+                                    timing.steps[a_step], forecast_ns
+                                ),
+                            )
+                            begin_ns = time.monotonic_ns()
+                            duration = refinement_model.predict(refined_data)
+                            cost_ns = time.monotonic_ns() - begin_ns
+                            if (
+                                duration
+                                and time.monotonic_ns() < effective_seal_expiry_ns
+                            ):
+                                duration = (
+                                    duration
+                                    * core.scheduler._late_seal_prediction_scale_percent
+                                    // 100
+                                )
+                                old_expiry = effective_seal_expiry_ns
+                                compute_seal_deadline_ns = (
+                                    max(r[3] for r in execution)
+                                    + duration
+                                    - compute_deadline_lead_us * 1000
+                                )
+                                effective_seal_expiry_ns = min(
+                                    compute_seal_deadline_ns,
+                                    base_ready_ns
+                                    + core.scheduler._late_seal_safety_us * 1000,
+                                )
+                                predicted_deadline_ns = (
+                                    max(r[3] for r in execution)
+                                    + duration
+                                    - prediction["preparation_reserve_ns"]
+                                )
+                                refinement = dict(
+                                    predecessor_step=a_step,
+                                    forecast_ns=forecast_ns,
+                                    predicted_duration_ns=duration,
+                                    previous_expiry_ns=old_expiry,
+                                    effective_expiry_ns=effective_seal_expiry_ns,
+                                    primary_snapshot=primary,
+                                    execution_snapshot=execution,
+                                    predictor_input=refinement_model.input_features(
+                                        refined_data
+                                    ).tolist(),
+                                    prediction_cost_ns=cost_ns,
+                                )
+                                record(
+                                    core.scheduler,
+                                    "seal_prediction_refined",
+                                    step=step,
+                                    **refinement,
+                                )
                     if (
                         prediction
                         and timing is not None
@@ -1108,6 +1186,7 @@ def stage_rpc(core, step, base, candidates):
                 else None
             ),
             prediction=prediction,
+            refinement=refinement,
             adaptive_poll_us=adaptive_poll_us,
             progress_polls=progress_polls,
             adaptive_poll_cpu_ns=poll_cpu_ns,

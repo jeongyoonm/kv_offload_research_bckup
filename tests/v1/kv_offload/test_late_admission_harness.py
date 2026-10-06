@@ -236,6 +236,100 @@ def test_compute_deadline_seals_while_a_is_held_and_clips_sleep(deadline_core, l
     assert not core.batch_queue[-1][0].poll()
 
 
+@pytest.mark.parametrize("duration", [90_000_000, 180_000_000, 2_000_000_000])
+def test_refinement_moves_seal_once_without_extending_safety_cap(
+    deadline_core, duration
+):
+    """Only observed all-rank CPU submission can revise an unexpired deadline."""
+    import numpy as np
+
+    core, clock = deadline_core()
+    core.scheduler._late_record_enabled = True
+    estimator = core.deferral_timing.seal_estimator
+    estimator.refinement_surface = SimpleNamespace(
+        predict=lambda data: duration,
+        input_features=lambda data: np.ones(29),
+    )
+    calls = []
+
+    def read(step):
+        submitted = 1_050_000_000 if clock.now >= 1_050_000_000 else 0
+        calls.append(clock.now)
+        return (
+            True,
+            True,
+            [[step, 1_000_000_000, 1_001_000_000, submitted, 0, 0, clock.now, 1, 0]]
+            * 8,
+        )
+
+    core.deferral_timing.read = read
+    core.deferral_timing.loads = SimpleNamespace(
+        forecast_features=lambda data, now: [0] * 10
+    )
+    stage_rpc(core, 9, [_request("base")], [_request("pending")])
+    transport = core.scheduler._late_transport
+    expected = min(1_000_000_000 + duration, 2_001_000_000)
+    assert transport["seal_ns"] == expected
+    assert transport["prediction"]["predicted_duration_ns"] == 120_000_000
+    assert transport["refinement"]["predicted_duration_ns"] == duration
+    records = core.scheduler._late_admission_records
+    assert sum(r["event"] == "seal_prediction_refined" for r in records) == 1
+    assert all(b - a >= 10_000_000 for a, b in zip(calls, calls[1:]))
+    assert max(clock.sleeps) <= 2_000_000
+    assert not core.batch_queue[-1][0].poll()
+
+
+@pytest.mark.parametrize("stop", ["partial", "compute", "candidate", "expired"])
+def test_refinement_preserves_prior_stop_conditions(deadline_core, stop):
+    """Partial submission and earlier stops cannot be turned into longer waits."""
+    import numpy as np
+
+    core, clock = deadline_core()
+    calls = []
+
+    def predict(data):
+        calls.append(clock.now)
+        if stop == "expired":
+            clock.now += 70_000_000
+        return 180_000_000
+
+    core.deferral_timing.seal_estimator.refinement_surface = SimpleNamespace(
+        predict=predict, input_features=lambda data: np.ones(29)
+    )
+
+    def read(step):
+        submitted = 1_050_000_000 if clock.now >= 1_050_000_000 else 0
+        records = [
+            [step, 1_000_000_000, 1_001_000_000, submitted, 0, 0, clock.now, 1, 0]
+            for _ in range(8)
+        ]
+        if stop == "partial":
+            records[-1][3] = 0
+        return True, True, records
+
+    core.deferral_timing.read = read
+    core.deferral_timing.loads = SimpleNamespace(
+        forecast_features=lambda data, now: [0] * 10
+    )
+    if stop == "compute":
+        clock.complete_at = 1_040_000_000
+    elif stop == "candidate":
+        clock.ready_at = {"pending": 1_040_000_000}
+    stage_rpc(core, 9, [_request("base")], [_request("pending")])
+    transport = core.scheduler._late_transport
+    assert transport["refinement"] is None
+    assert transport["compute_seal_deadline_ns"] == 1_120_000_000
+    if stop in {"compute", "candidate"}:
+        assert transport["seal_ns"] < 1_050_000_000
+        assert not calls
+    elif stop == "partial":
+        assert transport["seal_ns"] == 1_120_000_000
+        assert not calls
+    else:
+        assert transport["seal_ns"] >= 1_120_000_000
+        assert len(calls) == 1
+
+
 def test_compute_deadline_freezes_kv_ack_and_cancellation_snapshot(deadline_core):
     """After-deadline readiness cannot expand the sealed membership snapshot."""
     core, clock = deadline_core()

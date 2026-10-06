@@ -214,7 +214,22 @@ def pin_mmap_region(region: SharedOffloadRegion) -> None:
     rank = region.rank
 
     base_ptr = region._base.data_ptr()
+    register_start = time.perf_counter()
+    region.init_stats["register_start_ns"] = time.monotonic_ns()
     result = torch.cuda.cudart().cudaHostRegister(base_ptr, region.total_size_bytes, 0)
+    region.init_stats.update(
+        register_end_ns=time.monotonic_ns(),
+        register_seconds=time.perf_counter() - register_start,
+        register_bytes=region.total_size_bytes,
+        register_result=result.value,
+    )
+    logger.info(
+        "CPU cache registration rank=%s bytes=%d seconds=%.3f result=%d",
+        rank,
+        region.total_size_bytes,
+        region.init_stats["register_seconds"],
+        result.value,
+    )
     if result.value != 0:
         logger.warning(
             "cudaHostRegister failed for rank=%d (code=%d) — "

@@ -88,6 +88,8 @@ class SharedOffloadRegion:
         cpu_page_size: int,
         barrier: Callable[[], None] | None = None,
     ) -> None:
+        init_start = time.perf_counter()
+        self.init_stats: dict[str, int | float] = {}
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
 
@@ -161,6 +163,8 @@ class SharedOffloadRegion:
                     )
             raise
 
+        self.init_stats["mapping_seconds"] = time.perf_counter() - init_start
+        barrier_start = time.perf_counter()
         if barrier is not None:
             # Every worker has mapped the file once the barrier releases, so
             # its name is no longer needed and dropping it here means no exit
@@ -179,7 +183,12 @@ class SharedOffloadRegion:
                 self._creator = False
                 logger.info("Unlinked mmap file %s", self.mmap_path)
 
+        self.init_stats["mapping_barrier_seconds"] = time.perf_counter() - barrier_start
+        populate_start = time.perf_counter()
+        self.init_stats["populate_start_ns"] = time.monotonic_ns()
         populate_write_fn = _get_populate_write_fn(self.mmap_obj)
+        populate_calls = 0
+        populate_bytes = 0
 
         if rank is not None:
             # Populate only this worker's pages (one slot per block row).
@@ -192,6 +201,8 @@ class SharedOffloadRegion:
                 end = raw_offset + cpu_page_size
                 aligned_length = end - aligned_offset
                 populate_write_fn(self.mmap_obj, aligned_offset, aligned_length)
+                populate_calls += 1
+                populate_bytes += aligned_length
             logger.debug(
                 "MADV_POPULATE_WRITE loop: %d blocks in %.3f s",
                 num_blocks,
@@ -201,14 +212,30 @@ class SharedOffloadRegion:
             # No rank — populate the entire shared region in one call.
             _t0 = time.perf_counter()
             populate_write_fn(self.mmap_obj, 0, self.total_size_bytes)
+            populate_calls = 1
+            populate_bytes = self.total_size_bytes
             logger.debug(
                 "MADV_POPULATE_WRITE entire region: %.3f s", time.perf_counter() - _t0
             )
 
+        self.init_stats.update(
+            populate_end_ns=time.monotonic_ns(),
+            populate_seconds=time.perf_counter() - populate_start,
+            populate_calls=populate_calls,
+            populate_bytes=populate_bytes,
+        )
+        logger.info(
+            "CPU cache population rank=%s total_bytes=%d calls=%d seconds=%.3f",
+            rank,
+            self.total_size_bytes,
+            populate_calls,
+            self.init_stats["populate_seconds"],
+        )
         self._base = torch.frombuffer(memoryview(self.mmap_obj), dtype=torch.int8)
         self._views: list[torch.Tensor] = []
         self._canonical_offset = 0
         self.is_pinned: bool = False
+        self.init_stats["region_seconds"] = time.perf_counter() - init_start
 
     def create_next_worker_view(self, tensor_page_size: int) -> torch.Tensor:
         """Allocate a strided int8 view for this worker, one canonical tensor.

@@ -101,3 +101,30 @@ text mismatch. The summary still records how many comparisons matched.
 `--dma-audit` checks completed H2D and D2H payloads on every rank and fails on any
 byte mismatch. The audit adds synchronization and GPU/CPU copies; use it for
 correctness diagnosis rather than timing.
+
+### Output consistency diagnosis
+
+`--restoration-diagnosis` repeats each identical prompt with both caches cleared,
+then resets only GPU prefix state and restores the CPU prefix twice. It records
+token IDs, probabilities, and GPU/CPU hit counts. `--diagnosis-repeats` controls
+the repeat count; `--diagnosis-natural-prompts` adds two text-based controls.
+
+The DMA auditor also checks descriptor addresses against source/destination
+block specifications, fingerprints stored CPU pages, and verifies restored GPU
+bytes after input preparation and immediately before forward. It supports both
+worker runner implementations. These checks add synchronization.
+
+`--moe-replay` and `--topk-replay` replay one operation with its original inputs.
+The top-k diagnostic saves a logits row for independent replay:
+
+```bash
+.venv/bin/python tools/replay_cache_init_topk.py \
+  --captured /mnt/localnvme/cpu_cache_init_20261007/rootcause_private_topk/dma_audit/rank0_topk_row.pt \
+  --output /mnt/localnvme/cpu_cache_init_20261007/rootcause_saved_row_replay.json
+```
+
+`--stable-topk` is a diagnostic oracle using descending scores and token-index
+tie breaking. It fixes selection order on both prefill and decode. With
+`--dma-audit`, it also audits transfers; without that flag, it adds no transfer
+audits or CPU copies. Its full sorting cost makes it unsuitable for throughput
+comparisons. These controls do not change the production selector or defaults.

@@ -62,13 +62,102 @@ def _reset(base, external):
     raise RuntimeError("cache reset failed to drain transfers")
 
 
+def _diagnose_restoration(base, output, repeats=4, natural=False):
+    """Distinguish cold-run variability from CPU restoration errors."""
+    observations = []
+    prompts = []
+    for index in range(4):
+        tokens = [1000 + (index * 131 + i * 17) % 10000 for i in range(64)]
+        tokens += [1000 + (i * 23) % 10000 for i in range(4096)]
+        prompts.append(tokens)
+    if natural:
+        for question in (
+            "What is the capital of France? Reply with only the city name.",
+            "What is two plus two? Reply with only the number.",
+        ):
+            text = (
+                (
+                    "Background: A computer stores information in memory. "
+                    "Moving data between devices takes time. " * 512
+                )
+                + "\nQuestion: "
+                + question
+            )
+            tokenized = json.loads(
+                _call(
+                    base,
+                    "/tokenize",
+                    {
+                        "model": "glm53-cache-init",
+                        "messages": [{"role": "user", "content": text}],
+                        "add_generation_prompt": True,
+                        "chat_template_kwargs": {"enable_thinking": False},
+                    },
+                )
+            )["tokens"]
+            assert len(tokenized) > 4160
+            prompts.append(tokenized[:4096] + tokenized[-64:])
+    for index, tokens in enumerate(prompts):
+        payload = {
+            "model": "glm53-cache-init",
+            "prompt": tokens,
+            "temperature": 0,
+            "seed": 0,
+            "max_tokens": 2,
+            "ignore_eos": True,
+            "logprobs": 5,
+            "return_token_ids": True,
+        }
+        for repeat in range(repeats):
+            _reset(base, True)
+            for phase in ("cold", "cpu_restored_1", "cpu_restored_2"):
+                if phase != "cold":
+                    _reset(base, False)
+                before = _counters(_call(base, "/metrics"))
+                response = json.loads(_call(base, "/v1/completions", payload))
+                after = _counters(_call(base, "/metrics"))
+                observations.append(
+                    {
+                        "index": index,
+                        "repeat": repeat,
+                        "phase": phase,
+                        "response": response,
+                        "counter_delta": {
+                            key: after.get(key, 0) - before.get(key, 0) for key in after
+                        },
+                    }
+                )
+                (output / "restoration_diagnosis.json").write_text(
+                    json.dumps(observations, indent=2) + "\n"
+                )
+                print(
+                    json.dumps(
+                        {
+                            "index": index,
+                            "repeat": repeat,
+                            "phase": phase,
+                            "text": response["choices"][0]["text"],
+                        }
+                    ),
+                    flush=True,
+                )
+    return {"diagnostic_requests": len(observations)}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--port", type=int, default=18387)
     parser.add_argument("--flashinfer-workspace", type=Path)
     parser.add_argument("--dma-audit", action="store_true")
+    parser.add_argument("--moe-replay", action="store_true")
+    parser.add_argument("--topk-replay", action="store_true")
+    parser.add_argument("--stable-topk", action="store_true")
     parser.add_argument("--diagnose-only", action="store_true")
+    parser.add_argument("--restoration-diagnosis", action="store_true")
+    parser.add_argument("--diagnosis-repeats", type=int, default=4)
+    parser.add_argument("--diagnosis-natural-prompts", action="store_true")
+    parser.add_argument("--sync-h2d-submission", action="store_true")
     parser.add_argument(
         "--layout", choices=("block", "worker", "private"), default="private"
     )
@@ -117,15 +206,25 @@ def main():
         "kv_connector_extra_config": {
             "cpu_bytes_to_use": args.cpu_bytes,
             "cpu_cache_layout": args.layout,
-            "async_h2d_submission": True,
+            "async_h2d_submission": not args.sync_h2d_submission,
             "async_h2d_chunk_bytes": 134217728,
         },
     }
-    if args.dma_audit:
+    if args.dma_audit or args.moe_replay or args.topk_replay or args.stable_topk:
         config["kv_connector"] = "AuditedOffloadingConnector"
+        if args.stable_topk and not (
+            args.dma_audit or args.moe_replay or args.topk_replay
+        ):
+            config["kv_connector"] = "StableTopkOffloadingConnector"
         config["kv_connector_module_path"] = "cache_init_dma_audit"
         env["PYTHONPATH"] += os.pathsep + str(source / "tools")
         env["CACHE_INIT_DMA_AUDIT_DIR"] = str(args.output / "dma_audit")
+        if args.moe_replay:
+            env["CACHE_INIT_MOE_REPLAY"] = "1"
+        if args.topk_replay:
+            env["CACHE_INIT_TOPK_REPLAY"] = "1"
+        if args.stable_topk:
+            env["CACHE_INIT_STABLE_TOPK"] = "1"
     command = [
         sys.executable,
         str(Path(__file__).resolve()),
@@ -212,6 +311,16 @@ def main():
                 raise TimeoutError("server startup exceeded 40 minutes")
             summary["server_ready_seconds"] = time.monotonic() - started
             print(json.dumps(summary), flush=True)
+            if args.restoration_diagnosis:
+                summary.update(
+                    _diagnose_restoration(
+                        base,
+                        args.output,
+                        args.diagnosis_repeats,
+                        args.diagnosis_natural_prompts,
+                    )
+                )
+                return
             probes = []
             for index in range(4):
                 _reset(base, True)

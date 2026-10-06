@@ -108,6 +108,61 @@ def test_causal_surface_uses_current_receipts_and_validated_start_generation():
     assert model.predict(data) is None
 
 
+def test_composed_surface_restores_signed_residual_and_keeps_state_private():
+    """An encoded negative correction survives JSON without changing its base."""
+    import copy
+    import json
+
+    from vllm.v1.kv_offload.latency_surface import (
+        BASE_PREDICTION_NAMES,
+        FEATURE_NAMES,
+        FORECAST_NAMES,
+        LatencySurface,
+    )
+
+    base = transfer_surface_state()
+    base.update(schema=2, target_schema="critical_end_after_all_rank_start.v1")
+    residual = dict(
+        base,
+        feature_names=FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES,
+        trees=[[[-1, -1, -2, -2.0, 1004.0]]],
+    )
+    state = dict(
+        schema=3,
+        base=base,
+        residual=residual,
+        residual_shift_ms=1024.0,
+        target_schema=base["target_schema"],
+        provenance={},
+    )
+    model = LatencySurface(json.loads(json.dumps(state)))
+    data = dict(
+        step=1,
+        request_shapes=[[3072, 58368]],
+        load_state=[0, 0],
+        dispatch_ns=1,
+        forecast_ns=7_000_000,
+        execution_snapshot=[[1, 4_000_000, 4_000_000, 4_000_000, 5_000_000, 1, 0, 0, 0]]
+        * 8,
+        forecast_load_features=[0] * 10,
+    )
+    assert model.predict(data) == 80_000_000
+    assert model.input_features(data)[-1] == 100.0
+    exported = model.state_dict()
+    exported["residual"]["trees"][0][0][4] = 9999.0
+    assert model.predict(data) == 80_000_000
+    assert model.state_dict() == state
+    assert model.predict(dict(data, forecast_load_features=None)) is None
+    bad = copy.deepcopy(state)
+    bad["residual_shift_ms"] = 10**400
+    with pytest.raises(ValueError):
+        LatencySurface(bad)
+    bad = copy.deepcopy(state)
+    bad["base"] = copy.deepcopy(state)
+    with pytest.raises(ValueError):
+        LatencySurface(bad)
+
+
 @pytest.mark.parametrize("mutation", ["cycle", "shared_child", "nan", "huge", "leaf"])
 def test_surface_rejects_invalid_graphs_before_estimator_publication(mutation):
     """Untrusted saved graphs cannot hang inference or publish invalid costs."""

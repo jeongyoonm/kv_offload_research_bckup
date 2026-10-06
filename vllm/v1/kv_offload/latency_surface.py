@@ -37,6 +37,7 @@ FORECAST_NAMES = [
 ]
 SKEW_NAMES = ["rank_start_skew_ms"]
 OFFSET_NAMES = [f"rank_{rank}_start_offset_ms" for rank in range(8)]
+BASE_PREDICTION_NAMES = ["cached_base_prediction_ms"]
 FEATURE_SCHEMAS = [
     FEATURE_NAMES[:9],
     FEATURE_NAMES,
@@ -44,6 +45,7 @@ FEATURE_SCHEMAS = [
     FEATURE_NAMES + FORECAST_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + SKEW_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + OFFSET_NAMES,
+    FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES,
 ]
 
 
@@ -79,7 +81,63 @@ def batch_features(data):
 class LatencySurface:
     """Walk all regression trees together without importing a training library."""
 
+    feature_names: list[str]
+    target_schema: str
+
     def __init__(self, state):
+        self.base = None
+        if isinstance(state, dict) and state.get("schema") == 3:
+            keys = {
+                "schema",
+                "base",
+                "residual",
+                "residual_shift_ms",
+                "target_schema",
+                "provenance",
+            }
+            shift = state.get("residual_shift_ms")
+            if not isinstance(shift, (int, float)):
+                raise ValueError("invalid residual shift")
+            try:
+                valid_shift = (
+                    type(shift) in (int, float)
+                    and math.isfinite(shift)
+                    and 0 < shift <= 10_000
+                )
+            except OverflowError:
+                valid_shift = False
+            if (
+                set(state) != keys
+                or type(state["schema"]) is not int
+                or not valid_shift
+                or not all(
+                    isinstance(state[key], dict) and state[key].get("schema") in (1, 2)
+                    for key in ("base", "residual")
+                )
+            ):
+                raise ValueError("incompatible composed latency surface")
+            self.base = LatencySurface(state["base"])
+            self.residual = LatencySurface(state["residual"])
+            if (
+                self.base.feature_names != FEATURE_NAMES
+                or self.residual.feature_names
+                != FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES
+                or self.base.target_schema != self.residual.target_schema
+                or state["target_schema"] != self.base.target_schema
+                or sum(
+                    len(t)
+                    for child in ("base", "residual")
+                    for t in state[child]["trees"]
+                )
+                > 1_000_000
+            ):
+                raise ValueError("incompatible composed latency features")
+            self.requires_forecast = True
+            self.requires_load_progress = True
+            self.target_schema = state["target_schema"]
+            self.residual_shift_ms = shift
+            self._state = copy.deepcopy(state)
+            return
         keys = {"schema", "feature_names", "trees", "provenance"}
         if isinstance(state, dict) and state.get("schema") == 2:
             keys.add("target_schema")
@@ -105,6 +163,7 @@ class LatencySurface:
         ):
             raise ValueError("latency surface exceeds capacity")
         self.feature_count = len(state["feature_names"])
+        self.feature_names = state["feature_names"]
         self.requires_forecast = self.feature_count > 11
         self.requires_load_progress = "current_load_count" in state["feature_names"]
         self.target_schema = state.get("target_schema", "cuda_span_max.v1")
@@ -163,6 +222,13 @@ class LatencySurface:
         return copy.deepcopy(self._state)
 
     def input_features(self, data):
+        if self.base is not None:
+            base_ns = self.base.predict(data)
+            if base_ns is None:
+                return None
+            return self.residual.input_features(
+                dict(data, cached_base_prediction_ms=base_ns / 1e6)
+            )
         features = batch_features(data)
         if features is None:
             return None
@@ -174,7 +240,8 @@ class LatencySurface:
                 or len(r) != 9
                 or r[0] != data.get("step")
                 or r[5] != 1
-                or not 0 < r[3] <= now
+                or not 0 < r[2] <= r[3] <= now
+                or r[3] - r[2] > 2_000_000
                 for r in records
             ):
                 return None
@@ -190,7 +257,12 @@ class LatencySurface:
                     (now - max(starts)) / 1e6,
                     (max(starts) - data["dispatch_ns"]) / 1e6,
                 ]
-            if self.feature_count in (12, 24):
+            if self.feature_names[-1:] == BASE_PREDICTION_NAMES:
+                value = data.get("cached_base_prediction_ms")
+                if type(value) not in (int, float):
+                    return None
+                extra.append(value)
+            elif self.feature_count in (12, 24):
                 extra.append(max(offsets))
             elif self.feature_count == 31:
                 extra.extend(offsets)
@@ -200,6 +272,18 @@ class LatencySurface:
         return features[: self.feature_count]
 
     def predict(self, data):
+        if self.base is not None:
+            base_ns = self.base.predict(data)
+            if base_ns is None:
+                return None
+            correction = self.residual.predict(
+                dict(data, cached_base_prediction_ms=base_ns / 1e6)
+            )
+            if correction is None:
+                return None
+            return max(
+                1_000_000, int(base_ns + correction - self.residual_shift_ms * 1e6)
+            )
         features = self.input_features(data)
         if features is None:
             return None

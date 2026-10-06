@@ -348,21 +348,31 @@ class LatencySurface:
         return features[: self.feature_count]
 
     def predict(self, data):
+        return self.predict_with_features(data)[0]
+
+    def predict_with_features(self, data):
+        """Return the prediction and the exact inputs used by its final forest."""
         if self.base is not None:
             base_ns = self.base.predict(data)
             if base_ns is None:
-                return None
-            correction = self.residual.predict(
+                return None, None
+            correction, features = self.residual.predict_with_features(
                 dict(data, cached_base_prediction_ms=base_ns / 1e6)
             )
             if correction is None:
-                return None
-            return max(
-                1_000_000, int(base_ns + correction - self.residual_shift_ms * 1e6)
+                return None, None
+            return (
+                max(
+                    1_000_000, int(base_ns + correction - self.residual_shift_ms * 1e6)
+                ),
+                features,
             )
         features = self.input_features(data)
         if features is None:
-            return None
+            return None, None
+        return self._predict_features(features, data), features
+
+    def _predict_features(self, features, data):
         # Training libraries compare float32 inputs with float64 thresholds.
         features = features.astype(np.float32)
         if data.get("native_predictor", False) is True:

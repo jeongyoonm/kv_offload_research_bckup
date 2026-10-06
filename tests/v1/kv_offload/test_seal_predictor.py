@@ -217,6 +217,13 @@ def test_composed_surface_restores_signed_residual_and_keeps_state_private():
     )
     assert model.predict(data) == 80_000_000
     assert model.input_features(data)[-1] == 100.0
+    duration, used_features = model.predict_with_features(data)
+    assert duration == model.predict(data)
+    np.testing.assert_array_equal(used_features, model.input_features(data))
+    assert model.predict_with_features(dict(data, forecast_load_features=None)) == (
+        None,
+        None,
+    )
     exported = model.state_dict()
     exported["residual"]["trees"][0][0][4] = 9999.0
     assert model.predict(data) == 80_000_000

@@ -838,12 +838,18 @@ def stage_rpc(core, step, base, candidates):
                                     ),
                                 )
                             prediction_begin_ns = time.monotonic_ns()
-                            predicted = timing.seal_estimator.predict(prediction_data)
+                            if model is not None:
+                                predicted, point_features = model.predict_with_features(
+                                    prediction_data
+                                )
+                            else:
+                                predicted, point_features = None, None
+                            if predicted is None:
+                                predicted = timing.seal_estimator.predict(
+                                    prediction_data
+                                )
                             prediction_cost_ns = (
                                 time.monotonic_ns() - prediction_begin_ns
-                            )
-                            point_features = (
-                                model.input_features(prediction_data) if model else None
                             )
                             if predicted:
                                 predicted = (

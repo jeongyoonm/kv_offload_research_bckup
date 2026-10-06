@@ -53,6 +53,13 @@ def batch_features(data):
     shapes = data.get("request_shapes") or []
     if not shapes or any(n <= 1 or c <= 0 for n, c in shapes):
         return None
+    cached = data.get("cpu_cached_prefix_tokens")
+    if cached is not None and (
+        not isinstance(cached, list)
+        or len(cached) != len(shapes)
+        or any(type(n) is not int or n <= 0 for n in cached)
+    ):
+        return None
     suffix, context = zip(*shapes)
     loads = data.get("load_state")
     if (

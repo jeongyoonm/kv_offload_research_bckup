@@ -243,6 +243,10 @@ class SchedulerInterface(ABC):
     def deferral_request_shapes(self, output: "SchedulerOutput") -> list[list[int]]:
         return []
 
+    def deferral_cpu_cached_tokens(self, output: "SchedulerOutput") -> list[int]:
+        """Unknown cache origin uses the ordinary latency estimator."""
+        return [0] * len(output.num_scheduled_tokens)
+
     def zero_token_credit_has_ready_compute(self) -> bool:
         """Unsupported schedulers retain ordinary queue admission."""
         return False

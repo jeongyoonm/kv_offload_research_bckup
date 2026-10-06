@@ -1534,6 +1534,7 @@ class EngineCore:
         timing.loads.dispatch(getattr(metadata, "load_jobs", {}))
         data = dict(
             load_state=timing.loads.snapshot(),
+            cpu_cached_prefix_tokens=self.scheduler.deferral_cpu_cached_tokens(output),
             step=output.readiness_timeline_step,
             shape=shape,
             request_shapes=self.scheduler.deferral_request_shapes(output),

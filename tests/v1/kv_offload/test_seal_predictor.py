@@ -43,6 +43,9 @@ def test_saved_surface_uses_transfer_pressure_and_keeps_legacy_fallback():
     assert restored.predict(busy) == 150_000_000
     assert restored.predict({"request_shapes": [[3072, 0]]}) == 20_000_000
     assert restored.predict({"request_shapes": [[1, 58368]]}) == 20_000_000
+    assert restored.predict(dict(warm, cpu_cached_prefix_tokens=[58368])) == 100_000_000
+    assert restored.predict(dict(warm, cpu_cached_prefix_tokens=[0])) == 20_000_000
+    assert restored.predict(dict(warm, cpu_cached_prefix_tokens=[])) == 20_000_000
     assert restored.state_dict(state["context"]) == state
     state["latency_surface"]["trees"][0][1][4] = 999
     assert restored.predict(warm) == 100_000_000

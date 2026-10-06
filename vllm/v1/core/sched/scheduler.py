@@ -2797,6 +2797,12 @@ class Scheduler(SchedulerInterface):
             for r, n in output.num_scheduled_tokens.items()
         ]
 
+    def deferral_cpu_cached_tokens(self, output: SchedulerOutput) -> list[int]:
+        return [
+            getattr(self.requests[r].prefill_stats, "num_external_cached_tokens", 0)
+            for r in output.num_scheduled_tokens
+        ]
+
     def zero_token_credit_has_ready_compute(self) -> bool:
         """Conservative, non-mutating check; schedule() alone allocates blocks.
 

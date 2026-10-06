@@ -3,14 +3,53 @@
 """Check exported inference, signed corrections, and training-only scaling."""
 
 import unittest
+from unittest.mock import patch
 
 import numpy as np
+import study
 from sklearn.ensemble import HistGradientBoostingRegressor
 from study import FrozenComponent, ScaledMLP, export_component, surface
 from threadpoolctl import threadpool_limits
 
 
 class ExportContract(unittest.TestCase):
+    def test_correction_selection_scores_complete_duration(self):
+        configs = [{"prediction": 0.0}, {"prediction": -10.0}]
+
+        class Constant:
+            def __init__(self, prediction):
+                self.value = prediction
+
+            def predict(self, x):
+                return np.full(len(x), self.value)
+
+        def fit(config, *args):
+            return Constant(config["prediction"]), 0.0
+
+        x = np.zeros((4, 24))
+        residual = np.full(4, -10.0)
+        rows = [{"workload": "example", "episode": "sample"}] * 4
+        log = []
+        with (
+            patch.object(study, "configs", return_value=configs),
+            patch.object(study, "fit", side_effect=fit),
+        ):
+            chosen, _ = study.select(
+                "boost",
+                x,
+                residual,
+                rows,
+                x,
+                residual,
+                rows,
+                17,
+                log,
+                offset=np.full(4, 110.0),
+            )
+        self.assertEqual(chosen["prediction"], -10.0)
+        self.assertEqual(log[0]["validation_macro_mae_ms"], 10.0)
+        self.assertEqual(log[1]["validation_macro_mae_ms"], 0.0)
+
     def test_mlp_export_preserves_signed_correction_on_unseen_inputs(self):
         rng = np.random.default_rng(11)
         x = rng.uniform(0, 10, size=(100, 24))

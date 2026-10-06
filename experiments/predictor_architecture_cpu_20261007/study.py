@@ -298,15 +298,20 @@ def objective(y, prediction, rows):
     return metrics(y, prediction, rows)["workload_macro_mae_ms"]
 
 
-def select(kind, x, y, rows, vx, vy, validation, seed, log):
+def select(kind, x, y, rows, vx, vy, validation, seed, log, offset=None):
     results = []
     for config in configs(kind):
         model, seconds = fit(config, x, y, rows, seed)
         prediction = predict(model, vx)
+        # Score corrections after adding the base. Residuals can be negative;
+        # only complete duration predictions have the serving floor of 1 ms.
+        actual, estimated = vy, prediction
+        if offset is not None:
+            actual, estimated = vy + offset, prediction + offset
         record = {
             "config": config,
             "seconds": seconds,
-            "validation_macro_mae_ms": objective(vy, prediction, validation),
+            "validation_macro_mae_ms": objective(actual, estimated, validation),
         }
         if isinstance(model, ScaledMLP):
             record.update(model.fit_info)
@@ -505,6 +510,7 @@ def run_fold(task):
                     validation,
                     task["seed"],
                     logs[name],
+                    offset=val_base,
                 )
                 selected[name] = cfg
         for family, kind in [("mlp", "mlp"), ("tree", "boost")]:

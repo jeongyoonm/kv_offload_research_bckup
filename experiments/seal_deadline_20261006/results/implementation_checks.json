@@ -1,0 +1,15 @@
+{
+  "source_commit": "bcc4212",
+  "cpu": {
+    "passed": 174,
+    "skipped": 8,
+    "log": "cpu_tests_committed.log"
+  },
+  "gpu": {
+    "passed": 8,
+    "log": "gpu_adoption_tests.log"
+  },
+  "default_disabled": true,
+  "safety_and_prediction_use_one_effective_expiry": true,
+  "branch": "experiment/glm53-seal-deadline-20261006"
+}

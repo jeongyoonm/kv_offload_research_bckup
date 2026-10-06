@@ -218,3 +218,58 @@ can also affect them.
 Full artifacts are under `/mnt/localnvme/glm53_compact_prep_20261006`; compact
 evidence is committed in `results/compact_20261006`. The measured implementation
 is `e45616d`. The new option remains disabled by default.
+
+## Compute seal deadline follow-up (2026-10-06)
+
+Branch: `experiment/glm53-seal-deadline-20261006`; serving commit `bcc4212`.
+Artifacts: `/mnt/localnvme/glm53_seal_deadline_20261006`.
+
+The new `late_seal_compute_deadline` option defaults to false. It requires the
+existing predictive readiness policy and arms one fixed deadline at predicted
+preceding execution completion minus `late_seal_compute_deadline_lead_us`.
+The effective expiry is the earlier of this deadline and the existing maximum
+wait. Candidate readiness and physical completion can still seal earlier.
+Missing prediction retains the maximum-wait fallback. All base acknowledgments
+remain required; load-only decisions retain the existing policy. Both coarse
+notification waits and fine polling sleeps are clipped to the effective expiry.
+`late_seal_compute_deadline_shadow` records the deadline without enforcing it;
+shadow and active deadline modes are mutually exclusive.
+
+The CPU harness passes 174 checks, including deterministic snapshot boundaries,
+partial acknowledgments, cancellation, late base preparation, missing prediction,
+early completion, load-only behavior, and execute enqueue before held A release.
+Real notification waits exercise both the bridge and coalesced transport. Eight
+GPU adoption checks pass. All five TP8 canary settings pass 16/16 known-answer
+and 16/16 distinct-fact checks.
+
+The canary uses the same 60K workload and frozen predictor for one 80-request
+cell per setting. Control means the complete compact/pinned readiness prototype
+with shadow logging, without deadline enforcement.
+
+| Lead | req/s | Mean TTFT ms | p95 TTFT ms | Compute rounds |
+| --- | ---: | ---: | ---: | ---: |
+| Control | 7.028 | 3978 | 5371 | 14 |
+| 0ms | 7.094 | 3923 | 5720 | 14 |
+| 5ms | 7.304 | 3831 | 5290 | 14 |
+| 10ms | 7.054 | 3990 | 5744 | 14 |
+| 20ms | 7.238 | 3830 | 5045 | 13 |
+
+Deadline overshoot is 0.11–0.17ms in the canary. These single cells establish
+mechanism coverage and provide selection evidence, not a repeatable speedup.
+Static shadow replay of the preceding compact experiment would miss 15 of 206
+actual late admissions even at zero lead; it does not model later batching
+feedback. Actual canary admissions therefore need to be measured independently.
+
+The 5ms lead advances to four alternating paired 75-request episodes, totaling
+300 measured requests per policy, under `comparison_300`. Cache resets and
+priming occur between episodes and are excluded. This retains the 60K workload
+within the existing CPU cache; it is not a continuous 300-request stream.
+`experiments/seal_deadline_20261006/analyze.py` audits serving traces and
+`compare_pairs.py` reports a paired interval from the four episode ratios.
+
+The four paired episodes are complete and accepted. Control is 7.107 req/s and
+5ms lead is 7.193 req/s (+1.21%); mean TTFT improves 1.26%, while mean cell p95
+worsens 0.71%. The paired throughput 95% interval is -0.69% to +3.15%. Compute
+rounds rise from 50 to 52 and late admissions fall from 280 to 276. The feature
+remains disabled by default. Full results and scope are in
+`experiments/seal_deadline_20261006/README.md` and its `results/` directory.

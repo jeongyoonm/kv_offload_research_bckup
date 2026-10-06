@@ -1,0 +1,1052 @@
+{
+  "source_commit": "bcc4212090cd6d67996d02a1c61cd07b96544f83",
+  "cells": [
+    {
+      "cell": "r0_compact_shadow",
+      "path": "/mnt/localnvme/glm53_seal_deadline_20261006/canary/gpu/p61440_f95_h100/r0_compact_shadow",
+      "requests": 80,
+      "throughput": 7.02797226018692,
+      "mean_ttft_ms": 3977.8455125124997,
+      "p95_ttft_ms": 5370.956943249998,
+      "compute_rounds": 14,
+      "late_admissions": 68,
+      "recovered_compute_opportunities": 65,
+      "kv_ready_during_compute": 73,
+      "missed_ready_at_worker_entry_with_seal_ack": 1,
+      "h2d_bytes": 1781858304000.0,
+      "compute_span_ms": 10675.248139,
+      "gap_lower_ms": 476.43002,
+      "gap_upper_ms": 487.39831599999997,
+      "non_load_late_enqueue_lower_ms": 39.6447,
+      "seal_reasons": {
+        "ordinary": 12,
+        "candidate_target_ready": 8,
+        "deadline": 4,
+        "predecessor_compute_finished": 4
+      },
+      "deadline_overshoot_ms": {
+        "count": 0
+      },
+      "deadline_firings": [],
+      "worker_coverage": {
+        "2": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "1": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "4": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "7": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "3": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "5": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "0": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "6": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        }
+      },
+      "throughput_gain_pct": 0.0,
+      "mean_ttft_reduction_pct": 0.0
+    },
+    {
+      "cell": "r0_deadline0",
+      "path": "/mnt/localnvme/glm53_seal_deadline_20261006/canary/gpu/p61440_f95_h100/r0_deadline0",
+      "requests": 80,
+      "throughput": 7.0941687064221055,
+      "mean_ttft_ms": 3923.3541925375,
+      "p95_ttft_ms": 5719.95245395,
+      "compute_rounds": 14,
+      "late_admissions": 71,
+      "recovered_compute_opportunities": 64,
+      "kv_ready_during_compute": 72,
+      "missed_ready_at_worker_entry_with_seal_ack": 5,
+      "h2d_bytes": 1781858304000.0,
+      "compute_span_ms": 10527.009459,
+      "gap_lower_ms": 544.172947,
+      "gap_upper_ms": 555.49806,
+      "non_load_late_enqueue_lower_ms": 3.1387,
+      "seal_reasons": {
+        "ordinary": 10,
+        "candidate_target_ready": 10,
+        "deadline": 3,
+        "predecessor_compute_finished": 1,
+        "compute_seal_deadline": 3
+      },
+      "deadline_overshoot_ms": {
+        "count": 3,
+        "mean": 0.13983166666666666,
+        "median": 0.143331,
+        "min": 0.11067,
+        "max": 0.165494
+      },
+      "deadline_firings": [
+        {
+          "step": 778,
+          "actual_seal_lead_lower_ms": 133.506991,
+          "actual_seal_lead_upper_ms": 134.068912,
+          "actual_enqueue_lead_lower_ms": 127.1762,
+          "actual_enqueue_lead_upper_ms": 127.738121,
+          "last_wait_requested_ms": 0.607334,
+          "last_wait_actual_ms": 0.661998
+        },
+        {
+          "step": 782,
+          "actual_seal_lead_lower_ms": 93.667827,
+          "actual_seal_lead_upper_ms": 94.224997,
+          "actual_enqueue_lead_lower_ms": 77.130554,
+          "actual_enqueue_lead_upper_ms": 77.687724,
+          "last_wait_requested_ms": 1.389225,
+          "last_wait_actual_ms": 1.443531
+        },
+        {
+          "step": 783,
+          "actual_seal_lead_lower_ms": 111.585056,
+          "actual_seal_lead_upper_ms": 112.142625,
+          "actual_enqueue_lead_lower_ms": 89.951463,
+          "actual_enqueue_lead_upper_ms": 90.509032,
+          "last_wait_requested_ms": 0.404777,
+          "last_wait_actual_ms": 0.418239
+        }
+      ],
+      "worker_coverage": {
+        "3": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "6": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "4": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "5": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "7": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "1": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "2": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "0": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        }
+      },
+      "throughput_gain_pct": 0.941899651627609,
+      "mean_ttft_reduction_pct": 1.3698701923841705
+    },
+    {
+      "cell": "r0_deadline10",
+      "path": "/mnt/localnvme/glm53_seal_deadline_20261006/canary/gpu/p61440_f95_h100/r0_deadline10",
+      "requests": 80,
+      "throughput": 7.053573154933458,
+      "mean_ttft_ms": 3989.5182633375,
+      "p95_ttft_ms": 5744.201944899999,
+      "compute_rounds": 14,
+      "late_admissions": 70,
+      "recovered_compute_opportunities": 64,
+      "kv_ready_during_compute": 72,
+      "missed_ready_at_worker_entry_with_seal_ack": 6,
+      "h2d_bytes": 1781858304000.0,
+      "compute_span_ms": 10645.869079,
+      "gap_lower_ms": 517.0660369999999,
+      "gap_upper_ms": 529.167305,
+      "non_load_late_enqueue_lower_ms": 5.879978,
+      "seal_reasons": {
+        "ordinary": 8,
+        "candidate_target_ready": 10,
+        "deadline": 4,
+        "predecessor_compute_finished": 1,
+        "compute_seal_deadline": 3
+      },
+      "deadline_overshoot_ms": {
+        "count": 3,
+        "mean": 0.15465166666666666,
+        "median": 0.154566,
+        "min": 0.142918,
+        "max": 0.166471
+      },
+      "deadline_firings": [
+        {
+          "step": 1005,
+          "actual_seal_lead_lower_ms": 139.823068,
+          "actual_seal_lead_upper_ms": 140.385881,
+          "actual_enqueue_lead_lower_ms": 133.882673,
+          "actual_enqueue_lead_upper_ms": 134.445486,
+          "last_wait_requested_ms": 1.702596,
+          "last_wait_actual_ms": 1.757498
+        },
+        {
+          "step": 1009,
+          "actual_seal_lead_lower_ms": 157.855627,
+          "actual_seal_lead_upper_ms": 158.421084,
+          "actual_enqueue_lead_lower_ms": 149.562675,
+          "actual_enqueue_lead_upper_ms": 150.128132,
+          "last_wait_requested_ms": 0.11486,
+          "last_wait_actual_ms": 0.166971
+        },
+        {
+          "step": 1010,
+          "actual_seal_lead_lower_ms": 137.544081,
+          "actual_seal_lead_upper_ms": 138.099976,
+          "actual_enqueue_lead_lower_ms": 128.386855,
+          "actual_enqueue_lead_upper_ms": 128.94275,
+          "last_wait_requested_ms": 1.977537,
+          "last_wait_actual_ms": 2.030767
+        }
+      ],
+      "worker_coverage": {
+        "0": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "2": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "4": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "1": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "3": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "7": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "6": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "5": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        }
+      },
+      "throughput_gain_pct": 0.364271425650986,
+      "mean_ttft_reduction_pct": -0.2934440462376564
+    },
+    {
+      "cell": "r0_deadline20",
+      "path": "/mnt/localnvme/glm53_seal_deadline_20261006/canary/gpu/p61440_f95_h100/r0_deadline20",
+      "requests": 80,
+      "throughput": 7.23759235956296,
+      "mean_ttft_ms": 3830.1304344625,
+      "p95_ttft_ms": 5045.335006249999,
+      "compute_rounds": 13,
+      "late_admissions": 74,
+      "recovered_compute_opportunities": 73,
+      "kv_ready_during_compute": 78,
+      "missed_ready_at_worker_entry_with_seal_ack": 3,
+      "h2d_bytes": 1781858304000.0,
+      "compute_span_ms": 10491.640977,
+      "gap_lower_ms": 264.889156,
+      "gap_upper_ms": 276.547554,
+      "non_load_late_enqueue_lower_ms": 0.0,
+      "seal_reasons": {
+        "ordinary": 12,
+        "candidate_target_ready": 10,
+        "deadline": 4,
+        "compute_seal_deadline": 2
+      },
+      "deadline_overshoot_ms": {
+        "count": 2,
+        "mean": 0.1496965,
+        "median": 0.1496965,
+        "min": 0.146651,
+        "max": 0.152742
+      },
+      "deadline_firings": [
+        {
+          "step": 1121,
+          "actual_seal_lead_lower_ms": 166.107608,
+          "actual_seal_lead_upper_ms": 166.670968,
+          "actual_enqueue_lead_lower_ms": 164.224637,
+          "actual_enqueue_lead_upper_ms": 164.787997,
+          "last_wait_requested_ms": 0.43759,
+          "last_wait_actual_ms": 0.491963
+        },
+        {
+          "step": 1123,
+          "actual_seal_lead_lower_ms": 44.413487,
+          "actual_seal_lead_upper_ms": 44.970366,
+          "actual_enqueue_lead_lower_ms": 36.188258,
+          "actual_enqueue_lead_upper_ms": 36.745137,
+          "last_wait_requested_ms": 0.681159,
+          "last_wait_actual_ms": 0.733964
+        }
+      ],
+      "worker_coverage": {
+        "2": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "1": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "0": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "7": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "6": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "5": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "4": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        },
+        "3": {
+          "compute_entries": 13,
+          "compact": 79,
+          "pinned": 79
+        }
+      },
+      "throughput_gain_pct": 2.982654051774314,
+      "mean_ttft_reduction_pct": 3.713444315153891
+    },
+    {
+      "cell": "r0_deadline5",
+      "path": "/mnt/localnvme/glm53_seal_deadline_20261006/canary/gpu/p61440_f95_h100/r0_deadline5",
+      "requests": 80,
+      "throughput": 7.3038732037978,
+      "mean_ttft_ms": 3831.2828075625,
+      "p95_ttft_ms": 5289.725832749999,
+      "compute_rounds": 14,
+      "late_admissions": 74,
+      "recovered_compute_opportunities": 72,
+      "kv_ready_during_compute": 77,
+      "missed_ready_at_worker_entry_with_seal_ack": 2,
+      "h2d_bytes": 1781858304000.0,
+      "compute_span_ms": 10486.114898,
+      "gap_lower_ms": 307.039286,
+      "gap_upper_ms": 318.47184599999997,
+      "non_load_late_enqueue_lower_ms": 20.007604,
+      "seal_reasons": {
+        "ordinary": 10,
+        "candidate_target_ready": 11,
+        "deadline": 3,
+        "compute_seal_deadline": 1,
+        "predecessor_compute_finished": 1
+      },
+      "deadline_overshoot_ms": {
+        "count": 1,
+        "mean": 0.147085,
+        "median": 0.147085,
+        "min": 0.147085,
+        "max": 0.147085
+      },
+      "deadline_firings": [
+        {
+          "step": 891,
+          "actual_seal_lead_lower_ms": 119.536484,
+          "actual_seal_lead_upper_ms": 119.549015,
+          "actual_enqueue_lead_lower_ms": 116.855181,
+          "actual_enqueue_lead_upper_ms": 116.867712,
+          "last_wait_requested_ms": 1.072198,
+          "last_wait_actual_ms": 1.126695
+        }
+      ],
+      "worker_coverage": {
+        "3": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "1": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "6": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "0": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "2": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "7": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "5": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        },
+        "4": {
+          "compute_entries": 14,
+          "compact": 80,
+          "pinned": 80
+        }
+      },
+      "throughput_gain_pct": 3.9257545903224944,
+      "mean_ttft_reduction_pct": 3.6844745349958963
+    }
+  ],
+  "excluded_jit_warmups": [],
+  "correctness": {
+    "correctness": {
+      "compact_shadow": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline0": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline10": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline20": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      }
+    },
+    "correctness_distinct": {
+      "compact_shadow": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 14,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline0": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline10": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "deadline20": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      }
+    }
+  },
+  "scope": "Cell gains use the control from the same repeat. CUDA execution spans include output-copy and host gaps, not just model kernels. One cell per lead does not establish a repeatable speedup."
+}

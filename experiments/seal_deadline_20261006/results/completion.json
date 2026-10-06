@@ -1,0 +1,25 @@
+{
+  "source_commit": "bcc4212090cd6d67996d02a1c61cd07b96544f83",
+  "branch": "experiment/glm53-seal-deadline-20261006",
+  "accepted_cells": 8,
+  "requests_per_policy": 300,
+  "episode_count_per_policy": 4,
+  "requests_per_episode": 75,
+  "gpus_idle": true,
+  "gpu_memory_used_mib": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "worker_processes_exited": true,
+  "driver_exit_code": 0,
+  "default_disabled": true,
+  "source_and_measurement_audit_passed": true,
+  "completed_utc_unix": 1791245717.686993,
+  "raw_artifact_root": "/mnt/localnvme/glm53_seal_deadline_20261006/comparison_300"
+}

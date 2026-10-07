@@ -105,6 +105,7 @@ _R = TypeVar("_R")  # Return type for collective_rpc
 
 
 if TYPE_CHECKING:
+    from vllm.v1.core.sched.scheduler import Scheduler
     from vllm.v1.kv_offload.timing_replay import Capture
 
 
@@ -1534,6 +1535,15 @@ class EngineCore:
         timing.loads.dispatch(getattr(metadata, "load_jobs", {}))
         data = dict(
             load_state=timing.loads.snapshot(),
+            predictor_general_prefill=(
+                os.environ.get("VLLM_PREDICTOR_GENERAL_PREFILL") == "1"
+            ),
+            prefill_only=bool(output.num_scheduled_tokens)
+            and all(
+                cast("Scheduler", self.scheduler).requests[r].num_computed_tokens - n
+                < cast("Scheduler", self.scheduler).requests[r].num_prompt_tokens
+                for r, n in output.num_scheduled_tokens.items()
+            ),
             cpu_cached_prefix_tokens=self.scheduler.deferral_cpu_cached_tokens(output),
             step=output.readiness_timeline_step,
             shape=shape,
@@ -1746,6 +1756,31 @@ class EngineCore:
         return self.scheduler.reset_prefix_cache(
             reset_running_requests, reset_connector
         )
+
+    def get_deferral_cohort_status(self) -> dict[str, Any]:
+        if self.early_load_readiness is None:
+            raise RuntimeError("the early KV readiness experiment is not enabled")
+        result = dict(
+            paused=self.scheduler.pause_state != PauseState.UNPAUSED,
+            requests=len(self.scheduler.deferral_live_request_ids()),
+            queued_steps=len(self.batch_queue or ()),
+        )
+        if os.environ.get("VLLM_PREDICTOR_DATASET_SHADOW") == "1":
+            result["dataset_target_ready"] = sum(
+                "coverage-main-" in r.request_id
+                and r.num_computed_tokens > 0
+                and (
+                    r.status != RequestStatus.WAITING_FOR_REMOTE_KVS
+                    or r.request_id
+                    in cast("Scheduler", self.scheduler).finished_recving_kv_req_ids
+                )
+                for r in cast("Scheduler", self.scheduler).requests.values()
+            )
+            result["dataset_background_submitted"] = sum(
+                "coverage-bg-" in r.request_id and r.num_computed_tokens > 0
+                for r in cast("Scheduler", self.scheduler).requests.values()
+            )
+        return result
 
     def set_kv_load_scheduling(
         self,

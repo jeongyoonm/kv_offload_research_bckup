@@ -1055,6 +1055,9 @@ class AsyncLLM(EngineClient):
             early_load_completion, schedule_delay_ms, experiment_options, seal_estimator
         )
 
+    async def get_deferral_cohort_status(self) -> dict[str, Any]:
+        return await self.engine_core.get_deferral_cohort_status_async()
+
     async def reset_encoder_cache(self) -> None:
         await self.engine_core.reset_encoder_cache_async()
 

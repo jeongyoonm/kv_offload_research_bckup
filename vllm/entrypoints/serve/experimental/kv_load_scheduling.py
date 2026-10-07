@@ -87,3 +87,20 @@ async def set_kv_load_scheduling(
 
 def attach_router(app: FastAPI) -> None:
     app.include_router(router)
+
+
+@router.get("/experimental/deferral-cohort")
+async def get_deferral_cohort(raw_request: Request):
+    client = raw_request.client
+    try:
+        loopback = client is not None and ipaddress.ip_address(client.host).is_loopback
+    except ValueError:
+        loopback = False
+    if not loopback:
+        raise HTTPException(status_code=403, detail="loopback clients only")
+    config = raw_request.app.state.vllm_config.kv_transfer_config
+    extra = config.kv_connector_extra_config if config is not None else {}
+    if EARLY_COMPLETION_KEY not in extra and SCHEDULE_DELAY_KEY not in extra:
+        raise HTTPException(status_code=404, detail="experiment is not enabled")
+    engine: EngineClient = raw_request.app.state.engine_client
+    return await engine.get_deferral_cohort_status()

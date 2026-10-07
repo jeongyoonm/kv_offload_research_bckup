@@ -211,6 +211,11 @@ class TimingChannel:
             from vllm.v1.kv_offload.shadow_timing_audit import ShadowTimingAudit
 
             self.audit = ShadowTimingAudit(self.paths)
+        self.dataset_shadow = None
+        if os.environ.get("VLLM_PREDICTOR_DATASET_SHADOW") == "1":
+            from vllm.v1.kv_offload.dataset_shadow import DatasetShadow
+
+            self.dataset_shadow = DatasetShadow(self)
 
     def emit(self, event: str, **fields):
         self.events.append(dict(event=event, time_ns=time.monotonic_ns(), **fields))
@@ -394,6 +399,9 @@ class TimingChannel:
 
     def flush(self):
         self.collect()
+        shadow = getattr(self, "dataset_shadow", None)
+        if shadow is not None:
+            self.events.extend(shadow.drain())
         audit = getattr(self, "audit", None)
         if audit is not None:
             self.events.extend(audit.flush())
@@ -404,6 +412,9 @@ class TimingChannel:
         self.events.clear()
 
     def close(self):
+        shadow = getattr(self, "dataset_shadow", None)
+        if shadow is not None:
+            shadow.close()
         audit = getattr(self, "audit", None)
         if audit is not None:
             audit.close()

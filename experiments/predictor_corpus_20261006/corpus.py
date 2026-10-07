@@ -77,13 +77,20 @@ FEATURE_NAMES = [
 ]
 
 
-def extract(event):
+def extract(event, *, cached_only=True):
     if event.get("event") != "step_completion" or not event.get("selected"):
         return None, "not_compute"
     if not event.get("valid"):
         return None, "invalid_completion"
     shapes = event.get("request_shapes", [])
-    if not shapes or any(len(s) != 2 or s[0] <= 1 or s[1] <= 0 for s in shapes):
+    if not cached_only and not event.get("prefill_only"):
+        return None, "not_prefill_only"
+    if not shapes or any(
+        len(s) != 2
+        or s[0] <= (1 if cached_only else 0)
+        or s[1] < (1 if cached_only else 0)
+        for s in shapes
+    ):
         return None, "not_cached_prefill"
     if sum(s[0] for s in shapes) != sum(event["selected"].values()):
         return None, "token_accounting"
@@ -118,6 +125,9 @@ def extract(event):
         / 1e6,
         preparation_ms=max(p[2] - p[1] for p in preparation) / 1e6,
         execution_ranks=execution,
+        prefill_only=event.get("prefill_only", False),
+        predictor_general_prefill=not cached_only,
+        cpu_cached_prefix_tokens=event.get("cpu_cached_prefix_tokens"),
     ), None
 
 

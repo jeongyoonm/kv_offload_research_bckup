@@ -262,6 +262,9 @@ class EngineCoreClient(ABC):
     ) -> dict[str, Any]:
         raise NotImplementedError
 
+    async def get_deferral_cohort_status_async(self) -> dict[str, Any]:
+        raise NotImplementedError
+
     async def reset_encoder_cache_async(self) -> None:
         raise NotImplementedError
 
@@ -1207,6 +1210,9 @@ class AsyncMPClient(MPClient):
 
     async def reset_encoder_cache_async(self) -> None:
         await self.call_utility_async("reset_encoder_cache")
+
+    async def get_deferral_cohort_status_async(self) -> dict[str, Any]:
+        return await self.call_utility_async("get_deferral_cohort_status")
 
     async def sleep_async(self, level: int = 1, mode: PauseMode = "abort") -> None:
         await self.call_utility_async("sleep", level, mode)

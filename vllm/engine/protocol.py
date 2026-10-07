@@ -189,6 +189,10 @@ class EngineClient(ABC):
         """Configure the experiment-only KV readiness scheduling policy."""
         raise NotImplementedError
 
+    async def get_deferral_cohort_status(self) -> dict[str, Any]:
+        """Inspect the paused experiment cohort without scheduling requests."""
+        raise NotImplementedError
+
     @abstractmethod
     async def sleep(self, level: int = 1, mode: "PauseMode" = "abort") -> None:
         """Sleep the engine"""

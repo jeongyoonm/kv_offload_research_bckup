@@ -20,6 +20,7 @@ if TYPE_CHECKING:
 import numpy as np
 
 from vllm.v1.core.sched.output import NewRequestData
+from vllm.v1.kv_offload.dataset_shadow import collection_compute_held
 from vllm.v1.outputs import AsyncModelRunnerOutput
 from vllm.v1.request import RequestStatus
 
@@ -128,6 +129,8 @@ def prepare_candidates(scheduler, token_budget, base_reqs):
     ):
         if len(candidates) >= capacity:
             break
+        if collection_compute_held(request):
+            continue
         if (
             request.status != RequestStatus.WAITING_FOR_REMOTE_KVS
             or request.prompt_token_ids is None

@@ -56,6 +56,7 @@ from vllm.v1.core.sched.utils import check_stop, remove_all
 from vllm.v1.engine import EngineCoreEventType, EngineCoreOutput, EngineCoreOutputs
 from vllm.v1.kv_cache_interface import KVCacheConfig, MambaSpec
 from vllm.v1.kv_offload import timeline
+from vllm.v1.kv_offload.dataset_shadow import collection_compute_held
 from vllm.v1.metrics.perf import ModelMetrics, PerfStats
 from vllm.v1.metrics.stats import (
     PrefixCacheStats,
@@ -846,6 +847,11 @@ class Scheduler(SchedulerInterface):
                         # Deliverable stale output still in flight: resuming now
                         # could resample a position that output later delivers.
                         # It drains within the pipeline depth.
+                        request_queue.pop_request()
+                        step_skipped_waiting.prepend_request(request)
+                        continue
+
+                    if collection_compute_held(request):
                         request_queue.pop_request()
                         step_skipped_waiting.prepend_request(request)
                         continue

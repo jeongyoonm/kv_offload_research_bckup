@@ -24,9 +24,7 @@ def main():
     for name, by_step in batches.items():
         path = Path(name)
         late_path = path.parent / "late.json"
-        if not late_path.exists():
-            continue
-        late = json.loads(late_path.read_text())
+        late = json.loads(late_path.read_text()) if late_path.exists() else {}
         if late.get("overflow"):
             rejected["late_overflow"] += 1
             continue
@@ -38,8 +36,11 @@ def main():
             elif e["event"] == "kv_all_rank_completion":
                 # Engine receipt time, rather than an earlier device completion.
                 timeline.append((e["time_ns"], 1, e))
-        for e in late["records"]:
-            if e["event"] == "seal_prediction":
+        forecasts = list(late.get("records", [])) + [
+            e for e in events if e["event"] == "dataset_forecast"
+        ]
+        for e in forecasts:
+            if e["event"] in ("seal_prediction", "dataset_forecast"):
                 timeline.append((e["time_ns"], 2, e))
         jobs, dispatched, completed, seen = {}, {}, {}, set()
         for now, kind, event in sorted(timeline, key=lambda e: e[:2]):
@@ -89,7 +90,7 @@ def main():
                 (event["gpu_start_upper_ns"] - row["dispatch_ns"]) / 1e6,
             ]
             row["forecast_time_ns"] = now
-            row["prior_prediction_ms"] = event["predicted_duration_ns"] / 1e6
+            row["prior_prediction_ms"] = event.get("predicted_duration_ns", 0) / 1e6
             output.append(row)
     with (args.output / "forecasts.jsonl").open("w") as stream:
         for row in output:

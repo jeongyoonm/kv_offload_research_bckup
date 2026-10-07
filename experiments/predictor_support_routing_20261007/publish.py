@@ -35,7 +35,11 @@ def main():
                 signatures=support["signatures"],
                 feature_indices=r.INDICES,
                 known_model=source,
-                expert=states[source],
+                expert=(
+                    states["envelope_sparse_mlp"]["neural"]
+                    if source == "guarded_sparse_mlp"
+                    else states[source]
+                ),
                 envelope=states["suffix_guard_envelope_boost"],
             )
             path = r.ROOT / "exports" / name / f"seed{task['seed']}.json"

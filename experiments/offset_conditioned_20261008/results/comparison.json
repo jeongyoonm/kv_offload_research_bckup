@@ -1,0 +1,247 @@
+{
+  "complete": true,
+  "measured_cells": 9,
+  "aggregate": [
+    {
+      "workload": "familiar60k",
+      "predictor": "trees",
+      "episodes": 3,
+      "requests": 225,
+      "throughput_rps": 6.217346073226027,
+      "mean_ttft_ms": 4431.724041191111,
+      "p95_ttft_ms": 6083.725254800001,
+      "compute_rounds": 26,
+      "mean_episode_compute_span_ms": 9262.737413333334,
+      "cpu_enqueue_lead_ms": {
+        "count": 26,
+        "mean": 82.41955965384615,
+        "median": 0.5943130000000001,
+        "p95": 446.8934655,
+        "minimum": 0.014078,
+        "maximum": 482.680806
+      },
+      "batch_requests": {
+        "count": 26,
+        "mean": 8.653846153846153,
+        "median": 8.0,
+        "p95": 16.0,
+        "minimum": 1.0,
+        "maximum": 17.0
+      },
+      "mean_episode_gpu_gap_ms": 2408.08293,
+      "mean_episode_gpu_gap_lower_ms": 2404.427276666667,
+      "mean_episode_gpu_gap_upper_ms": 2415.757318666667,
+      "late_admissions": 221,
+      "recovered_compute_opportunities": 126,
+      "kv_ready_during_compute": 126,
+      "recovered_ready_percent": 100.0,
+      "prediction_mae_ms": 43.06014215384619,
+      "prediction_bias_ms": -7.106254461538456,
+      "prediction_p95_absolute_ms": 141.4847318,
+      "prediction_cost_us": {
+        "count": 13,
+        "mean": 393.60561538461536,
+        "median": 377.562,
+        "p95": 467.2378,
+        "minimum": 305.613,
+        "maximum": 471.322
+      },
+      "actual_seal_lead_ms": {
+        "count": 13,
+        "mean": 418.83680030769233,
+        "median": 310.726257,
+        "p95": 1053.7009983999997,
+        "minimum": -3.902244,
+        "maximum": 1164.288142
+      },
+      "actual_enqueue_lead_ms": {
+        "count": 13,
+        "mean": 408.5036926923077,
+        "median": 304.455902,
+        "p95": 1040.0545001999997,
+        "minimum": -17.235415,
+        "maximum": 1148.650878
+      },
+      "seal_reasons": {
+        "ordinary": 25,
+        "unknown": 8,
+        "candidate_target_ready": 21,
+        "deadline": 13,
+        "compute_seal_deadline": 2,
+        "predecessor_compute_finished": 2
+      },
+      "predictor_backends": {
+        "native": 13
+      },
+      "throughput_gain_percent": 0.0,
+      "mean_ttft_reduction_percent": 0.0,
+      "p95_ttft_reduction_percent": 0.0,
+      "paired_throughput_gain_percent": 0.0,
+      "paired_95pct_gain_bounds": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "workload": "familiar60k",
+      "predictor": "matched_elapsed",
+      "episodes": 3,
+      "requests": 225,
+      "throughput_rps": 6.15929105642343,
+      "mean_ttft_ms": 4491.217867582223,
+      "p95_ttft_ms": 6027.8251222,
+      "compute_rounds": 27,
+      "mean_episode_compute_span_ms": 9339.159055333334,
+      "cpu_enqueue_lead_ms": {
+        "count": 27,
+        "mean": 96.75976007407408,
+        "median": 0.577864,
+        "p95": 445.8163862,
+        "minimum": 0.016453,
+        "maximum": 483.571851
+      },
+      "batch_requests": {
+        "count": 27,
+        "mean": 8.333333333333334,
+        "median": 7.0,
+        "p95": 16.0,
+        "minimum": 1.0,
+        "maximum": 17.0
+      },
+      "mean_episode_gpu_gap_ms": 2473.951594,
+      "mean_episode_gpu_gap_lower_ms": 2469.3181860000004,
+      "mean_episode_gpu_gap_upper_ms": 2477.885063333333,
+      "late_admissions": 217,
+      "recovered_compute_opportunities": 121,
+      "kv_ready_during_compute": 124,
+      "recovered_ready_percent": 97.58064516129032,
+      "prediction_mae_ms": 22.12329786666667,
+      "prediction_bias_ms": -5.8934881333333315,
+      "prediction_p95_absolute_ms": 60.17437139999994,
+      "prediction_cost_us": {
+        "count": 15,
+        "mean": 475.12093333333337,
+        "median": 486.692,
+        "p95": 552.2478,
+        "minimum": 370.475,
+        "maximum": 570.837
+      },
+      "actual_seal_lead_ms": {
+        "count": 15,
+        "mean": 459.18000806666663,
+        "median": 149.878198,
+        "p95": 1438.7846814999996,
+        "minimum": -1.168755,
+        "maximum": 1753.16382
+      },
+      "actual_enqueue_lead_ms": {
+        "count": 15,
+        "mean": 448.20521733333334,
+        "median": 138.184922,
+        "p95": 1433.7824219999995,
+        "minimum": -9.368555,
+        "maximum": 1748.478608
+      },
+      "seal_reasons": {
+        "ordinary": 20,
+        "unknown": 9,
+        "candidate_target_ready": 20,
+        "deadline": 15,
+        "compute_seal_deadline": 4,
+        "predecessor_compute_finished": 2
+      },
+      "predictor_backends": {
+        "native_forest": 15
+      },
+      "throughput_gain_percent": -0.9337588115385986,
+      "mean_ttft_reduction_percent": -1.3424533169967612,
+      "p95_ttft_reduction_percent": 0.91884709218083,
+      "paired_throughput_gain_percent": -1.120638923510125,
+      "paired_95pct_gain_bounds": [
+        -29.81941951713005,
+        39.31386687919053
+      ]
+    },
+    {
+      "workload": "familiar60k",
+      "predictor": "matched_offset",
+      "episodes": 3,
+      "requests": 225,
+      "throughput_rps": 6.430307327881542,
+      "mean_ttft_ms": 4293.787519768889,
+      "p95_ttft_ms": 5512.200982,
+      "compute_rounds": 29,
+      "mean_episode_compute_span_ms": 9454.828835,
+      "cpu_enqueue_lead_ms": {
+        "count": 29,
+        "mean": 104.61830806896552,
+        "median": 0.580113,
+        "p95": 469.7758893999999,
+        "minimum": 0.016026,
+        "maximum": 482.865252
+      },
+      "batch_requests": {
+        "count": 29,
+        "mean": 7.758620689655173,
+        "median": 6.0,
+        "p95": 16.599999999999998,
+        "minimum": 1.0,
+        "maximum": 17.0
+      },
+      "mean_episode_gpu_gap_ms": 1840.2694513333333,
+      "mean_episode_gpu_gap_lower_ms": 1835.1655483333334,
+      "mean_episode_gpu_gap_upper_ms": 1845.8190743333332,
+      "late_admissions": 219,
+      "recovered_compute_opportunities": 148,
+      "kv_ready_during_compute": 148,
+      "recovered_ready_percent": 100.0,
+      "prediction_mae_ms": 17.134263058823514,
+      "prediction_bias_ms": -12.806240117647041,
+      "prediction_p95_absolute_ms": 49.56735639999996,
+      "prediction_cost_us": {
+        "count": 17,
+        "mean": 483.5211764705883,
+        "median": 480.015,
+        "p95": 582.3426000000001,
+        "minimum": 379.962,
+        "maximum": 594.529
+      },
+      "actual_seal_lead_ms": {
+        "count": 17,
+        "mean": 295.79688723529415,
+        "median": 149.383799,
+        "p95": 739.5463733999995,
+        "minimum": -1.918505,
+        "maximum": 1143.067719
+      },
+      "actual_enqueue_lead_ms": {
+        "count": 17,
+        "mean": 282.92825805882353,
+        "median": 137.383142,
+        "p95": 732.2339751999997,
+        "minimum": -45.559108,
+        "maximum": 1135.160748
+      },
+      "seal_reasons": {
+        "ordinary": 21,
+        "unknown": 6,
+        "compute_seal_deadline": 3,
+        "candidate_target_ready": 22,
+        "predecessor_compute_finished": 3,
+        "deadline": 12
+      },
+      "predictor_backends": {
+        "native_forest": 17
+      },
+      "throughput_gain_percent": 3.4252758676663886,
+      "mean_ttft_reduction_percent": 3.112479931966805,
+      "p95_ttft_reduction_percent": 9.394314319981378,
+      "paired_throughput_gain_percent": 3.1413880180698945,
+      "paired_95pct_gain_bounds": [
+        -37.72069315268076,
+        70.8134926481116
+      ]
+    }
+  ],
+  "scope": "Three 75-request episodes per predictor. Each follows a common-tree 32-request same-workload conditioning episode; throughput excludes priming/startup. Pooled p95 TTFT across 225 requests. Issued predictions have policy-dependent populations. Recovery counts distinct late-admitted requests whose KV became ready during some measured compute interval; it does not prove same-predecessor recovery. GPU gaps use all-rank start upper bounds and include load-only intervals."
+}

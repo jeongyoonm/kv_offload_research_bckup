@@ -24,6 +24,8 @@ def main():
     audits = helper.audit_measurements(ROOT, 9, 675)
     allocation = json.loads((ROOT / "allocation.json").read_text())
     assert allocation["server_stopped"]
+    cleanup = json.loads((ROOT / "cleanup.json").read_text())
+    assert cleanup["owned_server_stopped"] and cleanup["gpu_memory_released"]
     conditioning = sorted((ROOT / "live").glob("*/rconditioning_*/result.json"))
     assert len(conditioning) == 9
     for path in conditioning:
@@ -68,6 +70,7 @@ def main():
         excluded_conditioning_requests=288,
         all_request_accounting_passed=True,
         allocation=allocation,
+        cleanup=cleanup,
         paired_offset_vs_elapsed=paired,
         issued_replay_difference_ns=accuracy["issued_replay_max_difference_ns"],
         conditioning_phase_pairs=phase_pairs,
@@ -158,6 +161,7 @@ def main():
         "measurement_audit.json",
         "plan.json",
         "phase_audit.json",
+        "cleanup.json",
     ]:
         shutil.copy2(ROOT / name, dest / name)
     shutil.copy2(ROOT / "audit_live/audit.json", dest / "audit_live.json")

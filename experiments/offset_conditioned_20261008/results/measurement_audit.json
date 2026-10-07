@@ -1,0 +1,110 @@
+[
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r0_matched_elapsed",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 6,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r0_matched_offset",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 11,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r0_trees",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 6,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r1_matched_elapsed",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 9,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r1_matched_offset",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 9,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r1_trees",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 11,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r2_matched_elapsed",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 12,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r2_matched_offset",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 9,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  },
+  {
+    "cell": "/mnt/localnvme/glm53_offset_conditioned_20261008/live/familiar60k/r2_trees",
+    "requests": 75,
+    "scheduled_tokens": 230400,
+    "expected_tokens": 230400,
+    "per_request_token_accounting": true,
+    "unique_ordered_completion_steps": 9,
+    "frozen_checkpoint": true,
+    "matched_policy": true,
+    "optimized_preparation": true,
+    "passed": true
+  }
+]

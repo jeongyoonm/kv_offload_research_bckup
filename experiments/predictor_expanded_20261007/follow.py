@@ -109,6 +109,7 @@ def main():
         )
     budget = json.loads(budget_path.read_text())
     deadline = budget["deadline"]
+    workers = str(budget["cpu_workers"])
     log("waiting_for_coverage_completion", deadline=deadline)
     while time.time() < deadline:
         events = [
@@ -131,11 +132,11 @@ def main():
         unfinished("waiting_for_current_plan", deadline)
         return
     commands = [
-        ("architecture", ["study.py", "--workers", "4"]),
+        ("architecture", ["study.py", "--workers", workers]),
         ("architecture_report", ["report.py"]),
-        ("improvements", ["improve.py", "--workers", "4"]),
-        ("continuous_trend", ["trend.py", "--workers", "4"]),
-        ("benchmark", ["benchmark.py", "--workers", "4"]),
+        ("improvements", ["improve.py", "--workers", workers]),
+        ("continuous_trend", ["trend.py", "--workers", workers]),
+        ("benchmark", ["benchmark.py", "--workers", workers]),
         ("branches", ["branches.py"]),
         ("final_report", ["final_report.py"]),
     ]

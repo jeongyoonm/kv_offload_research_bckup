@@ -141,13 +141,12 @@ class ScaledMLP:
     def transform(self, x):
         x = np.asarray(x, dtype=np.float64)
         if self.config["input"] == "log1p":
-            assert np.all(x >= 0)
-            x = np.log1p(x)
+            x = np.sign(x) * np.log1p(np.abs(x))
         return (x - self.x_mean) / self.x_scale
 
     def fit(self, x, y, sample_weight):
         begin = time.perf_counter()
-        raw = np.log1p(x) if self.config["input"] == "log1p" else x
+        raw = np.sign(x) * np.log1p(np.abs(x)) if self.config["input"] == "log1p" else x
         self.x_mean = np.average(raw, axis=0, weights=sample_weight)
         self.x_scale = np.sqrt(
             np.average((raw - self.x_mean) ** 2, axis=0, weights=sample_weight)
@@ -386,7 +385,7 @@ class FrozenComponent:
                 x, {"native_predictor": self.native}
             ) / 1e6 - s.get("shift", 0)
         if s["config"]["input"] == "log1p":
-            x = np.log1p(x)
+            x = np.sign(x) * np.log1p(np.abs(x))
         v = (x - self.mean) / self.scale
         for i, (weight, bias) in enumerate(self.layers):
             v = v @ weight + bias

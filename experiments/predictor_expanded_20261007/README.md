@@ -76,3 +76,10 @@ When the selected architecture has an Extra Trees base, also replace leaf means
 with weighted training medians while retaining its exact partitions. Compare
 this alone and, where available, together with absolute-error boosting. This
 aligns the point prediction with MAE without changing inference layout or cost.
+
+Expanded-data validation found that an MLP base can produce a negative raw
+duration estimate, which is still a valid intermediate input to correction.
+The log-input MLP uses `sign(x) * log1p(abs(x))` consistently in fitting and frozen
+evaluation. This exactly preserves the previous transformation for nonnegative
+inputs and avoids NaNs for signed intermediate estimates. The abandoned initial
+tasks had no completed checkpoints; their attempt log remains preserved.

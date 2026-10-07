@@ -13,6 +13,24 @@ from threadpoolctl import threadpool_limits
 
 
 class ExportContract(unittest.TestCase):
+    def test_mlp_signed_log_handles_negative_intermediate_base_predictions(self):
+        rng = np.random.default_rng(73)
+        x = rng.uniform(0, 10, size=(100, 24))
+        x[:, -1] -= 20
+        y = 2 * x[:, -1] + np.sin(x[:, 0])
+        config = dict(layers=[32], input="log1p", solver="lbfgs", alpha=0.01)
+        with threadpool_limits(limits=1):
+            model = ScaledMLP(config, 73).fit(x, y, np.ones(len(x)))
+            frozen = FrozenComponent(model.frozen())
+            expected = model.predict(x)
+            actual = np.array([frozen.predict_one(v) for v in x])
+        self.assertTrue(np.isfinite(actual).all())
+        np.testing.assert_allclose(actual, expected, atol=1e-10, rtol=1e-10)
+        np.testing.assert_array_equal(
+            np.sign(x[:, :23]) * np.log1p(np.abs(x[:, :23])),
+            np.log1p(x[:, :23]),
+        )
+
     def test_correction_selection_scores_complete_duration(self):
         configs = [{"prediction": 0.0}, {"prediction": -10.0}]
 

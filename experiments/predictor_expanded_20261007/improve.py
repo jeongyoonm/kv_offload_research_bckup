@@ -543,7 +543,28 @@ def summarize(tasks, proposal):
     eligible = [
         n for n in proposal["candidates"] if cv["historical"][n]["mae_ms"] <= limit
     ]
-    winner = min(eligible, key=lambda n: cv["fresh"][n]["workload_macro_mae_ms"])
+    scopes = ["long_context", "long_suffix", "large_batch", "heavy_transfers"]
+
+    def range_score(name):
+        return float(
+            np.mean(
+                [
+                    results[f"{scope}:wide"]["scores"]["fresh"][name]["mae_ms"]
+                    / results[f"{scope}:wide"]["scores"]["fresh"]["trees_fixed"][
+                        "mae_ms"
+                    ]
+                    for scope in scopes
+                ]
+            )
+        )
+
+    winner = min(
+        eligible,
+        key=lambda n: (
+            cv["fresh"][n]["workload_macro_mae_ms"],
+            range_score(n),
+        ),
+    )
     selection = dict(
         architecture=proposal["architecture"],
         effective_architecture=architecture_description(
@@ -552,6 +573,8 @@ def summarize(tasks, proposal):
         improvement=winner,
         benchmark_used_for_selection=False,
         criterion="fresh episode-CV workload-macro MAE, historical regression <=10%",
+        exact_tie_break="mean withheld-range MAE normalized to fixed trees",
+        tie_break_range_score=range_score(winner),
         historical_limit_ms=limit,
         serving_integration_required=(
             winner.startswith("trend_")

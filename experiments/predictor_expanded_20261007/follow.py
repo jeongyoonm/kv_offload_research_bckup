@@ -138,6 +138,8 @@ def main():
         ("continuous_trend", ["trend.py", "--workers", workers]),
         ("enqueue_features", ["enqueue.py", "--workers", workers]),
         ("sparse_geometry", ["sparse.py", "--workers", workers]),
+        ("support_guard", ["guard.py", "--workers", workers]),
+        ("robust_selection", ["robust.py"]),
         ("benchmark", ["benchmark.py", "--workers", workers]),
         ("branches", ["branches.py"]),
         ("final_report", ["final_report.py"]),

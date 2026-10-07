@@ -125,3 +125,15 @@ cells and no benchmark scores examined. Its opening record is preserved as
 `benchmark_opened_before_sparse.json`. All further choices continue to use only
 episode/range validation; independent feature phases precede the new frozen
 benchmark pass. The benchmark remains explicitly reused, never a blind test.
+
+After sparse geometry validation, compare neural/tree policies with a marginal
+support guard. Use forecast training minima/maxima for geometry and causal load
+footprint, never labels or bounds from held episodes. Outside these bounds, use
+the same fold's fixed trees. Check both routes against exported predictions.
+Use normalized range MAE only to break exact ties in the original fresh-macro
+criterion. Also freeze a separate robustness-oriented alternative: allow 0.1 ms
+fresh macro tolerance, then minimize normalized range error and historical MAE.
+This tolerance follows an observed 0.013 ms near tie; it is a post-hoc exploratory
+policy, not a pre-registered accuracy result. Preserve the strict winner as well.
+Hash both choices before the final replay. Marginal support does not guarantee
+support for every joint geometry/transfer combination.

@@ -142,6 +142,7 @@ def main():
     study.arch.dump(study.ROOT / "enqueue_feature_runtime.json", extraction)
     tasks = json.loads((study.ROOT / "benchmark_tasks.json").read_text())
     selection = json.loads((study.ROOT / "final_selection.json").read_text())
+    robust_selection = json.loads((study.ROOT / "robust_selection.json").read_text())
     architecture = json.loads((study.ROOT / "architecture_summary.json").read_text())
     improvements = json.loads((study.ROOT / "improvement_summary.json").read_text())
     proposal = json.loads((study.ROOT / "improvement_plan.json").read_text())
@@ -243,6 +244,8 @@ def main():
     fig.savefig(study.ROOT / "range_generalization.pdf")
     plt.close(fig)
     best = benchmark["wide"]["improvements"][chosen]
+    robust_name = robust_selection["improvement"]
+    robust_benchmark = benchmark["wide"]["improvements"][robust_name]
     reference = benchmark["wide"]["architectures"]["trees_fixed"]
     lines = [
         "# Expanded predictor study: GLM 5.3 TP8",
@@ -255,6 +258,16 @@ def main():
             f"MAPE: **{best['mape_percent']:.2f}%**; p95 absolute error: "
             f"**{best['p95_absolute_ms']:.2f} ms**. Median exported evaluation: "
             f"**{runtime[chosen]['median_us']:.1f} us**."
+        ),
+        "",
+        (
+            f"Robustness-oriented alternate: **{robust_name}**, selected among "
+            "models within 0.1 ms of the best fresh CV workload-macro MAE using "
+            "withheld-range error, then historical MAE. Its reused benchmark "
+            f"MAE is **{robust_benchmark['mae_ms']:.2f} ms**, p95 error "
+            f"**{robust_benchmark['p95_absolute_ms']:.2f} ms**, and evaluation "
+            f"**{runtime[robust_name]['median_us']:.1f} us**. Both selections "
+            "were frozen before this final benchmark pass."
         ),
         "",
         "## Architecture comparison",
@@ -374,6 +387,11 @@ def main():
             "require a serving "
             "integration before GPU "
             "deployment; the production scheduler was not changed by CPU replay."
+        ),
+        (
+            "Support guards use only marginal training bounds. They cannot detect "
+            "every unseen combination inside those bounds, and the fixed-tree "
+            "fallback is not a guarantee of accurate extrapolation."
         ),
         "",
         (

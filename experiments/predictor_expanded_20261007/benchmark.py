@@ -25,6 +25,8 @@ def main():
     args = parser.parse_args()
     selection_path = study.ROOT / "final_selection.json"
     selection_hash = hashlib.sha256(selection_path.read_bytes()).hexdigest()
+    robust_path = study.ROOT / "robust_selection.json"
+    robust_hash = hashlib.sha256(robust_path.read_bytes()).hexdigest()
     pool = joblib.load(study.ROOT / "pool.joblib")
     final = joblib.load(study.ROOT / "locked_benchmark.joblib")
     training_size = len(pool["forecasts"])
@@ -54,6 +56,8 @@ def main():
         dict(
             selection_sha256=selection_hash,
             selection=json.loads(selection_path.read_text()),
+            robust_selection_sha256=robust_hash,
+            robust_selection=json.loads(robust_path.read_text()),
             reused_final_benchmark=True,
             benchmark_training_episode_overlap=0,
             samples=len(final),
@@ -70,6 +74,7 @@ def main():
                 flush=True,
             )
     assert hashlib.sha256(selection_path.read_bytes()).hexdigest() == selection_hash
+    assert hashlib.sha256(robust_path.read_bytes()).hexdigest() == robust_hash
 
 
 if __name__ == "__main__":

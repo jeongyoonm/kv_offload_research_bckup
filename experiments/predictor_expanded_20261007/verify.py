@@ -5,6 +5,7 @@
 import unittest
 from unittest.mock import patch
 
+import enqueue
 import improve
 import numpy as np
 import study
@@ -14,6 +15,17 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_gpu_enqueue_features_use_only_starts_known_by_forecast(self):
+        ranks = [[1, 1000, 2000, 2100 + i, 0, 1, 10000, 0, 0] for i in range(8)]
+        row = dict(execution_ranks=ranks, forecast_time_ns=3000)
+        before = enqueue.extra_features([row])
+        for rank in ranks:
+            rank[4:] = [900000000, 0, 800000000, 700000000, 600000000]
+        np.testing.assert_array_equal(before, enqueue.extra_features([row]))
+        row["forecast_time_ns"] = 2000
+        with self.assertRaises(AssertionError):
+            enqueue.extra_features([row])
+
     def test_median_tree_leaves_respect_training_weights_and_frozen_export(self):
         x = np.zeros((100, 11))
         y = np.r_[np.full(98, 10.0), np.full(2, 500.0)]

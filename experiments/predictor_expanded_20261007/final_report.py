@@ -59,6 +59,10 @@ def variation():
 
 
 def timings(states, x):
+    import enqueue
+
+    rows = joblib.load(study.ROOT / "locked_benchmark.joblib")[: len(x)]
+    x = np.column_stack((x, enqueue.extra_features(rows)))
     os.environ["VLLM_DEFERRAL_FAST_FOREST"] = str(
         study.HIST / "fast_forest/build/libpredictor_forest_walk.so"
     )
@@ -312,7 +316,8 @@ def main():
         ),
         (
             "The research exports support architecture comparisons. MLP and "
-            "linear-trend candidates require a serving integration before GPU "
+            "linear-trend and CUDA enqueue-feature candidates require a serving "
+            "integration before GPU "
             "deployment; the production scheduler was not changed by CPU replay."
         ),
         "",

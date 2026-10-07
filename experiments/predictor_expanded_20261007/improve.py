@@ -160,10 +160,14 @@ class FrozenCandidate:
             else arch.FrozenArchitecture(s, native)
             for s in state["models"]
         ]
+        self.input_indices = [s.get("input_indices") for s in state["models"]]
 
     def predict_one(self, x):
         prediction = sum(
-            w * m.predict_one(x) for w, m in zip(self.state["weights"], self.models)
+            w * m.predict_one(x[:23] if index is None else x[index])
+            for w, m, index in zip(
+                self.state["weights"], self.models, self.input_indices
+            )
         )
         calibration = self.state.get("calibration")
         if calibration:
@@ -203,8 +207,13 @@ class FrozenTrend:
 
 
 def predict_state(state, rows):
+    x = arch.runtime_features(rows)
+    if state.get("gpu_enqueue_features"):
+        import enqueue
+
+        x = np.column_stack((x, enqueue.extra_features(rows)))
     model = FrozenCandidate(state)
-    return np.array([model.predict_one(x) for x in arch.runtime_features(rows)])
+    return np.array([model.predict_one(v) for v in x])
 
 
 def wrapped(state):
@@ -316,7 +325,11 @@ def run_task(task):
     configure()
     with threadpool_limits(limits=1):
         for variant in proposal["candidates"]:
-            if variant.startswith("trend_"):
+            if variant.startswith("trend_") or variant in (
+                "gpu_enqueue_features",
+                "gpu_enqueue_gap_only",
+                "rank_skew_only",
+            ):
                 continue
             if variant in ("selected", "global_calibration", "group_calibration"):
                 continue
@@ -342,6 +355,12 @@ def run_task(task):
             import trend
 
             states.update(trend.fit_variants(batches, train, selected, task["seed"])[0])
+        if "gpu_enqueue_features" in proposal["candidates"]:
+            import enqueue
+
+            states.update(
+                enqueue.fit_variants(name, batches, train, selected, task["seed"])[0]
+            )
         configure()
         oof, audit = oof_architecture(name, selected, batches, train, task["seed"])
         calibration = calibrate(train, oof)
@@ -426,12 +445,22 @@ def summarize(tasks, proposal):
             "positive ridge geometry trend with optional boosted residual"
             if winner.startswith("trend_")
             else proposal["architecture"]
+            + (
+                " with GPU enqueue/start features"
+                if winner
+                in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")
+                else ""
+            )
         ),
         improvement=winner,
         benchmark_used_for_selection=False,
         criterion="fresh episode-CV workload-macro MAE, historical regression <=10%",
         historical_limit_ms=limit,
-        serving_integration_required=winner.startswith("trend_"),
+        serving_integration_required=(
+            winner.startswith("trend_")
+            or winner
+            in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")
+        ),
     )
     arch.dump(study.ROOT / "improvement_summary.json", results)
     arch.dump(study.ROOT / "final_selection.json", selection)

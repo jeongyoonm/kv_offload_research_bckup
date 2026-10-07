@@ -83,3 +83,16 @@ The log-input MLP uses `sign(x) * log1p(abs(x))` consistently in fitting and fro
 evaluation. This exactly preserves the previous transformation for nonnegative
 inputs and avoids NaNs for signed intermediate estimates. The abandoned initial
 tasks had no completed checkpoints; their attempt log remains preserved.
+
+Training-only diagnostics found matching two-request shapes with 69–92 ms of
+CUDA marker enqueue lead and 72–78 ms subsequent GPU span, compared with roughly
+zero lead and 125 ms span in fresh samples. The native record's enqueue word is
+set immediately before recording the forward-start CUDA event. Test marker-lead
+min/max/median/std plus rank-start skew; remove skew and remove lead separately
+as feature controls. These inputs use only immutable enqueue/start words already
+observable by forecast time. They exclude completion, elapsed-duration, and end
+words. Trigger after ordinary comparisons when historical CV MAE remains above
+5 ms and at least thirty pooled forecasts have lead at least 50 ms. Keep selected
+training-only capacities unchanged. This association is consistent with hiding
+CPU kernel submission under GPU backlog; CPU replay cannot confirm that mechanism.
+The added feature schemas require serving integration before deployment.

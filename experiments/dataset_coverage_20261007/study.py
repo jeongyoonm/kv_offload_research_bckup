@@ -130,6 +130,34 @@ def reference():
     )
 
 
+def historical_guard_predictions(rows):
+    """Audit the old cached-only guard and its existing linear fallback."""
+    state = json.loads((HIST / "boosted_residual/model.json").read_text())["state"]
+    estimation = module(
+        "coverage_estimation", SOURCE / "vllm/v1/kv_offload/seal_predictor.py"
+    )
+    model = estimation.ComputeEstimator()
+    model.coefficients = np.array(state["coefficients"])
+    model.errors.extend(state["errors"])
+    model.latency_surface = arch.surface.LatencySurface(state["latency_surface"])
+    model.frozen = True
+    return np.array(
+        [
+            model.predict(
+                dict(
+                    row,
+                    predictor_general_prefill=False,
+                    execution_snapshot=row["execution_ranks"],
+                    forecast_ns=row["forecast_time_ns"],
+                    forecast_load_features=row["forecast_features"][:10],
+                )
+            )
+            / 1e6
+            for row in rows
+        ]
+    )
+
+
 def verify_serving(state, rows):
     payload = serving(state)["state"]
     model = arch.surface.LatencySurface(payload["latency_surface"])
@@ -232,6 +260,7 @@ def development():
         ROOT / "study/frozen_reference.json",
         dict(
             development=scores(dev, predict(reference(), dev)),
+            development_old_guard=scores(dev, historical_guard_predictions(dev)),
             historical=scores(historical, predict(reference(), historical)),
         ),
     )
@@ -352,6 +381,10 @@ def final():
         )
     predictions["historical_frozen"] = predict(reference(), rows)[None, :]
     results["historical_frozen"] = scores(rows, predictions["historical_frozen"][0])
+    predictions["historical_old_guard"] = historical_guard_predictions(rows)[None, :]
+    results["historical_old_guard"] = scores(
+        rows, predictions["historical_old_guard"][0]
+    )
     y = arch.target(rows)
     groups = defaultdict(list)
     for i, r in enumerate(rows):

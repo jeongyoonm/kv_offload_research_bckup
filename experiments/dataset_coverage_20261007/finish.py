@@ -71,6 +71,7 @@ def main():
     command("normalize", serving_python, ["run.py", "--normalize"])
     command("development", cpu_python, ["study.py"])
     command("final", cpu_python, ["study.py", "--final"])
+    command("branches", serving_python, ["branches.py"])
     command("live", serving_python, ["live.py"])
     command("report", cpu_python, ["report.py"])
     run.log("study_complete")

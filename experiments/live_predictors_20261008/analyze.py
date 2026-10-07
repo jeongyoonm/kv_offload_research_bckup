@@ -46,12 +46,23 @@ def diagnostics(directory):
             spans[step] = dict(
                 start=max(r[3] for r in ranks),
                 end=max(r[3] + r[6] for r in ranks),
+                start_lower=max(r[2] for r in ranks),
+                end_lower=max(r[7] for r in ranks),
+                end_upper=max(r[8] for r in ranks),
                 uncertainty=max(r[3] - r[2] for r in ranks),
             )
     intervals = sorted(spans.values(), key=lambda x: x["start"])
     gaps = [
         max(0, b["start"] - a["end"]) / 1e6 for a, b in zip(intervals, intervals[1:])
     ]
+    gap_lower = sum(
+        max(0, b["start_lower"] - a["end_upper"]) / 1e6
+        for a, b in zip(intervals, intervals[1:])
+    )
+    gap_upper = sum(
+        max(0, b["start"] - a["end_lower"]) / 1e6
+        for a, b in zip(intervals, intervals[1:])
+    )
     errors, costs, leads, enqueue_leads = [], [], [], []
     backends, reasons = Counter(), Counter()
     native_predictions = 0
@@ -71,26 +82,14 @@ def diagnostics(directory):
             a = spans.get((transport.get("prediction") or {}).get("predecessor_step"))
             if a:
                 leads.append((a["end"] - transport["seal_ns"]) / 1e6)
-    for e in late:
-        if e["event"] == "execute_rpc_issued":
-            # Some protocol generations record enqueue under this event.
-            seal = next(
-                (
-                    s
-                    for s in late
-                    if s["event"] == "membership_sealed" and s["step"] == e["step"]
-                ),
-                None,
-            )
-            if seal:
-                a = spans.get(
-                    (seal["transport"].get("prediction") or {}).get("predecessor_step")
-                )
-                if a:
-                    enqueue_leads.append((a["end"] - e["time_ns"]) / 1e6)
+                b = completed.get(e["step"])
+                if b:
+                    enqueue_leads.append((a["end"] - b["dispatch_ns"]) / 1e6)
     return dict(
         compute_rounds=len(spans),
         gpu_gap_ms=sum(gaps),
+        gpu_gap_lower_ms=gap_lower,
+        gpu_gap_upper_ms=gap_upper,
         gpu_compute_span_ms=sum((s["end"] - s["start"]) / 1e6 for s in spans.values()),
         prediction_errors_ms=errors,
         prediction_cost_us=costs,
@@ -136,6 +135,12 @@ def main():
                 p95_ttft_ms=float(np.quantile(times, 0.95)),
                 compute_rounds=sum(d["compute_rounds"] for d in ds),
                 mean_episode_gpu_gap_ms=float(np.mean([d["gpu_gap_ms"] for d in ds])),
+                mean_episode_gpu_gap_lower_ms=float(
+                    np.mean([d["gpu_gap_lower_ms"] for d in ds])
+                ),
+                mean_episode_gpu_gap_upper_ms=float(
+                    np.mean([d["gpu_gap_upper_ms"] for d in ds])
+                ),
                 late_admissions=sum(c["late_admissions"] for c in selected),
                 recovered_compute_opportunities=recovered,
                 kv_ready_during_compute=ready,
@@ -147,6 +152,9 @@ def main():
                 else None,
                 prediction_cost_us=describe(costs),
                 actual_seal_lead_ms=describe(leads),
+                actual_enqueue_lead_ms=describe(
+                    [v for d in ds for v in d["actual_enqueue_lead_ms"]]
+                ),
                 seal_reasons=dict(
                     sum((Counter(d["seal_reasons"]) for d in ds), Counter())
                 ),

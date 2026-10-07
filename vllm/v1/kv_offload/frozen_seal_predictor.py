@@ -163,17 +163,24 @@ class FrozenSealPredictor:
             != {"schema", "architecture", "checkpoint", "provenance", "target_schema"}
             or state["schema"] != 4
             or state["architecture"]
-            not in ("guarded_sparse_mlp", "envelope_sparse_mlp")
+            not in (
+                "guarded_sparse_mlp",
+                "guarded_sparse_mlp_offset",
+                "envelope_sparse_mlp",
+            )
             or state["target_schema"] != self.target_schema
             or state["provenance"].get("general_prefill") is not True
         ):
             raise ValueError("incompatible frozen predictor snapshot")
         self._state = copy.deepcopy(state)
         self.architecture = state["architecture"]
+        self.excludes_elapsed = self.architecture == "guarded_sparse_mlp_offset"
         self.feature_names = (
             FEATURE_NAMES + FORECAST_NAMES + SPARSE_NAMES + ENVELOPE_NAMES
         )
         checkpoint = self._state["checkpoint"]
+        if self.excludes_elapsed and checkpoint.get("excluded_feature_indices") != [21]:
+            raise ValueError("offset predictor must exclude elapsed execution time")
         self.neural = NeuralCandidate(checkpoint.get("neural", checkpoint))
         if self.architecture == "envelope_sparse_mlp":
             if checkpoint.get("weights") != [0.5, 0.5]:
@@ -218,9 +225,12 @@ class FrozenSealPredictor:
         return np.r_[x, prefix, causal, sparse, lead]
 
     def predict_features_ms(self, x, native=True):
+        if self.excludes_elapsed:
+            x = x.copy()
+            x[21] = 0
         neural_x = np.r_[x[:23], np.zeros(5), x[23:26]]
         neural = self.neural.predict(neural_x, native)
-        if self.architecture == "guarded_sparse_mlp":
+        if self.architecture in ("guarded_sparse_mlp", "guarded_sparse_mlp_offset"):
             return neural
         if self.support.outside(x):
             envelope = self.fallback.predict(x[:23], native)

@@ -903,6 +903,10 @@ def stage_rpc(core, step, base, candidates):
                                     predictor_architecture=getattr(
                                         model, "architecture", "trees"
                                     ),
+                                    predictor_excludes_elapsed=bool(
+                                        getattr(model, "excludes_elapsed", False)
+                                    ),
+                                    execution_snapshot=records,
                                 )
                                 record(
                                     core.scheduler,

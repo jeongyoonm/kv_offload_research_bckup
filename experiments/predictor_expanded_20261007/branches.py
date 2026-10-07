@@ -58,7 +58,11 @@ def main():
             family=family,
             candidate=name,
             implementation=base,
-            architecture=plan["architecture"] if family == "improvement" else name,
+            architecture=(
+                "trees_tuned" if name.startswith("tree_") else plan["architecture"]
+            )
+            if family == "improvement"
+            else name,
             checkpoints=checkpoints,
             inventory=json.loads((study.ROOT / "inventory.json").read_text()),
             cpu_only=True,

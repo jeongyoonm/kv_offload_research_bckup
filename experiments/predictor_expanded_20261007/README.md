@@ -76,6 +76,10 @@ When the selected architecture has an Extra Trees base, also replace leaf means
 with weighted training medians while retaining its exact partitions. Compare
 this alone and, where available, together with absolute-error boosting. This
 aligns the point prediction with MAE without changing inference layout or cost.
+If an MLP or crossed-stage design leads, retain a tuned-tree alternative with
+ordinary means/squared loss, median leaves alone, absolute residual loss alone,
+and their combination. This tests whether the training objective changes the
+architecture conclusion; capacities still come from inner training splits.
 
 Expanded-data validation found that an MLP base can produce a negative raw
 duration estimate, which is still a valid intermediate input to correction.

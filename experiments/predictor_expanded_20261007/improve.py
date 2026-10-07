@@ -288,6 +288,18 @@ def plan():
                 "Combine median base leaves and absolute-error boosting under "
                 "the same features, capacity, and episode controls."
             )
+    if name not in ("trees_fixed", "trees_tuned"):
+        candidates += [
+            "tree_tuned_control",
+            "tree_absolute",
+            "tree_median",
+            "tree_median_absolute",
+        ]
+        reasons["mae_aligned_tree_alternative"] = (
+            "An MLP or crossed-stage design leads ordinary validation, but tuned "
+            "trees remain competitive. Compare tree controls and MAE-aligned "
+            "leaves/residuals before attributing the difference to architecture."
+        )
     result = dict(
         architecture=name,
         candidates=candidates,
@@ -340,16 +352,34 @@ def run_task(task):
                 continue
             configure(
                 loss="absolute_error"
-                if variant in ("absolute_loss", "median_absolute")
+                if variant
+                in (
+                    "absolute_loss",
+                    "median_absolute",
+                    "tree_absolute",
+                    "tree_median_absolute",
+                )
                 else "squared_error",
                 weighting={
                     "legacy_weights": "legacy",
                     "fresh_double": "fresh_double",
                 }.get(variant, "source_mass_matched"),
-                median_leaves=variant in ("median_base", "median_absolute"),
+                median_leaves=variant
+                in (
+                    "median_base",
+                    "median_absolute",
+                    "tree_median",
+                    "tree_median_absolute",
+                ),
             )
             states[variant] = wrapped(
-                fit_one(name, selected, batches, train, task["seed"])
+                fit_one(
+                    "trees_tuned" if variant.startswith("tree_") else name,
+                    selected,
+                    batches,
+                    train,
+                    task["seed"],
+                )
             )
         if any(n.startswith("trend_") for n in proposal["candidates"]):
             import trend
@@ -453,7 +483,11 @@ def summarize(tasks, proposal):
         effective_architecture=(
             "positive ridge geometry trend with optional boosted residual"
             if winner.startswith("trend_")
-            else proposal["architecture"]
+            else (
+                "trees_tuned"
+                if winner.startswith("tree_")
+                else proposal["architecture"]
+            )
             + (
                 " with GPU enqueue/start features"
                 if winner
@@ -467,6 +501,7 @@ def summarize(tasks, proposal):
         historical_limit_ms=limit,
         serving_integration_required=(
             winner.startswith("trend_")
+            or ("mlp" in proposal["architecture"] and not winner.startswith("tree_"))
             or winner
             in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")
         ),

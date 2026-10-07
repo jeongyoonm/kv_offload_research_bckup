@@ -112,6 +112,11 @@ def main():
     cpu = json.loads((ROOT / "cpu_comparison.json").read_text())
     previous = json.loads((ROOT / "audit_previous/audit.json").read_text())
     selection = json.loads((ROOT / "selection.json").read_text())
+    robustness = json.loads((ROOT / "cpu_seed_robustness.json").read_text())
+    conditioned_root = Path("/mnt/localnvme/glm53_offset_conditioned_20261008")
+    conditioned = json.loads((conditioned_root / "comparison.json").read_text())
+    conditioned_done = json.loads((conditioned_root / "completion.json").read_text())
+    assert conditioned_done["complete"]
     lines = [
         "# Offset-only duration prediction: results and accuracy audit",
         "",
@@ -138,6 +143,23 @@ def main():
         "previous live cells are now development data. No fresh live labels",
         "are used in fitting or selection. Masking is applied to primary",
         "and fallback models; only elapsed execution time is removed.",
+        "",
+        "### Robustness across fitting seeds",
+        "",
+        "Seeds 73–75 retain the same splits, rows and hyperparameters.",
+        "Only seed 73 checkpoints are served. Seeds 74 and 75 are CPU-only",
+        "sensitivity checks and do not consume fresh live labels.",
+        "",
+        "| Data | Model | Mean macro MAE (ms) | Min–max (ms) |",
+        "| --- | --- | ---: | ---: |",
+    ]
+    for group in robustness["groups"]:
+        lines.append(
+            f"| {group['source']} | {group['name']} | "
+            f"{group['macro_mean_ms']:.2f} | "
+            f"{group['macro_min_ms']:.2f}–{group['macro_max_ms']:.2f} |"
+        )
+    lines += [
         "",
         "## Fresh live throughput and TTFT",
         "",
@@ -204,6 +226,8 @@ def main():
         "interval with three degrees of freedom. This small study cannot",
         "establish equivalence. The current tree baseline differs in fitting",
         "data and architecture; matched controls isolate feature removal.",
+        "The tree control is the existing optimized deadline prototype,",
+        "not unoptimized vLLM.",
         "",
         "## Accuracy on identical fresh live decision snapshots",
         "",
@@ -222,6 +246,35 @@ def main():
         "All models are replayed at the same causal inputs sampled by the",
         "union of live policies. A different issued-prediction population",
         "must not be treated as an architecture accuracy comparison.",
+        "",
+        "![Offline and live prediction accuracy](prediction_accuracy.png)",
+        "",
+        "### How often the prediction deadline determines sealing",
+        "",
+        (
+            "| Workload | Predictor | Compute rounds | Prediction deadline | "
+            "Fixed fallback deadline | Ready target |"
+        ),
+        "| --- | --- | ---: | ---: | ---: | ---: |",
+    ]
+    for group in comparison["aggregate"]:
+        reasons = group["seal_reasons"]
+        lines.append(
+            f"| {group['workload']} | {group['predictor']} | "
+            f"{group['compute_rounds']} | "
+            f"{reasons.get('compute_seal_deadline', 0)} | "
+            f"{reasons.get('deadline', 0)} | "
+            f"{reasons.get('candidate_target_ready', 0)} |"
+        )
+    lines += [
+        "",
+        "Counts include load-only sealing transactions, so compute rounds",
+        "are not a denominator for a seal percentage. Readiness or actual",
+        "compute completion can stop a hold before its predicted deadline.",
+        "The unchanged fixed hold path is recorded separately as 'deadline';",
+        "it must not be counted as a prediction-based sealing deadline.",
+        "This helps explain why lower forecast error need not increase",
+        "throughput in direct proportion to the accuracy improvement.",
         "",
         "## Audit findings",
         "",
@@ -262,6 +315,65 @@ def main():
         "The observed coverage shifts do not yet provide a numerical causal",
         "attribution of the entire gap. Feature ablations, data ablations",
         "and per-snapshot replay are the controlled evidence here.",
+        "",
+        "Timestamp reconstruction was checked separately. All 973 training",
+        "seal rows with an explicit feature-capture timestamp already use",
+        "that timestamp, rather than their later log timestamp. Evaluation",
+        "to logging adds a median 1.29 ms, but this lag is not added to those",
+        "training inputs. All 664 rows with a comparable saved raw feature",
+        "vector match exactly. The 1,235 new training shadow rows and all",
+        "192 benchmark rows record their capture time directly without",
+        "running a predictor. Older 2,786 seal rows lack an explicit capture",
+        "timestamp, so their timing offset cannot be recovered exactly.",
+        "This audit does not establish a timestamp bug in the checked rows.",
+        "",
+        "### Checkpoint identity and the offline comparison",
+        "",
+        "The audit evaluates the exact serving checkpoints on the reused",
+        "192-row offline benchmark. An architecture name alone does not",
+        "identify the fitted checkpoint. This table is descriptive; the",
+        "192-row benchmark is not a new independent test.",
+        "",
+        "| Previous serving checkpoint | Offline MAE (ms) |",
+        "| --- | ---: |",
+    ]
+    for item in previous["offline_benchmark"]:
+        lines.append(f"| {item['predictor']} | {item['metrics']['mae_ms']:.2f} |")
+    lines += [
+        "",
+        "### Serving phase variation and controlled follow-up",
+        "",
+        "Some 60K cells spent several seconds in load-only waits and GPU",
+        "gaps, with few actual compute predictions. These slowdowns occurred",
+        "under more than one predictor and were not explained by workload",
+        "position alone. The phase audit records the order, transfer bytes,",
+        "load turnaround, compute rounds, gaps and no-compute repeated holds.",
+        "Hold sums are not disjoint physical gap attribution.",
+        "",
+        "A follow-up gives every measured 60K episode an excluded common-tree",
+        "32-request same-workload episode, then resets and primes measured",
+        "caches separately. Three balanced rotations use fresh seeds",
+        "3301–3303 and the same frozen checkpoints. There are 225 measured",
+        "requests per predictor; the conditioning episodes are excluded.",
+        "",
+        "| Conditioned predictor | req/s | Mean TTFT (ms) | p95 TTFT (ms) |",
+        "| --- | ---: | ---: | ---: |",
+    ]
+    for group in conditioned["aggregate"]:
+        lines.append(
+            f"| {group['predictor']} | {group['throughput_rps']:.3f} | "
+            f"{group['mean_ttft_ms']:.1f} | {group['p95_ttft_ms']:.1f} |"
+        )
+    gains = conditioned_done["paired_offset_vs_elapsed"]
+    lo, hi = gains["bounds"]
+    lines += [
+        "",
+        f"Paired offset-only versus elapsed-input gain: {gains['gain_percent']:+.2f}%",
+        f"with a 95% interval [{lo:+.2f}%, {hi:+.2f}%].",
+        "This small study cannot establish equivalence or identify the",
+        "physical root cause of phase variation. It provides a separate",
+        "check against interpreting a single fast episode as predictor gain.",
+        f"Follow-up details: `{conditioned_root}/FINDINGS.md`.",
         "",
         "## Limits and artifacts",
         "",
@@ -304,6 +416,11 @@ def main():
         "protocol.json",
         "selection.json",
         "freeze.json",
+        "cpu_seed_robustness.json",
+        "phase_audit.json",
+        "timestamp_audit.json",
+        "prediction_accuracy.png",
+        "prediction_accuracy.pdf",
     ]:
         shutil.copy2(ROOT / name, dest / name)
     shutil.copy2(ROOT / "audit_previous/audit.json", dest / "audit_previous.json")

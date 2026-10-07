@@ -52,6 +52,10 @@ prediction from its checkpoint and saved inputs, verifies labels/deadlines,
 replays every model on common snapshots, and measures elapsed sensitivity with
 other state fixed. `conditions.py` compares transfer and submission conditions.
 New live traces retain the exact rank snapshot used at prediction time.
+`timestamps.py` checks corpus timestamp conventions and comparable saved raw
+features. `phase.py` records per-cell order, batch sizes, no-compute repeated
+holds, GPU gaps and load turnaround. Prediction deadline seals and unchanged
+fixed fallback seals are counted separately in the final report.
 
 The target is the CUDA event span through critical completion. It includes
 host submission gaps and required output-copy joins. CPU submission end is a

@@ -54,6 +54,7 @@ def main():
                 throughput_rps=result["throughput_rps"],
                 first_request_ns=min(r["start_ns"] for r in result["responses"]),
                 compute_rounds=d["compute_rounds"],
+                batch_requests=d["batch_requests"],
                 compute_span_ms=d["gpu_compute_span_ms"],
                 gpu_gap_ms=d["gpu_gap_ms"],
                 native_predictions=d["point_predictions"],

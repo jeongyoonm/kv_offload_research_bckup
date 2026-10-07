@@ -74,11 +74,11 @@ def main():
         f"Validation-selected candidate: **{winner}**.",
         "",
         (
-            "Route known aggregate geometry and dispatch-load signatures to "
+            "Route known aggregate compute geometry signatures to "
             "the fixed blend or sparse MLP, and unseen signatures to the "
             "suffix-guarded envelope. Signatures come exclusively from "
-            "training. All 1,151 observed signatures uniquely identify their "
-            "sorted request geometry and dispatch-load state in this corpus; "
+            "training. Observed signatures identify their "
+            "sorted request compute geometry in this corpus; "
             "this does not prove uniqueness for arbitrary future shapes."
         ),
         "",

@@ -19,13 +19,10 @@ b = importlib.import_module("envelope_blend")
 g = importlib.import_module("envelope_guard")
 ev = importlib.import_module("envelope_evaluate")
 report = importlib.import_module("report")
-ROOT = Path("/mnt/localnvme/glm53_support_routing_20261007")
+ROOT = Path("/mnt/localnvme/glm53_compute_support_20261007")
 GEOMETRY = Path("/mnt/localnvme/glm53_geometry_control_20261007")
-INDICES = list(range(11)) + [23, 24, 25]
-KNOWN = {
-    "known_blend_else_envelope": "envelope_sparse_mlp",
-    "known_mlp_else_envelope": "guarded_sparse_mlp",
-}
+INDICES = list(range(9)) + [23, 24, 25]
+KNOWN = {"compute_known_blend_else_envelope": "envelope_sparse_mlp"}
 
 
 def signatures(rows):

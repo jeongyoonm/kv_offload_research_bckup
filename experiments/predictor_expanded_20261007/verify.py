@@ -18,7 +18,7 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
-    def test_support_router_uses_geometry_and_preserves_expert_for_runtime_changes(
+    def test_support_router_uses_geometry_and_preserves_expert_for_io_runtime_changes(
         self,
     ):
         sys.path.insert(
@@ -41,7 +41,7 @@ class CalibrationContract(unittest.TestCase):
         ):
             model = route.Frozen(state)
         self.assertEqual(model.predict_one(x), 10)
-        x[11:23] += 10000
+        x[9:23] += 10000
         self.assertEqual(model.predict_one(x), 10)
         envelope.predict_one.assert_not_called()
         x[5] += 1

@@ -61,6 +61,25 @@ def main():
             source_differences=sorted(
                 differences, key=lambda r: -abs(r["fresh_minus_historical_ms"])
             ),
+            marker_uncertainty={
+                source: dict(
+                    start_bound_width_p50_p95_max_ms=np.quantile(
+                        [
+                            max((z[3] - z[2]) / 1e6 for z in r["execution_ranks"])
+                            for r in pool["forecasts"]
+                            if r["_source"] == source
+                        ],
+                        [0.5, 0.95, 1],
+                    ).tolist(),
+                    lower_bound_lead_ge50ms=sum(
+                        np.median([(z[2] - z[1]) / 1e6 for z in r["execution_ranks"]])
+                        >= 50
+                        for r in pool["forecasts"]
+                        if r["_source"] == source
+                    ).item(),
+                )
+                for source in ["historical", "fresh"]
+            },
             benchmark_used=False,
             caveat=(
                 "Matching unordered geometry and dispatch loads does not control "

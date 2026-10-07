@@ -36,17 +36,31 @@ def scores(data, mask=None):
     }
 
 
-def paired_interval(data, name):
-    episodes, inverse = np.unique(data["episode"], return_inverse=True)
-    count = np.bincount(inverse)
-    delta = np.abs(data[name] - data["y"]) - np.abs(data["trees_fixed"] - data["y"])
-    total = np.bincount(inverse, weights=delta)
+def paired_interval(data, name, mask=None, macro=False):
+    if mask is None:
+        mask = np.ones(len(data["y"]), dtype=bool)
+    if not mask.any():
+        return {}
+    episodes, inverse = np.unique(data["episode"][mask], return_inverse=True)
+    delta = np.abs(data[name][mask] - data["y"][mask]) - np.abs(
+        data["trees_fixed"][mask] - data["y"][mask]
+    )
+    weight = np.ones(len(delta))
+    if macro:
+        _, wi, wc = np.unique(
+            data["workload"][mask], return_inverse=True, return_counts=True
+        )
+        weight = 1 / wc[wi]
+    count = np.bincount(inverse, weights=weight)
+    total = np.bincount(inverse, weights=delta * weight)
     rng = np.random.default_rng(7307)
     draws = rng.integers(len(episodes), size=(2000, len(episodes)))
     values = total[draws].sum(1) / count[draws].sum(1)
     return dict(
-        difference_ms=float(np.mean(delta)),
+        difference_ms=float(np.average(delta, weights=weight)),
         ci95_ms=np.quantile(values, [0.025, 0.975]).tolist(),
+        episodes=len(episodes),
+        estimand="fixed empirical workload weights" if macro else "sample MAE",
     )
 
 
@@ -70,7 +84,16 @@ def main():
             fresh=scores(data, data["phase"] == "fresh"),
             historical=scores(data, data["phase"] != "fresh"),
         )
-        paired[key] = {name: paired_interval(data, name) for name in study.arch.MODELS}
+        paired[key] = {
+            name: dict(
+                overall=paired_interval(data, name),
+                fresh=paired_interval(data, name, data["phase"] == "fresh"),
+                fresh_macro=paired_interval(
+                    data, name, data["phase"] == "fresh", macro=True
+                ),
+            )
+            for name in study.arch.MODELS
+        }
         seed_scores[key] = {
             str(seed): scores(arrays([task for task in ts if task["seed"] == seed]))
             for seed in [73, 74, 75]

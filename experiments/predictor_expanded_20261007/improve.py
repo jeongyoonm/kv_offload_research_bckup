@@ -431,7 +431,16 @@ def summarize(tasks, proposal):
             )
         results[key] = dict(
             scores=metrics,
-            paired={n: report.paired_interval(data, n) for n in proposal["candidates"]},
+            paired={
+                n: dict(
+                    overall=report.paired_interval(data, n),
+                    fresh=report.paired_interval(data, n, data["phase"] == "fresh"),
+                    fresh_macro=report.paired_interval(
+                        data, n, data["phase"] == "fresh", macro=True
+                    ),
+                )
+                for n in proposal["candidates"]
+            },
         )
     cv = results["episode:wide"]["scores"]
     limit = cv["historical"]["trees_fixed"]["mae_ms"] * 1.1

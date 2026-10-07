@@ -18,6 +18,35 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_support_router_uses_geometry_and_preserves_expert_for_runtime_changes(
+        self,
+    ):
+        sys.path.insert(
+            0, str(study.SOURCE / "experiments/predictor_support_routing_20261007")
+        )
+        route = importlib.import_module("route")
+        x = np.arange(27, dtype=float)
+        expert, envelope = Mock(), Mock()
+        expert.predict_one.return_value = 10
+        envelope.predict_one.return_value = 20
+        state = dict(
+            signatures=[x[route.INDICES].tolist()],
+            envelope={},
+            expert={},
+            known_model="envelope_sparse_mlp",
+        )
+        with (
+            patch.object(route.g, "Frozen", return_value=envelope),
+            patch.object(route.b, "Frozen", return_value=expert),
+        ):
+            model = route.Frozen(state)
+        self.assertEqual(model.predict_one(x), 10)
+        x[11:23] += 10000
+        self.assertEqual(model.predict_one(x), 10)
+        envelope.predict_one.assert_not_called()
+        x[5] += 1
+        self.assertEqual(model.predict_one(x), 20)
+
     def test_fixed_blend_maps_sparse_features_without_future_rank_features(self):
         sys.path.insert(
             0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")

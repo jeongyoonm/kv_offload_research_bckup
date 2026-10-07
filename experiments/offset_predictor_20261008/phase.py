@@ -36,6 +36,19 @@ def main():
             json.loads(line)
             for line in (path.parent / "engine.jsonl").read_text().splitlines()
         ]
+        compute_steps = [
+            e["step"]
+            for e in events
+            if e["event"] == "step_completion" and e.get("valid") and e.get("selected")
+        ]
+        native = [
+            e
+            for e in late
+            if e["event"] == "seal_prediction" and e.get("predictor_input") is not None
+        ]
+        first_forecast_ordinal = (
+            compute_steps.index(native[0]["predecessor_step"]) + 1 if native else None
+        )
         dispatched = {
             e["job_id"]: e["dispatch_ns"]
             for e in events
@@ -58,6 +71,7 @@ def main():
                 compute_span_ms=d["gpu_compute_span_ms"],
                 gpu_gap_ms=d["gpu_gap_ms"],
                 native_predictions=d["point_predictions"],
+                first_native_prediction_compute_ordinal=first_forecast_ordinal,
                 no_compute_repeated_hold_ms=no_compute_holds,
                 no_compute_repeated_hold_sum_ms=sum(no_compute_holds),
                 load_turnaround_median_ms=float(np.median(load_times))

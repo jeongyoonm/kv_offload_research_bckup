@@ -56,6 +56,14 @@ Only development accuracy selects the live checkpoint. Dataset variants receive
 separate branches with frozen checkpoint hashes; they share the same collector,
 features, and tree hyperparameters.
 
+The live historical checkpoint retains its original cached-only applicability
+guard and linear fallback. New checkpoints explicitly declare general-prefill
+support. Select a new checkpoint only when both its three-seed mean and serving
+seed 73 improve development workload-macro MAE over the original guard, while
+historical MAE stays within 10% of the historical refit. Otherwise retain the
+original checkpoint. Both live variants use identical optimized preparation and
+the same predictive sealing policy.
+
 The geometry expansion also reuses already-recorded cold prefix-priming batches
 from repeated training cells, after excluding first-use and JIT windows. This
 extends uncached suffix coverage beyond 8K without another GPU run. These records

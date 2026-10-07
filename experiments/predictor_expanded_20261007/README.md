@@ -64,7 +64,8 @@ an individual branch. `final_report.py` writes standalone PNG/PDF comparisons,
 convergence data, range tests, paired intervals, and export evaluation timings.
 Run `verify.py` for the cheapest calibration-leakage and signed-export checks.
 
-If fresh held-range MAE exceeds twice fresh episode-CV MAE and exceeds 10 ms,
+If a fresh held geometry-range MAE (context, suffix, or batch size) exceeds twice
+fresh episode-CV MAE and exceeds 10 ms,
 also test a positive ridge geometry trend with squared/absolute tree residuals.
 It uses existing causal features and training-only scaling/alpha selection.
 This tests continuous extrapolation where tree leaves remain bounded. The linear

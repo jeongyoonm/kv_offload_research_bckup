@@ -165,14 +165,17 @@ def main():
         scope: summary[f"{scope}:wide"]["scores"]["fresh"][name]["mae_ms"]
         for scope in ["long_context", "long_suffix", "large_batch", "heavy_transfers"]
     }
-    triggered = max(ranges.values()) > max(10, 2 * cv)
+    geometry_ranges = ["long_context", "long_suffix", "large_batch"]
+    triggered = max(ranges[n] for n in geometry_ranges) > max(10, 2 * cv)
     study.arch.dump(
         study.ROOT / "trend_plan.json",
         dict(
             triggered=triggered,
             fresh_cv_mae_ms=cv,
             range_mae_ms=ranges,
-            criterion="max fresh range MAE > max(10 ms, twice fresh episode-CV MAE)",
+            criterion=(
+                "max fresh geometry-range MAE > max(10 ms, twice fresh episode-CV MAE)"
+            ),
             benchmark_used_for_planning=False,
             method="positive ridge geometry trend plus bounded tree residual",
             added_serving_features=False,

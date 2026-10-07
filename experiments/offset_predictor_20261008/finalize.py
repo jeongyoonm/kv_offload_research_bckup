@@ -33,10 +33,10 @@ def format_report(source):
     return "\n".join(lines) + "\n"
 
 
-def main():
-    plan = json.loads((ROOT / "plan.json").read_text())
+def audit_measurements(root=ROOT, expected_cells=36, expected_requests=2700):
+    plan = json.loads((root / "plan.json").read_text())
     audits = []
-    for path in sorted((ROOT / "live").glob("*/r[0-3]_*/result.json")):
+    for path in sorted((root / "live").glob("*/r[0-3]_*/result.json")):
         result = json.loads(path.read_text())
         assert result["accepted"] and result["frozen_unchanged"]
         assert result["optimized_preparation_verified"]
@@ -44,7 +44,7 @@ def main():
         assert result["concurrency"] == 32
         assert result["observed_cached"] == result["expected_cached"]
         checkpoint = json.loads(
-            (ROOT / "models" / f"{result['label']}.json").read_text()
+            (root / "models" / f"{result['label']}.json").read_text()
         )
         digest = hashlib.sha256(
             json.dumps(checkpoint, sort_keys=True).encode()
@@ -97,9 +97,14 @@ def main():
                 passed=True,
             )
         )
-    assert len(audits) == 36
-    assert sum(a["requests"] for a in audits) == 2700
-    (ROOT / "measurement_audit.json").write_text(json.dumps(audits, indent=2) + "\n")
+    assert len(audits) == expected_cells
+    assert sum(a["requests"] for a in audits) == expected_requests
+    (root / "measurement_audit.json").write_text(json.dumps(audits, indent=2) + "\n")
+    return audits
+
+
+def main():
+    audit_measurements()
     allocation = json.loads((ROOT / "allocation.json").read_text())
     assert allocation["server_stopped"]
     comparison = json.loads((ROOT / "comparison.json").read_text())

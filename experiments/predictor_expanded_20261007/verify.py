@@ -14,6 +14,26 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_median_tree_leaves_respect_training_weights_and_frozen_export(self):
+        x = np.zeros((100, 11))
+        y = np.r_[np.full(98, 10.0), np.full(2, 500.0)]
+        config = dict(kind="base_tree", trees=1, leaf=100, depth=1)
+        weights = np.ones(len(x))
+        try:
+            improve.configure(median_leaves=True)
+            with patch.object(study.arch, "weights", side_effect=lambda rows: weights):
+                model, _ = improve.fit(config, x, y, [{}] * len(x), 73)
+                self.assertEqual(float(model.predict(x[:1])[0]), 10)
+                weights[-2:] = 100
+                model, _ = improve.fit(config, x, y, [{}] * len(x), 73)
+                self.assertEqual(float(model.predict(x[:1])[0]), 500)
+                frozen = study.arch.FrozenComponent(
+                    study.arch.export_component(model, study.arch.surface.FEATURE_NAMES)
+                )
+                self.assertEqual(frozen.predict_one(x[0]), 500)
+        finally:
+            improve.configure()
+
     def test_exported_continuous_trend_extrapolates_positive_work(self):
         x = np.zeros((100, 11))
         x[:, 0] = np.linspace(512, 32768, len(x))

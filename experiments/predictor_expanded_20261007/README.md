@@ -71,3 +71,8 @@ It uses existing causal features and training-only scaling/alpha selection.
 This tests continuous extrapolation where tree leaves remain bounded. The linear
 and MLP exports are CPU research artifacts requiring serving integration before
 deployment. Benchmark labels cannot trigger or tune this additional experiment.
+
+When the selected architecture has an Extra Trees base, also replace leaf means
+with weighted training medians while retaining its exact partitions. Compare
+this alone and, where available, together with absolute-error boosting. This
+aligns the point prediction with MAE without changing inference layout or cost.

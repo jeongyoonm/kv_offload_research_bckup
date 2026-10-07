@@ -19,11 +19,28 @@ from threadpoolctl import threadpool_limits
 arch = study.arch
 original_fit = arch.fit
 active_loss = "squared_error"
+active_median_leaves = False
 
 
 def fit(config, x, y, rows, seed):
     if config["kind"] != "boost" or active_loss == "squared_error":
-        return original_fit(config, x, y, rows, seed)
+        model, seconds = original_fit(config, x, y, rows, seed)
+        if config["kind"] == "base_tree" and active_median_leaves:
+            begin = time.perf_counter()
+            weights = arch.weights(rows)
+            for tree in model.estimators_:
+                leaves = tree.apply(x)
+                order = np.argsort(leaves)
+                boundaries = np.r_[
+                    0, np.flatnonzero(np.diff(leaves[order])) + 1, len(x)
+                ]
+                for start, end in zip(boundaries[:-1], boundaries[1:]):
+                    index = order[start:end]
+                    tree.tree_.value[leaves[index[0]], 0, 0] = weighted_median(
+                        y[index], weights[index]
+                    )
+            seconds += time.perf_counter() - begin
+        return model, seconds
     begin = time.perf_counter()
     model = HistGradientBoostingRegressor(
         loss=active_loss,
@@ -41,9 +58,12 @@ def fit(config, x, y, rows, seed):
 arch.fit = fit
 
 
-def configure(loss="squared_error", weighting="source_mass_matched"):
-    global active_loss
+def configure(
+    loss="squared_error", weighting="source_mass_matched", median_leaves=False
+):
+    global active_loss, active_median_leaves
     active_loss = loss
+    active_median_leaves = median_leaves
     if weighting == "legacy":
         arch.weights = study.legacy_weights
     elif weighting == "fresh_double":
@@ -246,6 +266,19 @@ def plan():
             "The selected architecture has a boosted-tree component trained on "
             "squared error; the selection objective is absolute error."
         )
+    if name in ("trees_fixed", "trees_tuned", "tree_mlp", "tree_base_only"):
+        candidates.append("median_base")
+        reasons["median_base"] = (
+            "Extra Trees leaves use conditional means, while validation minimizes "
+            f"absolute error; fresh p95 error is {fresh['p95_absolute_ms']:.3f} ms. "
+            "Keep partitions identical and replace leaf means by weighted medians."
+        )
+        if name in ("trees_fixed", "trees_tuned"):
+            candidates.append("median_absolute")
+            reasons["median_absolute"] = (
+                "Combine median base leaves and absolute-error boosting under "
+                "the same features, capacity, and episode controls."
+            )
     result = dict(
         architecture=name,
         candidates=candidates,
@@ -294,12 +327,13 @@ def run_task(task):
                 continue
             configure(
                 loss="absolute_error"
-                if variant == "absolute_loss"
+                if variant in ("absolute_loss", "median_absolute")
                 else "squared_error",
                 weighting={
                     "legacy_weights": "legacy",
                     "fresh_double": "fresh_double",
                 }.get(variant, "source_mass_matched"),
+                median_leaves=variant in ("median_base", "median_absolute"),
             )
             states[variant] = wrapped(
                 fit_one(name, selected, batches, train, task["seed"])

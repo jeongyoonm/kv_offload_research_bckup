@@ -882,7 +882,7 @@ def stage_rpc(core, step, base, candidates):
                                     preparation_reserve_ns=reserve_ns,
                                     prediction_cost_ns=prediction_cost_ns,
                                     predictor_backend=(
-                                        "native"
+                                        getattr(model, "backend", "native")
                                         if prediction_data["native_predictor"]
                                         else "numpy"
                                     )
@@ -900,6 +900,9 @@ def stage_rpc(core, step, base, candidates):
                                         else None
                                     ),
                                     forecast_ns=forecast_ns,
+                                    predictor_architecture=getattr(
+                                        model, "architecture", "trees"
+                                    ),
                                 )
                                 record(
                                     core.scheduler,

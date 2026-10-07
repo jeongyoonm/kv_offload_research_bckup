@@ -62,6 +62,12 @@ SUBMISSION_NAMES = [
     "cpu_submit_offset_std_ms",
     "cpu_last_submit_age_ms",
 ]
+SPARSE_NAMES = [
+    "prefix_index_pairs",
+    "causal_suffix_index_pairs",
+    "sparse_attention_pairs",
+]
+ENVELOPE_NAMES = ["all_rank_start_minus_last_enqueue_ms"]
 FEATURE_SCHEMAS = [
     FEATURE_NAMES[:9],
     FEATURE_NAMES,
@@ -72,6 +78,11 @@ FEATURE_SCHEMAS = [
     FEATURE_NAMES + FORECAST_NAMES + BASE_PREDICTION_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + SUBMISSION_NAMES,
     FEATURE_NAMES + FORECAST_NAMES + SUBMISSION_NAMES + BASE_PREDICTION_NAMES,
+    FEATURE_NAMES
+    + FORECAST_NAMES
+    + SPARSE_NAMES
+    + ENVELOPE_NAMES
+    + BASE_PREDICTION_NAMES,
 ]
 
 

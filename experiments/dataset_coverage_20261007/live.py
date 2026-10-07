@@ -65,20 +65,24 @@ def stream(tokens, name):
     )
 
 
-def cell(label, state, workload, seed, repeat):
+def cell(label, state, workload, seed, repeat, requests_count=75):
     directory = run.ROOT / "live" / workload / f"r{repeat}_{label}"
     if (directory / "result.json").exists():
         return json.loads((directory / "result.json").read_text())
     directory.mkdir(parents=True, exist_ok=True)
     run.reset(True)
-    context = 58368 if workload == "familiar60k" else 24576
-    suffix = 3072 if workload == "familiar60k" else 8192
+    homogeneous = workload in ("familiar60k", "short16k")
+    context, suffix = {
+        "familiar60k": (58368, 3072),
+        "short16k": (15552, 832),
+        "heterogeneous": (24576, 8192),
+    }[workload]
     requests, primes, expected = [], [], []
-    for i in range(75):
-        c = context if workload == "familiar60k" or i % 2 else 4096
-        s = suffix if workload == "familiar60k" or i % 3 else 2048
+    for i in range(requests_count):
+        c = context if homogeneous or i % 2 else 4096
+        s = suffix if homogeneous or i % 3 else 2048
         prefix, tail = run.prompt(c, s, seed * 100000 + i)
-        hit = workload == "familiar60k" or i % 2 == 0
+        hit = homogeneous or i % 2 == 0
         expected.append(c if hit else 0)
         requests.append(prefix + tail)
         if hit:
@@ -208,9 +212,9 @@ def cell(label, state, workload, seed, repeat):
         seed=seed,
         repeat=repeat,
         concurrency=32,
-        requests=75,
+        requests=requests_count,
         seconds=elapsed,
-        throughput_rps=75 / elapsed,
+        throughput_rps=requests_count / elapsed,
         mean_ttft_ms=statistics.mean(ttft),
         p50_ttft_ms=float(np.quantile(ttft, 0.5)),
         p95_ttft_ms=float(np.quantile(ttft, 0.95)),

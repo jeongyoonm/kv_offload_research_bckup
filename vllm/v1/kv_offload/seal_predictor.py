@@ -356,7 +356,13 @@ class ComputeEstimator:
         if state["schema"] in (2, 3):
             from vllm.v1.kv_offload.latency_surface import LatencySurface
 
-            estimator.latency_surface = LatencySurface(state["latency_surface"])
+            surface_state = state["latency_surface"]
+            if surface_state.get("schema") == 4:
+                from vllm.v1.kv_offload.frozen_seal_predictor import FrozenSealPredictor
+
+                estimator.latency_surface = FrozenSealPredictor(surface_state)
+            else:
+                estimator.latency_surface = LatencySurface(surface_state)
             if state["schema"] == 3:
                 estimator.refinement_surface = LatencySurface(
                     state["refinement_surface"]

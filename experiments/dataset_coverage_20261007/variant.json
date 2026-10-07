@@ -1,0 +1,29 @@
+{
+  "variant": "familiar_n300_mass_matched",
+  "implementation": "70bce4c81a53dec34448974edb92056d1ea06921",
+  "architecture": "Extra Trees base + histogram gradient boosting correction",
+  "recipe_unchanged": false,
+  "hyperparameters_unchanged": true,
+  "weighting": "source_mass_matched",
+  "input_features_unchanged": true,
+  "new_forecast_samples": 300,
+  "one_matching_base_row_per_forecast": true,
+  "dataset_hashes": {
+    "/mnt/localnvme/glm53_dataset_coverage_20261007/matrix.json": "e384d392e575f1cceeb0728d6c3b07632b075f90dd3bcf887507a14a083d6c42",
+    "/mnt/localnvme/glm53_dataset_coverage_20261007/data/forecasts.jsonl": "ed82a75c906d3dc32dafc5c8c4ec63faabc715e0866b82981790358174831915"
+  },
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/familiar_n300_mass_matched/seed73/serving.json",
+      "sha256": "5589e0c721432b3530d5d9b0c122224792e2651bb9ef0c5f7c0b29438e50e337"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/familiar_n300_mass_matched/seed74/serving.json",
+      "sha256": "cfd41e383cfe7e97d668bdf37f463366ffaf0b6c0bd37b94cbd77576655e5a60"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/familiar_n300_mass_matched/seed75/serving.json",
+      "sha256": "803d753b430108c6c832b325dd5129a5ba26dffa2286234a0d27e22a6059751d"
+    }
+  }
+}

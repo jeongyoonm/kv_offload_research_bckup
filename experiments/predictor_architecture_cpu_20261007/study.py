@@ -265,7 +265,10 @@ def fit(config, x, y, rows, seed):
 def predict(model, x):
     if isinstance(model, HistGradientBoostingRegressor):
         x = np.asarray(x, dtype=np.float32)
-    return model.predict(x)
+    prediction = model.predict(x)
+    if isinstance(model, ExtraTreesRegressor):
+        prediction = np.maximum(1, np.floor(prediction * 1e6) / 1e6)
+    return prediction
 
 
 def metrics(y, prediction, rows):
@@ -616,7 +619,7 @@ def run_fold(task):
             features=tx,
             **predictions,
         )
-        if task.get("historical"):
+        if task.get("historical") or task.get("save_checkpoints"):
             dump(output / "checkpoints.json", exported)
         dump(output / "cross_fit_audit.json", cross_audit)
         result = {

@@ -1,0 +1,23 @@
+{
+  "candidate": "compute_known_blend_else_envelope",
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_compute_support_20261007/exports/compute_known_blend_else_envelope/seed73.json",
+      "sha256": "8bb3b4afb887f733b29a6b9a31ac3421d051deaa06fdb6ac438fb71158e81617"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_compute_support_20261007/exports/compute_known_blend_else_envelope/seed74.json",
+      "sha256": "aa66c032dcd4ec996d02b0eb4bbe9d82e97786417fc624435e0f0f7f9abba497"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_compute_support_20261007/exports/compute_known_blend_else_envelope/seed75.json",
+      "sha256": "b297b1a136cccaca0512947c968199ef668e412086163ee5b42d03e3bab71b65"
+    }
+  },
+  "implementation": "14579164619b03e0a6a391d85ec7e1e667bda84c",
+  "no_inference_fitting": true,
+  "cpu_only": true,
+  "benchmark_is_reused": true,
+  "benchmark_used_for_selection": false,
+  "serving_integration_required": true
+}

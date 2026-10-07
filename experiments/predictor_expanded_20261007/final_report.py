@@ -23,7 +23,10 @@ def variation():
     pool = joblib.load(study.ROOT / "pool.joblib")
     groups = defaultdict(list)
     for row in pool["batches"]:
-        key = (tuple(map(tuple, row["request_shapes"])), tuple(row["load_state"]))
+        key = (
+            tuple(sorted(map(tuple, row["request_shapes"]))),
+            tuple(row["load_state"]),
+        )
         groups[key].append(row)
     values = []
     for (shapes, loads), rows in groups.items():

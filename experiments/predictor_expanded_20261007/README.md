@@ -100,3 +100,11 @@ words. Trigger after ordinary comparisons when historical CV MAE remains above
 training-only capacities unchanged. This association is consistent with hiding
 CPU kernel submission under GPU backlog; CPU replay cannot confirm that mechanism.
 The added feature schemas require serving integration before deployment.
+
+Finally, repeat all nine architectures with fresh fitting rows removed from each
+episode fold. Keep the same held episodes and capacities selected on the expanded
+training folds; recompute normalization and workload weights on historical rows.
+This control isolates fitting-data coverage and gives historical-only models
+access to expanded-training hyperparameters. It does not recreate independently
+tuned historical deployment. Use only fresh episode-validation labels for this
+comparison; do not change the frozen selection from these final reporting runs.

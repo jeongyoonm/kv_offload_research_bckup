@@ -107,6 +107,8 @@ def main():
     audit_measurements()
     allocation = json.loads((ROOT / "allocation.json").read_text())
     assert allocation["server_stopped"]
+    cleanup = json.loads((ROOT / "cleanup.json").read_text())
+    assert cleanup["owned_server_stopped"] and cleanup["gpu_memory_released"]
     comparison = json.loads((ROOT / "comparison.json").read_text())
     accuracy = json.loads((ROOT / "audit_live/audit.json").read_text())
     cpu = json.loads((ROOT / "cpu_comparison.json").read_text())
@@ -404,6 +406,7 @@ def main():
         requests=2700,
         all_request_accounting_passed=True,
         allocation=allocation,
+        cleanup=cleanup,
         offset_feature_invariance_verified=True,
         previous_issued_replay_difference_ns=previous[
             "issued_replay_max_difference_ns"
@@ -433,6 +436,7 @@ def main():
         "timestamp_audit.json",
         "prediction_accuracy.png",
         "prediction_accuracy.pdf",
+        "cleanup.json",
     ]:
         shutil.copy2(ROOT / name, dest / name)
     shutil.copy2(ROOT / "audit_previous/audit.json", dest / "audit_previous.json")

@@ -1,0 +1,52 @@
+{
+  "sources": {
+    "historical": 3759,
+    "fresh": 1235
+  },
+  "old_live_forecasts": 215,
+  "old_live_batches": 558,
+  "paired_feature_ablation": true,
+  "held_groups": "All predictor variants with same workload and prompt seed",
+  "training_sources": [
+    "historical",
+    "fresh",
+    "live"
+  ],
+  "source_weighting": "Equal total mass for each source",
+  "elapsed_column": 21,
+  "elapsed_mask": 0,
+  "target": "critical_end_after_all_rank_start.v1",
+  "seed": 73,
+  "blind_live_seeds": [
+    2301,
+    2302,
+    2303,
+    2304
+  ],
+  "original_final_benchmark_used_for_training": false,
+  "fitting_configurations": {
+    "base": {
+      "kind": "base_tree",
+      "trees": 160,
+      "leaf": 5,
+      "depth": 18
+    },
+    "correction": {
+      "kind": "boost",
+      "iterations": 180,
+      "leaves": 15,
+      "leaf": 15,
+      "l2": 10.0
+    },
+    "mlp": {
+      "kind": "mlp",
+      "layers": [
+        64,
+        64
+      ],
+      "input": "log1p",
+      "solver": "lbfgs",
+      "alpha": 0.01
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "complete": true,
+  "cells": 36,
+  "requests": 2700,
+  "all_request_accounting_passed": true,
+  "allocation": {
+    "seconds": 4053.650599916,
+    "server_stopped": true
+  },
+  "cleanup": {
+    "owned_server_stopped": true,
+    "compute_apps": "",
+    "checked_at": 1791411907.4495335,
+    "gpu_memory_released": true,
+    "memory_used_mib": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "scope": "All eight GPUs observed at zero MiB after owned workers exited and before the conditioned server launched."
+  },
+  "offset_feature_invariance_verified": true,
+  "previous_issued_replay_difference_ns": 0,
+  "fresh_issued_replay_difference_ns": 0,
+  "branch": "experiment/glm53-offset-only-predictor-20261008"
+}

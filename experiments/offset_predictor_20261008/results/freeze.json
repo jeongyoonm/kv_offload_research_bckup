@@ -1,0 +1,26 @@
+{
+  "models": {
+    "matched_elapsed": "669bf1ca8022c07bf8f21780648a0e70ee234a9c75f633ffd4cb037c729b9008",
+    "matched_offset": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+    "trees": "c4a02a59df1ecc0bcd5743a1dedaae96bd562cfbc99df70e7be0c57aa5d93604"
+  },
+  "blind_seeds": [
+    2301,
+    2302,
+    2303,
+    2304
+  ],
+  "selection": {
+    "source": "live_aware",
+    "name": "trees_offset",
+    "mae_ms": 18.26865120703026,
+    "macro_mae_ms": 15.733730938086035,
+    "bias_ms": 0.5569259698277054,
+    "p95_ms": 57.83830111619771,
+    "per_workload_mae_ms": {
+      "familiar60k": 22.045933578587693,
+      "heterogeneous": 9.087672416966814,
+      "short16k": 16.067586818703596
+    }
+  }
+}

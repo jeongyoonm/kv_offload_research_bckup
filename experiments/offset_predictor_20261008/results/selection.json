@@ -1,0 +1,18 @@
+{
+  "selected_family": "trees",
+  "selected": {
+    "source": "live_aware",
+    "name": "trees_offset",
+    "mae_ms": 18.26865120703026,
+    "macro_mae_ms": 15.733730938086035,
+    "bias_ms": 0.5569259698277054,
+    "p95_ms": 57.83830111619771,
+    "per_workload_mae_ms": {
+      "familiar60k": 22.045933578587693,
+      "heterogeneous": 9.087672416966814,
+      "short16k": 16.067586818703596
+    }
+  },
+  "criterion": "Live-aware grouped out-of-fold workload-macro MAE",
+  "matched_control": "trees_elapsed"
+}

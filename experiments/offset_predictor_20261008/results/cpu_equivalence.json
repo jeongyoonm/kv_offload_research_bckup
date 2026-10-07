@@ -1,0 +1,16 @@
+{
+  "matched_elapsed": {
+    "rows": 215,
+    "maximum_export_difference_ms": 7.140065463318024e-07,
+    "elapsed_invariance_checks": 0,
+    "snapshot_round_trip": true,
+    "causal_snapshot_checks": true
+  },
+  "matched_offset": {
+    "rows": 215,
+    "maximum_export_difference_ms": 8.395497843594057e-07,
+    "elapsed_invariance_checks": 2150,
+    "snapshot_round_trip": true,
+    "causal_snapshot_checks": true
+  }
+}

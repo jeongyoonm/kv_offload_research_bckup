@@ -1,0 +1,40 @@
+{
+  "sources": {
+    "training": {
+      "rows": 4994,
+      "event_types": {
+        "seal_prediction": 3759,
+        "capture_timestamp": 973,
+        "dataset_forecast": 1235
+      },
+      "known_capture_to_record_lag_ms": {
+        "count": 973,
+        "median": 1.288409,
+        "p95": 2.1584628,
+        "maximum": 11.821423
+      },
+      "raw_feature_max_abs_difference": {
+        "count": 664,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      },
+      "raw_load_count_difference": {
+        "count": 664,
+        "median": 0.0,
+        "p95": 0.0,
+        "maximum": 0.0
+      }
+    },
+    "benchmark": {
+      "rows": 192,
+      "event_types": {
+        "dataset_forecast": 192
+      },
+      "known_capture_to_record_lag_ms": null,
+      "raw_feature_max_abs_difference": null,
+      "raw_load_count_difference": null
+    }
+  },
+  "limitation": "Older seal events often omit forecast_ns and raw native features, so their evaluation lag cannot be recovered exactly. Shadow dataset events record the capture time directly and do not evaluate a model. Feature maximum differences combine different units."
+}

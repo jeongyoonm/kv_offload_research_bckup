@@ -1,0 +1,852 @@
+{
+  "offline": {
+    "training": {
+      "actual_ms": {
+        "count": 4994,
+        "mean": 475.38996364457347,
+        "median": 312.5217215,
+        "p95": 1318.4269594999998,
+        "maximum": 2022.154907
+      },
+      "elapsed_ms": {
+        "count": 4994,
+        "mean": 18.25505520324389,
+        "median": 5.331355,
+        "p95": 67.09376364999997,
+        "maximum": 172.685056
+      },
+      "queue_ms": {
+        "count": 4994,
+        "mean": 228.7761731696035,
+        "median": 98.54878450000001,
+        "p95": 964.0837798499994,
+        "maximum": 2154.756935
+      },
+      "marker_enqueue_headstart_ms": {
+        "count": 4994,
+        "mean": 49.46617054245094,
+        "median": 0.567492,
+        "p95": 321.81247029999986,
+        "maximum": 680.647075
+      },
+      "current_load_count": {
+        "count": 4994,
+        "mean": 5.941930316379656,
+        "median": 6.0,
+        "p95": 14.0,
+        "maximum": 28.0
+      },
+      "current_load_tokens": {
+        "count": 4994,
+        "mean": 209335.05486583902,
+        "median": 110400.0,
+        "p95": 700416.0,
+        "maximum": 1284096.0
+      },
+      "load_max_age_ms": {
+        "count": 4994,
+        "mean": 292.11914836383664,
+        "median": 132.8734635,
+        "p95": 1015.2315636499997,
+        "maximum": 1870.809898
+      },
+      "completed_old_tokens": {
+        "count": 4994,
+        "mean": 27883.328794553465,
+        "median": 0.0,
+        "p95": 175104.0,
+        "maximum": 525312.0
+      },
+      "cpu_submit_end_after_gpu_start_ms": {
+        "count": 4994,
+        "mean": 359.6839573255907,
+        "median": 240.42913850000002,
+        "p95": 918.5252925,
+        "maximum": 1967.591786
+      },
+      "cpu_submit_remaining_at_forecast_ms": {
+        "count": 4994,
+        "mean": 341.42890212234687,
+        "median": 227.3328075,
+        "p95": 858.2106005499998,
+        "maximum": 1916.896914
+      }
+    },
+    "benchmark": {
+      "actual_ms": {
+        "count": 192,
+        "mean": 330.610772765625,
+        "median": 183.1747935,
+        "p95": 1807.11757745,
+        "maximum": 1819.491577
+      },
+      "elapsed_ms": {
+        "count": 192,
+        "mean": 0.9869502447916667,
+        "median": 0.637554,
+        "p95": 3.2185862999999992,
+        "maximum": 15.153624
+      },
+      "queue_ms": {
+        "count": 192,
+        "mean": 165.575177609375,
+        "median": 6.1933505,
+        "p95": 1795.9110621,
+        "maximum": 1860.228539
+      },
+      "marker_enqueue_headstart_ms": {
+        "count": 192,
+        "mean": 44.050980958333334,
+        "median": 0.0258795,
+        "p95": 445.8192274,
+        "maximum": 680.522405
+      },
+      "current_load_count": {
+        "count": 192,
+        "mean": 1.0833333333333333,
+        "median": 0.0,
+        "p95": 5.449999999999989,
+        "maximum": 8.0
+      },
+      "current_load_tokens": {
+        "count": 192,
+        "mean": 30704.0,
+        "median": 0.0,
+        "p95": 164249.59999999916,
+        "maximum": 317440.0
+      },
+      "load_max_age_ms": {
+        "count": 192,
+        "mean": 78.74974953645834,
+        "median": 0.0,
+        "p95": 402.9071665999999,
+        "maximum": 1861.117402
+      },
+      "completed_old_tokens": {
+        "count": 192,
+        "mean": 2325.3333333333335,
+        "median": 0.0,
+        "p95": 16384.0,
+        "maximum": 32768.0
+      },
+      "cpu_submit_end_after_gpu_start_ms": {
+        "count": 192,
+        "mean": 223.316699703125,
+        "median": 130.677404,
+        "p95": 1042.0817240000001,
+        "maximum": 1054.679545
+      },
+      "cpu_submit_remaining_at_forecast_ms": {
+        "count": 192,
+        "mean": 222.32974945833334,
+        "median": 128.76058799999998,
+        "p95": 1041.9613486,
+        "maximum": 1054.478747
+      }
+    }
+  },
+  "live": [
+    {
+      "workload": "familiar60k",
+      "distribution": {
+        "actual_ms": {
+          "count": 92,
+          "mean": 870.0100650434782,
+          "median": 781.2861945,
+          "p95": 1767.2184833500003,
+          "maximum": 1907.598335
+        },
+        "elapsed_ms": {
+          "count": 92,
+          "mean": 45.85685996739132,
+          "median": 52.288624999999996,
+          "p95": 89.10633570000002,
+          "maximum": 105.692659
+        },
+        "queue_ms": {
+          "count": 92,
+          "mean": 493.40784707608697,
+          "median": 153.16651050000002,
+          "p95": 1647.1991361,
+          "maximum": 1843.296839
+        },
+        "marker_enqueue_headstart_ms": {
+          "count": 92,
+          "mean": 98.62943139130434,
+          "median": 0.5851710000000001,
+          "p95": 435.9899539500001,
+          "maximum": 484.861154
+        },
+        "current_load_count": {
+          "count": 92,
+          "mean": 10.021739130434783,
+          "median": 8.5,
+          "p95": 25.0,
+          "maximum": 30.0
+        },
+        "current_load_tokens": {
+          "count": 92,
+          "mean": 584948.8695652174,
+          "median": 496128.0,
+          "p95": 1459200.0,
+          "maximum": 1751040.0
+        },
+        "load_max_age_ms": {
+          "count": 92,
+          "mean": 1001.5688748043478,
+          "median": 881.2416310000001,
+          "p95": 2104.76704545,
+          "maximum": 2684.081011
+        },
+        "completed_old_tokens": {
+          "count": 92,
+          "mean": 45679.30434782609,
+          "median": 58368.0,
+          "p95": 116736.0,
+          "maximum": 175104.0
+        },
+        "cpu_submit_end_after_gpu_start_ms": {
+          "count": 92,
+          "mean": 647.525987923913,
+          "median": 589.8963515,
+          "p95": 1279.6633176500002,
+          "maximum": 1376.967797
+        },
+        "cpu_submit_remaining_at_forecast_ms": {
+          "count": 92,
+          "mean": 601.6691279565217,
+          "median": 556.215628,
+          "p95": 1211.4052147500001,
+          "maximum": 1363.674841
+        }
+      },
+      "signed_error_spearman": {
+        "trees": {
+          "actual_ms": {
+            "rho": -0.1423331226977791,
+            "pvalue": 0.17591281461087704,
+            "count": 92
+          },
+          "elapsed_ms": {
+            "rho": 0.10559006211180125,
+            "pvalue": 0.31646890821347157,
+            "count": 92
+          },
+          "queue_ms": {
+            "rho": 0.30069509732903843,
+            "pvalue": 0.003586011447800982,
+            "count": 92
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": 0.3801920379760492,
+            "pvalue": 0.00018533290345154688,
+            "count": 92
+          },
+          "current_load_count": {
+            "rho": 0.06660451865374674,
+            "pvalue": 0.5281618928710969,
+            "count": 92
+          },
+          "current_load_tokens": {
+            "rho": 0.06660451865374674,
+            "pvalue": 0.5281618928710969,
+            "count": 92
+          },
+          "load_max_age_ms": {
+            "rho": -0.03509393831974477,
+            "pvalue": 0.739806792597131,
+            "count": 92
+          },
+          "completed_old_tokens": {
+            "rho": -0.07988933074000633,
+            "pvalue": 0.449046461798617,
+            "count": 92
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.17810520475317107,
+            "pvalue": 0.08939887009982234,
+            "count": 92
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.18340705577732225,
+            "pvalue": 0.08011774509003003,
+            "count": 92
+          }
+        },
+        "guarded_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.05099949139219826,
+            "pvalue": 0.6292405503387122,
+            "count": 92
+          },
+          "elapsed_ms": {
+            "rho": 0.21433965753741346,
+            "pvalue": 0.04020132171153137,
+            "count": 92
+          },
+          "queue_ms": {
+            "rho": -0.15418522571397747,
+            "pvalue": 0.14225014101074898,
+            "count": 92
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": 0.20254920395172848,
+            "pvalue": 0.05282580072524133,
+            "count": 92
+          },
+          "current_load_count": {
+            "rho": 0.4049631956778126,
+            "pvalue": 6.225102881072137e-05,
+            "count": 92
+          },
+          "current_load_tokens": {
+            "rho": 0.4049631956778126,
+            "pvalue": 6.225102881072137e-05,
+            "count": 92
+          },
+          "load_max_age_ms": {
+            "rho": -0.11143134565294453,
+            "pvalue": 0.2902852893814742,
+            "count": 92
+          },
+          "completed_old_tokens": {
+            "rho": 0.19244252642052712,
+            "pvalue": 0.0660881925927289,
+            "count": 92
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.05371206633478723,
+            "pvalue": 0.6110947666315815,
+            "count": 92
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.06203473945409429,
+            "pvalue": 0.5569034775164934,
+            "count": 92
+          }
+        },
+        "envelope_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.12613473483038698,
+            "pvalue": 0.23088117892032436,
+            "count": 92
+          },
+          "elapsed_ms": {
+            "rho": 0.06633478723240294,
+            "pvalue": 0.5298374988411242,
+            "count": 92
+          },
+          "queue_ms": {
+            "rho": -0.4743461307276174,
+            "pvalue": 1.7823745251857404e-06,
+            "count": 92
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": -0.04363238444584869,
+            "pvalue": 0.6796199496017807,
+            "count": 92
+          },
+          "current_load_count": {
+            "rho": 0.3921674058332608,
+            "pvalue": 0.0001105530060685929,
+            "count": 92
+          },
+          "current_load_tokens": {
+            "rho": 0.3921674058332608,
+            "pvalue": 0.0001105530060685929,
+            "count": 92
+          },
+          "load_max_age_ms": {
+            "rho": -0.3193440500593376,
+            "pvalue": 0.0019167728460271626,
+            "count": 92
+          },
+          "completed_old_tokens": {
+            "rho": 0.2633389050318727,
+            "pvalue": 0.011204390483077059,
+            "count": 92
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.10841052355778863,
+            "pvalue": 0.30364166343766014,
+            "count": 92
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.11361990043616972,
+            "pvalue": 0.2808553180302848,
+            "count": 92
+          }
+        }
+      }
+    },
+    {
+      "workload": "heterogeneous",
+      "distribution": {
+        "actual_ms": {
+          "count": 11,
+          "mean": 1558.7096717272727,
+          "median": 1720.623934,
+          "p95": 1908.000088,
+          "maximum": 1917.932495
+        },
+        "elapsed_ms": {
+          "count": 11,
+          "mean": 0.8378988181818183,
+          "median": 0.513294,
+          "p95": 1.932507,
+          "maximum": 2.042477
+        },
+        "queue_ms": {
+          "count": 11,
+          "mean": 1792.9966124545454,
+          "median": 1967.223588,
+          "p95": 1995.4274125000002,
+          "maximum": 2002.305129
+        },
+        "marker_enqueue_headstart_ms": {
+          "count": 11,
+          "mean": 0.5378660000000001,
+          "median": 0.586087,
+          "p95": 0.6025780000000001,
+          "maximum": 0.605105
+        },
+        "current_load_count": {
+          "count": 11,
+          "mean": 1.9090909090909092,
+          "median": 2.0,
+          "p95": 2.5,
+          "maximum": 3.0
+        },
+        "current_load_tokens": {
+          "count": 11,
+          "mean": 7819.636363636364,
+          "median": 8192.0,
+          "p95": 10240.0,
+          "maximum": 12288.0
+        },
+        "load_max_age_ms": {
+          "count": 11,
+          "mean": 1793.8555566363639,
+          "median": 1968.537335,
+          "p95": 1996.5340385,
+          "maximum": 2003.124258
+        },
+        "completed_old_tokens": {
+          "count": 11,
+          "mean": 5957.818181818182,
+          "median": 8192.0,
+          "p95": 12288.0,
+          "maximum": 12288.0
+        },
+        "cpu_submit_end_after_gpu_start_ms": {
+          "count": 11,
+          "mean": 926.693339090909,
+          "median": 1044.79804,
+          "p95": 1158.149179,
+          "maximum": 1166.235455
+        },
+        "cpu_submit_remaining_at_forecast_ms": {
+          "count": 11,
+          "mean": 925.8554402727273,
+          "median": 1044.628683,
+          "p95": 1157.8942615,
+          "maximum": 1166.180676
+        }
+      },
+      "signed_error_spearman": {
+        "trees": {
+          "actual_ms": {
+            "rho": 0.41818181818181827,
+            "pvalue": 0.20057021703405048,
+            "count": 11
+          },
+          "elapsed_ms": {
+            "rho": 0.10909090909090911,
+            "pvalue": 0.7495085962341481,
+            "count": 11
+          },
+          "queue_ms": {
+            "rho": 0.5090909090909091,
+            "pvalue": 0.10973723224165634,
+            "count": 11
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": -0.16363636363636366,
+            "pvalue": 0.6306852146425356,
+            "count": 11
+          },
+          "current_load_count": {
+            "rho": 0.2843268380609732,
+            "pvalue": 0.3967847097972882,
+            "count": 11
+          },
+          "current_load_tokens": {
+            "rho": 0.2843268380609732,
+            "pvalue": 0.3967847097972882,
+            "count": 11
+          },
+          "load_max_age_ms": {
+            "rho": 0.5636363636363637,
+            "pvalue": 0.07095173447637551,
+            "count": 11
+          },
+          "completed_old_tokens": {
+            "rho": 0.45787329042992514,
+            "pvalue": 0.15672186975331318,
+            "count": 11
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": 0.45454545454545453,
+            "pvalue": 0.1601454372552589,
+            "count": 11
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": 0.45454545454545453,
+            "pvalue": 0.1601454372552589,
+            "count": 11
+          }
+        },
+        "guarded_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.6818181818181819,
+            "pvalue": 0.020842853610945084,
+            "count": 11
+          },
+          "elapsed_ms": {
+            "rho": 0.20909090909090913,
+            "pvalue": 0.5372209352113227,
+            "count": 11
+          },
+          "queue_ms": {
+            "rho": 0.6272727272727273,
+            "pvalue": 0.03884525362035334,
+            "count": 11
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": -0.15454545454545454,
+            "pvalue": 0.6500339654975799,
+            "count": 11
+          },
+          "current_load_count": {
+            "rho": -0.2088931871468374,
+            "pvalue": 0.5376146592620175,
+            "count": 11
+          },
+          "current_load_tokens": {
+            "rho": -0.2088931871468374,
+            "pvalue": 0.5376146592620175,
+            "count": 11
+          },
+          "load_max_age_ms": {
+            "rho": 0.6090909090909091,
+            "pvalue": 0.046695709354098905,
+            "count": 11
+          },
+          "completed_old_tokens": {
+            "rho": -0.16521201201079772,
+            "pvalue": 0.6273523256541316,
+            "count": 11
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.6363636363636364,
+            "pvalue": 0.03528698122006231,
+            "count": 11
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.6363636363636364,
+            "pvalue": 0.03528698122006231,
+            "count": 11
+          }
+        },
+        "envelope_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.7272727272727273,
+            "pvalue": 0.011204967253592074,
+            "count": 11
+          },
+          "elapsed_ms": {
+            "rho": 0.20000000000000004,
+            "pvalue": 0.5554454421055853,
+            "count": 11
+          },
+          "queue_ms": {
+            "rho": 0.6181818181818182,
+            "pvalue": 0.04264556980532674,
+            "count": 11
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": -0.10909090909090911,
+            "pvalue": 0.7495085962341481,
+            "count": 11
+          },
+          "current_load_count": {
+            "rho": -0.2088931871468374,
+            "pvalue": 0.5376146592620175,
+            "count": 11
+          },
+          "current_load_tokens": {
+            "rho": -0.2088931871468374,
+            "pvalue": 0.5376146592620175,
+            "count": 11
+          },
+          "load_max_age_ms": {
+            "rho": 0.5909090909090909,
+            "pvalue": 0.055575604288774685,
+            "count": 11
+          },
+          "completed_old_tokens": {
+            "rho": -0.2171357872141913,
+            "pvalue": 0.5213031576546259,
+            "count": 11
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.690909090909091,
+            "pvalue": 0.01856503338159501,
+            "count": 11
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.690909090909091,
+            "pvalue": 0.01856503338159501,
+            "count": 11
+          }
+        }
+      }
+    },
+    {
+      "workload": "short16k",
+      "distribution": {
+        "actual_ms": {
+          "count": 112,
+          "mean": 268.7117081607143,
+          "median": 263.01268200000004,
+          "p95": 460.82018449999975,
+          "maximum": 507.914461
+        },
+        "elapsed_ms": {
+          "count": 112,
+          "mean": 14.467700732142857,
+          "median": 15.506606000000001,
+          "p95": 25.220058999999992,
+          "maximum": 35.34812
+        },
+        "queue_ms": {
+          "count": 112,
+          "mean": 138.87779733035714,
+          "median": 124.950171,
+          "p95": 328.7914836499999,
+          "maximum": 407.287937
+        },
+        "marker_enqueue_headstart_ms": {
+          "count": 112,
+          "mean": 60.38408492857143,
+          "median": 36.324396500000006,
+          "p95": 175.14368469999997,
+          "maximum": 189.210488
+        },
+        "current_load_count": {
+          "count": 112,
+          "mean": 7.883928571428571,
+          "median": 7.0,
+          "p95": 22.0,
+          "maximum": 24.0
+        },
+        "current_load_tokens": {
+          "count": 112,
+          "mean": 122610.85714285714,
+          "median": 108864.0,
+          "p95": 342144.0,
+          "maximum": 373248.0
+        },
+        "load_max_age_ms": {
+          "count": 112,
+          "mean": 205.51407597321426,
+          "median": 212.567133,
+          "p95": 419.3762096999999,
+          "maximum": 566.884859
+        },
+        "completed_old_tokens": {
+          "count": 112,
+          "mean": 8748.0,
+          "median": 0.0,
+          "p95": 31104.0,
+          "maximum": 108864.0
+        },
+        "cpu_submit_end_after_gpu_start_ms": {
+          "count": 112,
+          "mean": 192.2778341607143,
+          "median": 178.0433105,
+          "p95": 302.85008899999997,
+          "maximum": 309.69867
+        },
+        "cpu_submit_remaining_at_forecast_ms": {
+          "count": 112,
+          "mean": 177.8101334285714,
+          "median": 165.20561750000002,
+          "p95": 289.58273095000004,
+          "maximum": 304.414551
+        }
+      },
+      "signed_error_spearman": {
+        "trees": {
+          "actual_ms": {
+            "rho": -0.37444903816585234,
+            "pvalue": 4.755329749436305e-05,
+            "count": 112
+          },
+          "elapsed_ms": {
+            "rho": 0.17973314654730585,
+            "pvalue": 0.05792692059609015,
+            "count": 112
+          },
+          "queue_ms": {
+            "rho": 0.32722007722007723,
+            "pvalue": 0.0004289695656381906,
+            "count": 112
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": 0.3442102026172823,
+            "pvalue": 0.00020229239386575205,
+            "count": 112
+          },
+          "current_load_count": {
+            "rho": -0.16862741828465594,
+            "pvalue": 0.07551641365176319,
+            "count": 112
+          },
+          "current_load_tokens": {
+            "rho": -0.16862741828465594,
+            "pvalue": 0.07551641365176319,
+            "count": 112
+          },
+          "load_max_age_ms": {
+            "rho": 0.0432825366453685,
+            "pvalue": 0.6504529360466198,
+            "count": 112
+          },
+          "completed_old_tokens": {
+            "rho": -0.18077425951605655,
+            "pvalue": 0.05646637894365801,
+            "count": 112
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.4837957426453002,
+            "pvalue": 6.523348870574846e-08,
+            "count": 112
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.48407763009532917,
+            "pvalue": 6.393295129557727e-08,
+            "count": 112
+          }
+        },
+        "guarded_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.2798288174394369,
+            "pvalue": 0.0028067781434337174,
+            "count": 112
+          },
+          "elapsed_ms": {
+            "rho": -0.05004783544606554,
+            "pvalue": 0.6002485120754761,
+            "count": 112
+          },
+          "queue_ms": {
+            "rho": 0.4579816858577921,
+            "pvalue": 3.8280333104348394e-07,
+            "count": 112
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": 0.4273413742440291,
+            "pvalue": 2.6113715313890006e-06,
+            "count": 112
+          },
+          "current_load_count": {
+            "rho": -0.08568072684074743,
+            "pvalue": 0.3690574016750643,
+            "count": 112
+          },
+          "current_load_tokens": {
+            "rho": -0.08568072684074743,
+            "pvalue": 0.3690574016750643,
+            "count": 112
+          },
+          "load_max_age_ms": {
+            "rho": 0.4261967403560324,
+            "pvalue": 2.7955697198806253e-06,
+            "count": 112
+          },
+          "completed_old_tokens": {
+            "rho": 0.02582344752484142,
+            "pvalue": 0.7869534141820262,
+            "count": 112
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.30997369050466395,
+            "pvalue": 0.0008811190412978595,
+            "count": 112
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.31054600744866234,
+            "pvalue": 0.0008609069116773488,
+            "count": 112
+          }
+        },
+        "envelope_sparse_mlp": {
+          "actual_ms": {
+            "rho": -0.4260344415211672,
+            "pvalue": 2.8226616859509075e-06,
+            "count": 112
+          },
+          "elapsed_ms": {
+            "rho": -0.007790344073529915,
+            "pvalue": 0.9350271682859265,
+            "count": 112
+          },
+          "queue_ms": {
+            "rho": 0.4840178357877473,
+            "pvalue": 6.420673578217021e-08,
+            "count": 112
+          },
+          "marker_enqueue_headstart_ms": {
+            "rho": 0.43180886322479245,
+            "pvalue": 1.996611713310665e-06,
+            "count": 112
+          },
+          "current_load_count": {
+            "rho": 0.08922040276204668,
+            "pvalue": 0.34953342620921274,
+            "count": 112
+          },
+          "current_load_tokens": {
+            "rho": 0.08922040276204668,
+            "pvalue": 0.34953342620921274,
+            "count": 112
+          },
+          "load_max_age_ms": {
+            "rho": 0.42283117504356443,
+            "pvalue": 3.411016624363119e-06,
+            "count": 112
+          },
+          "completed_old_tokens": {
+            "rho": 0.027939957537661764,
+            "pvalue": 0.7699589082126826,
+            "count": 112
+          },
+          "cpu_submit_end_after_gpu_start_ms": {
+            "rho": -0.35806539788840674,
+            "pvalue": 0.00010608624678543502,
+            "count": 112
+          },
+          "cpu_submit_remaining_at_forecast_ms": {
+            "rho": -0.35671575494584346,
+            "pvalue": 0.00011311909436679645,
+            "count": 112
+          }
+        }
+      }
+    }
+  ],
+  "label_scope": "CUDA event span includes gaps during host submission and joins required output copies; it is not isolated kernel runtime.",
+  "scope": "CPU submission end is a diagnostic label and is never passed to the predictor when it lies after the forecast.",
+  "causal_limit": "Correlations and matched-geometry comparisons do not isolate causal contributions."
+}

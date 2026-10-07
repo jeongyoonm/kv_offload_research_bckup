@@ -19,6 +19,27 @@ def log(event, **fields):
     print(json.dumps(record), flush=True)
 
 
+def unfinished(name, deadline):
+    completed = len(list((study.ROOT / "folds").glob("*/completed.json")))
+    improvements = len(list((study.ROOT / "improvements").glob("*/completed.json")))
+    study.arch.dump(
+        study.ROOT / "status.json",
+        dict(
+            phase="budget_stopped",
+            interrupted_phase=name,
+            completed_architecture_tasks=completed,
+            completed_improvement_tasks=improvements,
+            deadline=deadline,
+        ),
+    )
+    (study.ROOT / "UNFINISHED.md").write_text(
+        f"# Exploration stopped at its time budget\n\nInterrupted phase: {name}.\n\n"
+        f"Completed architecture tasks: {completed}; improvement tasks: "
+        f"{improvements}. Saved checkpoints and predictions remain available. "
+        "Incomplete comparisons do not establish a selected improvement.\n"
+    )
+
+
 def phase(name, arguments, deadline):
     directory = study.SOURCE / "experiments/predictor_expanded_20261007"
     env = dict(
@@ -51,6 +72,7 @@ def phase(name, arguments, deadline):
                     os.killpg(proc.pid, signal.SIGKILL)
                     proc.wait(timeout=15)
                 log("budget_stop", phase=name)
+                unfinished(name, deadline)
                 return False
             completed = len(list((study.ROOT / "folds").glob("*/completed.json")))
             study.arch.dump(
@@ -106,19 +128,24 @@ def main():
         time.sleep(30)
     else:
         log("budget_stop", phase="waiting_for_current_plan")
+        unfinished("waiting_for_current_plan", deadline)
         return
     commands = [
         ("architecture", ["study.py", "--workers", "4"]),
         ("architecture_report", ["report.py"]),
+        ("improvements", ["improve.py", "--workers", "4"]),
+        ("benchmark", ["benchmark.py", "--workers", "4"]),
+        ("branches", ["branches.py"]),
+        ("final_report", ["final_report.py"]),
     ]
     for name, arguments in commands:
         if not phase(name, arguments, deadline):
             return
-    log("architecture_complete")
+    log("exploration_complete")
     study.arch.dump(
         study.ROOT / "status.json",
         dict(
-            phase="architecture_complete",
+            phase="exploration_complete",
             deadline=deadline,
             remaining_seconds=deadline - time.time(),
         ),

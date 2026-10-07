@@ -48,3 +48,18 @@ Do not tune on final benchmark outcomes or infer throughput gains from replay.
 
 The supervisor records its deadline, stops owned CPU processes at that deadline,
 persists completed work, and writes an explicit report of unfinished comparisons.
+
+The verified pool has 8,486 base rows and 4,994 causal forecasts, including 1,235
+fresh forecasts. Its 192-row reused benchmark has no training episode overlap.
+The architecture study runs 42 tasks (seven split types, two data controls, three
+seeds). Follow-up changes reuse each task's training-only selected configuration:
+legacy source weighting, full-architecture OOF global/group calibration, an
+equal blend with the fixed-tree control when the architectures differ, doubled
+fresh weight when fresh validation MAE exceeds historical MAE by 50%, and
+absolute-error boosting when the selected architecture contains boosting.
+
+Freeze `final_selection.json` before `benchmark.py` opens benchmark labels.
+`branches.py` exports three frozen checkpoints per candidate and records each on
+an individual branch. `final_report.py` writes standalone PNG/PDF comparisons,
+convergence data, range tests, paired intervals, and export evaluation timings.
+Run `verify.py` for the cheapest calibration-leakage and signed-export checks.

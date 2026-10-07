@@ -213,9 +213,11 @@ def main():
         "",
         f"Complete: {report['complete']}; measured cells: {len(cells)}/36.",
         "",
-        "| Workload | Predictor | req/s | Throughput gain | Mean TTFT (ms) | "
-        "p95 TTFT (ms) | Compute rounds | Mean GPU gap/episode (ms) | "
-        "Issued MAE (ms) | Recovered KV-ready (%) |",
+        (
+            "| Workload | Predictor | req/s | Throughput gain | Mean TTFT (ms) | "
+            "p95 TTFT (ms) | Compute rounds | Mean GPU gap/episode (ms) | "
+            "Issued MAE (ms) | Recovered KV-ready (%) |"
+        ),
         "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for g in groups.values():
@@ -238,11 +240,13 @@ def main():
             "",
             report["scope"],
             "",
-            "Checkpoint coverage differs as well as architecture. The control is "
-            "the latest broader-data serving tree checkpoint. All policies use "
-            "the same 5 ms deadline lead and optimized preparation. The original "
-            "sparse selector is preserved. Prediction-cost and actual-seal-lead "
-            "distributions and paired confidence intervals are in comparison.json.",
+            (
+                "Checkpoint coverage differs as well as architecture. The control is "
+                "the latest broader-data serving tree checkpoint. All policies use "
+                "the same 5 ms deadline lead and optimized preparation. The original "
+                "sparse selector is preserved. Prediction-cost and actual-seal-lead "
+                "distributions and paired confidence intervals are in comparison.json."
+            ),
             "",
         ]
     )

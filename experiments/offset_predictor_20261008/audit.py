@@ -194,6 +194,7 @@ def main():
                     dict(replay_difference_ns=delta, feature_difference=feature_delta)
                 )
         offline = []
+        offline_rows = []
         for name, estimator in models.items():
             y, p = [], []
             for row in benchmark:
@@ -204,6 +205,16 @@ def main():
                 assert v is not None
                 y.append(target(row))
                 p.append(v / 1e6)
+                offline_rows.append(
+                    dict(
+                        predictor=name,
+                        actual_ms=y[-1],
+                        prediction_ms=p[-1],
+                        episode=row["episode"],
+                        workload=row["workload"],
+                        current_load_count=row["forecast_features"][0],
+                    )
+                )
             offline.append(
                 dict(
                     predictor=name,
@@ -311,6 +322,9 @@ def main():
     (args.output / "audit.json").write_text(json.dumps(report, indent=2) + "\n")
     (args.output / "forecasts.jsonl").write_text(
         "".join(json.dumps(r) + "\n" for r in forecasts)
+    )
+    (args.output / "offline_predictions.jsonl").write_text(
+        "".join(json.dumps(r) + "\n" for r in offline_rows)
     )
     print(json.dumps(report, indent=2), flush=True)
 

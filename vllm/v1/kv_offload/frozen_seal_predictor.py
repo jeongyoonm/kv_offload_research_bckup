@@ -182,6 +182,13 @@ class FrozenSealPredictor:
         if self.excludes_elapsed and checkpoint.get("excluded_feature_indices") != [21]:
             raise ValueError("offset predictor must exclude elapsed execution time")
         self.neural = NeuralCandidate(checkpoint.get("neural", checkpoint))
+        if all(
+            component["kind"] == "tree"
+            for model in checkpoint.get("neural", checkpoint)["models"]
+            for key in ("direct", "base", "correction")
+            if (component := model.get(key)) is not None
+        ):
+            self.backend = "native_forest"
         if self.architecture == "envelope_sparse_mlp":
             if checkpoint.get("weights") != [0.5, 0.5]:
                 raise ValueError("unsupported envelope blend weights")

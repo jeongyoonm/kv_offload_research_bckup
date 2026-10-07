@@ -25,6 +25,57 @@ def transfer_surface_state():
     )
 
 
+@pytest.mark.parametrize("fallback", [False, True])
+def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
+    """Even an elapsed-sensitive component cannot move an offset deadline."""
+    import copy
+
+    from vllm.v1.kv_offload.frozen_seal_predictor import FrozenSealPredictor
+    from vllm.v1.kv_offload.latency_surface import FEATURE_NAMES, FORECAST_NAMES
+
+    tree = transfer_surface_state()
+    tree.update(
+        schema=2,
+        target_schema="critical_end_after_all_rank_start.v1",
+        feature_names=FEATURE_NAMES + FORECAST_NAMES,
+    )
+    tree["trees"][0][0][2:4] = [21, 5.0]
+    alternate = copy.deepcopy(tree)
+    alternate["trees"][0][1][4] = 200.0
+    state = dict(
+        schema=4,
+        architecture="guarded_sparse_mlp_offset",
+        target_schema="critical_end_after_all_rank_start.v1",
+        provenance=dict(general_prefill=True),
+        checkpoint=dict(
+            models=[dict(direct=dict(kind="tree", state=s)) for s in [tree, alternate]],
+            weights=[1.0, 0.0],
+            excluded_feature_indices=[21],
+            support_guard=dict(
+                indices=[0],
+                minimum=[0],
+                maximum=[32 if fallback else 100],
+                fallback_model_index=1,
+            ),
+        ),
+    )
+    model = FrozenSealPredictor(state)
+    data = dict(
+        step=1,
+        request_shapes=[[64, 64]],
+        load_state=[0, 0],
+        predictor_general_prefill=True,
+        prefill_only=True,
+        dispatch_ns=1_000_000,
+        forecast_load_features=[0] * 10,
+        execution_snapshot=[[1, 1_000_000, 2_000_000, 2_000_000, 0, 1, 0, 0, 0]] * 8,
+    )
+    expected = 200_000_000 if fallback else 100_000_000
+    for elapsed_ms in [0, 10, 100]:
+        query = dict(data, forecast_ns=2_000_000 + elapsed_ms * 1_000_000)
+        assert model.predict(query) == expected
+
+
 def test_refinement_requires_all_cpu_submissions_and_round_trips_separately():
     """An incomplete or future submission cannot update the initial predictor."""
     from vllm.v1.kv_offload.latency_surface import (

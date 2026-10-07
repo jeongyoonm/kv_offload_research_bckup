@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Compare duration estimators with elapsed time masked, using episode splits."""
 
+import argparse
 import copy
 import hashlib
 import importlib.util
@@ -204,7 +205,10 @@ def predict(checkpoint, rows):
     return np.array(result)
 
 
-def main():
+def main(seed=73):
+    global ROOT
+    if seed != 73:
+        ROOT = ROOT / f"seed{seed}"
     ROOT.mkdir(exist_ok=True)
     pool = joblib.load("/mnt/localnvme/glm53_predictor_expanded_20261007/pool.joblib")
     live_batches, live_forecasts = live_rows()
@@ -221,7 +225,7 @@ def main():
             elapsed_column=21,
             elapsed_mask=0,
             target="critical_end_after_all_rank_start.v1",
-            seed=73,
+            seed=seed,
             blind_live_seeds=[2301, 2302, 2303, 2304],
             original_final_benchmark_used_for_training=False,
             fitting_configurations=dict(
@@ -248,7 +252,7 @@ def main():
                     r["episode"] for r in train + batches
                 )
                 begin = time.monotonic()
-                states = variants(batches, train, 73)
+                states = variants(batches, train, seed)
                 scores = []
                 for name, state in states.items():
                     prediction = predict(state, test)
@@ -321,7 +325,7 @@ def main():
         )
         train = pool["forecasts"] + live_forecasts
         batches = pool["batches"] + live_batches
-        states = variants(batches, train, 73)
+        states = variants(batches, train, seed)
         tree = json.loads((OLD / "models/trees.json").read_text())
         for suffix in ["elapsed", "offset"]:
             state = copy.deepcopy(tree)
@@ -334,7 +338,7 @@ def main():
                 checkpoint=checkpoint,
                 provenance=dict(
                     general_prefill=True,
-                    seed=73,
+                    seed=seed,
                     fitting="original_plus_old_live",
                     excluded_features=["elapsed_execution_ms"]
                     if suffix == "offset"
@@ -359,4 +363,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--seed", type=int, default=73)
+    main(parser.parse_args().seed)

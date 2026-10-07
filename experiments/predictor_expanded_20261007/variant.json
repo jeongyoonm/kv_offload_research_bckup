@@ -1,0 +1,79 @@
+{
+  "family": "architecture",
+  "candidate": "trees_tuned",
+  "implementation": "a5a1ad439bb173b303b9b62570bda256416cf7d1",
+  "architecture": "trees_tuned",
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_predictor_expanded_20261007/exports/architecture/trees_tuned/seed73.json",
+      "checkpoint_sha256": "e23b2b543de472699cd4eda8510aabdf19732fba886397f2ee175820a8fbfb4c",
+      "canonical_state_sha256": "039b138afe138b5bde020c505e1daa358fa367991547de7356c16bd7a12b9ff9"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_predictor_expanded_20261007/exports/architecture/trees_tuned/seed74.json",
+      "checkpoint_sha256": "93fd0b0a2c9605d0a2d421124abb09c360c13e5490c00159c1843714fe9f11c7",
+      "canonical_state_sha256": "6c52e6503f20fc46363d08a8634e4fccde9d2310e52171f479a92164f642f0fd"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_predictor_expanded_20261007/exports/architecture/trees_tuned/seed75.json",
+      "checkpoint_sha256": "3ab3375490586dd7342ff8f9afc449f158a2acf3c84ece257b2b353ad455617b",
+      "canonical_state_sha256": "63c4288a33279f7160cb2554f4686e81a3d4494764463f2a7105dce2541adcb8"
+    }
+  },
+  "inventory": {
+    "batches": 8486,
+    "forecasts": 4994,
+    "benchmark": 192,
+    "benchmark_training_episode_overlap": 0,
+    "source_counts": {
+      "historical": 3089,
+      "legacy_replay": 670,
+      "fresh": 1235
+    },
+    "hashes": {
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/refreshed/data/batches.jsonl": "447ef697d451dfb18f4512b92fd3523e0175257aac89954c7b0a6349fad75451",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/refreshed/data/forecasts.jsonl": "8d2974d19ff055db52d209b3ba914d3d36a2c9e21cf358cf55c0219323905d50",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/submission_progress/frozen_evaluation/forecasts/forecasts.jsonl": "9d02ef1f1f4b6b3f03220f461a54bd3b775d5862cb27b097a492a78930d62bfa",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/transfer_progress/frozen_evaluation/forecasts/forecasts.jsonl": "ed8928eca455d3f94156267f0900a9081d828c2577eb0f899fc72efa0b6f7063",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/mixed/frozen_evaluation/forecasts/forecasts.jsonl": "427e10e139dd47c419b4c5ed3b6e065702ec62f188abd0d7098a2b2572a330e0",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/dense_validation/frozen_evaluation/forecasts/forecasts.jsonl": "642b6eded006e214f5f3ad660f2f9708699cb8a91d7b4a97a7b64cd656edf0ec",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/online_live/frozen_evaluation/forecasts/forecasts.jsonl": "fac112f78555ee3bfbf0c99f1663679ff1a5fa667c451c941e5c9eabfef5ce92",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/generalization/frozen_evaluation/forecasts/forecasts.jsonl": "2cd4f1903ec45412be96560550070f9d31f7c2ffe6f2d90ae0a88394ab5968de",
+      "/mnt/localnvme/glm53_predictor_overnight_20261006/final_ood/frozen_evaluation/forecasts/forecasts.jsonl": "3344f75da80576796519672736aa8397a1fb8190b99e62adc768cc3d491e76a3",
+      "/mnt/localnvme/glm53_dataset_coverage_20261007/data/batches.jsonl": "45219b52eb293456318d853a4fa7372e4d3ec4026fbd4a237fedb7e3d877f5d3",
+      "/mnt/localnvme/glm53_dataset_coverage_20261007/data/forecasts.jsonl": "ed82a75c906d3dc32dafc5c8c4ec63faabc715e0866b82981790358174831915"
+    },
+    "feature_names": [
+      "suffix_tokens",
+      "requests",
+      "attention_pairs",
+      "context_sum",
+      "suffix_min",
+      "suffix_max",
+      "context_min",
+      "context_max",
+      "padded128",
+      "outstanding_loads_at_dispatch",
+      "outstanding_load_tokens_at_dispatch",
+      "current_load_count",
+      "current_load_tokens",
+      "load_min_age_ms",
+      "load_max_age_ms",
+      "load_weighted_age_ms",
+      "old_remaining_count",
+      "old_remaining_tokens",
+      "new_load_count",
+      "new_load_tokens",
+      "completed_old_tokens",
+      "elapsed_execution_ms",
+      "queue_to_gpu_start_ms"
+    ],
+    "weighting": "source_mass_matched",
+    "previous_final_is_reused_benchmark": true,
+    "cpu_only": true
+  },
+  "cpu_only": true,
+  "inference_time_fitting": false,
+  "final_benchmark_used_for_selection": false,
+  "final_benchmark_is_reused": true
+}

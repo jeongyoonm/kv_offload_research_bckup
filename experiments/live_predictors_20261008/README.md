@@ -47,3 +47,18 @@ PYTHONPATH="$PWD" .venv/bin/python experiments/live_predictors_20261008/run.py
 GPU ownership preflight rejects occupied devices. A four-hour shutdown timer
 bounds allocation. Each result is persisted immediately. Normal/failure exits
 stop the owned process group and save incomplete results. Port: 18408.
+
+## Completed comparison
+
+All 36 cells passed. Results and interpretation are saved in
+[results/REPORT.md](results/REPORT.md) and
+[results/FINDINGS.md](results/FINDINGS.md), with compact machine-readable
+evidence alongside them. Raw traces remain in the artifact directory above.
+The serving tree remains the recommended default; neither new checkpoint
+established a consistent live throughput improvement.
+
+Regenerate summaries with `analyze.py` and `common_predictions.py` using the
+CPU evaluation environment. Then run `.venv/bin/python
+experiments/live_predictors_20261008/finalize.py` to audit every request's
+scheduled tokens, matched policies, and frozen checkpoints, and copy the
+final evidence into this branch.

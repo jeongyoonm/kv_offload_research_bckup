@@ -13,8 +13,7 @@ import regex as re
 ROOT = Path("/mnt/localnvme/glm53_dataset_coverage_20261007")
 
 
-def audit():
-    wall_offset = time.time() - time.monotonic()
+def inference_jit_events():
     jit = []
     for log in (ROOT / "server").glob("server*.log"):
         for line in log.read_text(errors="replace").splitlines():
@@ -26,6 +25,12 @@ def audit():
                     "2026-" + stamp[1], "%Y-%m-%d %H:%M:%S"
                 ).timestamp()
                 jit.append((epoch, line))
+    return jit
+
+
+def audit():
+    wall_offset = time.time() - time.monotonic()
+    jit = inference_jit_events()
     summaries = Counter()
     records = []
     for path in sorted((ROOT / "cells").rglob("result.json")):

@@ -56,6 +56,13 @@ Only development accuracy selects the live checkpoint. Dataset variants receive
 separate branches with frozen checkpoint hashes; they share the same collector,
 features, and tree hyperparameters.
 
+The geometry expansion also reuses already-recorded cold prefix-priming batches
+from repeated training cells, after excluding first-use and JIT windows. This
+extends uncached suffix coverage beyond 8K without another GPU run. These records
+share an episode with their associated measured cohort for cross-fitting, and
+receive separate cold workload labels for balanced sampling. No development or
+final priming labels enter training. The total matched addition budget stays fixed.
+
 ## Commands
 
 ```bash

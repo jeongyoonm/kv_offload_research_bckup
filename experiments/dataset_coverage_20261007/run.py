@@ -488,6 +488,9 @@ def normalize():
                 cpu_cached_prefix_tokens=e.get("cpu_cached_prefix_tokens"),
             )
             rows.append(row)
+    from cold import rows as cold_rows
+
+    rows.extend(cold_rows(module))
     data = ROOT / "data"
     data.mkdir(exist_ok=True)
     (data / "batches.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows))

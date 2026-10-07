@@ -191,6 +191,30 @@ def main():
     fig.savefig(study.ROOT / "architecture_comparison.pdf")
     plt.close(fig)
     chosen, model = selection["improvement"], selection["effective_architecture"]
+    scopes = ["long_context", "long_suffix", "large_batch", "heavy_transfers"]
+    fig, ax = plt.subplots(figsize=(8.5, 4.5))
+    positions = np.arange(len(scopes))
+    fixed = [
+        improvements[f"{s}:wide"]["scores"]["fresh"]["trees_fixed"]["mae_ms"]
+        for s in scopes
+    ]
+    improved = [
+        improvements[f"{s}:wide"]["scores"]["fresh"][chosen]["mae_ms"] for s in scopes
+    ]
+    ax.bar(positions - 0.19, fixed, 0.38, label="Fixed tree recipe")
+    ax.bar(positions + 0.19, improved, 0.38, label="Validation-selected predictor")
+    ax.set_xticks(
+        positions,
+        ["Context >=48K", "Suffix >=8K", "Batch >=8", "Transfers >=4"],
+    )
+    ax.set_ylabel("Mean absolute error (ms)")
+    ax.set_title("GLM 5.3 TP8: withheld workload ranges")
+    ax.legend()
+    ax.grid(axis="y", alpha=0.25)
+    fig.tight_layout()
+    fig.savefig(study.ROOT / "range_generalization.png", dpi=180)
+    fig.savefig(study.ROOT / "range_generalization.pdf")
+    plt.close(fig)
     best = benchmark["wide"]["improvements"][chosen]
     reference = benchmark["wide"]["architectures"]["trees_fixed"]
     lines = [

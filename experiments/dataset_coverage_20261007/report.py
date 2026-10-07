@@ -44,7 +44,9 @@ def main():
         f"Selected on development data: **{selection['winner']}**, seed 73.",
         "",
         (
-            "The tree architecture, feature vector, and fitting recipe are unchanged. "
+            "The tree architecture, features, and hyperparameters are unchanged. "
+            "Original-recipe variants retain the existing weighting; mass_matched "
+            "controls equalize each addition's total training weight. "
             "GPU compute geometry uses actual scheduled prompt tokens and context; "
             "CPU cache-hit percentage only generates request mixtures. "
             "All new GPU cells use the same private CPU-cache layout."
@@ -131,9 +133,9 @@ def main():
             "First training occurrences and the first development seed are warmup. "
             "Cells with reported inference JIT or unconfirmed own-KV readiness "
             "are excluded. Transfer overlap uses submission/completion intervals; "
-            "it does not measure SM contention. Inverse-frequency weighting is "
-            "retained: matched counts can have different effective weight mass, "
-            "which the dataset audit records. The generalization scope is "
+            "it does not measure SM contention. Original-recipe and mass-matched "
+            "weighting comparisons are reported separately; the dataset audit "
+            "records weight masses. The generalization scope is "
             "GLM 5.3 TP8 within the tested 64K range."
         ),
         "",
@@ -147,16 +149,26 @@ def main():
     )
     (ROOT / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     (ROOT / "REPORT.md").write_text("\n".join(lines))
-    fig, ax = plt.subplots(figsize=(10, 4.8))
-    ax.bar(
-        np.arange(len(names)),
-        values,
-        color=["#4c78a8" if n != selection["winner"] else "#f58518" for n in names],
-    )
-    ax.set_xticks(np.arange(len(names)), names, rotation=45, ha="right")
-    ax.set_ylabel("Final MAE (ms)")
-    ax.set_title("GLM 5.3 TP8: dataset coverage, fixed tree recipe")
-    ax.spines[["top", "right"]].set_visible(False)
+    fig, axes = plt.subplots(2, 1, figsize=(12, 9))
+    for mass_matched, ax in zip([False, True], axes):
+        indices = [
+            i
+            for i, n in enumerate(names)
+            if n.endswith("_mass_matched") == mass_matched
+        ]
+        labels = [names[i].removesuffix("_mass_matched") for i in indices]
+        ax.bar(
+            np.arange(len(indices)),
+            [values[i] for i in indices],
+            color=[
+                "#f58518" if names[i] == selection["winner"] else "#4c78a8"
+                for i in indices
+            ],
+        )
+        ax.set_xticks(np.arange(len(indices)), labels, rotation=35, ha="right")
+        ax.set_ylabel("Final MAE (ms)")
+        ax.set_title("Equal source weight" if mass_matched else "Original weights")
+        ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout()
     fig.savefig(ROOT / "accuracy.png", dpi=180)
     fig.savefig(ROOT / "accuracy.pdf")

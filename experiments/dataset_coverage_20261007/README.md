@@ -48,12 +48,21 @@ sample count. No test labels enter selection. Report accuracy by workload group,
 directional deadline errors, forecast coverage, paired uncertainty, and historical
 regression. Compare selected and historical predictors with identical live policy.
 
+Run each addition both with the original weighting and with a source-mass-matched
+control. The latter keeps historical weights independent of new workload counts
+and gives every new sample budget the same total weight. Record both the frozen
+tree's broad-shape extrapolation and the old cached-only guard's linear fallback.
+Only development accuracy selects the live checkpoint. Dataset variants receive
+separate branches with frozen checkpoint hashes; they share the same collector,
+features, and tree hyperparameters.
+
 ## Commands
 
 ```bash
 .venv/bin/python -m pytest experiments/dataset_coverage_20261007/verify.py -q
 .venv/bin/python experiments/dataset_coverage_20261007/run.py
 .venv/bin/python experiments/dataset_coverage_20261007/run.py --normalize
+.venv/bin/python experiments/dataset_coverage_20261007/finish.py
 ```
 
 Raw process events, configuration, request seeds, counters, response records, and

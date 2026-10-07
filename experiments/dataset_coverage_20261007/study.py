@@ -29,6 +29,18 @@ arch = module(
     "coverage_architecture",
     SOURCE / "experiments/predictor_architecture_cpu_20261007/study.py",
 )
+LEGACY_WEIGHTS = arch.weights
+
+
+def mass_matched_weights(rows):
+    weights = np.zeros(len(rows))
+    fresh = np.array([r["episode"].startswith(str(ROOT / "cells/train")) for r in rows])
+    for mask in [fresh, ~fresh]:
+        if mask.any():
+            weights[mask] = LEGACY_WEIGHTS(
+                [r for r, selected in zip(rows, mask) if selected]
+            )
+    return weights
 
 
 def read(path):
@@ -239,15 +251,32 @@ def development():
             for r in balanced(a[b], n)
         ]
         variants[f"familiar_n{3 * n}"] = balanced(a["familiar"], 3 * n)
+    variants.update(
+        {
+            name + "_mass_matched": extra
+            for name, extra in list(variants.items())
+            if name != "historical_refit"
+        }
+    )
     audit = dict(
         limit_per_block=limit,
         historical_base=len(hb),
         historical_forecasts=len(hf),
         counts={k: len(v) for k, v in variants.items()},
         extra_base_per_forecast=1,
-        weighting="unchanged inverse-workload-frequency with 50-sample floor",
+        weighting=(
+            "Legacy inverse-workload-frequency with 50-sample floor; "
+            "mass_matched variants separately normalize historical and new "
+            "weights to sample counts, retaining within-source ratios."
+        ),
         new_forecast_weight_mass={
-            name: float(arch.weights(hf + extra)[len(hf) :].sum())
+            name: float(
+                (
+                    mass_matched_weights
+                    if name.endswith("_mass_matched")
+                    else LEGACY_WEIGHTS
+                )(hf + extra)[len(hf) :].sum()
+            )
             for name, extra in variants.items()
         },
         hashes={
@@ -266,6 +295,9 @@ def development():
     )
     outputs = {}
     for name, extra in variants.items():
+        arch.weights = (
+            mass_matched_weights if name.endswith("_mass_matched") else LEGACY_WEIGHTS
+        )
         rows = hf + extra
         batches = hb + extra
         assert not {r["episode"] for r in rows + batches} & {r["episode"] for r in dev}
@@ -289,6 +321,12 @@ def development():
                 forecast_samples=len(rows),
                 general_prefill=True,
                 features_unchanged=True,
+                hyperparameters_unchanged=True,
+                weighting=(
+                    "source_mass_matched"
+                    if name.endswith("_mass_matched")
+                    else "legacy"
+                ),
                 cross_fit=cross_audit,
             )
             state = exported(base, correction, provenance)
@@ -336,7 +374,16 @@ def development():
     threshold = summary["historical_refit"]["historical_mae"] * 1.1
     eligible = [
         name
-        for name in ["geometry", "composition", "transfer", "combined"]
+        for name in [
+            "geometry",
+            "composition",
+            "transfer",
+            "combined",
+            "geometry_mass_matched",
+            "composition_mass_matched",
+            "transfer_mass_matched",
+            "combined_mass_matched",
+        ]
         if summary[name]["historical_mae"] <= threshold
     ]
     winner = (
@@ -397,6 +444,10 @@ def final():
         ("composition", "familiar_small"),
         ("transfer", "familiar_small"),
         ("combined", "familiar_full"),
+        ("geometry_mass_matched", "familiar_small_mass_matched"),
+        ("composition_mass_matched", "familiar_small_mass_matched"),
+        ("transfer_mass_matched", "familiar_small_mass_matched"),
+        ("combined_mass_matched", "familiar_full_mass_matched"),
     ]:
         differences = np.abs(predictions[name] - y).mean(0) - np.abs(
             predictions[control] - y

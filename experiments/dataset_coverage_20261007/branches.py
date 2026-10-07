@@ -42,7 +42,11 @@ def main():
             variant=variant,
             implementation=base,
             architecture="Extra Trees base + histogram gradient boosting correction",
-            recipe_unchanged=True,
+            recipe_unchanged=not variant.endswith("_mass_matched"),
+            hyperparameters_unchanged=True,
+            weighting=(
+                "source_mass_matched" if variant.endswith("_mass_matched") else "legacy"
+            ),
             input_features_unchanged=True,
             new_forecast_samples=audit["counts"][variant],
             one_matching_base_row_per_forecast=True,

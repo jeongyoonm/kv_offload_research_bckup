@@ -25,6 +25,8 @@ def main():
     final = json.loads((ROOT / "study/final.json").read_text())
     selection = final["selection"]
     allocation = json.loads((ROOT / "allocation.json").read_text())
+    measurement_audit = json.loads((ROOT / "measurement_audit.json").read_text())
+    dataset_audit = json.loads((ROOT / "study/dataset_audit.json").read_text())
     inventory = {
         "batches": dict(Counter(f"{r['split']}:{r['block']}" for r in batches)),
         "forecasts": dict(Counter(f"{r['split']}:{r['block']}" for r in forecasts)),
@@ -37,6 +39,8 @@ def main():
             max(s for r in batches for s, c in r["request_shapes"]),
         ],
         "allocation_seconds": allocation["total_seconds"],
+        "measurement_audit": measurement_audit["counts"],
+        "matched_forecasts_per_expansion": dataset_audit["limit_per_block"],
     }
     lines = [
         "# GLM 5.3 TP8 dataset coverage evaluation",
@@ -135,6 +139,23 @@ def main():
             f"Normalized batches: {len(batches)}; causal forecasts: {len(forecasts)}. "
             f"Total TP8 allocation: {allocation['total_seconds'] / 3600:.2f} hours. "
             f"Live pairs completed: {len(complete)}/8."
+        ),
+        "",
+        (
+            f"Matched training additions contain {dataset_audit['limit_per_block']} "
+            "forecasts per expansion block, with one corresponding base row each. "
+            "Requested collection targets were 400 per expansion and 1,200 familiar "
+            "controls; the measured normalized counts above are authoritative."
+        ),
+        "",
+        (
+            "The first server's inherited native timing observer stopped after "
+            "4,096 completed forwards because it retained unused audit records. "
+            "Those invalid labels were excluded. The ordinary-mode retention fix "
+            "passed 4,200 consecutive CUDA forwards, and evaluation was rerun in "
+            "a fresh server session using the frozen seeds. Restart and check "
+            "time are included in the GPU allocation. Explicit diagnostic audit "
+            "behavior is preserved."
         ),
         "",
         (

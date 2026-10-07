@@ -61,7 +61,7 @@ def main():
         assert max(result["export_equivalence_max_ms"].values()) < 1e-4
         group = task["range_scope"] or "episode"
         groups[(group, task["regime"])].append(task)
-    summary, paired = {}, {}
+    summary, paired, seed_scores = {}, {}, {}
     for (group, regime), ts in groups.items():
         data = arrays(ts)
         key = f"{group}:{regime}"
@@ -71,6 +71,10 @@ def main():
             historical=scores(data, data["phase"] != "fresh"),
         )
         paired[key] = {name: paired_interval(data, name) for name in study.arch.MODELS}
+        seed_scores[key] = {
+            str(seed): scores(arrays([task for task in ts if task["seed"] == seed]))
+            for seed in [73, 74, 75]
+        }
     cv = summary["episode:wide"]
     limit = cv["historical"]["trees_fixed"]["mae_ms"] * 1.1
     eligible = [
@@ -88,7 +92,13 @@ def main():
     )
     study.arch.dump(study.ROOT / "architecture_selection.json", selection)
     study.arch.dump(
-        study.ROOT / "architecture_summary.json", dict(scores=summary, paired=paired)
+        study.ROOT / "architecture_summary.json",
+        dict(
+            scores=summary,
+            paired=paired,
+            seed_scores=seed_scores,
+            seed_aggregation="mean error over three trained models, no new ensemble",
+        ),
     )
     os.environ["VLLM_DEFERRAL_FAST_FOREST"] = str(
         study.HIST / "fast_forest/build/libpredictor_forest_walk.so"

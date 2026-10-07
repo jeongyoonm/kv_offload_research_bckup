@@ -153,6 +153,16 @@ def main():
         x = f["features"][:200]
     runtime = timings(states, x)
     study.arch.dump(study.ROOT / "improvement_runtime.json", runtime)
+    architecture_states = json.loads(
+        (study.ROOT / "folds/benchmark_wide_s73/checkpoints.json").read_text()
+    )
+    architecture_runtime = timings(
+        {name: improve.wrapped(state) for name, state in architecture_states.items()},
+        x,
+    )
+    study.arch.dump(
+        study.ROOT / "architecture_runtime_final.json", architecture_runtime
+    )
     diagnostic = variation()
     convergence(json.loads((study.ROOT / "tasks.json").read_text()) + tasks)
     cv = architecture["scores"]["episode:wide"]["fresh"]
@@ -200,16 +210,17 @@ def main():
         "",
         (
             "| Architecture | Fresh CV MAE | Fresh CV macro MAE | "
-            "Reused benchmark MAE | Reused benchmark p95 error |"
+            "Reused benchmark MAE | Reused benchmark p95 error | Evaluation (us) |"
         ),
-        "|---|---:|---:|---:|---:|",
+        "|---|---:|---:|---:|---:|---:|",
     ]
     for n in names:
         score = benchmark["wide"]["architectures"][n]
         lines.append(
             f"| {n} | {cv[n]['mae_ms']:.2f} | "
             f"{cv[n]['workload_macro_mae_ms']:.2f} | {score['mae_ms']:.2f} | "
-            f"{score['p95_absolute_ms']:.2f} |"
+            f"{score['p95_absolute_ms']:.2f} | "
+            f"{architecture_runtime[n]['median_us']:.1f} |"
         )
     lines += [
         "",
@@ -257,7 +268,8 @@ def main():
             "controls, matched base-data controls, paired episode-bootstrap "
             "intervals and export equivalence checks are included in the JSON "
             "artifacts. Calibration labels are predictions from complete "
-            "architectures trained on other episodes."
+            "architectures trained on other episodes. Reported errors average "
+            "three trained seeds; they do not create a new prediction ensemble."
         ),
         "",
         (

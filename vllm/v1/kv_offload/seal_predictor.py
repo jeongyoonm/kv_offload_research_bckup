@@ -132,7 +132,12 @@ class ComputeEstimator:
 
     def predict(self, data):
         if self.latency_surface is not None:
-            duration = self.latency_surface.predict(data)
+            surface_data = data
+            if data.get("predictor_general_prefill") and not getattr(
+                self.latency_surface, "_state", {}
+            ).get("provenance", {}).get("general_prefill", False):
+                surface_data = dict(data, predictor_general_prefill=False)
+            duration = self.latency_surface.predict(surface_data)
             if duration is not None:
                 return duration
         features = self.features(data)

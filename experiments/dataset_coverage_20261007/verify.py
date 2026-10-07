@@ -177,3 +177,21 @@ def test_cold_priming_is_training_only_and_excludes_first_use(monkeypatch, tmp_p
     meta = json.loads(family.read_text())
     run.save(family, dict(meta, repeat=0))
     assert not cold.rows(corpus)
+
+
+def test_general_prefill_gate_preserves_the_old_checkpoint_fallback():
+    from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
+
+    surface = SimpleNamespace(
+        _state=dict(provenance={}),
+        predict=lambda data: (
+            10000000 if data.get("predictor_general_prefill") else None
+        ),
+    )
+    model = ComputeEstimator()
+    model.latency_surface = surface
+    model.coefficients = np.array([5.0, 0.0, 0.0, 0.0])
+    data = dict(request_shapes=[[128, 0]], predictor_general_prefill=True)
+    assert model.predict(data) == 5000000
+    surface._state["provenance"]["general_prefill"] = True
+    assert model.predict(data) == 10000000

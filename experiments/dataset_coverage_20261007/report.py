@@ -75,6 +75,14 @@ def main():
         "",
         "## Paired live confirmation",
         "",
+        (
+            "Historical uses the original cached-only guard and linear fallback. "
+            "The selected new checkpoint enables broader pure-prefill geometry; "
+            "both use the same preparation optimization and sealing policy. "
+            "If no new checkpoint improves development accuracy while passing "
+            "the historical regression gate, the historical checkpoint is retained."
+        ),
+        "",
     ]
     cells = []
     for path in (ROOT / "live").rglob("result.json"):

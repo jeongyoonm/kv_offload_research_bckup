@@ -285,11 +285,12 @@ def development():
         },
     )
     dump(ROOT / "study/dataset_audit.json", audit)
+    old_guard_development = scores(dev, historical_guard_predictions(dev))
     dump(
         ROOT / "study/frozen_reference.json",
         dict(
             development=scores(dev, predict(reference(), dev)),
-            development_old_guard=scores(dev, historical_guard_predictions(dev)),
+            development_old_guard=old_guard_development,
             historical=scores(historical, predict(reference(), historical)),
         ),
     )
@@ -332,7 +333,9 @@ def development():
             state = exported(base, correction, provenance)
             dev_pred = predict(state, dev)
             bx = arch.features(dev)
-            bp = base.predict(bx)
+            # Serving stores the base duration in integer nanoseconds before
+            # passing it to the correction forest's float32 feature vector.
+            bp = np.floor(base.predict(bx) * 1e6) / 1e6
             expected = np.maximum(
                 1,
                 bp
@@ -385,19 +388,31 @@ def development():
             "combined_mass_matched",
         ]
         if summary[name]["historical_mae"] <= threshold
+        and summary[name]["development_macro_mae"]
+        < old_guard_development["workload_macro_mae_ms"]
+        and outputs[f"{name}:73"]["development"]["workload_macro_mae_ms"]
+        < old_guard_development["workload_macro_mae_ms"]
     ]
     winner = (
         min(eligible, key=lambda n: summary[n]["development_macro_mae"])
         if eligible
-        else "historical_refit"
+        else "historical_old_guard"
     )
     selection = dict(
         winner=winner,
         seed=73,
         variants=summary,
         development_only=True,
-        checkpoint=str(ROOT / "study/models" / winner / "seed73/serving.json"),
+        checkpoint=str(ROOT / "study/models" / winner / "seed73/serving.json")
+        if eligible
+        else str(HIST / "boosted_residual/model.json"),
         historical_limit_ms=threshold,
+        old_guard_development_macro_mae=old_guard_development["workload_macro_mae_ms"],
+        selection_rule=(
+            "Lowest three-seed development workload-macro MAE; both the mean "
+            "and serving seed 73 must improve on the unchanged old guard; "
+            "historical MAE must be within 10% of historical_refit."
+        ),
     )
     dump(ROOT / "study/selection.json", selection)
     print(json.dumps(selection), flush=True)

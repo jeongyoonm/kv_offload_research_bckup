@@ -49,6 +49,7 @@ class Observer {
   std::condition_variable wake;
   bool stopping = false, failed = false;
   int mode = 0;  // 0: legacy full, 1: record only, 2: full retained
+  bool collect_audits = false;
   uint64_t query_count = 0, first_sample = 0, last_sample = 0, max_gap = 0;
 
   using Jobs = std::map<uint64_t, Job>;
@@ -138,9 +139,14 @@ class Observer {
           write(r, &job);
           if (r[8]) {
             job.audit[17] = r[8];
-            if (audits.size() >= capacity)
-              throw std::runtime_error("audit overflow");
-            audits.push_back(job.audit);
+            // Ordinary serving has no audit consumer. Retaining these records
+            // would permanently disable timing after 4096 completed forwards.
+            // Diagnostic modes keep their existing bounded audit contract.
+            if (collect_audits || audit_fd >= 0) {
+              if (audits.size() >= capacity)
+                throw std::runtime_error("audit overflow");
+              audits.push_back(job.audit);
+            }
             if (audit_fd >= 0 &&
                 ::write(audit_fd, job.audit.data(), 18 * sizeof(uint64_t)) !=
                     18 * sizeof(uint64_t))
@@ -208,8 +214,12 @@ class Observer {
       return 0;
     }
   }
-  Observer(const char* path, int dev, const char* audit_path, int selected = 0)
-      : notifier(path), device(dev), mode(selected) {
+  Observer(const char* path, int dev, const char* audit_path, int selected = 0,
+           bool audit_enabled = false)
+      : notifier(path),
+        device(dev),
+        mode(selected),
+        collect_audits(audit_enabled) {
     fd = open(path, O_RDWR | O_CLOEXEC);
     struct stat st{};
     if (fd < 0) throw std::runtime_error("timing open failed");
@@ -344,7 +354,7 @@ void* timing_create(const char* path, int device,
 void* timing_create_mode(const char* path, int device, int mode) noexcept {
   if (mode < 0 || mode > 2) return nullptr;
   try {
-    return new Observer(path, device, "", mode);
+    return new Observer(path, device, "", mode, true);
   } catch (...) {
     return nullptr;
   }

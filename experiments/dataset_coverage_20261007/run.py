@@ -410,7 +410,7 @@ def launch():
         VLLM_PREDICTOR_GENERAL_PREFILL="1",
         VLLM_DATASET_BACKGROUND_PREFIX="coverage-bg-",
         VLLM_DATASET_TARGET_GATE=str(ROOT / "target_hold"),
-        VLLM_DEFERRAL_NATIVE_OBSERVER="/mnt/localnvme/glm53_coalesced_notify_20261004/build/libseal_execution_observer.so",
+        VLLM_DEFERRAL_NATIVE_OBSERVER=str(ROOT / "libseal_execution_observer.so"),
         VLLM_DEFERRAL_FAST_FOREST=str(
             HIST / "fast_forest/build/libpredictor_forest_walk.so"
         ),

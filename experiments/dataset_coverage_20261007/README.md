@@ -75,6 +75,7 @@ final priming labels enter training. The total matched addition budget stays fix
 
 ```bash
 .venv/bin/python -m pytest experiments/dataset_coverage_20261007/verify.py -q
+.venv/bin/python experiments/dataset_coverage_20261007/build_observer.py
 .venv/bin/python experiments/dataset_coverage_20261007/run.py
 .venv/bin/python experiments/dataset_coverage_20261007/run.py --normalize
 .venv/bin/python experiments/dataset_coverage_20261007/finish.py
@@ -83,3 +84,14 @@ final priming labels enter training. The total matched addition budget stays fix
 Raw process events, configuration, request seeds, counters, response records, and
 timing traces are persisted after each cell. Checkpoints are never retrained at
 prediction time. Report incomplete phases explicitly when the hard budget expires.
+
+## Observer recovery
+
+The inherited ordinary native observer retained diagnostic audit records even
+without an audit consumer, then failed after 4,096 completed forwards. The local
+fix stops retaining ordinary-mode audits; explicit diagnostic creation retains
+its original bounded audit behavior. `check_observer.py` verifies 4,200 consecutive
+CUDA forwards. It needs an otherwise idle GPU and is outside throughput timing.
+`recover.py` retains valid training records and reruns the frozen evaluation seeds
+in new attempt directories after restart. Invalid prior labels remain excluded;
+restart and regression-check time are charged to the original GPU budget.

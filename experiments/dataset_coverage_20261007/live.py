@@ -255,6 +255,7 @@ def main():
     started = time.monotonic()
     watchdog = None
     results = []
+    paired_seconds = []
     try:
         proc = run.launch()
         watchdog = threading.Timer(max(1, 14400 - used - 60), run.stop_server, (proc,))
@@ -273,18 +274,28 @@ def main():
         # ABBA ordering within each workload, with identical prompt seeds per pair.
         for repeat in range(4):
             for workload in ["familiar60k", "heterogeneous"]:
-                if used + time.monotonic() - started > 14400 - 900:
-                    run.log("live_budget_stop", completed_cells=len(results))
+                reserve = max(
+                    600 if not paired_seconds else 300,
+                    1.5 * max(paired_seconds, default=0) + 60,
+                )
+                if used + time.monotonic() - started > 14400 - reserve:
+                    run.log(
+                        "live_budget_stop",
+                        completed_cells=len(results),
+                        reserve_seconds=reserve,
+                    )
                     return
                 order = (
                     ["historical", "selected"]
                     if repeat in [0, 3]
                     else ["selected", "historical"]
                 )
+                pair_start = time.monotonic()
                 for label in order:
                     results.append(
                         cell(label, models[label], workload, 1001 + repeat, repeat)
                     )
+                paired_seconds.append(time.monotonic() - pair_start)
         run.log("live_complete", cells=len(results))
     finally:
         if watchdog:

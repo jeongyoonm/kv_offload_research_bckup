@@ -30,6 +30,21 @@ def main():
         result = json.loads(path.read_text())
         assert result["accepted"] and result["requests"] == 32
         assert result["label"] == "trees"
+    phase_pairs = []
+    for path in conditioning:
+        result = json.loads(path.read_text())
+        repeat, name = result["repeat"].removeprefix("conditioning_").split("_", 1)
+        measured = json.loads(
+            (ROOT / "live/familiar60k" / f"r{repeat}_{name}/result.json").read_text()
+        )
+        phase_pairs.append(
+            dict(
+                repeat=int(repeat),
+                predictor=name,
+                common_tree_conditioning_rps=result["throughput_rps"],
+                measured_rps=measured["throughput_rps"],
+            )
+        )
     comparison = json.loads((ROOT / "comparison.json").read_text())
     accuracy = json.loads((ROOT / "audit_live/audit.json").read_text())
     assert comparison["complete"] and accuracy["issued_replay_max_difference_ns"] == 0
@@ -55,6 +70,7 @@ def main():
         allocation=allocation,
         paired_offset_vs_elapsed=paired,
         issued_replay_difference_ns=accuracy["issued_replay_max_difference_ns"],
+        conditioning_phase_pairs=phase_pairs,
     )
     (ROOT / "completion.json").write_text(json.dumps(completion, indent=2) + "\n")
     lines = [
@@ -80,6 +96,28 @@ def main():
         f"Paired offset-only versus elapsed-input gain: {paired['gain_percent']:+.2f}%",
         f"with a 95% Student-t interval [{lo:+.2f}%, {hi:+.2f}%].",
         "Three episodes provide limited precision; this is not equivalence.",
+        "",
+        "## Conditioning phase check",
+        "",
+        "The conditioning checkpoint and procedure are identical across models.",
+        "Its throughput is measured on 32 excluded requests, while each main",
+        "episode uses 75; the absolute values are not equal-length comparisons.",
+        "Variation among conditioning episodes exposes phase differences even",
+        "without a predictor change. Conditioning does not guarantee identical",
+        "physical state at the start of each measured episode.",
+        "",
+        (
+            "| Repeat | Measured predictor | Common-tree conditioning req/s | "
+            "Measured req/s |"
+        ),
+        "| ---: | --- | ---: | ---: |",
+    ]
+    for row in phase_pairs:
+        lines.append(
+            f"| {row['repeat']} | {row['predictor']} | "
+            f"{row['common_tree_conditioning_rps']:.3f} | {row['measured_rps']:.3f} |"
+        )
+    lines += [
         "",
         "## Accuracy at common live snapshots",
         "",

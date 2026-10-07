@@ -190,11 +190,17 @@ def cell(label, state, workload, seed, repeat):
         ]
         if export.get("overflow"):
             raise RuntimeError("worker trace overflowed")
-        worker_coverage[str(export["rank"])] = dict(
-            entries=len(entries),
-            compact=sum(bool(e.get("compact_tokens")) for e in entries),
-            pinned=sum(bool(e.get("pinned_tokens")) for e in entries),
+        totals = worker_coverage.setdefault(
+            str(export["rank"]), dict(entries=0, compact=0, pinned=0)
         )
+        totals["entries"] += len(entries)
+        totals["compact"] += sum(bool(e.get("compact_tokens")) for e in entries)
+        totals["pinned"] += sum(bool(e.get("pinned_tokens")) for e in entries)
+    preparation_verified = set(worker_coverage) == {str(r) for r in range(8)} and all(
+        coverage["compact"] > 0 and coverage["pinned"] > 0
+        for coverage in worker_coverage.values()
+    )
+    accepted = accepted and preparation_verified
     result = dict(
         accepted=accepted,
         label=label,
@@ -221,6 +227,7 @@ def cell(label, state, workload, seed, repeat):
         kv_ready_during_compute=len(ready_during_compute),
         recovered_compute_opportunities=len(activated & ready_during_compute),
         worker_preparation_coverage=worker_coverage,
+        optimized_preparation_verified=preparation_verified,
         responses=responses,
         metrics_before=before,
         metrics_after=after,

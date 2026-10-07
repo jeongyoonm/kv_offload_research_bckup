@@ -30,9 +30,11 @@ def rows(extractor):
     starts = [c[0] for c in cells]
     all_events = []
     for path in (run.ROOT / "server/timing").glob("engine-*.jsonl"):
-        all_events.extend(json.loads(line) for line in path.read_text().splitlines())
+        all_events.extend(
+            (path.name, json.loads(line)) for line in path.read_text().splitlines()
+        )
     selected, metadata = defaultdict(list), {}
-    for event in all_events:
+    for origin, event in all_events:
         ids = event.get("selected", {})
         if event["event"] != "step_completion" or not ids:
             continue
@@ -60,14 +62,14 @@ def rows(extractor):
             continue
         if len({tuple(shape) for shape in event.get("request_shapes", [])}) != 1:
             continue
-        selected[path.parent].append(event)
-        metadata[path.parent] = (meta, lower, begin)
+        selected[(path.parent, origin)].append(event)
+        metadata[(path.parent, origin)] = (meta, lower, begin)
     jit = audit.inference_jit_events()
     offset = time.time() - time.monotonic()
     result_rows = []
     audit_records = []
-    for directory, events in selected.items():
-        meta, lower, upper = metadata[directory]
+    for (directory, origin), events in selected.items():
+        meta, lower, upper = metadata[(directory, origin)]
         compile_events = [
             line
             for t, line in jit
@@ -85,8 +87,9 @@ def rows(extractor):
         steps = {e["step"] for e in events}
         trace = [
             e
-            for e in all_events
-            if (
+            for engine, e in all_events
+            if engine == origin
+            and (
                 (e["event"] == "step_completion" and e.get("step") in steps)
                 or (
                     e["event"] == "dataset_forecast"
@@ -98,7 +101,7 @@ def rows(extractor):
                 )
             )
         ]
-        source = directory / "prime-engine.jsonl"
+        source = directory / ("prime-" + origin)
         source.write_text("".join(json.dumps(e) + "\n" for e in trace))
         for e in events:
             row, reason = extractor.extract(e, cached_only=False)

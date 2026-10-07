@@ -46,8 +46,8 @@ def stream(tokens, name):
                 break
             event = json.loads(payload)
             for choice in event.get("choices", []):
+                first = first or time.monotonic_ns()
                 if choice.get("text"):
-                    first = first or time.monotonic_ns()
                     output += choice["text"]
             if event.get("usage"):
                 usage = event["usage"]
@@ -96,6 +96,7 @@ def cell(label, state, workload, seed, repeat):
         run.save(directory / "policy.json", run.configure(True, state))
         before = run.counters()
         offsets = run.snapshots()
+        late_before = set((run.ROOT / "server/timing/late_admission").glob("*.json"))
         start = time.monotonic_ns()
         futures = [
             pool.submit(stream, p, f"live-main-{seed}-{i}")
@@ -104,6 +105,29 @@ def cell(label, state, workload, seed, repeat):
         responses = [f.result() for f in futures]
         elapsed = (time.monotonic_ns() - start) / 1e9
     events = run.traces(offsets, directory)
+    engine_records, late_sources, worker_exports, engine_exports = [], [], [], []
+    for path in sorted(
+        set((run.ROOT / "server/timing/late_admission").glob("*.json")) - late_before
+    ):
+        data = json.loads(path.read_text())
+        if data.get("role") == "engine":
+            if data.get("overflow"):
+                raise RuntimeError("live seal trace overflowed")
+            engine_records.extend(data["records"])
+            engine_exports.append(data)
+            late_sources.append(str(path))
+        elif data.get("role") == "worker":
+            worker_exports.append(dict(source=str(path), **data))
+    run.save(
+        directory / "late.json",
+        dict(
+            records=engine_records,
+            sources=late_sources,
+            overflow=False,
+            generations=[e["generation"] for e in engine_exports],
+            worker_sources=[e["source"] for e in worker_exports],
+        ),
+    )
     after = run.counters()
     exported = run.call(
         "/experimental/kv-load-scheduling",
@@ -128,6 +152,49 @@ def cell(label, state, workload, seed, repeat):
         == before.get("vllm:prefix_cache_hits_total", 0)
     )
     ttft = [r["ttft_ms"] for r in responses]
+    activated = {
+        req
+        for e in engine_records
+        if e["event"] == "membership_sealed"
+        for req in e.get("activated", {})
+    }
+    completed_steps = [
+        e
+        for e in events
+        if e["event"] == "step_completion" and e.get("selected") and e.get("valid")
+    ]
+    intervals = [
+        (
+            max(r[3] for r in e["execution_ranks"]),
+            max(r[3] + r[6] for r in e["execution_ranks"]),
+        )
+        for e in completed_steps
+    ]
+    jobs = {
+        e["job_id"]: e["request"] for e in events if e["event"] == "kv_load_dispatched"
+    }
+    ready_during_compute = {
+        jobs[e["job_id"]]
+        for e in events
+        if e["event"] == "kv_all_rank_completion"
+        and e["job_id"] in jobs
+        and any(a <= e["completion_ns"] < b for a, b in intervals)
+    }
+    worker_coverage = {}
+    compute_steps = {e["step"] for e in completed_steps}
+    for export in worker_exports:
+        entries = [
+            e
+            for e in export["records"]
+            if e["event"] == "worker_entry" and e.get("step") in compute_steps
+        ]
+        if export.get("overflow"):
+            raise RuntimeError("worker trace overflowed")
+        worker_coverage[str(export["rank"])] = dict(
+            entries=len(entries),
+            compact=sum(bool(e.get("compact_tokens")) for e in entries),
+            pinned=sum(bool(e.get("pinned_tokens")) for e in entries),
+        )
     result = dict(
         accepted=accepted,
         label=label,
@@ -150,6 +217,10 @@ def cell(label, state, workload, seed, repeat):
         ),
         expected_cached=expected,
         observed_cached=restored,
+        late_admissions=len(activated),
+        kv_ready_during_compute=len(ready_during_compute),
+        recovered_compute_opportunities=len(activated & ready_during_compute),
+        worker_preparation_coverage=worker_coverage,
         responses=responses,
         metrics_before=before,
         metrics_after=after,

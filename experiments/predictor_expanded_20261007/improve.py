@@ -134,7 +134,12 @@ class FrozenCandidate:
 
     def __init__(self, state, native=False):
         self.state = state
-        self.models = [arch.FrozenArchitecture(s, native) for s in state["models"]]
+        self.models = [
+            FrozenTrend(s, native)
+            if s.get("base", {}).get("kind") == "linear"
+            else arch.FrozenArchitecture(s, native)
+            for s in state["models"]
+        ]
 
     def predict_one(self, x):
         prediction = sum(
@@ -147,6 +152,34 @@ class FrozenCandidate:
                 shift = calibration["group_shift_ms"].get(calibration_group(x), shift)
             prediction += shift
         return max(1, prediction)
+
+
+class FrozenTrend:
+    """Evaluate a continuous geometry trend plus an optional tree residual."""
+
+    def __init__(self, state, native=False):
+        self.base = state["base"]
+        self.indices = np.array(self.base["indices"])
+        self.mean = np.array(self.base["mean"])
+        self.scale = np.array(self.base["scale"])
+        self.coefficients = np.array(self.base["coefficients"])
+        self.correction = (
+            arch.FrozenComponent(state["correction"], native)
+            if state.get("correction")
+            else None
+        )
+
+    def predict_one(self, x):
+        value = max(
+            1,
+            float(
+                ((x[self.indices] - self.mean) / self.scale) @ self.coefficients
+                + self.base["intercept"]
+            ),
+        )
+        if self.correction:
+            value += self.correction.predict_one(np.r_[x, value])
+        return max(1, value)
 
 
 def predict_state(state, rows):
@@ -250,6 +283,8 @@ def run_task(task):
     configure()
     with threadpool_limits(limits=1):
         for variant in proposal["candidates"]:
+            if variant.startswith("trend_"):
+                continue
             if variant in ("selected", "global_calibration", "group_calibration"):
                 continue
             if variant == "blend_fixed":
@@ -269,6 +304,10 @@ def run_task(task):
             states[variant] = wrapped(
                 fit_one(name, selected, batches, train, task["seed"])
             )
+        if any(n.startswith("trend_") for n in proposal["candidates"]):
+            import trend
+
+            states.update(trend.fit_variants(batches, train, selected, task["seed"])[0])
         configure()
         oof, audit = oof_architecture(name, selected, batches, train, task["seed"])
         calibration = calibrate(train, oof)
@@ -349,10 +388,16 @@ def summarize(tasks, proposal):
     winner = min(eligible, key=lambda n: cv["fresh"][n]["workload_macro_mae_ms"])
     selection = dict(
         architecture=proposal["architecture"],
+        effective_architecture=(
+            "positive ridge geometry trend with optional boosted residual"
+            if winner.startswith("trend_")
+            else proposal["architecture"]
+        ),
         improvement=winner,
         benchmark_used_for_selection=False,
         criterion="fresh episode-CV workload-macro MAE, historical regression <=10%",
         historical_limit_ms=limit,
+        serving_integration_required=winner.startswith("trend_"),
     )
     arch.dump(study.ROOT / "improvement_summary.json", results)
     arch.dump(study.ROOT / "final_selection.json", selection)

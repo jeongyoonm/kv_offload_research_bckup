@@ -180,7 +180,7 @@ def main():
     fig.savefig(study.ROOT / "architecture_comparison.png", dpi=180)
     fig.savefig(study.ROOT / "architecture_comparison.pdf")
     plt.close(fig)
-    chosen, model = selection["improvement"], selection["architecture"]
+    chosen, model = selection["improvement"], selection["effective_architecture"]
     best = benchmark["wide"]["improvements"][chosen]
     reference = benchmark["wide"]["architectures"]["trees_fixed"]
     lines = [
@@ -273,6 +273,11 @@ def main():
             "contention. Replay accuracy does not establish throughput or TTFT "
             "gains. The private CPU cache optimization and the serving preparation "
             "optimization remain part of the original collection path."
+        ),
+        (
+            "The research exports support architecture comparisons. MLP and "
+            "linear-trend candidates require a serving integration before GPU "
+            "deployment; the production scheduler was not changed by CPU replay."
         ),
         "",
         (

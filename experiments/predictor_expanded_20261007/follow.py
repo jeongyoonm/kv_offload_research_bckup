@@ -134,6 +134,7 @@ def main():
         ("architecture", ["study.py", "--workers", "4"]),
         ("architecture_report", ["report.py"]),
         ("improvements", ["improve.py", "--workers", "4"]),
+        ("continuous_trend", ["trend.py", "--workers", "4"]),
         ("benchmark", ["benchmark.py", "--workers", "4"]),
         ("branches", ["branches.py"]),
         ("final_report", ["final_report.py"]),

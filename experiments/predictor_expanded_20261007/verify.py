@@ -8,11 +8,29 @@ from unittest.mock import patch
 import improve
 import numpy as np
 import study
+import trend
 from sklearn.ensemble import HistGradientBoostingRegressor
 from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_exported_continuous_trend_extrapolates_positive_work(self):
+        x = np.zeros((100, 11))
+        x[:, 0] = np.linspace(512, 32768, len(x))
+        x[:, 1] = 1
+        y = 5 + 0.015 * x[:, 0]
+        with (
+            patch.object(study.arch, "features", return_value=x),
+            patch.object(study.arch, "target", return_value=y),
+            patch.object(study.arch, "weights", return_value=np.ones(len(x))),
+        ):
+            state = trend.fit_linear([{}] * len(x), 0.1)
+        model = improve.FrozenTrend(dict(base=state))
+        unseen = x[-1].copy()
+        unseen[0] = 65536
+        self.assertGreater(model.predict_one(unseen), model.predict_one(x[-1]))
+        self.assertLess(abs(model.predict_one(unseen) - (5 + 0.015 * 65536)), 2)
+
     def test_absolute_loss_export_preserves_negative_corrections(self):
         rng = np.random.default_rng(73)
         x = rng.uniform(0, 10, size=(100, 23)).astype(np.float32)

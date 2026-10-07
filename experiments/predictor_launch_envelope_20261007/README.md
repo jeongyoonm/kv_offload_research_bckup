@@ -64,3 +64,15 @@ The benchmark remains reused and exploratory.
 
 Run `envelope_guard.py` before `envelope_guard.py --benchmark`. Artifacts are under
 `/mnt/localnvme/glm53_envelope_guard_20261007`.
+
+## Complementary predictor blend
+
+Episode CV errors from the envelope and sparse MLP had correlation 0.29. A
+separate branch tests two fixed 50/50 combinations: suffix-guarded envelope
+with the guarded sparse MLP, and with its earlier tree blend. No weights are
+searched. Select fresh episode macro MAE subject to the same historical gate
+before reading final replay predictions. `envelope_blend.py` selects the candidate;
+`envelope_blend.py --benchmark` evaluates it. `publication.py` verifies exported
+inference on all final rows and seeds, measures latency, preserves fourteen
+variants on separate branches, and writes reports and plots. Artifacts are under
+`/mnt/localnvme/glm53_envelope_blend_20261007`.

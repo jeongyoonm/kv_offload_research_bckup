@@ -18,6 +18,28 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_fixed_blend_maps_sparse_features_without_future_rank_features(self):
+        sys.path.insert(
+            0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")
+        )
+        blend = importlib.import_module("envelope_blend")
+        envelope, neural = Mock(), Mock()
+        envelope.predict_one.return_value = 10
+        neural.predict_one.return_value = 30
+        with (
+            patch.object(blend.guard, "Frozen", return_value=envelope),
+            patch.object(blend.e.improve, "FrozenCandidate", return_value=neural),
+        ):
+            model = blend.Frozen(dict(envelope={}, neural={}))
+        x = np.arange(27, dtype=float)
+        self.assertEqual(model.predict_one(x), 20)
+        np.testing.assert_array_equal(
+            neural.predict_one.call_args.args[0][28:], x[23:26]
+        )
+        np.testing.assert_array_equal(
+            neural.predict_one.call_args.args[0][23:28], np.zeros(5)
+        )
+
     def test_envelope_guard_preserves_in_range_and_falls_back_outside(self):
         sys.path.insert(
             0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")

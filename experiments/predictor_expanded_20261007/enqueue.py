@@ -56,15 +56,16 @@ def extra_features(rows):
         assert len(ranks) == 8
         forecast = row.get("forecast_time_ns", max(r[3] for r in ranks))
         assert all(0 < r[1] <= r[3] <= forecast for r in ranks)
-        gaps = np.array([(r[3] - r[1]) / 1e6 for r in ranks])
-        starts = np.array([r[3] for r in ranks], dtype=np.int64)
+        gaps = sorted((r[3] - r[1]) / 1e6 for r in ranks)
+        starts = [r[3] for r in ranks]
+        mean = sum(gaps) / 8
         result.append(
             [
-                gaps.min(),
-                gaps.max(),
-                np.median(gaps),
-                gaps.std(),
-                (starts.max() - starts.min()) / 1e6,
+                gaps[0],
+                gaps[-1],
+                (gaps[3] + gaps[4]) / 2,
+                (sum((v - mean) ** 2 for v in gaps) / 8) ** 0.5,
+                (max(starts) - min(starts)) / 1e6,
             ]
         )
     return np.array(result)

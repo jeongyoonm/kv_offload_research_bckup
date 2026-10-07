@@ -123,6 +123,22 @@ def main():
     import coverage_control
 
     coverage_control.main()
+    import enqueue
+
+    extraction_rows = joblib.load(study.ROOT / "locked_benchmark.joblib")[:200]
+    extraction = []
+    for _ in range(5):
+        for row in extraction_rows:
+            started = time.perf_counter_ns()
+            enqueue.extra_features([row])
+            extraction.append((time.perf_counter_ns() - started) / 1000)
+    extraction = dict(
+        median_us=float(np.median(extraction)),
+        p95_us=float(np.quantile(extraction, 0.95)),
+        includes_causality_checks=True,
+        only_added_enqueue_features=True,
+    )
+    study.arch.dump(study.ROOT / "enqueue_feature_runtime.json", extraction)
     tasks = json.loads((study.ROOT / "benchmark_tasks.json").read_text())
     selection = json.loads((study.ROOT / "final_selection.json").read_text())
     architecture = json.loads((study.ROOT / "architecture_summary.json").read_text())
@@ -342,6 +358,12 @@ def main():
             "contention. Replay accuracy does not establish throughput or TTFT "
             "gains. The private CPU cache optimization and the serving preparation "
             "optimization remain part of the original collection path."
+        ),
+        (
+            f"Added CUDA enqueue-feature extraction takes "
+            f"{extraction['median_us']:.1f} us median and "
+            f"{extraction['p95_us']:.1f} us p95, including causality checks. "
+            "This is separate from exported model evaluation."
         ),
         (
             "The research exports support architecture comparisons. MLP and "

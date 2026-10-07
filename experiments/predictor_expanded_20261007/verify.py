@@ -3,7 +3,7 @@
 """Guard signed absolute-loss exports and episode-purged calibration labels."""
 
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import enqueue
 import improve
@@ -16,6 +16,30 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_support_guard_uses_fallback_only_outside_training_bounds(self):
+        neural = Mock()
+        neural.predict_one.return_value = 10.0
+        fallback = Mock()
+        fallback.predict_one.return_value = 30.0
+        state = dict(
+            models=[{}, {}],
+            weights=[1.0, 0.0],
+            support_guard=dict(
+                indices=[0], minimum=[2.0], maximum=[10.0], fallback_model_index=1
+            ),
+        )
+        with patch.object(
+            study.arch, "FrozenArchitecture", side_effect=[neural, fallback]
+        ):
+            model = improve.FrozenCandidate(state)
+        x = np.zeros(23)
+        x[0] = 10
+        self.assertEqual(model.predict_one(x), 10)
+        fallback.predict_one.assert_not_called()
+        x[0] = 11
+        self.assertEqual(model.predict_one(x), 30)
+        neural.predict_one.assert_called_once()
+
     def test_sparse_attention_geometry_matches_causal_selected_token_counts(self):
         for q in [1, 64, 2047, 2048, 2049, 4096]:
             for c in [0, 1, 2047, 2048, 60000]:

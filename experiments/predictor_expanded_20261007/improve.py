@@ -163,11 +163,22 @@ class FrozenCandidate:
         self.input_indices = [s.get("input_indices") for s in state["models"]]
 
     def predict_one(self, x):
+        guard = self.state.get("support_guard")
+        if guard and any(
+            x[i] < lo or x[i] > hi
+            for i, lo, hi in zip(guard["indices"], guard["minimum"], guard["maximum"])
+        ):
+            index = guard["fallback_model_index"]
+            selected = self.input_indices[index]
+            return self.models[index].predict_one(
+                x[:23] if selected is None else x[selected]
+            )
         prediction = sum(
             w * m.predict_one(x[:23] if index is None else x[index])
             for w, m, index in zip(
                 self.state["weights"], self.models, self.input_indices
             )
+            if w
         )
         calibration = self.state.get("calibration")
         if calibration:
@@ -341,7 +352,9 @@ def run_task(task):
     configure()
     with threadpool_limits(limits=1):
         for variant in proposal["candidates"]:
-            if variant.startswith(("trend_", "sparse_", "gpu_")) or variant in (
+            if variant.startswith(
+                ("trend_", "sparse_", "gpu_", "guarded_")
+            ) or variant in (
                 "gpu_enqueue_features",
                 "gpu_enqueue_gap_only",
                 "rank_skew_only",
@@ -405,6 +418,12 @@ def run_task(task):
             import sparse
 
             sparse.add_blends(states, existing["trees_fixed"])
+        if "guarded_sparse_mlp" in proposal["candidates"]:
+            import guard
+
+            states.update(
+                guard.states_for(train, states["sparse_mlp"], existing["trees_fixed"])
+            )
         configure()
         oof, audit = oof_architecture(name, selected, batches, train, task["seed"])
         calibration = calibrate(train, oof)
@@ -438,6 +457,12 @@ def run_task(task):
 
 
 def architecture_description(variant, architecture):
+    if variant.startswith("guarded_"):
+        return (
+            "training-support guarded sparse MLP"
+            + ("/tree blend" if variant.endswith("_blend") else "")
+            + " with fixed-tree fallback"
+        )
     if variant == "blend_fixed":
         return f"50/50 blend of {architecture} and trees_fixed"
     if variant.endswith("_blend_fixed"):
@@ -530,7 +555,9 @@ def summarize(tasks, proposal):
         historical_limit_ms=limit,
         serving_integration_required=(
             winner.startswith("trend_")
+            or winner.startswith("guarded_")
             or winner.startswith("sparse_")
+            or winner.startswith("gpu_")
             or ("mlp" in proposal["architecture"] and not winner.startswith("tree_"))
             or winner
             in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")

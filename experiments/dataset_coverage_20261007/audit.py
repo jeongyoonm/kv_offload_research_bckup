@@ -61,6 +61,22 @@ def audit():
             json.loads(line)
             for line in (path.parent / "engine.jsonl").read_text().splitlines()
         ]
+        prefixes = [r["response"]["id"] + "-" for r in responses]
+        foreign = [
+            dict(step=e["step"], requests=unknown)
+            for e in events
+            if e["event"] == "step_completion"
+            and (
+                unknown := [
+                    request
+                    for request in e.get("selected", {})
+                    if not any(request.startswith(p) for p in prefixes)
+                ]
+            )
+        ]
+        if foreign:
+            clean = False
+            reason = "foreign_completions"
         jobs = {e["job_id"]: e for e in events if e["event"] == "kv_load_dispatched"}
         done = {
             e["job_id"]: e for e in events if e["event"] == "kv_all_rank_completion"
@@ -96,6 +112,7 @@ def audit():
             reason=reason,
             jit_events=compile_events,
             own_waits=own_waits,
+            foreign_completions=foreign,
             transfer_overlap=overlaps,
             block=meta["block"],
             split=meta["split"],

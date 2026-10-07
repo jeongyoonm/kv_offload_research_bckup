@@ -195,3 +195,45 @@ def test_general_prefill_gate_preserves_the_old_checkpoint_fallback():
     assert model.predict(data) == 5000000
     surface._state["provenance"]["general_prefill"] = True
     assert model.predict(data) == 10000000
+
+
+def test_delayed_foreign_completion_cannot_become_an_evaluation_label(
+    monkeypatch, tmp_path
+):
+    import audit
+
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    monkeypatch.setattr(audit, "inference_jit_events", lambda: [])
+    directory = tmp_path / "cells/final/example"
+    directory.mkdir(parents=True)
+    (directory / "result.json").write_text(
+        json.dumps(
+            dict(
+                accepted=True,
+                responses=[
+                    dict(
+                        started_ns=1,
+                        ended_ns=2,
+                        response=dict(id="cmpl-current"),
+                    )
+                ],
+            )
+        )
+    )
+    (directory / "family.json").write_text(
+        json.dumps(dict(split="final", seed=901, block="combination", repeat=0))
+    )
+    (directory / "engine.jsonl").write_text(
+        json.dumps(
+            dict(
+                event="step_completion",
+                step=7,
+                valid=False,
+                selected={"cmpl-previous-0-deadbeef": 128},
+            )
+        )
+        + "\n"
+    )
+    audit.audit()
+    result = json.loads((directory / "measurement_audit.json").read_text())
+    assert not result["usable"] and result["reason"] == "foreign_completions"

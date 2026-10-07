@@ -7,7 +7,9 @@ The original frozen, rotating-order study is preserved under
 `/mnt/localnvme/glm53_offset_predictor_20261008`. Its first two 60K cells after
 mixed workloads show roughly four seconds of GPU gaps, while later same-shape
 cells have much smaller gaps. The slow position moves between predictors.
-This suggests a workload-transition/phase effect, not a proven root cause.
+Later repeats show slow phases in other positions, too. Workload position alone
+does not explain the variation. Long load-only waits and bursty batch sizes
+appear under different predictors; the physical cause is not established.
 
 This follow-up conditions every measured cell identically: 32 requests of the
 same workload and prompt seed, using the common original tree checkpoint.

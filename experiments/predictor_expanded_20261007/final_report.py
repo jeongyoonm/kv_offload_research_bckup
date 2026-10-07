@@ -117,6 +117,9 @@ def convergence(tasks):
 
 
 def main():
+    import coverage_control
+
+    coverage_control.main()
     tasks = json.loads((study.ROOT / "benchmark_tasks.json").read_text())
     selection = json.loads((study.ROOT / "final_selection.json").read_text())
     architecture = json.loads((study.ROOT / "architecture_summary.json").read_text())
@@ -286,6 +289,29 @@ def main():
         lines.append(
             f"| {scope} | {s['trees_fixed']['mae_ms']:.2f} | "
             f"{s[chosen]['mae_ms']:.2f} |"
+        )
+    lines += [
+        "",
+        "## Fitting-data coverage control",
+        "",
+        (
+            "Historical-only and expanded-data models use the same held episodes "
+            "and training-selected capacities. Normalization and workload weights "
+            "are refit on their respective training rows. The historical control "
+            "inherits expanded-training hyperparameters; it isolates fitting data "
+            "coverage rather than reproducing historical model selection."
+        ),
+        "",
+        "| Architecture | Historical-only fresh MAE | Expanded fresh MAE |",
+        "|---|---:|---:|",
+    ]
+    coverage = json.loads((study.ROOT / "coverage_control_summary.json").read_text())[
+        "scores"
+    ]["wide"]
+    for n in names:
+        lines.append(
+            f"| {n} | {coverage['historical_only'][n]['mae_ms']:.2f} | "
+            f"{coverage['expanded'][n]['mae_ms']:.2f} |"
         )
     lines += [
         "",

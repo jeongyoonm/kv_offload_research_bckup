@@ -1,0 +1,23 @@
+{
+  "candidate": "envelope_mlp",
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/envelope_mlp/seed73.json",
+      "sha256": "0bb1e44240c8da5338182b046a706e665af8bcea0c55f503691c53dacdfb17bb"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/envelope_mlp/seed74.json",
+      "sha256": "528c39f6349afb6880d9a47526c39e74666438e2cc3e3ece772bf3d8e3f3233c"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/envelope_mlp/seed75.json",
+      "sha256": "9efc548220764844af4d4628cd168d39fa8a41b3ae27c69f44ca98b7b9ff9086"
+    }
+  },
+  "implementation": "1c6309c6e59833e521a11950b53ff96a38913f15",
+  "cpu_only": true,
+  "no_inference_fitting": true,
+  "benchmark_is_reused": true,
+  "benchmark_used_for_selection": false,
+  "serving_integration_required": true
+}

@@ -8,6 +8,7 @@ from unittest.mock import patch
 import enqueue
 import improve
 import numpy as np
+import sparse
 import study
 import trend
 from sklearn.ensemble import HistGradientBoostingRegressor
@@ -15,6 +16,19 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_sparse_attention_geometry_matches_causal_selected_token_counts(self):
+        for q in [1, 64, 2047, 2048, 2049, 4096]:
+            for c in [0, 1, 2047, 2048, 60000]:
+                got = sparse.extra_features([dict(request_shapes=[(q, c)])])[0]
+                np.testing.assert_array_equal(
+                    got,
+                    [
+                        q * c,
+                        sum(range(1, q + 1)),
+                        sum(min(sparse.TOPK, c + i) for i in range(1, q + 1)),
+                    ],
+                )
+
     def test_gpu_enqueue_features_use_only_starts_known_by_forecast(self):
         ranks = [[1, 1000, 2000, 2100 + i, 0, 1, 10000, 0, 0] for i in range(8)]
         row = dict(execution_ranks=ranks, forecast_time_ns=3000)

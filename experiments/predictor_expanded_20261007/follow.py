@@ -136,6 +136,8 @@ def main():
         ("architecture_report", ["report.py"]),
         ("improvements", ["improve.py", "--workers", workers]),
         ("continuous_trend", ["trend.py", "--workers", workers]),
+        ("enqueue_features", ["enqueue.py", "--workers", workers]),
+        ("sparse_geometry", ["sparse.py", "--workers", workers]),
         ("benchmark", ["benchmark.py", "--workers", workers]),
         ("branches", ["branches.py"]),
         ("final_report", ["final_report.py"]),

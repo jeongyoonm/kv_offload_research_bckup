@@ -108,3 +108,20 @@ This control isolates fitting-data coverage and gives historical-only models
 access to expanded-training hyperparameters. It does not recreate independently
 tuned historical deployment. Use only fresh episode-validation labels for this
 comparison; do not change the frozen selection from these final reporting runs.
+
+Range failures also motivate GLM-specific sparse geometry: cached-prefix index
+pairs, causal suffix index pairs, and causal attention pairs capped by the
+model's `index_topk=2048`. Test positive trends with squared/absolute residuals,
+and direct MLPs with/without the already-tested enqueue features. Keep capacities
+selected on each fold's training labels. Because the ordinary 50/50 MLP/tree
+blend led CV, reuse that fixed weight for feature variants as additional controls.
+Never search blend weights on held-out data. These exports need serving support.
+The original scalar trend underperformed the ordinary blend in completed CV;
+the sparse basis tests a more accurate description of this model's work.
+
+The supervisor initially entered reused-benchmark fitting before the new sparse
+stage was loaded. That attempt was interrupted with zero completed benchmark
+cells and no benchmark scores examined. Its opening record is preserved as
+`benchmark_opened_before_sparse.json`. All further choices continue to use only
+episode/range validation; independent feature phases precede the new frozen
+benchmark pass. The benchmark remains explicitly reused, never a blind test.

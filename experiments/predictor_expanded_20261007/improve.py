@@ -208,10 +208,14 @@ class FrozenTrend:
 
 def predict_state(state, rows):
     x = arch.runtime_features(rows)
-    if state.get("gpu_enqueue_features"):
+    if state.get("gpu_enqueue_features") or state.get("sparse_geometry"):
         import enqueue
 
         x = np.column_stack((x, enqueue.extra_features(rows)))
+    if state.get("sparse_geometry"):
+        import sparse
+
+        x = np.column_stack((x, sparse.extra_features(rows)))
     model = FrozenCandidate(state)
     return np.array([model.predict_one(v) for v in x])
 
@@ -337,7 +341,7 @@ def run_task(task):
     configure()
     with threadpool_limits(limits=1):
         for variant in proposal["candidates"]:
-            if variant.startswith("trend_") or variant in (
+            if variant.startswith(("trend_", "sparse_", "gpu_")) or variant in (
                 "gpu_enqueue_features",
                 "gpu_enqueue_gap_only",
                 "rank_skew_only",
@@ -391,6 +395,16 @@ def run_task(task):
             states.update(
                 enqueue.fit_variants(name, batches, train, selected, task["seed"])[0]
             )
+        if "sparse_mlp" in proposal["candidates"]:
+            import sparse
+
+            states.update(
+                sparse.fit_variants(batches, train, selected, task["seed"])[0]
+            )
+        if any(n.endswith("_blend_fixed") for n in proposal["candidates"]):
+            import sparse
+
+            sparse.add_blends(states, existing["trees_fixed"])
         configure()
         oof, audit = oof_architecture(name, selected, batches, train, task["seed"])
         calibration = calibrate(train, oof)
@@ -421,6 +435,33 @@ def run_task(task):
     arch.dump(completed, result)
     print(json.dumps(dict(event="improvement_task_complete", **result)), flush=True)
     return result
+
+
+def architecture_description(variant, architecture):
+    if variant == "blend_fixed":
+        return f"50/50 blend of {architecture} and trees_fixed"
+    if variant.endswith("_blend_fixed"):
+        source = variant[: -len("_blend_fixed")]
+        return (
+            "50/50 blend of "
+            + architecture_description(source, architecture)
+            + " and trees_fixed"
+        )
+    if variant.startswith("sparse_trend_"):
+        return "positive sparse-geometry trend with optional boosted residual"
+    if variant.startswith("trend_"):
+        return "positive geometry trend with optional boosted residual"
+    if variant.startswith("sparse_mlp"):
+        return "direct MLP with GLM sparse geometry" + (
+            " and GPU enqueue features" if variant.endswith("_enqueue") else ""
+        )
+    if variant.startswith("tree_"):
+        return "trees_tuned"
+    if variant.startswith("gpu_"):
+        return architecture + " with GPU enqueue/start features"
+    if variant == "rank_skew_only":
+        return architecture + " with rank-start skew"
+    return architecture
 
 
 def summarize(tasks, proposal):
@@ -480,20 +521,8 @@ def summarize(tasks, proposal):
     winner = min(eligible, key=lambda n: cv["fresh"][n]["workload_macro_mae_ms"])
     selection = dict(
         architecture=proposal["architecture"],
-        effective_architecture=(
-            "positive ridge geometry trend with optional boosted residual"
-            if winner.startswith("trend_")
-            else (
-                "trees_tuned"
-                if winner.startswith("tree_")
-                else proposal["architecture"]
-            )
-            + (
-                " with GPU enqueue/start features"
-                if winner
-                in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")
-                else ""
-            )
+        effective_architecture=architecture_description(
+            winner, proposal["architecture"]
         ),
         improvement=winner,
         benchmark_used_for_selection=False,
@@ -501,6 +530,7 @@ def summarize(tasks, proposal):
         historical_limit_ms=limit,
         serving_integration_required=(
             winner.startswith("trend_")
+            or winner.startswith("sparse_")
             or ("mlp" in proposal["architecture"] and not winner.startswith("tree_"))
             or winner
             in ("gpu_enqueue_features", "gpu_enqueue_gap_only", "rank_skew_only")
@@ -514,9 +544,13 @@ def summarize(tasks, proposal):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--summarize-only", action="store_true")
     args = parser.parse_args()
-    proposal = plan()
     tasks = json.loads((study.ROOT / "tasks.json").read_text())
+    if args.summarize_only:
+        summarize(tasks, json.loads((study.ROOT / "improvement_plan.json").read_text()))
+        return
+    proposal = plan()
     with ProcessPoolExecutor(
         max_workers=args.workers, mp_context=multiprocessing.get_context("spawn")
     ) as executor:

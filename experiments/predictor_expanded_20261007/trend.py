@@ -183,9 +183,6 @@ def main():
         ),
     )
     if not triggered:
-        import enqueue
-
-        enqueue.main()
         return
     tasks = json.loads((study.ROOT / "tasks.json").read_text())
     with ProcessPoolExecutor(
@@ -201,9 +198,6 @@ def main():
     )
     study.arch.dump(study.ROOT / "improvement_plan.json", proposal)
     improve.summarize(tasks, proposal)
-    import enqueue
-
-    enqueue.main()
 
 
 if __name__ == "__main__":

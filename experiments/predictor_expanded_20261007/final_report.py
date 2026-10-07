@@ -63,9 +63,10 @@ def variation():
 
 def timings(states, x):
     import enqueue
+    import sparse
 
     rows = joblib.load(study.ROOT / "locked_benchmark.joblib")[: len(x)]
-    x = np.column_stack((x, enqueue.extra_features(rows)))
+    x = np.column_stack((x, enqueue.extra_features(rows), sparse.extra_features(rows)))
     os.environ["VLLM_DEFERRAL_FAST_FOREST"] = str(
         study.HIST / "fast_forest/build/libpredictor_forest_walk.so"
     )
@@ -349,7 +350,9 @@ def main():
             "The benchmark is the previous coverage study's final set, reused "
             "after that study. It did not select architectures or follow-up "
             "changes, but it is not a new blind test. Model choices were written "
-            "and hashed before it was opened."
+            "and hashed for the final benchmark pass. An earlier pass was "
+            "interrupted with zero completed cells while additional CV feature "
+            "studies were added; no scores from that attempt were examined."
         ),
         "",
         (
@@ -367,7 +370,8 @@ def main():
         ),
         (
             "The research exports support architecture comparisons. MLP and "
-            "linear-trend and CUDA enqueue-feature candidates require a serving "
+            "linear-trend, sparse-geometry and CUDA enqueue-feature candidates "
+            "require a serving "
             "integration before GPU "
             "deployment; the production scheduler was not changed by CPU replay."
         ),

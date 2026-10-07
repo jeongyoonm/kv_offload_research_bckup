@@ -7,6 +7,7 @@ import json
 import os
 import subprocess
 
+import improve
 import study
 
 
@@ -58,9 +59,7 @@ def main():
             family=family,
             candidate=name,
             implementation=base,
-            architecture=(
-                "trees_tuned" if name.startswith("tree_") else plan["architecture"]
-            )
+            architecture=improve.architecture_description(name, plan["architecture"])
             if family == "improvement"
             else name,
             checkpoints=checkpoints,

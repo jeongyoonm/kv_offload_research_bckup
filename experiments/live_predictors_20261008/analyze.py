@@ -49,6 +49,11 @@ def diagnostics(directory):
                 start_lower=max(r[2] for r in ranks),
                 end_lower=max(r[7] for r in ranks),
                 end_upper=max(r[8] for r in ranks),
+                cpu_enqueue_lead_ms=(
+                    max(r[3] for r in ranks) - max(r[1] for r in ranks)
+                )
+                / 1e6,
+                requests=len(e["selected"]),
                 uncertainty=max(r[3] - r[2] for r in ranks),
             )
     intervals = sorted(spans.values(), key=lambda x: x["start"])
@@ -91,6 +96,8 @@ def diagnostics(directory):
         gpu_gap_lower_ms=gap_lower,
         gpu_gap_upper_ms=gap_upper,
         gpu_compute_span_ms=sum((s["end"] - s["start"]) / 1e6 for s in spans.values()),
+        cpu_enqueue_lead_ms=[s["cpu_enqueue_lead_ms"] for s in spans.values()],
+        batch_requests=[s["requests"] for s in spans.values()],
         prediction_errors_ms=errors,
         prediction_cost_us=costs,
         actual_seal_lead_ms=leads,
@@ -134,6 +141,13 @@ def main():
                 mean_ttft_ms=float(np.mean(times)),
                 p95_ttft_ms=float(np.quantile(times, 0.95)),
                 compute_rounds=sum(d["compute_rounds"] for d in ds),
+                mean_episode_compute_span_ms=float(
+                    np.mean([d["gpu_compute_span_ms"] for d in ds])
+                ),
+                cpu_enqueue_lead_ms=describe(
+                    [v for d in ds for v in d["cpu_enqueue_lead_ms"]]
+                ),
+                batch_requests=describe([v for d in ds for v in d["batch_requests"]]),
                 mean_episode_gpu_gap_ms=float(np.mean([d["gpu_gap_ms"] for d in ds])),
                 mean_episode_gpu_gap_lower_ms=float(
                     np.mean([d["gpu_gap_lower_ms"] for d in ds])

@@ -18,6 +18,33 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_envelope_guard_preserves_in_range_and_falls_back_outside(self):
+        sys.path.insert(
+            0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")
+        )
+        guard = importlib.import_module("envelope_guard")
+        state = dict(
+            support=dict(indices=[5], minimum=[64], maximum=[8192]),
+            envelope={},
+            fallback={},
+        )
+        envelope, fallback = Mock(), Mock()
+        envelope.predict_one.return_value = 10
+        fallback.predict_one.return_value = 30
+        with (
+            patch.object(guard.e, "Frozen", return_value=envelope),
+            patch.object(guard.e.ARCH, "FrozenArchitecture", return_value=fallback),
+        ):
+            model = guard.Frozen(state)
+        x = np.zeros(27)
+        x[5] = 8192
+        self.assertEqual(model.predict_one(x), 10)
+        fallback.predict_one.assert_not_called()
+        x[5] = 8193
+        self.assertEqual(model.predict_one(x), 30)
+        x[5] = 63
+        self.assertEqual(model.predict_one(x), 30)
+
     def test_launch_envelope_queue_lead_can_hide_host_but_not_gpu_work(self):
         sys.path.insert(
             0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")

@@ -42,11 +42,25 @@ Use the existing evaluation venv with BLAS/OpenMP thread counts set to one:
 /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
   experiments/predictor_launch_envelope_20261007/envelope.py --workers 16
 /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
-  experiments/predictor_launch_envelope_20261007/evaluate.py
+  experiments/predictor_launch_envelope_20261007/envelope_evaluate.py
 /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
-  experiments/predictor_launch_envelope_20261007/evaluate.py --benchmark
+  experiments/predictor_launch_envelope_20261007/envelope_evaluate.py --benchmark
 ```
 
 Artifacts: `/mnt/localnvme/glm53_launch_envelope_20261007`.
 Inference requires exported coefficients and optional tree/MLP weights only;
 there is no fitting at inference time. Serving integration remains separate work.
+
+## Suffix-support fallback follow-up
+
+A separate branch evaluates two training-bound fallback rules after the envelope
+validation revealed long-suffix extrapolation errors. Suffix-only fallback checks
+individual maximum suffix length; geometry fallback checks the same eleven
+geometry/causal-I/O coordinates as the earlier conservative guard. Out-of-range
+rows use the same fold's fixed trees. No new fitting or held-out-label thresholds
+are introduced. Selection uses episode macro MAE and historical regression gates,
+with exact ties broken by mean withheld-range MAE normalized to fixed trees.
+The benchmark remains reused and exploratory.
+
+Run `envelope_guard.py` before `envelope_guard.py --benchmark`. Artifacts are under
+`/mnt/localnvme/glm53_envelope_guard_20261007`.

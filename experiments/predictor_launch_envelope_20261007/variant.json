@@ -1,0 +1,23 @@
+{
+  "candidate": "geometry_guard_envelope_boost",
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/geometry_guard_envelope_boost/seed73.json",
+      "sha256": "a4cb35bf968f9d3285b31b5c8986c87e67d6c1b88bec3bb62e9cc0c90a0b5e7d"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/geometry_guard_envelope_boost/seed74.json",
+      "sha256": "8da5c68d5723a97c8f949362b05f4ce53af0f729100d497917c819596f679817"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_envelope_blend_20261007/exports/geometry_guard_envelope_boost/seed75.json",
+      "sha256": "ee68da6bbb79b137eb8febe356eb1e2e7e29a4d55e333aabf01b3ee9163a0f40"
+    }
+  },
+  "implementation": "1c6309c6e59833e521a11950b53ff96a38913f15",
+  "cpu_only": true,
+  "no_inference_fitting": true,
+  "benchmark_is_reused": true,
+  "benchmark_used_for_selection": false,
+  "serving_integration_required": true
+}

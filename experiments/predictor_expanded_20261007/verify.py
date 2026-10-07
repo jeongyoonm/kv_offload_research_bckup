@@ -2,6 +2,8 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Guard signed absolute-loss exports and episode-purged calibration labels."""
 
+import importlib
+import sys
 import unittest
 from unittest.mock import Mock, patch
 
@@ -16,6 +18,27 @@ from threadpoolctl import threadpool_limits
 
 
 class CalibrationContract(unittest.TestCase):
+    def test_launch_envelope_queue_lead_can_hide_host_but_not_gpu_work(self):
+        sys.path.insert(
+            0, str(study.SOURCE / "experiments/predictor_launch_envelope_20261007")
+        )
+        envelope = importlib.import_module("envelope")
+        state = dict(
+            base=dict(
+                core_coefficients=[70.0] + [0.0] * 8,
+                host_coefficients=[125.0] + [0.0] * 8,
+            )
+        )
+        model = envelope.Frozen(state)
+        x = np.zeros(27)
+        self.assertEqual(model.predict_one(x), 125)
+        x[-1] = 25
+        self.assertEqual(model.predict_one(x), 100)
+        x[-1] = 100
+        self.assertEqual(model.predict_one(x), 70)
+        x[-1] = 10000
+        self.assertEqual(model.predict_one(x), 70)
+
     def test_support_guard_uses_fallback_only_outside_training_bounds(self):
         neural = Mock()
         neural.predict_one.return_value = 10.0

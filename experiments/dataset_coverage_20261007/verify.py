@@ -117,3 +117,18 @@ def test_collection_gates_allow_lookup_and_release_compute(monkeypatch, tmp_path
     assert collection_compute_held(target) and collection_compute_held(background)
     gate.unlink()
     assert not collection_compute_held(target) and collection_compute_held(background)
+
+
+def test_shadow_and_live_options_satisfy_the_serving_configuration_contract():
+    from run import options
+
+    from vllm.v1.kv_offload.early_readiness import validate_experiment_options
+
+    shadow = validate_experiment_options(options(False))
+    live = validate_experiment_options(options(True))
+    assert shadow["late_seal_policy"] == "event"
+    assert not shadow["late_seal_native_predictor"]
+    assert not shadow["late_seal_compute_deadline"]
+    assert live["late_seal_policy"] == "predictive"
+    assert live["late_seal_compute_deadline"]
+    assert live["late_compact_tokens"] and shadow["late_compact_tokens"]

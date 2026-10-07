@@ -105,8 +105,7 @@ def serving(state):
     result = json.loads((HIST / "boosted_residual/model.json").read_text())
     base = state["base"]["state"]
     correction = state["correction"]
-    result["state"]["latency_surface"] = base
-    result["state"]["refinement_surface"] = dict(
+    result["state"]["latency_surface"] = dict(
         schema=3,
         target_schema="critical_end_after_all_rank_start.v1",
         base=base,
@@ -116,6 +115,39 @@ def serving(state):
     )
     result["provenance"] = state["provenance"]
     return result
+
+
+def reference():
+    surface = json.loads((HIST / "boosted_residual/model.json").read_text())["state"][
+        "latency_surface"
+    ]
+    return dict(
+        base=dict(kind="tree", state=surface["base"]),
+        correction=dict(
+            kind="tree", state=surface["residual"], shift=surface["residual_shift_ms"]
+        ),
+        provenance=dict(variant="historical_frozen"),
+    )
+
+
+def verify_serving(state, rows):
+    payload = serving(state)["state"]
+    model = arch.surface.LatencySurface(payload["latency_surface"])
+    observed = []
+    for row in rows:
+        value = model.predict(
+            dict(
+                row,
+                execution_snapshot=row["execution_ranks"],
+                forecast_ns=row["forecast_time_ns"],
+                forecast_load_features=row["forecast_features"][:10],
+            )
+        )
+        observed.append(value / 1e6)
+    expected = predict(state, rows)
+    error = float(np.max(np.abs(np.array(observed) - expected)))
+    assert error < 0.00001, f"serving export mismatch: {error} ms"
+    return dict(samples=len(rows), maximum_difference_ms=error)
 
 
 def data():
@@ -185,12 +217,24 @@ def development():
         historical_forecasts=len(hf),
         counts={k: len(v) for k, v in variants.items()},
         extra_base_per_forecast=1,
+        weighting="unchanged inverse-workload-frequency with 50-sample floor",
+        new_forecast_weight_mass={
+            name: float(arch.weights(hf + extra)[len(hf) :].sum())
+            for name, extra in variants.items()
+        },
         hashes={
             str(p): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in [ROOT / "matrix.json", ROOT / "data/forecasts.jsonl"]
         },
     )
     dump(ROOT / "study/dataset_audit.json", audit)
+    dump(
+        ROOT / "study/frozen_reference.json",
+        dict(
+            development=scores(dev, predict(reference(), dev)),
+            historical=scores(historical, predict(reference(), historical)),
+        ),
+    )
     outputs = {}
     for name, extra in variants.items():
         rows = hf + extra
@@ -233,6 +277,7 @@ def development():
             report = dict(
                 development=scores(dev, dev_pred),
                 historical=scores(historical, predict(state, historical)),
+                serving_export=verify_serving(state, dev[:10]),
             )
             dump(directory / "architecture.json", state)
             dump(directory / "serving.json", serving(state))
@@ -298,11 +343,15 @@ def final():
                 ).read_text()
             )
             p.append(predict(state, rows))
-        predictions[name] = np.mean(p, axis=0)
+        # Compare expected error over training seeds, without making a new ensemble.
+        predictions[name] = np.array(p)
         results[name] = dict(
             seed_scores=[scores(rows, x) for x in p],
-            mean_prediction=scores(rows, predictions[name]),
+            serving_seed73=scores(rows, p[0]),
+            mean_seed_mae_ms=float(np.mean([scores(rows, x)["mae_ms"] for x in p])),
         )
+    predictions["historical_frozen"] = predict(reference(), rows)[None, :]
+    results["historical_frozen"] = scores(rows, predictions["historical_frozen"][0])
     y = arch.target(rows)
     groups = defaultdict(list)
     for i, r in enumerate(rows):
@@ -310,13 +359,15 @@ def final():
     keys = list(groups)
     rng = np.random.default_rng(820)
     intervals = {}
-    for name, reference in [
+    for name, control in [
         ("geometry", "familiar_small"),
         ("composition", "familiar_small"),
         ("transfer", "familiar_small"),
         ("combined", "familiar_full"),
     ]:
-        differences = np.abs(predictions[name] - y) - np.abs(predictions[reference] - y)
+        differences = np.abs(predictions[name] - y).mean(0) - np.abs(
+            predictions[control] - y
+        ).mean(0)
         samples = []
         for _ in range(2000):
             indices = [
@@ -329,7 +380,7 @@ def final():
                 by_workload[rows[i]["workload"]].append(differences[i])
             samples.append(np.mean([np.mean(v) for v in by_workload.values()]))
         intervals[name] = dict(
-            reference=reference,
+            reference=control,
             macro_mae_difference_ci95_ms=np.quantile(samples, [0.025, 0.975]).tolist(),
         )
     dump(
@@ -350,7 +401,9 @@ def final():
                     workload=r["workload"],
                     block=r["block"],
                     actual_ms=float(y[i]),
-                    predictions={name: float(p[i]) for name, p in predictions.items()},
+                    predictions={
+                        name: float(p[0, i]) for name, p in predictions.items()
+                    },
                 )
             )
             + "\n"
@@ -368,7 +421,19 @@ def final():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--final", action="store_true")
+    parser.add_argument("--verify-export", action="store_true")
     args = parser.parse_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = ""
     with threadpool_limits(limits=1):
-        final() if args.final else development()
+        if args.verify_export:
+            print(
+                json.dumps(
+                    verify_serving(
+                        reference(), read(HIST / "refreshed/data/forecasts.jsonl")[:10]
+                    )
+                )
+            )
+        elif args.final:
+            final()
+        else:
+            development()

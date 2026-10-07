@@ -93,13 +93,21 @@ def options(active=False):
         "/mnt/localnvme/glm53_predictor_overnight_20261006/dense_cached/micro_warm/p16384_f95_h100/n8/p16384_f95_h100/r0_micro/policy_setting.json"
     )
     result = json.loads(original.read_text())
+    result.pop("early_load_completion", None)
+    result.pop("schedule_delay_ms", None)
     result.update(
         late_seal_policy="predictive" if active else "event",
         late_seal_compute_deadline=active,
         late_seal_compute_deadline_shadow=False,
         late_seal_compute_deadline_lead_us=5000 if active else 0,
-        late_seal_native_predictor=True,
+        late_seal_native_predictor=active,
         late_seal_freeze_estimator=True,
+        late_seal_condition_preparation=active,
+        late_seal_recent_preparation=active,
+        late_seal_prediction_to_readiness=active,
+        late_seal_full_prediction_wait=active,
+        late_seal_coalesced_notifications=active,
+        late_seal_hybrid_wait_us=50000 if active else 0,
     )
     return result
 
@@ -397,6 +405,8 @@ def launch():
         VLLM_DEFERRAL_TIMING_DIR=str(ROOT / "server/timing"),
         VLLM_DEFERRAL_EXECUTION_TIMING="1",
         VLLM_PREDICTOR_DATASET_SHADOW="1",
+        VLLM_COOPERATIVE_RESPONSE_PROGRESS="1",
+        VLLM_DEFERRAL_PREDICTOR_PROGRESS="1",
         VLLM_PREDICTOR_GENERAL_PREFILL="1",
         VLLM_DATASET_BACKGROUND_PREFIX="coverage-bg-",
         VLLM_DATASET_TARGET_GATE=str(ROOT / "target_hold"),
@@ -447,7 +457,17 @@ def normalize():
         result = json.loads(path.read_text())
         if not result["accepted"]:
             continue
+        audit_path = path.parent / "measurement_audit.json"
+        if audit_path.exists() and not json.loads(audit_path.read_text())["usable"]:
+            rejected["measurement_guard"] += 1
+            continue
         meta = json.loads((path.parent / "family.json").read_text())
+        workload = meta["id"]
+        if meta["block"] == "familiar":
+            suffix, context = meta["shapes"][0]
+            total = suffix + context
+            fraction = 99 if context / total > 0.98 else 95
+            workload = f"p{total}_f{fraction}_h100"
         for line in (path.parent / "engine.jsonl").read_text().splitlines():
             e = json.loads(line)
             row, reason = module.extract(e, cached_only=False)
@@ -462,7 +482,7 @@ def normalize():
             row.update(
                 episode=str(path.parent),
                 source_file=str(path.parent / "engine.jsonl"),
-                workload=meta["id"],
+                workload=workload,
                 block=meta["block"],
                 split=meta["split"],
                 cpu_cached_prefix_tokens=e.get("cpu_cached_prefix_tokens"),
@@ -494,7 +514,10 @@ def main():
     args = parser.parse_args()
     ROOT.mkdir(exist_ok=True)
     matrix = build()
-    save(ROOT / "matrix.json", matrix)
+    if (ROOT / "matrix.json").exists():
+        assert json.loads((ROOT / "matrix.json").read_text()) == matrix
+    else:
+        save(ROOT / "matrix.json", matrix)
     if args.normalize:
         normalize()
         return
@@ -553,7 +576,7 @@ def main():
         positions = Counter()
         targets = dict(geometry=400, composition=400, transfer=400, familiar=1200)
         families = {b: [f for f in matrix["train"] if f["block"] == b] for b in blocks}
-        while time.monotonic() - started < 9000 and any(
+        while used + time.monotonic() - started < 9000 and any(
             counts[b] < targets[b] for b in blocks
         ):
             b = min(
@@ -581,7 +604,9 @@ def main():
         ]:
             for seed in seeds:
                 for i, f in enumerate(matrix["challenge"] + matrix["train"][::8]):
-                    if time.monotonic() - started >= 11700:
+                    if used + time.monotonic() - started >= (
+                        10350 if split == "development" else 11700
+                    ):
                         break
                     cohort(f, seed, i, split)
                 else:

@@ -1,0 +1,29 @@
+{
+  "variant": "without_transfer",
+  "implementation": "70bce4c81a53dec34448974edb92056d1ea06921",
+  "architecture": "Extra Trees base + histogram gradient boosting correction",
+  "recipe_unchanged": true,
+  "hyperparameters_unchanged": true,
+  "weighting": "legacy",
+  "input_features_unchanged": true,
+  "new_forecast_samples": 417,
+  "one_matching_base_row_per_forecast": true,
+  "dataset_hashes": {
+    "/mnt/localnvme/glm53_dataset_coverage_20261007/matrix.json": "e384d392e575f1cceeb0728d6c3b07632b075f90dd3bcf887507a14a083d6c42",
+    "/mnt/localnvme/glm53_dataset_coverage_20261007/data/forecasts.jsonl": "ed82a75c906d3dc32dafc5c8c4ec63faabc715e0866b82981790358174831915"
+  },
+  "checkpoints": {
+    "73": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/without_transfer/seed73/serving.json",
+      "sha256": "8499bca6ff4aee57e11b13f59b289213266264c4ba9c18038d248d3ef0454af2"
+    },
+    "74": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/without_transfer/seed74/serving.json",
+      "sha256": "a7008988703e2f758062b28fe37256df18f7685d30b5f893afb97e558eb0facb"
+    },
+    "75": {
+      "path": "/mnt/localnvme/glm53_dataset_coverage_20261007/study/models/without_transfer/seed75/serving.json",
+      "sha256": "de8d6dcf1f7b46e883b2a1598f33ad08560349fea00f805237428ecba1bf3edb"
+    }
+  }
+}

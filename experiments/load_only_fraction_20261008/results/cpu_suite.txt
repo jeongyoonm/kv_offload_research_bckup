@@ -1,0 +1,132 @@
+........................................................................ [ 11%]
+........................................................................ [ 23%]
+......................................................ssssssss.......... [ 35%]
+........................................................................ [ 47%]
+......ss........................F...............ssssssssssssssss........ [ 59%]
+.........ssss.ss........................................................ [ 71%]
+........................................................................ [ 83%]
+.....................................F..............................F... [ 95%]
+.............................                                            [100%]
+=================================== FAILURES ===================================
+__________________ test_completed_timing_survives_collection ___________________
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-273/test_completed_timing_survives0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fa6d4733620>
+
+    def test_completed_timing_survives_collection(tmp_path, monkeypatch):
+        from vllm.v1.kv_offload.step_timing import RankFile, TimingChannel
+
+        timing = TimingChannel.__new__(TimingChannel)
+        timing.ranks = [RankFile(str(tmp_path / "rank"), create=True)]
+        timing.steps = {}
+        timing.registrations = {}
+        timing.events = []
+        monkeypatch.setattr("vllm.v1.kv_offload.step_timing.time.monotonic_ns", lambda: 100)
+        try:
+            assert timing.register(dict(step=7, dispatch_ns=10))
+            timing.ranks[0].write([7, 20, 30, 40, 50, 60, 60, 1, 0])
+>           timing.collect()
+
+tests/v1/kv_offload/test_early_readiness.py:1103:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <vllm.v1.kv_offload.step_timing.TimingChannel object at 0x7fa6d4730950>
+
+    def collect(self):
+        audit = getattr(self, "audit", None)
+        if audit is not None:
+            self.events.extend(audit.drain())
+        now = time.monotonic_ns()
+        for step, data in list(self.steps.items()):
+            valid, complete, records = self.read(step)
+            execution = self.read_execution(step)
+            if (
+                complete
+                and execution
+                and not all(r and r[8] for r in execution)
+                and now - max(r[5] for r in records) < 100_000_000
+            ):
+                continue
+            if complete or now - data["dispatch_ns"] > 60_000_000_000:
+>               self.seal_estimator.observe(data, execution)
+                ^^^^^^^^^^^^^^^^^^^
+E               AttributeError: 'TimingChannel' object has no attribute 'seal_estimator'
+
+vllm/v1/kv_offload/step_timing.py:362: AttributeError
+______ test_late_control_rejects_stale_identity_and_duplicate_publication ______
+
+tmp_path = PosixPath('/tmp/pytest-of-root/pytest-273/test_late_control_rejects_stal0')
+
+    def test_late_control_rejects_stale_identity_and_duplicate_publication(tmp_path):
+        import struct
+
+        from vllm.v1.kv_offload.late_admission_runtime import signal_prepared
+
+        path = tmp_path / "control"
+        path.write_bytes(struct.pack("<QQ", 9, 8) + bytes(8))
+        with pytest.raises(RuntimeError, match="identity"):
+            signal_prepared(path, 8, 0, 1)
+>       signal_prepared(path, 9, 0, 1)
+
+tests/v1/kv_offload/test_early_readiness.py:2868:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+vllm/v1/kv_offload/late_admission_runtime.py:208: in signal_prepared
+    signal_preparation(path, step, rank, status, slot)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+control = PosixPath('/tmp/pytest-of-root/pytest-273/test_late_control_rejects_stal0/control')
+step = 9, rank = 0, status = 1, slot = -1
+
+    def signal_preparation(control, step, rank, status, slot):
+        try:
+>           lines = Path(control + ".seal").read_text().splitlines()
+                         ^^^^^^^^^^^^^^^^^
+E           TypeError: unsupported operand type(s) for +: 'PosixPath' and 'str'
+
+vllm/v1/kv_offload/seal_notifications.py:289: TypeError
+_ test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selection _
+
+    def test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selection():
+        import importlib.util
+        from pathlib import Path
+
+        source = (
+            Path(__file__).resolve().parents[3]
+            / "experiments/late_admission_20260925/opportunities.py"
+        )
+        spec = importlib.util.spec_from_file_location("late_opportunities", source)
+        assert spec is not None and spec.loader is not None
+        analysis = importlib.util.module_from_spec(spec)
+>       spec.loader.exec_module(analysis)
+
+tests/v1/kv_offload/test_early_readiness.py:3168:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+<frozen importlib._bootstrap_external>:995: in exec_module
+    ???
+<frozen importlib._bootstrap_external>:1132: in get_code
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <_frozen_importlib_external.SourceFileLoader object at 0x7fa6ff9d7fb0>
+path = '/mnt/localnvme/vllm_glm53_load_only_fraction_20261008/experiments/late_admission_20260925/opportunities.py'
+
+>   ???
+E   FileNotFoundError: [Errno 2] No such file or directory: '/mnt/localnvme/vllm_glm53_load_only_fraction_20261008/experiments/late_admission_20260925/opportunities.py'
+
+<frozen importlib._bootstrap_external>:1190: FileNotFoundError
+=============================== warnings summary ===============================
+vllm/__init__.py:7
+  /mnt/localnvme/vllm_glm53_load_only_fraction_20261008/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:
+  No module named 'vllm._version'
+    from .version import __version__, __version_tuple__  # isort:skip
+
+.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /mnt/localnvme/vllm_glm53_load_only_fraction_20261008/.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/v1/kv_offload/test_early_readiness.py::test_completed_timing_survives_collection
+FAILED tests/v1/kv_offload/test_early_readiness.py::test_late_control_rejects_stale_identity_and_duplicate_publication
+FAILED tests/v1/kv_offload/test_early_readiness.py::test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selection
+3 failed, 570 passed, 32 skipped, 15 warnings in 115.96s (0:01:55)

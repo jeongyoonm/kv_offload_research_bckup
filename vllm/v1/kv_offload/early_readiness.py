@@ -34,6 +34,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_policy": "fixed",
     "late_seal_target_candidates": 4,
     "late_seal_load_only_target_candidates": 0,
+    "late_seal_load_only_ready_percent": 0,
     "late_seal_repeat_us": 25_000,
     "late_seal_condition_preparation": False,
     "late_seal_recent_preparation": False,
@@ -100,6 +101,7 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         ("late_seal_compute_deadline_lead_us", 100_000),
         ("late_seal_target_candidates", 16),
         ("late_seal_load_only_target_candidates", 16),
+        ("late_seal_load_only_ready_percent", 100),
         ("late_seal_repeat_us", 100_000),
         ("late_candidate_slots", 16),
         ("late_partial_min_pending_candidates", 16),
@@ -164,6 +166,17 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         or not result["late_seal_repeat_us"]
     ):
         raise ValueError("prediction-to-readiness requires predictive seal and target")
+    if result["late_seal_load_only_ready_percent"] and (
+        result["late_admission_mode"] != 4
+        or not (
+            result["late_seal_policy"] == "event"
+            or (
+                result["late_seal_policy"] == "predictive"
+                and result["late_seal_prediction_to_readiness"]
+            )
+        )
+    ):
+        raise ValueError("load-only percentage requires mode 4 and readiness seal")
     deadline_options = (
         result["late_seal_compute_deadline"]
         or result["late_seal_compute_deadline_shadow"]

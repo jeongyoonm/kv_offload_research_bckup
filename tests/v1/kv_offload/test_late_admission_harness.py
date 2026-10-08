@@ -1751,6 +1751,149 @@ def test_prediction_to_readiness_uses_partial_target_without_compute():
     executor.finish()
 
 
+@pytest.mark.parametrize("policy", ["event", "predictive"])
+@pytest.mark.parametrize("count", [1, 2, 9, 14, 16])
+def test_load_only_fraction_waits_for_half_the_published_cohort(
+    deadline_core, policy, count
+):
+    """Ready loads do not shrink the denominator; odd counts round upward."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    scheduler = core.scheduler
+    scheduler._late_seal_policy = policy
+    scheduler._late_seal_target_candidates = 4
+    scheduler._late_seal_load_only_target_candidates = 4
+    scheduler._late_seal_load_only_ready_percent = 50
+    target = (count + 1) // 2
+    candidates = [_request(f"candidate-{i}") for i in range(count)]
+    ready = {c.req_id for c in candidates[:target]}
+    clock.ready_at = {c.req_id: clock.now for c in candidates[: target - 1]}
+    clock.ready_at[candidates[target - 1].req_id] = 1_011_000_000
+    stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    assert transport["seal_ns"] == 1_011_000_000
+    assert transport["ready_target"] == target
+    assert transport["load_only_pending_candidates"] == count
+    assert transport["load_only_fraction_target"] == target
+    assert transport["partial_ready_count"] == target
+    assert transport["seal_reason"] == "candidate_target_ready"
+    assert scheduler._late_kv_snapshot == ready
+    assert not core.batch_queue[-1][0].poll()
+
+
+def test_load_only_fraction_requires_eighth_rank_candidate_ack(deadline_core):
+    """Eight ready loads are insufficient while the eighth slot lacks one ack."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    candidates[7] = _request("partial")
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:8]}
+    publish = core.model_executor.publish_late_preparation
+    refresh = core._refresh_early_load_readiness.side_effect
+    paths = []
+
+    def capture(data_path):
+        with open(data_path, "rb") as source:
+            paths.append(pickle.load(source)[4])
+        publish(data_path)
+
+    def acknowledge(**kwargs):
+        refresh(**kwargs)
+        if clock.now >= 1_021_000_000:
+            signal_prepared(paths[0], 9, 7, 1, 7)
+
+    core.model_executor.publish_late_preparation = capture
+    core._refresh_early_load_readiness.side_effect = acknowledge
+    stage_rpc(core, 9, [_request("base")], candidates)
+    assert scheduler._late_transport["seal_ns"] == 1_021_000_000
+    assert scheduler._late_transport["partial_ready_count"] == 8
+
+
+def test_load_only_fraction_requires_all_base_acks(deadline_core):
+    """A ready half-cohort cannot bypass base preparation on the eighth rank."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    core.scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:8]}
+    clock.base_at = 1_021_000_000
+    stage_rpc(core, 9, [_request("base")], candidates)
+    assert core.scheduler._late_transport["seal_ns"] == clock.base_at
+    assert core.scheduler._late_transport["partial_ready_count"] == 8
+
+
+def test_load_only_fraction_excludes_cancellation_without_shrinking_target(
+    deadline_core,
+):
+    """Cancelling one of eight ready loads still requires an eighth live load."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:8]}
+    clock.ready_at["candidate-8"] = 1_021_000_000
+    core.aborts_queue.put(["candidate-7"])
+    stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    assert transport["seal_ns"] == 1_021_000_000
+    assert transport["ready_target"] == 8
+    assert transport["partial_ready_count"] == 8
+    assert scheduler._late_cancelled == {"candidate-7"}
+
+
+def test_load_only_fraction_caps_target_at_remaining_live_candidates(deadline_core):
+    """A frozen half-cohort target cannot strand fewer live loads after aborts."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:6]}
+    core.aborts_queue.put([c.req_id for c in candidates[6:]])
+    stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    assert transport["load_only_fraction_target"] == 8
+    assert transport["ready_target"] == 6
+    assert transport["partial_ready_count"] == 6
+    assert transport["seal_reason"] == "candidate_target_ready"
+
+
+def test_load_only_fraction_preserves_active_compute_target(deadline_core):
+    """Half ready cannot seal B early while a productive A is still running."""
+    core, clock = deadline_core()
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:8]}
+    clock.ready_at.update({c.req_id: 1_021_000_000 for c in candidates[8:]})
+    stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    assert transport["seal_ns"] == 1_021_000_000
+    assert transport["ready_target"] == 16
+    assert transport["partial_ready_count"] == 16
+    assert transport["prediction"] is not None
+    assert not core.batch_queue[-1][0].poll()
+
+
+def test_load_only_fraction_retains_safety_timeout(deadline_core):
+    """Seven ready loads cannot wait indefinitely for the eighth."""
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_ready_percent = 50
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: clock.now for c in candidates[:7]}
+    stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    assert transport["seal_reason"] == "adaptive_safety_deadline"
+    assert transport["ready_target"] == 8
+    assert transport["partial_ready_count"] == 7
+    assert transport["seal_ns"] == 2_001_000_000
+
+
 def test_prediction_to_readiness_handles_physical_completion_before_base_ack():
     executor = ControlledExecutor()
     core = _core(executor)

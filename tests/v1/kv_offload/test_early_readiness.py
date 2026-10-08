@@ -3275,6 +3275,47 @@ def test_prediction_to_readiness_is_opt_in():
     )["late_seal_prediction_to_readiness"]
 
 
+@pytest.mark.parametrize("policy", ["event", "predictive"])
+def test_load_only_percentage_requires_supported_readiness_path(policy):
+    options = dict(
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        late_seal_policy=policy,
+        late_seal_prediction_to_readiness=policy == "predictive",
+        late_seal_load_only_ready_percent=50,
+    )
+    assert (
+        early.validate_experiment_options(options)["late_seal_load_only_ready_percent"]
+        == 50
+    )
+    with pytest.raises(ValueError, match="load-only percentage"):
+        early.validate_experiment_options(
+            dict(
+                options,
+                late_seal_policy="fixed",
+                late_seal_prediction_to_readiness=False,
+            )
+        )
+    if policy == "predictive":
+        with pytest.raises(ValueError, match="load-only percentage"):
+            early.validate_experiment_options(
+                dict(options, late_seal_prediction_to_readiness=False)
+            )
+
+
+@pytest.mark.parametrize("percent", [-1, 101, 50.0, True])
+def test_load_only_percentage_rejects_invalid_bounds_or_types(percent):
+    with pytest.raises(ValueError, match="late_seal_load_only_ready_percent"):
+        early.validate_experiment_options(
+            dict(
+                late_admission_mode=4,
+                cooperative_response_progress=True,
+                late_seal_policy="event",
+                late_seal_load_only_ready_percent=percent,
+            )
+        )
+
+
 @pytest.mark.parametrize(
     "missing", ["late_seal_condition_preparation", "late_seal_prediction_to_readiness"]
 )

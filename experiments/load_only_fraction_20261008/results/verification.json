@@ -1,0 +1,39 @@
+{
+  "verified_utc": "2026-10-08T15:42:04.871172+00:00",
+  "checkout": "/mnt/localnvme/vllm_glm53_load_only_fraction_20261008",
+  "branch": "experiment/glm53-load-only-fraction-20261008",
+  "parent_commit": "24c30df",
+  "feature": "late_seal_load_only_ready_percent",
+  "configured_percent": 50,
+  "default_percent": 0,
+  "denominator": "Published bounded request-level KV-load candidate cohort for B, frozen at publication",
+  "examples": {
+    "16": 8,
+    "14": 7,
+    "9": 5,
+    "1": 1
+  },
+  "focused_tests": {
+    "passed": 22,
+    "deselected": 583
+  },
+  "broader_cpu_tests": {
+    "passed": 570,
+    "skipped": 32,
+    "failed": 3
+  },
+  "parent_reproduction": {
+    "failed": 3,
+    "deselected": 390,
+    "same_failures": [
+      "test_completed_timing_survives_collection",
+      "test_late_control_rejects_stale_identity_and_duplicate_publication",
+      "test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selection"
+    ]
+  },
+  "launcher_profiles_match_saved_profiles": true,
+  "profiles_validated": true,
+  "gpu_benchmark_run": false,
+  "gpu_model_code_changed": false,
+  "artifact_root": "/mnt/localnvme/glm53_load_only_fraction_20261008"
+}

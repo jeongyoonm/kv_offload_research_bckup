@@ -447,6 +447,14 @@ def stage_rpc(core, step, base, candidates):
     )
     partial_min = getattr(core.scheduler, "_late_partial_min_pending_candidates", 0)
     partial_percent = getattr(core.scheduler, "_late_partial_ready_percent", 0)
+    load_only_ready_percent = getattr(
+        core.scheduler, "_late_seal_load_only_ready_percent", 0
+    )
+    load_only_fraction_target = (
+        (len(candidates) * load_only_ready_percent + 99) // 100
+        if load_only_ready_percent
+        else None
+    )
     policy = getattr(core.scheduler, "_late_seal_policy", "fixed")
     repeated_intervals = 0
     prediction = None
@@ -714,8 +722,11 @@ def stage_rpc(core, step, base, candidates):
                     load_only_target = getattr(
                         core.scheduler, "_late_seal_load_only_target_candidates", 0
                     )
-                    if not has_compute and load_only_target:
-                        target = min(target, load_only_target)
+                    if not has_compute:
+                        if load_only_fraction_target is not None:
+                            target = min(load_only_fraction_target, len(active))
+                        elif load_only_target:
+                            target = min(target, load_only_target)
                     if ready_count >= target:
                         seal_reason = "candidate_target_ready"
                         break
@@ -1211,6 +1222,9 @@ def stage_rpc(core, step, base, candidates):
                 if (policy == "event" or prediction_to_readiness) and candidates
                 else None
             ),
+            load_only_pending_candidates=len(candidates),
+            load_only_ready_percent=load_only_ready_percent,
+            load_only_fraction_target=load_only_fraction_target,
             has_compute=(
                 has_compute
                 if (policy == "event" or prediction_to_readiness) and candidates

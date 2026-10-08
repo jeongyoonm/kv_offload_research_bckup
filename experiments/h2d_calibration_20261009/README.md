@@ -74,3 +74,25 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
 Use a fresh output directory. The isolated calibration records results;
 automatic application during server startup is not added in this experiment.
 Transfer-only gains do not establish gains under concurrent model compute.
+
+## Full result plots
+
+Generate figures from the existing audited measurements without GPU work:
+
+```bash
+/mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
+  experiments/h2d_calibration_20261009/plot_results.py \
+  /mnt/localnvme/h2d_calibration_20261009
+```
+
+The `plots/` directory contains PNG, PDF, and SVG exports:
+
+- `full_sweep`: all 28 configurations, grouped by prefix size; bandwidth and
+  first-load all-rank readiness, with the current 128 MiB/depth 2 marked.
+- `confirmation_results`: all five final nominees, eight repeats each;
+  bandwidth, readiness, and paired bandwidth gains with nominal 95% intervals.
+- `sweep.csv` and `confirmation_strict.csv`: complete aggregate numerical data.
+
+Copies are archived under `results/plots/`. Screening and strict confirmation
+remain separate because only the latter prevents validation work from starting
+until all ranks have finished their timed copies.

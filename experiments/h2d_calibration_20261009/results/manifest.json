@@ -194,6 +194,38 @@
     "sweep_analysis.log.gz": {
       "bytes": 261,
       "sha256": "a54331dc07454ad00236c3b389b4d595017592e52829b6205f6e34563f66c01c"
+    },
+    "plots/confirmation_results.pdf": {
+      "bytes": 26429,
+      "sha256": "e90a25732173a67ce785d9b3631af5b27185bff8ed282572635813377afc30f9"
+    },
+    "plots/confirmation_results.png": {
+      "bytes": 526122,
+      "sha256": "1446292d0dc6989e19036e7b620cb9093d519263918abe573e8b71913905ed84"
+    },
+    "plots/confirmation_results.svg": {
+      "bytes": 208047,
+      "sha256": "ac69ba50906728a9b579ed170c7bbe9292158c1e0692b6563c613a76a22f8a35"
+    },
+    "plots/confirmation_strict.csv": {
+      "bytes": 2354,
+      "sha256": "02db49c9e35dbbd441c1540f8f51ad55e28f82da95624b8f17997f914cfd3ca2"
+    },
+    "plots/full_sweep.pdf": {
+      "bytes": 34644,
+      "sha256": "d4fef0afe5a3b32e7dd2081442a321ab58fac66ef9fa3ddef69a1f4703dd7147"
+    },
+    "plots/full_sweep.png": {
+      "bytes": 407375,
+      "sha256": "d9a3e3599e651153be3684564bd31973b574263b227fd5be3a2ca1a88383c17b"
+    },
+    "plots/full_sweep.svg": {
+      "bytes": 166540,
+      "sha256": "6c22b65793e9903157fb4a668fe82a6a1cd24bd57082b28f66b4c3a1d539a05d"
+    },
+    "plots/sweep.csv": {
+      "bytes": 10930,
+      "sha256": "d09e00eaba93e36b358a6e59fbeaf0c9d6336bc1216d37a086ecc6dda66b22f9"
     }
   }
 }

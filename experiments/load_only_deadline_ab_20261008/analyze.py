@@ -228,6 +228,14 @@ def main():
             if first_forecast is None or seals[e["step"]]["time_ns"] < first_forecast
         ]
         d["all_compute_batch_sizes"] = [len(e["selected"]) for e in compute]
+        d["first_request_to_first_compute_ms"] = (
+            max(r[3] for r in compute[0]["execution_ranks"])
+            - min(r["start_ns"] for r in result["responses"])
+        ) / 1e6
+        d["last_compute_to_last_response_ms"] = (
+            max(r["end_ns"] for r in result["responses"])
+            - max(r[3] + r[6] for r in compute[-1]["execution_ranks"])
+        ) / 1e6
         categories = Counter()
         category_counts = Counter()
         for a, b in zip(compute, compute[1:]):
@@ -267,6 +275,31 @@ def main():
     save(ROOT / "measurement_audit.json", audit)
     save(ROOT / "prediction_audit.json", predictions)
     save(ROOT / "audited_cells.json", cells)
+    blocks = []
+    for workload, repeats in plan["repeats"].items():
+        for repeat in range(repeats):
+            block = [
+                c for c in cells if c["workload"] == workload and c["repeat"] == repeat
+            ]
+            if len(block) != len(policies):
+                continue
+            assert len({c["label"] for c in block}) == len(policies)
+            assert len({c["seed"] for c in block}) == 1
+            metric = "vllm:kv_offload_load_bytes_total"
+            volumes = {
+                c["metrics_after"][metric] - c["metrics_before"][metric] for c in block
+            }
+            assert len(volumes) == 1
+            blocks.append(
+                dict(
+                    workload=workload,
+                    repeat=repeat,
+                    passed=True,
+                    matched_seed=block[0]["seed"],
+                    equal_aggregate_transfer_bytes=volumes.pop(),
+                )
+            )
+    save(ROOT / "block_audit.json", blocks)
     if args.audit_only:
         print(json.dumps(dict(cells=len(cells), forecasts=len(predictions))))
         return
@@ -329,6 +362,12 @@ def main():
                     ),
                     mean_episode_compute_span_ms=statistics.mean(
                         d["gpu_compute_span_ms"] for d in diagnostics
+                    ),
+                    first_request_to_first_compute_ms=statistics.mean(
+                        d["first_request_to_first_compute_ms"] for d in diagnostics
+                    ),
+                    last_compute_to_last_response_ms=statistics.mean(
+                        d["last_compute_to_last_response_ms"] for d in diagnostics
                     ),
                     gap_categories_ms_per_episode={
                         name: statistics.mean(

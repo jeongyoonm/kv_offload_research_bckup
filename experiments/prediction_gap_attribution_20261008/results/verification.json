@@ -1,0 +1,8 @@
+{
+  "aggregate_checks": 48,
+  "transitions": 583,
+  "prediction_deadline_exits": 31,
+  "prediction_deadline_seals_after_predecessor_end": 0,
+  "source_sha256": "74087fd6e67ebf364d37633e9d4f134d33223d4d68caa439920d08e8229c9d5d",
+  "gpu_runs_added": 0
+}

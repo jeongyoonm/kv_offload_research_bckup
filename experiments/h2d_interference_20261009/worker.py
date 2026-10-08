@@ -269,3 +269,22 @@ def drain(worker):
 def close(worker):
     worker._h2d_calibration.close()
     return dict(rank=worker.rank, closed=True)
+
+
+class CalibrationExtension:
+    """Named control RPCs; calibration does not require callable serialization."""
+
+    def calibration_setup(self, root):
+        return setup(self, root)
+
+    def calibration_arm(self, cell):
+        return arm(self, cell)
+
+    def calibration_copy_only(self):
+        return copy_only(self)
+
+    def calibration_drain(self):
+        return drain(self)
+
+    def calibration_close(self):
+        return close(self)

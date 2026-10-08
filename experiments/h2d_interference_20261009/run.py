@@ -162,7 +162,6 @@ def main():
             model=MODEL,
         ),
     )
-    from experiments.h2d_interference_20261009 import worker
     from vllm import LLM, SamplingParams
 
     kwargs = dict(
@@ -180,6 +179,8 @@ def main():
         block_size=64,
         enable_flashinfer_autotune=False,
         async_scheduling=True,
+        worker_extension_cls="experiments.h2d_interference_20261009.worker."
+        "CalibrationExtension",
         numa_bind=True,
         numa_bind_nodes=[0, 0, 0, 0, 1, 1, 1, 1],
         numa_bind_cpus=[
@@ -194,7 +195,7 @@ def main():
     try:
         llm = LLM(**kwargs)
         params = SamplingParams(max_tokens=1, temperature=0, seed=0, ignore_eos=True)
-        ready = llm.collective_rpc(worker.setup, timeout=300, args=(str(root),))
+        ready = llm.collective_rpc("calibration_setup", timeout=300, args=(str(root),))
         assert {r["rank"] for r in ready} == set(range(8))
         save(root / "workers.json", ready)
         initialized = True
@@ -225,10 +226,10 @@ def main():
                     ]
                     llm.generate(prompts, params, use_tqdm=False)
                 previous_shape = shape
-            llm.collective_rpc(worker.arm, timeout=120, args=(cell,))
+            llm.collective_rpc("calibration_arm", timeout=120, args=(cell,))
             responses = None
             if cell["mode"] == "copy_only":
-                llm.collective_rpc(worker.copy_only, timeout=120)
+                llm.collective_rpc("calibration_copy_only", timeout=120)
             else:
                 geom = GEOMETRY[shape]
                 # Match suffix tails within repeat; a unique leading token prevents
@@ -246,7 +247,7 @@ def main():
                 responses = llm.generate(prompts, params, use_tqdm=False)
                 assert len(responses) == geom["batch"]
                 assert all(len(r.outputs[0].token_ids) == 1 for r in responses)
-            rows = llm.collective_rpc(worker.drain, timeout=180)
+            rows = llm.collective_rpc("calibration_drain", timeout=180)
             assert {r["rank"] for r in rows} == set(range(8))
             if shape is not None:
                 geom = GEOMETRY[shape]
@@ -274,7 +275,7 @@ def main():
                 ),
                 flush=True,
             )
-        closed = llm.collective_rpc(worker.close, timeout=120)
+        closed = llm.collective_rpc("calibration_close", timeout=120)
         initialized = False
         save(root / "worker_cleanup.json", closed)
         save(

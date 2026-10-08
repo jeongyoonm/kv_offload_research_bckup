@@ -56,6 +56,13 @@ def diagnostics(late, completed, policy):
             )
     return dict(
         windows=len(windows),
+        forecast_windows=sum(bool(w.get("prediction")) for w in windows),
+        compute_windows=sum(w["has_compute"] is True for w in windows),
+        load_only_windows=sum(w["has_compute"] is False for w in windows),
+        load_only_hold_ms=sum(
+            w["seal_hold_actual_ns"] for w in windows if w["has_compute"] is False
+        )
+        / 1e6,
         progress_polls=sum(w["progress_polls"] for w in windows),
         scheduler_wait_returns=len(waits),
         coarse_wait_returns=sum(w["phase"] == "coarse" for w in waits),

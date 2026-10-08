@@ -292,6 +292,12 @@ def main():
         wait_spec.loader.exec_module(wait_helper)
         d["waiting"] = wait_helper.diagnostics(late, completed, result["label"])
         d["cpu"] = read(directory / "cpu.json")
+        d["cpu"]["worker_cpu_ms"] = sum(
+            row["cpu_ms"] for row in d["cpu"]["processes"] if "Worker" in row["name"]
+        )
+        d["cpu"]["all_server_cpu_ms"] = sum(
+            row["cpu_ms"] for row in d["cpu"]["processes"]
+        )
         result["diagnostics"] = d
         cells.append(result)
         predictions.extend(cell_predictions)
@@ -452,6 +458,12 @@ def main():
                     mean_episode_engine_cpu_ms=statistics.mean(
                         d["cpu"]["engine_cpu_ms"] for d in diagnostics
                     ),
+                    mean_episode_worker_cpu_ms=statistics.mean(
+                        d["cpu"]["worker_cpu_ms"] for d in diagnostics
+                    ),
+                    mean_episode_server_cpu_ms=statistics.mean(
+                        d["cpu"]["all_server_cpu_ms"] for d in diagnostics
+                    ),
                     mean_episode_engine_context_switches=statistics.mean(
                         d["cpu"]["engine_context_switches"] for d in diagnostics
                     ),
@@ -494,6 +506,47 @@ def main():
                 )
                 for p in [reference, treatment]
             ]
+            mechanisms = {}
+            for key, source in [
+                ("total_wait_cpu_ms", "waiting"),
+                ("progress_polls", "waiting"),
+                ("scheduler_wait_returns", "waiting"),
+                ("compute_exposed_hold_ms", "waiting"),
+                ("gpu_gap_ms", "diagnostics"),
+                ("engine_cpu_ms", "cpu"),
+                ("worker_cpu_ms", "cpu"),
+            ]:
+                values = []
+                for repeat in range(repeats):
+                    pair = [
+                        next(
+                            c
+                            for c in selected
+                            if c["label"] == p and c["repeat"] == repeat
+                        )
+                        for p in [reference, treatment]
+                    ]
+                    numbers = [
+                        c["diagnostics"][key]
+                        if source == "diagnostics"
+                        else c["diagnostics"][source][key]
+                        for c in pair
+                    ]
+                    values.append(numbers[1] - numbers[0])
+                difference = statistics.mean(values)
+                difference_margin = (
+                    t.ppf(0.975, repeats - 1)
+                    * statistics.stdev(values)
+                    / math.sqrt(repeats)
+                )
+                mechanisms[key] = dict(
+                    mean_treatment_minus_reference=difference,
+                    paired_95pct_bounds=[
+                        difference - difference_margin,
+                        difference + difference_margin,
+                    ],
+                    paired_differences=values,
+                )
             contrasts.append(
                 dict(
                     workload=workload,
@@ -510,6 +563,7 @@ def main():
                     mean_ttft_reduction_percent=100
                     * (1 - b["mean_ttft_ms"] / a["mean_ttft_ms"]),
                     pairs=pairs,
+                    mechanisms=mechanisms,
                 )
             )
     report = dict(
@@ -558,6 +612,23 @@ def main():
             f"{c['aggregate_gain_percent']:+.2f}% | "
             f"{c['paired_gain_percent']:+.2f}% [{lo:+.2f}%, {hi:+.2f}%] | "
             f"{c['mean_ttft_reduction_percent']:+.2f}% |"
+        )
+    lines.extend(
+        [
+            "",
+            "| Workload | Policy | Progress polls/episode | Wait returns/episode | "
+            "Wait CPU ms/episode | EngineCore CPU ms/episode | "
+            "Exposed compute hold ms/episode |",
+            "| --- | --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for g in aggregates:
+        w = g["waiting"]
+        lines.append(
+            f"| {g['workload']} | {g['policy']} | {w['progress_polls']:.1f} | "
+            f"{w['scheduler_wait_returns']:.1f} | {w['total_wait_cpu_ms']:.2f} | "
+            f"{g['mean_episode_engine_cpu_ms']:.1f} | "
+            f"{w['compute_exposed_hold_ms']:.2f} |"
         )
     lines.extend(
         [

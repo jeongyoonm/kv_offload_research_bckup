@@ -1,0 +1,125 @@
+{
+  "artifact_root": "/mnt/localnvme/glm53_efficient_wait_ab_20261009",
+  "serving_source_unchanged": true,
+  "serving_commit": "673ddfa9fc3a2a02df2d202de01166b428624a05",
+  "measured_episodes": 54,
+  "measured_requests": 4050,
+  "files": {
+    "FINDINGS.md": {
+      "bytes": 7218,
+      "sha256": "5c9d24d4fabad86ecd75b896e79c4cbc7d77a75ab01104359ee36c8b155d3682"
+    },
+    "REPORT.md": {
+      "bytes": 3957,
+      "sha256": "54a3aa2828ba8a3c0032253812333428fc94f4210153c7a647ff7bd3161595f9"
+    },
+    "allocation.json": {
+      "bytes": 61,
+      "sha256": "faddc749e105d15528a6b7b8ff069ff0c8025ba94593e5986df352e228736a3f"
+    },
+    "analysis_complete.json": {
+      "bytes": 51,
+      "sha256": "b2d9ddcc05bfe054e4c3f660366ce49cd6f094b6248d312a5a3ecf524cd46f82"
+    },
+    "analyze.log.gz": {
+      "bytes": 10770,
+      "sha256": "9d252bbd1e68b34b0de24659a732950d1f26829eeae45817655e04d324bbc8bd"
+    },
+    "audited_cells.json.gz": {
+      "bytes": 573879,
+      "sha256": "4f28272c3e96a8a9304cb3c2dc292158f1c8d973df8f7d47d28e958a31e092ac"
+    },
+    "block_audit.json": {
+      "bytes": 2805,
+      "sha256": "b61f30ac7c7e04dc1d39cee86254e404d58bd80765f7575c05985fd130fa23cd"
+    },
+    "cleanup.json": {
+      "bytes": 790,
+      "sha256": "3c7db3f766548f9c94337196a5af002df9bf653410cc379d6db3a8d658bf5c2b"
+    },
+    "comparison.json": {
+      "bytes": 68896,
+      "sha256": "065a79844fc3b8807179842736a75be3943af85aff9b4f36e1813a0ae10ebc72"
+    },
+    "cpu_tests.log": {
+      "bytes": 1003,
+      "sha256": "50312b88677297e325d05c2e4919cda6834512c95f28af34edf1a76fbf8dec07"
+    },
+    "dependency-preflight.json": {
+      "bytes": 488,
+      "sha256": "8f4865f508d6188cb6fb7365d8c7abc1757ee34b532e4d946259c70862eeb731"
+    },
+    "diagnostic_replay_check.json": {
+      "bytes": 997,
+      "sha256": "1fde5b372673e930f3bc0ef0f9b43373c5c24ffdfb8387a3ba08add0846ea060"
+    },
+    "driver.log.gz": {
+      "bytes": 1658,
+      "sha256": "64e175b893e3485c9baff90ce23486b3fff95fec0f2a057ccd2cdc4665d310ca"
+    },
+    "environment-preflight.json": {
+      "bytes": 536,
+      "sha256": "cba7d3c4de3dd32e0661747a317a1a0d39c7a00215c6790890d8d7d9bab4fa97"
+    },
+    "finalizer.log.gz": {
+      "bytes": 69,
+      "sha256": "4f0856cf08c537d06175b88ae3c1365613da254742e87bdb10bb94352dacc2da"
+    },
+    "measurement_audit.json": {
+      "bytes": 19407,
+      "sha256": "bc29df848d5294db7044ee9e2ca70091c742eea0f04b7de90ce7ce00260d3c92"
+    },
+    "ownership.json": {
+      "bytes": 1119,
+      "sha256": "d71d8e3dea058d891348705f4bf3f1ea3c08ec13653d15682e0fcf0558d174bb"
+    },
+    "plan.json": {
+      "bytes": 7685,
+      "sha256": "e3c0da722bf566f4f093faee2971ebadcd6aedf16e717d7844431ef494175fcd"
+    },
+    "prediction_audit.json": {
+      "bytes": 90015,
+      "sha256": "11dc6f85bd72edcce5acb85b48e38c5792c4380fd824fcc4434ec9c4232cfc6f"
+    },
+    "protocol_checks.json": {
+      "bytes": 7875,
+      "sha256": "dfc23a2ddbdc31ebe47c5256cfd671350a5ffbea033efa15c37c2cb7fd08402a"
+    },
+    "server_command.json.gz": {
+      "bytes": 769,
+      "sha256": "1f8a2d88e65990c1e73468704e7ee2096d93f435765180e2136df9309ac6521d"
+    },
+    "server_connector_config.json.gz": {
+      "bytes": 245,
+      "sha256": "3728a8d071a4d57c1223c334e6bb3817eefa6f8263a03ddbfa3adbe5df029b4b"
+    },
+    "server_environment.json.gz": {
+      "bytes": 528,
+      "sha256": "93970f90a500f56b637e6c209412ecf9ae30e274131a684c87db3235fc70bd7d"
+    },
+    "server_server.log.gz": {
+      "bytes": 81977,
+      "sha256": "df68dbd9e6ac4f540de755ad57ca6f50f856aeca48c65463f393702a1959951d"
+    },
+    "source_provenance.json": {
+      "bytes": 256,
+      "sha256": "7a9d0b8946ea685f806a704e81766e24598ac3b85cb826ec782f6059f96156f8"
+    },
+    "summary.json.gz": {
+      "bytes": 168374,
+      "sha256": "287e6c935f442a53657fa124c84a7b17e1a923b630f67b2283d0a48f9e880500"
+    },
+    "waiting_ablation.pdf": {
+      "bytes": 22824,
+      "sha256": "6d0c99b9d4a54980acc50f8e83aa492ad8a73078160600786a56709f6662b686"
+    },
+    "waiting_ablation.png": {
+      "bytes": 125408,
+      "sha256": "8a9bf32506a841d983ab714f5e2d71936393bc382047964f5d6fcd328ef5c4dc"
+    },
+    "waiting_ablation.svg": {
+      "bytes": 80121,
+      "sha256": "ebe2c61bb3121412b61748a287780642d91e6e69dbb9268367238099d13df394"
+    }
+  }
+}

@@ -64,3 +64,21 @@ native prediction replay, target/deadline arithmetic, matched transfer volume,
 and absence of measured compilation/errors. Paired throughput intervals use
 episode log ratios with six blocks; intervals are nominal, unadjusted for multiple
 comparisons. AI assistance: Codex.
+
+## Completed results
+
+All 54 episodes (4,050 measured requests), 18 matched-block audits, and 290 native
+forecast replays passed. The CPU protocol harness passed 198 tests with eight
+GPU-gated skips. All owned server processes were released; all eight GPUs were
+idle after cleanup.
+
+Efficient waiting reduced measured progress CPU by 39.7% on 16K and 55.0% on 60K
+relative to plain 2 ms polling. Aggregate throughput gains were only 0.06% and
+0.05%, respectively; paired confidence intervals span zero. No repeatable
+throughput or TTFT improvement is established. Detailed tracing affects the CPU
+measurement, and these savings should not be treated as untraced production
+savings.
+
+See [findings](results/FINDINGS.md), [full report](results/REPORT.md), and
+[plot](results/waiting_ablation.png). The results directory includes audited
+measurements, compressed process logs, provenance, and a SHA-256 manifest.

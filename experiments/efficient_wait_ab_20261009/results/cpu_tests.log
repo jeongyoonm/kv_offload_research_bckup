@@ -1,0 +1,15 @@
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+......................................................ssssssss           [100%]
+=============================== warnings summary ===============================
+vllm/__init__.py:7
+  /mnt/localnvme/vllm_glm53_efficient_wait_ab_20261009/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:
+  No module named 'vllm._version'
+    from .version import __version__, __version_tuple__  # isort:skip
+
+.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /mnt/localnvme/vllm_glm53_efficient_wait_ab_20261009/.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+198 passed, 8 skipped, 15 warnings in 53.08s

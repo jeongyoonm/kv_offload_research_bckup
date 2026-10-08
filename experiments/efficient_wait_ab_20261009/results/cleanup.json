@@ -1,0 +1,27 @@
+{
+  "owned_released": true,
+  "all_gpus_idle": true,
+  "external_compute_apps": [],
+  "samples": [
+    {
+      "time": 1791492580.9273515,
+      "owned_session_processes": [
+        " 848328  836989 D    VLLM::Worker_TP",
+        " 850779  836989 D    VLLM::Worker_TP",
+        " 853310  836989 D    VLLM::Worker_TP",
+        " 855871  836989 R    VLLM::Worker_TP",
+        " 858290  836989 R    VLLM::Worker_TP",
+        " 860808  836989 D    VLLM::Worker_TP",
+        " 864337  836989 D    VLLM::Worker_TP",
+        " 867407  836989 D    VLLM::Worker_TP"
+      ],
+      "gpu_query_timeout": true
+    },
+    {
+      "time": 1791492691.766487,
+      "owned_session_processes": [],
+      "gpu_memory": "0, 0\n1, 0\n2, 0\n3, 0\n4, 0\n5, 0\n6, 0\n7, 0\n",
+      "compute_apps": ""
+    }
+  ]
+}

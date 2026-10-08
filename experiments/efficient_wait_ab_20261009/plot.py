@@ -76,7 +76,10 @@ def main():
         axis.set_axisbelow(True)
         axis.margins(y=0.25)
         axis.spines[["top", "right"]].set_visible(False)
-    fig.legend(labels, loc="outside lower center", ncol=3, frameon=False)
+    handles, legend_labels = axes[2].get_legend_handles_labels()
+    fig.legend(
+        handles, legend_labels, loc="outside lower center", ncol=3, frameon=False
+    )
     fig.suptitle("GLM 5.3 TP8: same sealing rules, different waiting mechanisms")
     for extension in ["png", "pdf", "svg"]:
         fig.savefig(ROOT / f"waiting_ablation.{extension}", dpi=200)

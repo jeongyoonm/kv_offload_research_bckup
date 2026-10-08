@@ -153,6 +153,9 @@ def main():
                     assert transport["ready_target"] == min(
                         target, n - len(transport["cancelled"])
                     )
+                if transport.get("seal_reason") == "candidate_target_ready":
+                    assert transport["partial_ready_count"] >= transport["ready_target"]
+                    assert transport["statuses"][:8] == [1] * 8
                 load_only.append(
                     dict(
                         step=sealed["step"],
@@ -161,6 +164,10 @@ def main():
                         reason=transport.get("seal_reason"),
                         activated=len(sealed["activated"]),
                         selected=len(sealed["selected"]),
+                        ready=transport["partial_ready_count"],
+                        unready=n
+                        - len(transport["cancelled"])
+                        - transport["partial_ready_count"],
                         wait_after_base_ms=(
                             transport["seal_ns"] - transport["base_ready_ns"]
                         )
@@ -335,6 +342,9 @@ def main():
                         )
                     ),
                     load_only_seals=len(load_seals),
+                    load_only_seals_with_unready_candidates=sum(
+                        s["unready"] > 0 for s in load_seals
+                    ),
                     load_only_wait_after_base_ms=helper.describe(
                         [s["wait_after_base_ms"] for s in load_seals]
                     ),

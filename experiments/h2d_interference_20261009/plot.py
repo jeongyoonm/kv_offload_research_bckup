@@ -93,8 +93,15 @@ def main():
                     fontsize=10,
                 )
         handles = [
-            Line2D([], [], color="#707070", marker="o", label="Depth 1"),
-            Line2D([], [], color="#0072B2", marker="o", label="Depth 2"),
+            Line2D(
+                [],
+                [],
+                color="#707070" if depth == 1 else "#0072B2",
+                marker="o",
+                label=f"Depth {depth}",
+            )
+            for depth in depths
+        ] + [
             Line2D(
                 [],
                 [],
@@ -110,12 +117,13 @@ def main():
             handles=handles, loc="upper center", bbox_to_anchor=(0.5, 0.95), ncol=3
         )
         fig.subplots_adjust(
-            left=0.07, right=0.99, top=0.84, bottom=0.09, hspace=0.65, wspace=0.32
+            left=0.07, right=0.99, top=0.84, bottom=0.13, hspace=0.65, wspace=0.32
         )
         fig.text(
             0.5,
             0.02,
-            f"{plan['repeats']} randomized repeats; four FIFO loads per rank. "
+            f"{plan['repeats']} randomized repeats; {plan['cells'][0]['jobs']} "
+            "FIFO loads per rank. "
             "Fixed GPU-resident compute cohorts; not serving throughput.\n"
             "Joint completion uses native end-interval upper bounds. "
             "Unique suffix-leading tokens prevent suffix-cache hits.",

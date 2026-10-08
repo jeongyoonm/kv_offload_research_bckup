@@ -7,6 +7,7 @@ import hashlib
 import importlib.util
 import json
 import shutil
+import subprocess
 import threading
 import time
 from pathlib import Path
@@ -37,6 +38,7 @@ def main():
 
     def server_command():
         command, config = original_command()
+        command[0] = str(source / ".venv/bin/python")
         command[command.index("--port") + 1] = "18419"
         config["kv_connector_extra_config"]["async_h2d_chunk_bytes"] = (
             args.chunk_mib * 1024**2
@@ -61,6 +63,18 @@ def main():
     assert digest == freeze["models"]["matched_offset"]
     state = json.loads(checkpoint.read_text())
     workloads = ("short16k", "familiar60k", "heterogeneous")
+    collector.save(
+        root / "source_provenance.json",
+        dict(
+            source=str(source),
+            branch=subprocess.check_output(
+                ["git", "branch", "--show-current"], cwd=source, text=True
+            ).strip(),
+            commit=subprocess.check_output(
+                ["git", "rev-parse", "HEAD"], cwd=source, text=True
+            ).strip(),
+        ),
+    )
     collector.save(
         root / "plan.json",
         dict(

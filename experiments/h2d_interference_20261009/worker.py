@@ -127,6 +127,10 @@ class Calibration:
                 host_begin_ns=time.monotonic_ns(),
                 tokens=dict(scheduler_output.num_scheduled_tokens),
             )
+            torch.cuda.nvtx.range_push(
+                f"calibration/{self.cell['mode']}/c{self.cell['chunk_mib']}/"
+                f"d{self.cell['depth']}/{self.cell['profile']}/{self.cell['shape']}"
+            )
             self.observer.start(self.cell["id"])
             if self.cell["mode"] == "concurrent":
                 self.submit()
@@ -153,6 +157,7 @@ class Calibration:
             )
             if self.cell["mode"] == "after_enqueued":
                 self.submit()
+            torch.cuda.nvtx.range_pop()
         return result
 
     def arm(self, cell):
@@ -289,3 +294,9 @@ class CalibrationExtension:
 
     def calibration_close(self):
         return close(self)
+
+    def calibration_profile_begin(self):
+        torch.cuda.profiler.start()
+
+    def calibration_profile_end(self):
+        torch.cuda.profiler.stop()

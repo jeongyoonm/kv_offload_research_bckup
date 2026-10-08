@@ -89,7 +89,9 @@ def test_joint_finish_preserves_native_compute_completion_uncertainty():
 def test_copy_launch_respects_requested_compute_boundary(monkeypatch, mode, expected):
     events = []
     calibration = Calibration.__new__(Calibration)
-    calibration.cell = dict(mode=mode, id=1)
+    calibration.cell = dict(
+        mode=mode, id=1, chunk_mib=128, depth=2, profile="4k", shape="short"
+    )
     calibration.current = None
     calibration.forward_count = 0
     calibration.device = None
@@ -111,6 +113,14 @@ def test_copy_launch_respects_requested_compute_boundary(monkeypatch, mode, expe
     monkeypatch.setattr(
         "experiments.h2d_interference_20261009.worker.torch.cuda.current_stream",
         lambda _: None,
+    )
+    monkeypatch.setattr(
+        "experiments.h2d_interference_20261009.worker.torch.cuda.nvtx.range_push",
+        lambda _: None,
+    )
+    monkeypatch.setattr(
+        "experiments.h2d_interference_20261009.worker.torch.cuda.nvtx.range_pop",
+        lambda: None,
     )
     schedule = SimpleNamespace(num_scheduled_tokens={"request": 64})
 

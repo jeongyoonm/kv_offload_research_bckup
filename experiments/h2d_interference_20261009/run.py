@@ -153,6 +153,11 @@ def main():
     parser.add_argument("--pilot", action="store_true")
     parser.add_argument("--confirmation", action="store_true")
     parser.add_argument("--configs", nargs="+")
+    parser.add_argument(
+        "--trace",
+        action="store_true",
+        help="Diagnostic Nsight capture; exclude from performance selection",
+    )
     args = parser.parse_args()
     assert args.repeats > 0
     root = args.output
@@ -164,6 +169,7 @@ def main():
     ).strip()
     assert not apps, f"GPUs occupied: {apps}"
     plan = make_plan(args)
+    plan["diagnostic_trace"] = args.trace
     save(root / "plan.json", plan)
     env = environment(root)
     save(root / "ownership.json", dict(pid=os.getpid(), pgid=os.getpgrp()))
@@ -223,6 +229,7 @@ def main():
         initialized = True
         prefixes = {}
         previous_shape = None
+        profiling = False
         for cell in plan["cells"]:
             shape = cell["shape"]
             if shape is not None and shape != previous_shape:
@@ -246,6 +253,9 @@ def main():
                     ]
                     queued_generate(llm, prompts, params)
                 previous_shape = shape
+            if args.trace and shape is not None and not profiling:
+                llm.collective_rpc("calibration_profile_begin", timeout=120)
+                profiling = True
             llm.collective_rpc("calibration_arm", timeout=120, args=(cell,))
             responses = None
             if cell["mode"] == "copy_only":
@@ -297,6 +307,8 @@ def main():
                 ),
                 flush=True,
             )
+        if profiling:
+            llm.collective_rpc("calibration_profile_end", timeout=120)
         closed = llm.collective_rpc("calibration_close", timeout=120)
         initialized = False
         save(root / "worker_cleanup.json", closed)

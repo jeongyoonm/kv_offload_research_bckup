@@ -184,6 +184,7 @@ def worker(rank, args, plan, engine, barrier, output):
             ops.wait_async_batch_memcpy(handle, ids)
             end = time.monotonic_ns()
             cpu_end = time.process_time_ns()
+            barrier.wait(300)
             finished, durations = ops.poll_async_batch_memcpy(handle)
             sessions, jobs, stamps, statuses, overflow, failure = (
                 ops.poll_async_batch_memcpy_completion_ring(ring)

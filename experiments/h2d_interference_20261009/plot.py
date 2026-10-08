@@ -39,17 +39,17 @@ def main():
     for metric, label, title in (
         (
             "joint_finish_ms",
-            "Both compute and copy cohort ready (ms) ↓",
+            "Joint completion (ms) ↓",
             "Joint compute / copy completion",
         ),
         (
             "forward_enqueue_ms",
-            "Maximum rank forward enqueue time (ms) ↓",
+            "Forward enqueue (ms) ↓",
             "Host compute submission including copy enqueue",
         ),
         (
             "first_ready_ms",
-            "First-load all-rank readiness (ms) ↓",
+            "First-load ready (ms) ↓",
             "KV readiness while compute runs",
         ),
     ):
@@ -132,7 +132,7 @@ def main():
             color="#444444",
         )
         for extension in ("png", "pdf", "svg"):
-            fig.savefig(root / f"{metric}.{extension}", dpi=200)
+            fig.savefig(root / f"{metric}.{extension}", dpi=200, bbox_inches="tight")
         plt.close(fig)
 
 

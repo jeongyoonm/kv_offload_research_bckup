@@ -43,6 +43,8 @@ All arms enable the same existing detailed wait tracing. GPU spans include host
 submission stalls/output joins; exposed sealing hold is not total GPU bubble
 time. Forecast-conditioned exposure excludes windows without a valid predecessor
 forecast. Accuracy populations can differ as trajectories change.
+The common submission-progress diagnostics also run at polling opportunities;
+CPU savings describe this instrumented prototype configuration.
 
 ```bash
 PYTHONPATH="$PWD" .venv/bin/python \
@@ -51,6 +53,10 @@ OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
   /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
   experiments/efficient_wait_ab_20261009/analyze.py
 ```
+
+`finalize.py` can run alongside the allocation. It waits for completion, runs
+analysis and plotting, and verifies that owned processes and GPU contexts have
+been released. It writes `analysis_complete.json` and `cleanup.json`.
 
 Audit ordered unique retirement, exact uncached token accounting, CPU restoration,
 zero GPU prefix hits/preemptions, all-rank preparation/execution timing, frozen

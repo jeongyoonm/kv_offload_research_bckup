@@ -26,12 +26,27 @@ def main():
     fig, axes = plt.subplots(1, 3, figsize=(12.8, 3.8), layout="constrained")
     for index, (policy, label, color) in enumerate(zip(policies, labels, colors)):
         values = [[], [], []]
+        intervals = [[], []]
         for workload in workloads:
             base = groups[workload, "poll"]
             cell = groups[workload, policy]
-            values[0].append(
-                100 * (cell["throughput_rps"] / base["throughput_rps"] - 1)
-            )
+            if policy == "poll":
+                gain, bounds = 0, [0, 0]
+            else:
+                contrast = next(
+                    c
+                    for c in report["contrasts"]
+                    if c["workload"] == workload
+                    and c["reference"] == "poll"
+                    and c["treatment"] == policy
+                )
+                gain, bounds = (
+                    contrast["paired_gain_percent"],
+                    contrast["paired_95pct_bounds"],
+                )
+            values[0].append(gain)
+            intervals[0].append(gain - bounds[0])
+            intervals[1].append(bounds[1] - gain)
             values[1].append(100 * (1 - cell["mean_ttft_ms"] / base["mean_ttft_ms"]))
             values[2].append(cell["waiting"]["total_wait_cpu_ms"] / 75)
         for axis, data in zip(axes, values):
@@ -39,8 +54,17 @@ def main():
                 x + (index - 1) * width, data, width, color=color, label=label
             )
             axis.bar_label(bars, fmt="%.2f", fontsize=8, padding=3)
+        axes[0].errorbar(
+            x + (index - 1) * width,
+            values[0],
+            yerr=intervals,
+            fmt="none",
+            color="black",
+            capsize=3,
+            linewidth=0.8,
+        )
     titles = [
-        "Throughput gain vs plain polling (%)",
+        "Paired throughput gain vs polling (%)",
         "Mean TTFT reduction vs plain polling (%)",
         "Measured waiting CPU (ms/request)",
     ]

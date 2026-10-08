@@ -116,6 +116,9 @@ def environment(root):
         OPENBLAS_NUM_THREADS="1",
         OMP_NUM_THREADS="2",
         TMPDIR=str(root / "tmp"),
+        PATH=str(SOURCE / ".venv/bin")
+        + ":/usr/local/cuda-13.0/bin:"
+        + os.environ.get("PATH", ""),
     )
     (root / "tmp").mkdir(exist_ok=True)
     os.environ.update(env)
@@ -228,8 +231,8 @@ def main():
                 llm.collective_rpc(worker.copy_only, timeout=120)
             else:
                 geom = GEOMETRY[shape]
-                # Repeat-matched token payloads across all configurations and modes.
-                # The first suffix token differs per cell, preventing suffix KV hits.
+                # Match suffix tails within repeat; a unique leading token prevents
+                # suffix-cache hits and is recorded as a workload limitation.
                 prompts = [
                     dict(
                         prompt_token_ids=p

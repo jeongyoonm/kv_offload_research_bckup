@@ -10,6 +10,55 @@ import pytest
 from experiments.h2d_interference_20261009.worker import Calibration
 
 
+def test_joint_finish_preserves_native_compute_completion_uncertainty():
+    from experiments.h2d_interference_20261009.analyze import aggregate_cell
+
+    cell = dict(
+        id=1,
+        mode="concurrent",
+        profile="4k",
+        jobs=4,
+        shape="short",
+        repeat=0,
+        chunk_mib=128,
+        depth=2,
+    )
+    ranks = [
+        dict(
+            rank=i,
+            **cell,
+            host_begin_ns=1_000_000,
+            compute_submit_begin_ns=1_200_000,
+            compute_enqueued_ns=2_000_000,
+            execution=[
+                1,
+                1_000_001,
+                1_000_002,
+                1_000_003,
+                8_000_000,
+                1,
+                6_000_000,
+                7_000_000,
+                7_500_000,
+            ],
+            io_begin_ns=1_100_000,
+            io_enqueued_ns=1_150_000,
+            bytes_per_job=195379200,
+            completion_ns=[2_000_000, 3_000_000, 4_000_000, 5_000_000],
+            validated_bytes=99 * 3 * 64,
+        )
+        for i in range(8)
+    ]
+    result = aggregate_cell(dict(cell=cell, ranks=ranks))
+    assert result["joint_finish_ms"] == 6.5
+    assert result["joint_finish_lower_ms"] == 6.0
+    assert result["first_ready_ms"] == 1.0
+    assert result["max_end_uncertainty_ms"] == 0.5
+    ranks[0]["completion_ns"] = [2_000_000, 3_000_000, 4_000_000, 10_000_000]
+    result = aggregate_cell(dict(cell=cell, ranks=ranks))
+    assert result["joint_finish_ms"] == result["joint_finish_lower_ms"] == 9.0
+
+
 @pytest.mark.parametrize(
     "mode,expected",
     [

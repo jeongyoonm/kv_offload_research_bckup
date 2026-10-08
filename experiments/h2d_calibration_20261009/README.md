@@ -32,6 +32,11 @@ depths 1, 2, 4, and 8. Five randomized repetitions over three prefix sizes give
 configuration/profile are excluded. Descriptor construction, population,
 registration, allocation, and validation are outside measurement boundaries.
 
+That matrix describes the completed historical screen. Future calibration
+sweeps accept only depths 1 and 2, including explicit `--configs` selections.
+Historical results and plots retain the original matrix. This restriction
+does not change native pipeline support or the serving configuration.
+
 Effective bandwidth uses total bytes divided by elapsed time from the earliest
 rank submission start to the latest rank's final native completion. Reported
 per-GPU bandwidth divides aggregate bandwidth by eight. First-load readiness

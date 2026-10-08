@@ -243,7 +243,7 @@ def main():
     parser.add_argument(
         "--chunks", type=int, nargs="+", default=[8, 16, 32, 64, 128, 256, 512]
     )
-    parser.add_argument("--depths", type=int, nargs="+", default=[1, 2, 4, 8])
+    parser.add_argument("--depths", type=int, nargs="+", default=[1, 2], choices=[1, 2])
     parser.add_argument("--configs", nargs="+", help="Explicit chunkMiB:depth pairs")
     parser.add_argument("--seed", type=int, default=8109)
     parser.add_argument("--repeats", type=int, default=5)
@@ -267,8 +267,8 @@ def main():
         if args.configs
         else [(chunk, depth) for chunk in args.chunks for depth in args.depths]
     )
-    if any(chunk < 1 or not 1 <= depth <= 8 for chunk, depth in configs):
-        parser.error("chunk must be positive and depth must be 1 through 8")
+    if any(chunk < 1 or depth not in (1, 2) for chunk, depth in configs):
+        parser.error("chunk must be positive and calibration depth must be 1 or 2")
     for repeat in range(args.repeats):
         order = list(configs)
         random.Random(args.seed + repeat).shuffle(order)

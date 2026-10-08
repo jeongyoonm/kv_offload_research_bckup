@@ -97,6 +97,9 @@ def main():
                 continue
             assert event["valid"] and event["step"] not in completed
             completed[event["step"]] = event
+            if event.get("selected"):
+                assert len(event["execution_ranks"]) == 8
+                assert all(r[5] == 1 and r[6] > 0 for r in event["execution_ranks"])
             for internal_id, tokens in event.get("selected", {}).items():
                 matches = [
                     request
@@ -106,6 +109,7 @@ def main():
                 assert len(matches) == 1
                 scheduled[matches[0]] += tokens
         assert dict(scheduled) == expected
+        assert list(completed) == sorted(completed)
         late = read(directory / "late.json")["records"]
         job_requests = {
             e["job_id"]: e["request"]

@@ -60,7 +60,7 @@ def main():
     digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     assert digest == freeze["models"]["matched_offset"]
     state = json.loads(checkpoint.read_text())
-    workloads = ("short16k", "familiar60k")
+    workloads = ("short16k", "familiar60k", "heterogeneous")
     collector.save(
         root / "plan.json",
         dict(

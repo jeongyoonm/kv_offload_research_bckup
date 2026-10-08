@@ -2,12 +2,48 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """CPU checks of launch ordering and the unarmed forwarding path."""
 
+import contextlib
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
 from experiments.h2d_interference_20261009.worker import Calibration
+
+
+@pytest.mark.parametrize("mode", ["concurrent", "after_enqueued"])
+def test_post_enqueue_copy_fence_uses_independent_stream(monkeypatch, mode):
+    calibration = Calibration.__new__(Calibration)
+    calibration.cell = dict(mode=mode, profile="4k", jobs=2)
+    calibration.descriptors = {"4k": dict(src=None, dst=None, sizes=None)}
+    calibration.submission_stream = object()
+    calibration.current = {}
+    calibration.handle = 1
+    calibration.job = 0
+    active, recorded = ["compute"], []
+
+    @contextlib.contextmanager
+    def stream_context(stream):
+        assert stream is calibration.submission_stream
+        active[0] = "independent"
+        try:
+            yield
+        finally:
+            active[0] = "compute"
+
+    monkeypatch.setattr(
+        "experiments.h2d_interference_20261009.worker.torch.cuda.stream",
+        stream_context,
+    )
+    monkeypatch.setattr(
+        "experiments.h2d_interference_20261009.worker.ops.submit_async_batch_memcpy",
+        lambda *args: recorded.append(active[0]),
+    )
+    calibration.submit()
+    expected = "independent" if mode == "after_enqueued" else "compute"
+    assert recorded == [expected, expected]
+    assert calibration.ids == [1, 2]
+    assert active == ["compute"]
 
 
 def test_all_cohort_requests_are_enqueued_before_resuming_compute():

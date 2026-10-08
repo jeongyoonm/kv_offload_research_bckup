@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Opt-in same-process native H2D alongside unchanged real model forwards."""
 
+import contextlib
 import os
 import time
 import uuid
@@ -75,6 +76,7 @@ class Calibration:
         pin_mmap_region(self.region)
         assert self.region.is_pinned
         self.gpu = torch.empty(1024 * ROW_BYTES, dtype=torch.uint8, device=self.device)
+        self.submission_stream = torch.cuda.Stream(device=self.device)
         rng = np.random.default_rng(8100 + self.rank)
         source_ids, destination_ids = rng.permutation(2048), rng.permutation(1024)
         self.descriptors = {}
@@ -110,12 +112,18 @@ class Calibration:
         desc = self.descriptors[self.cell["profile"]]
         begin = time.monotonic_ns()
         self.ids = []
-        for _ in range(self.cell["jobs"]):
-            self.job += 1
-            self.ids.append(self.job)
-            ops.submit_async_batch_memcpy(
-                self.handle, self.job, desc["src"], desc["dst"], desc["sizes"], True
-            )
+        context = (
+            torch.cuda.stream(self.submission_stream)
+            if self.cell["mode"] == "after_enqueued"
+            else contextlib.nullcontext()
+        )
+        with context:
+            for _ in range(self.cell["jobs"]):
+                self.job += 1
+                self.ids.append(self.job)
+                ops.submit_async_batch_memcpy(
+                    self.handle, self.job, desc["src"], desc["dst"], desc["sizes"], True
+                )
         self.current.update(io_begin_ns=begin, io_enqueued_ns=time.monotonic_ns())
 
     def pre_forward(self, scheduler_output):

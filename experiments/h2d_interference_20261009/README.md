@@ -20,7 +20,11 @@ same lengths and respectively 64, 512 and 2,048 uncached tokens per request.
 The full screen has 150 copy-only controls, 15 compute-only controls and 450
 concurrent cells at five randomized repeats. Confirmation also starts copies
 after compute has been enqueued. This diagnostic changes overlap timing and is
-not a pure subtraction isolating driver contention.
+not a pure subtraction isolating driver contention. Its ready fence uses a
+dedicated idle submission stream: these private copy buffers have no dependency
+on model work. Otherwise the native submitter's caller-stream fence would force
+the copies to wait for the previously enqueued forward. The concurrent screen
+keeps the ordinary caller-stream fence, matching production submission order.
 
 Compute priming, shape warmup, native warmup, descriptor allocation and validation
 are untimed. Native compute observation brackets the model forward and its small

@@ -31,6 +31,25 @@ def save(path, data):
     temp.replace(path)
 
 
+def queued_generate(llm, prompts, params):
+    core = llm.llm_engine.engine_core
+    core.call_utility("pause_scheduler", "keep", False)
+    try:
+        llm.enqueue(prompts, params, use_tqdm=False)
+    finally:
+        core.call_utility("resume_scheduler")
+    return llm.wait_for_completion(use_tqdm=False)
+
+
+def text_tokens(tokenizer, count, seed):
+    rng = random.Random(seed)
+    text, tokens = f"CALIBRATION_KV_{seed:020d}\n", []
+    while len(tokens) < count:
+        text += "".join(f" kv{rng.randrange(1_000_000_000)}" for _ in range(2048))
+        tokens = tokenizer.encode(text, add_special_tokens=False)
+    return tokens[:count]
+
+
 def make_plan(args):
     configs = [(128, 2), (16, 2)] if args.pilot else CONFIGS
     if args.configs:
@@ -96,6 +115,8 @@ def make_plan(args):
         repeats=args.repeats,
         modes=modes,
         seed=9109,
+        prompt_distribution="Tokenized random kv-number text, "
+        "matching serving generator",
         scope="Real cached GLM forward, independent reconstructed KV copies; "
         "GPU-resident prefixes, fixed cohorts, no scheduler late admission; "
         "not serving throughput or full model-output equivalence.",
@@ -194,6 +215,7 @@ def main():
     initialized = False
     try:
         llm = LLM(**kwargs)
+        tokenizer = llm.get_tokenizer()
         params = SamplingParams(max_tokens=1, temperature=0, seed=0, ignore_eos=True)
         ready = llm.collective_rpc("calibration_setup", timeout=300, args=(str(root),))
         assert {r["rank"] for r in ready} == set(range(8))
@@ -206,25 +228,23 @@ def main():
             if shape is not None and shape != previous_shape:
                 geom = GEOMETRY[shape]
                 prefixes[shape] = [
-                    random.Random(100000 + j).choices(
-                        range(1000, 30000), k=geom["context"]
-                    )
+                    text_tokens(tokenizer, geom["context"], 100000 + j)
                     for j in range(geom["batch"])
                 ]
                 # Prime exact block-aligned contexts, then warm actual cached shapes.
                 prompts = [dict(prompt_token_ids=p + [31000]) for p in prefixes[shape]]
-                llm.generate(prompts, params, use_tqdm=False)
+                queued_generate(llm, prompts, params)
                 for warm in range(2):
                     prompts = [
                         dict(
                             prompt_token_ids=p
-                            + random.Random(200000 + warm * 100 + j).choices(
-                                range(1000, 30000), k=geom["suffix"]
+                            + text_tokens(
+                                tokenizer, geom["suffix"], 200000 + warm * 100 + j
                             )
                         )
                         for j, p in enumerate(prefixes[shape])
                     ]
-                    llm.generate(prompts, params, use_tqdm=False)
+                    queued_generate(llm, prompts, params)
                 previous_shape = shape
             llm.collective_rpc("calibration_arm", timeout=120, args=(cell,))
             responses = None
@@ -238,13 +258,15 @@ def main():
                     dict(
                         prompt_token_ids=p
                         + [32000 + cell["id"]]
-                        + random.Random(300000 + cell["repeat"] * 100 + j).choices(
-                            range(1000, 30000), k=geom["suffix"] - 1
+                        + text_tokens(
+                            tokenizer,
+                            geom["suffix"] - 1,
+                            300000 + cell["repeat"] * 100 + j,
                         )
                     )
                     for j, p in enumerate(prefixes[shape])
                 ]
-                responses = llm.generate(prompts, params, use_tqdm=False)
+                responses = queued_generate(llm, prompts, params)
                 assert len(responses) == geom["batch"]
                 assert all(len(r.outputs[0].token_ids) == 1 for r in responses)
             rows = llm.collective_rpc("calibration_drain", timeout=180)

@@ -134,8 +134,9 @@ class Calibration:
         return result
 
     def execute(self, *args, **kwargs):
+        before = getattr(self, "forward_count", 0)
         result = self.original_execute(*args, **kwargs)
-        if self.cell is not None and self.current is not None:
+        if self.cell is not None and self.forward_count > before:
             now = time.monotonic_ns()
             self.current["compute_enqueued_ns"] = now
             self.observer.finish(

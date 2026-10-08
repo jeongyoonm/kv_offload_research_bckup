@@ -28,6 +28,9 @@ output-state bookkeeping, excluding input preparation and sampling. Host launch
 time, native GPU start/end intervals, GPU event span, FIFO copy completion stamps
 and sample bytes are saved on every rank. All ranks drain before validation.
 Each measured cell must be one forward with exact context and suffix lengths.
+Pause before enqueuing each cohort and resume after all requests arrive, keeping
+async scheduling enabled. This prevents frontend enqueue timing from splitting
+the intended batch. Use the serving generator's tokenized random KV-number text.
 Suffix tails are matched within repeat except for a unique first token that
 prevents GPU suffix-cache hits. This token can change model routing, so random
 order and repeats are required; this is not a bit-identical workload replay.

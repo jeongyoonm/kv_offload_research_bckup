@@ -10,6 +10,25 @@ import pytest
 from experiments.h2d_interference_20261009.worker import Calibration
 
 
+def test_all_cohort_requests_are_enqueued_before_resuming_compute():
+    from experiments.h2d_interference_20261009.run import queued_generate
+
+    events = []
+    core = SimpleNamespace(call_utility=lambda *args: events.append(args))
+    llm = SimpleNamespace(
+        llm_engine=SimpleNamespace(engine_core=core),
+        enqueue=lambda *args, **kwargs: events.append("enqueue"),
+        wait_for_completion=lambda **kwargs: events.append("wait"),
+    )
+    queued_generate(llm, [], None)
+    assert events == [
+        ("pause_scheduler", "keep", False),
+        "enqueue",
+        ("resume_scheduler",),
+        "wait",
+    ]
+
+
 def test_joint_finish_preserves_native_compute_completion_uncertainty():
     from experiments.h2d_interference_20261009.analyze import aggregate_cell
 

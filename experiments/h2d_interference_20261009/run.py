@@ -55,11 +55,11 @@ def make_plan(args):
     if args.configs:
         configs = [tuple(map(int, s.split(":"))) for s in args.configs]
     assert all(c > 0 and d in (1, 2) for c, d in configs)
-    shapes = ["short"] if args.pilot else list(GEOMETRY)
+    shapes = args.shapes or (["short"] if args.pilot else list(GEOMETRY))
     modes = ["concurrent", "after_enqueued"] if args.confirmation else ["concurrent"]
     cells = []
     for repeat in range(args.repeats):
-        order = [(c, d, p) for c, d in configs for p in ("4k", "16k", "60k")]
+        order = [(c, d, p) for c, d in configs for p in args.profiles]
         random.Random(9109 + repeat).shuffle(order)
         cells.extend(
             dict(
@@ -69,7 +69,7 @@ def make_plan(args):
                 chunk_mib=c,
                 depth=d,
                 profile=p,
-                jobs=4,
+                jobs=args.jobs,
             )
             for c, d, p in order
         )
@@ -83,14 +83,11 @@ def make_plan(args):
                     chunk_mib=128,
                     depth=2,
                     profile="4k",
-                    jobs=4,
+                    jobs=args.jobs,
                 )
             )
             order = [
-                (c, d, p, m)
-                for c, d in configs
-                for p in ("4k", "16k", "60k")
-                for m in modes
+                (c, d, p, m) for c, d in configs for p in args.profiles for m in modes
             ]
             random.Random(9209 + repeat).shuffle(order)
             cells.extend(
@@ -101,7 +98,7 @@ def make_plan(args):
                     chunk_mib=c,
                     depth=d,
                     profile=p,
-                    jobs=4,
+                    jobs=args.jobs,
                 )
                 for c, d, p, m in order
             )
@@ -112,6 +109,8 @@ def make_plan(args):
         geometry=GEOMETRY,
         configs=configs,
         shapes=shapes,
+        profiles=args.profiles,
+        jobs=args.jobs,
         repeats=args.repeats,
         modes=modes,
         seed=9109,
@@ -154,12 +153,20 @@ def main():
     parser.add_argument("--confirmation", action="store_true")
     parser.add_argument("--configs", nargs="+")
     parser.add_argument(
+        "--profiles",
+        nargs="+",
+        choices=["4k", "16k", "60k"],
+        default=["4k", "16k", "60k"],
+    )
+    parser.add_argument("--shapes", nargs="+", choices=list(GEOMETRY))
+    parser.add_argument("--jobs", type=int, default=4)
+    parser.add_argument(
         "--trace",
         action="store_true",
         help="Diagnostic Nsight capture; exclude from performance selection",
     )
     args = parser.parse_args()
-    assert args.repeats > 0
+    assert args.repeats > 0 and args.jobs > 0
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
     assert not (root / "plan.json").exists(), "Use a fresh output directory"

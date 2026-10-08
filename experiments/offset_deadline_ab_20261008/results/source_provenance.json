@@ -1,0 +1,11 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_offset_deadline_ab_20261008",
+  "parent_commit": "fd3be1d",
+  "sha256": {
+    "vllm/v1/kv_offload/late_admission_runtime.py": "d731011cd370d4a74c1422211a4c7b1bd5b08a7234f5c9c4c4e7f892bc8e99ba",
+    "vllm/v1/kv_offload/frozen_seal_predictor.py": "594733cf74d89368303fe43627dd55a2aada7cd9850f849cbdf14ec63e7fb0bb",
+    "experiments/offset_deadline_ab_20261008/run.py": "ff589e15e2c950c64b23e0214acefbda2fbcf8db801e603fb1a5f517a3893f8d",
+    "experiments/dataset_coverage_20261007/run.py": "c933bac4badaf48929b60dd0ac90650df8c786293e2b07b17a64173a8bc8ce53",
+    "experiments/dataset_coverage_20261007/live.py": "1307848e6f8e3ebb5406329f477c476b1e3bf674eb69a590ed1bed067fd6d6ae"
+  }
+}

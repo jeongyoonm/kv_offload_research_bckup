@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Audit matched deadline serving cells and report paired outcomes."""
 
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -44,6 +45,9 @@ def save(path, value):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--audit-only", action="store_true")
+    args = parser.parse_args()
     plan = read(ROOT / "plan.json")
     off, on = "deadline_off", "deadline_on"
     off_state, on_state = [read(ROOT / "models" / f"{p}.json") for p in [off, on]]
@@ -181,6 +185,16 @@ def main():
             key=lambda e: max(r[3] for r in e["execution_ranks"]),
         )
         seals = {e["step"]: e for e in late if e["event"] == "membership_sealed"}
+        forecast_times = [
+            e["forecast_ns"] for e in late if e["event"] == "seal_prediction"
+        ]
+        first_forecast = min(forecast_times) if forecast_times else None
+        d["initial_compute_batches_before_first_forecast"] = [
+            len(e["selected"])
+            for e in compute
+            if first_forecast is None or seals[e["step"]]["time_ns"] < first_forecast
+        ]
+        d["all_compute_batch_sizes"] = [len(e["selected"]) for e in compute]
         categories = Counter()
         category_counts = Counter()
         for a, b in zip(compute, compute[1:]):
@@ -216,6 +230,14 @@ def main():
                 measured_compilation=compilation,
             )
         )
+    if args.audit_only:
+        save(ROOT / "partial_measurement_audit.json", audit)
+        print(
+            json.dumps(
+                dict(accepted_cells=len(cells), forecasts_replayed=len(predictions))
+            )
+        )
+        return
     assert len(cells) == plan["measured_cells"]
     assert sum(c["requests"] for c in cells) == plan["measured_requests"]
     aggregates, pairs = [], []
@@ -271,6 +293,12 @@ def main():
                     p95_ttft_ms=float(np.quantile(ttft, 0.95)),
                     compute_rounds=sum(c["compute_rounds"] for c in group),
                     late_admissions=sum(c["late_admissions"] for c in group),
+                    kv_ready_during_compute=sum(
+                        c["kv_ready_during_compute"] for c in group
+                    ),
+                    recovered_compute_opportunities=sum(
+                        c["recovered_compute_opportunities"] for c in group
+                    ),
                     mean_episode_gap_ms=statistics.mean(
                         c["diagnostics"]["gpu_gap_ms"] for c in group
                     ),
@@ -323,10 +351,32 @@ def main():
         checkpoint_sha256=digest,
         scope=plan["scope"],
         issued_accuracy_population="Policy-dependent; same checkpoint in both arms",
+        opportunity_definition=(
+            "Unique requests per episode whose KV completion overlapped any "
+            "measured compute span. Recovery intersects this set with all late "
+            "admissions; it is not a per-transaction predecessor denominator."
+        ),
     )
     save(ROOT / "comparison.json", report)
     save(ROOT / "measurement_audit.json", audit)
     save(ROOT / "prediction_audit.json", predictions)
+    save(
+        ROOT / "batch_phase_audit.json",
+        [
+            dict(
+                workload=c["workload"],
+                policy=c["label"],
+                repeat=c["repeat"],
+                throughput_rps=c["throughput_rps"],
+                initial_compute_batches_before_first_forecast=c["diagnostics"][
+                    "initial_compute_batches_before_first_forecast"
+                ],
+                all_compute_batch_sizes=c["diagnostics"]["all_compute_batch_sizes"],
+                seal_reasons=c["diagnostics"]["seal_reasons"],
+            )
+            for c in cells
+        ],
+    )
     lines = [
         "# Latest offset predictor: deadline enabled versus disabled",
         "",
@@ -335,6 +385,7 @@ def main():
         "The disabled arm computes and records the deadline in shadow mode.",
         "",
         "<!-- markdownlint-disable MD013 -->",
+        "",
         (
             "| Workload | Deadline off req/s | Deadline on req/s | Aggregate gain | "
             "Paired gain (95% interval) | Mean TTFT off/on ms | "
@@ -362,6 +413,7 @@ def main():
         )
     lines.extend(
         [
+            "",
             "<!-- markdownlint-enable MD013 -->",
             "",
             "Eight pairs for 60K and four pairs each for 16K and mixed workloads.",

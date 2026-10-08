@@ -1,0 +1,19 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008",
+  "checkout": "/mnt/localnvme/vllm_glm53_offset_deadline_ab_20261008",
+  "linked_native": [
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_C_stable_libtorch.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_flashkda_C.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_flashmla_C.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_flashmla_extension_C.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_glm53_async.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_moe_C_stable_libtorch.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_qutlass_C.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/_rust_tool_parser.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/cumem_allocator.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/fs_io_C.abi3.so",
+    "/mnt/localnvme/vllm_glm53_offset_conditioned_20261008/vllm/spinloop.abi3.so"
+  ],
+  "flash_attention_extension_source": "/mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/vllm/vllm_flash_attn",
+  "rejected_startup": "/mnt/localnvme/glm53_offset_deadline_ab_20261008_startup_rejected"
+}

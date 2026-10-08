@@ -1,0 +1,20 @@
+{
+  "completed_utc": "2026-10-08T06:17:57.413110+00:00",
+  "measured_cells": 32,
+  "measured_requests": 2400,
+  "excluded_warmup_cells": 6,
+  "excluded_warmup_requests": 192,
+  "all_measurements_accepted": true,
+  "native_forecasts_replayed_exactly": 184,
+  "cpu_deadline_tests_passed": 15,
+  "serving_source_unchanged_from": "fd3be1d",
+  "recorded_source_hashes_verified": true,
+  "all_owned_processes_exited": true,
+  "all_gpus_free": true,
+  "checkout": "/mnt/localnvme/vllm_glm53_offset_deadline_ab_20261008",
+  "branch": "experiment/glm53-offset-deadline-ab-20261008",
+  "setup_commit": "e9affb0",
+  "scope": "Separate reset/primed 75-request episodes; not continuous 300-request cells.",
+  "no_retraining": true,
+  "selector": "original"
+}

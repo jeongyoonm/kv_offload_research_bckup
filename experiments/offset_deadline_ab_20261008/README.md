@@ -3,6 +3,27 @@
 Branch: `experiment/glm53-offset-deadline-ab-20261008`.
 Artifacts: `/mnt/localnvme/glm53_offset_deadline_ab_20261008`.
 
+## Completed results
+
+All 32 cells and 2,400 measured requests passed. All 184 forecasts replayed
+exactly. The fifteen CPU deadline tests passed, and all owned workers exited;
+all eight GPUs were free after cleanup. Serving source is unchanged from
+`fd3be1d`.
+
+With the latest frozen predictor, deadline enforcement increased aggregate
+throughput by 6.28% for 60K and 4.75% for 16K; mixed traffic was unchanged.
+The paired 95% intervals include zero in every workload. Mean 60K TTFT improved
+5.77%, with unchanged p95; inter-compute gaps fell 49.6%. Initial batches varied
+before the first prediction, and compute rounds increased rather than decreased.
+
+See [the table](results/REPORT.md), [interpretation](results/FINDINGS.md),
+[machine-readable results](results/comparison.json), and
+[completion record](results/completion.json). Raw traces and per-request results
+remain in the artifact directory above. The archived process log records the
+allocation, every measured cell, audit, and ownership cleanup.
+
+## Protocol
+
 Both arms use the frozen `matched_offset` checkpoint from the completed
 offset predictor study. Only deadline enforcement versus shadow recording
 changes. The 5 ms nominal lead, full prediction wait, 50 ms guard, 2 ms fine

@@ -1,0 +1,10 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008",
+  "native_from": "/mnt/localnvme/vllm_glm53_offset_deadline_ab_20261008/vllm",
+  "copied_vendor": [
+    "deep_gemm",
+    "flashmla",
+    "flash_linear_attention"
+  ],
+  "failed_preflight_preserved": "/mnt/localnvme/glm53_load_only_deadline_ab_20261008/setup_attempt_1"
+}

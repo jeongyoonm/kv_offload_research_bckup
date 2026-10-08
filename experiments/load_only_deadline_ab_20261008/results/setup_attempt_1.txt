@@ -1,0 +1,11 @@
+{"event": "comparison_started", "time": 1791475128.2434163, "expected_cells": 48}
+{"event": "comparison_failed", "time": 1791475128.3568406, "error": "RuntimeError('Missing vendored dependency: /mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/vllm/third_party/flashmla/flash_mla_interface.py')"}
+{"event": "comparison_stopped", "time": 1791475128.3570437, "cells": 0}
+Traceback (most recent call last):
+  File "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/experiments/load_only_deadline_ab_20261008/run.py", line 229, in <module>
+    main()
+  File "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/experiments/load_only_deadline_ab_20261008/run.py", line 153, in main
+    module.check(SOURCE, ROOT, uuids)
+  File "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/experiments/coalesced_notify_20261004/environment_preflight.py", line 18, in check
+    raise RuntimeError(f"Missing vendored dependency: {source / path}")
+RuntimeError: Missing vendored dependency: /mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/vllm/third_party/flashmla/flash_mla_interface.py

@@ -1,0 +1,53 @@
+{
+  "status": "complete",
+  "source": "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008",
+  "branch": "experiment/glm53-load-only-deadline-ab-20261008",
+  "protocol_commit": "6824fd0",
+  "analysis_commit": "db7ea75",
+  "artifact_root": "/mnt/localnvme/glm53_load_only_deadline_ab_20261008",
+  "serving_implementation_commit": "673ddfa9fc3a2a02df2d202de01166b428624a05",
+  "driver_session_id": 56853,
+  "planned_cells": 48,
+  "planned_requests": 3600,
+  "started_at": 1791475276.3081152,
+  "setup_attempt_1": "Preserved; missing vendor dependency detected before GPU allocation; corrected from previous checkout.",
+  "progress": {
+    "cells": 48,
+    "expected_cells": 48,
+    "latest": {
+      "policy": "half_off",
+      "workload": "heterogeneous",
+      "repeat": 3
+    }
+  },
+  "updated_at": 1791480874.4099088,
+  "notes": "All planned cells and final audits complete; owned processes exited; eight GPUs free.",
+  "completion": {
+    "complete": true,
+    "timestamp": 1791480874.4075937,
+    "measured_cells": 48,
+    "measured_requests": 3600,
+    "excluded_warmup_requests": 384,
+    "native_forecasts_replayed": 267,
+    "checkpoint_sha256": "e1fa2e68bdfa29b2dc0f425602f972d47e6a71aa0fb3087f077755851f198b86",
+    "matched_blocks": 12,
+    "all_protocol_audits_passed": true,
+    "all_owned_processes_stopped": true,
+    "all_eight_gpus_free": true,
+    "serving_implementation_commit": "673ddfa9fc3a2a02df2d202de01166b428624a05",
+    "no_serving_code_changes_during_allocation": true,
+    "analysis_commit": "db7ea7528f33204e085a4dc0ff554c4fd860642a",
+    "allocation_seconds": 5407.861405352829,
+    "artifact_root": "/mnt/localnvme/glm53_load_only_deadline_ab_20261008",
+    "source": "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008",
+    "branch": "experiment/glm53-load-only-deadline-ab-20261008",
+    "cpu_validation_inherited": {
+      "focused_passed": 22,
+      "broader_passed": 570,
+      "broader_skipped": 32,
+      "broader_failures_reproduced_on_parent": 3
+    },
+    "setup_preflight_failure_before_gpu_allocation_preserved": "setup_attempt_1",
+    "shutdown_note": "CUDA registration teardown temporarily blocked the first NVML query; all workers subsequently exited and a fresh query confirmed eight GPUs free."
+  }
+}

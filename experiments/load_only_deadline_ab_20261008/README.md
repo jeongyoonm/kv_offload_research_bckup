@@ -6,6 +6,12 @@ GLM 5.3 NVFP4, TP8, concurrency 32, one output token. The four arms are
 disabled or enabled. The disabled deadline is traced in shadow mode. All arms
 use the same frozen offset predictor, preparation, and H2D optimizations.
 
+| Workload | Context tokens | Uncached suffix tokens | CPU prefix restoration |
+| --- | --- | --- | --- |
+| 60K | 58,368 | 3,072 | All 75 requests |
+| 16K | 15,552 | 832 | All 75 requests |
+| Mixed | 4,096 cached / 24,576 cold | 2,048 or 8,192 | 38 of 75 requests |
+
 Each workload has four independently reset and primed 75-request episodes per
 arm (300 measured requests per arm). Workloads are 60K cached, 16K cached, and
 mixed context/suffix/cache status. The four-arm Williams order balances position
@@ -31,3 +37,19 @@ Artifacts: `/mnt/localnvme/glm53_load_only_deadline_ab_20261008`.
 PYTHONPATH="$PWD" .venv/bin/python \
   experiments/load_only_deadline_ab_20261008/run.py
 ```
+
+Audit and analysis use the existing CPU evaluation environment with SciPy:
+
+```bash
+OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+  /mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv/bin/python \
+  experiments/load_only_deadline_ab_20261008/analyze.py
+```
+
+`--audit-only` audits completed episodes without requiring the final cell count.
+The audit verifies strictly ordered unique retirement, exact scheduled tokens,
+CPU restoration counts, matching transfer volume and seeds within each block,
+all-rank execution timing and preparation coverage, frozen predictor replay,
+deadline arithmetic, and readiness targets. Partial-cohort KV completions are
+compared with recorded compute spans, which include CPU submission stalls and
+output joins. This is a serving protocol check, not a model quality evaluation.

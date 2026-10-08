@@ -1,0 +1,61 @@
+{
+  "server_pid": 2873334,
+  "session_id": 2873334,
+  "processes": [
+    {
+      "pid": 2873334,
+      "session_id": 2873334,
+      "command": "vllm"
+    },
+    {
+      "pid": 2881472,
+      "session_id": 2873334,
+      "command": "python"
+    },
+    {
+      "pid": 2881476,
+      "session_id": 2873334,
+      "command": "VLLM::EngineCor"
+    },
+    {
+      "pid": 2883888,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2886238,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2890223,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2893252,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2896295,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2899632,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2902038,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2904452,
+      "session_id": 2873334,
+      "command": "VLLM::Worker_TP"
+    }
+  ]
+}

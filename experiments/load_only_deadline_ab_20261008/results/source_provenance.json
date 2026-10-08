@@ -1,0 +1,6 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008",
+  "branch": "experiment/glm53-load-only-deadline-ab-20261008",
+  "commit": "6824fd05b4a8f2b3b07c8eb90e892b20cd475e15",
+  "serving_parent": "673ddfa9fc3a2a02df2d202de01166b428624a05"
+}

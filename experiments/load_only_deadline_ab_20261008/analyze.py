@@ -107,6 +107,17 @@ def main():
                 scheduled[matches[0]] += tokens
         assert dict(scheduled) == expected
         late = read(directory / "late.json")["records"]
+        job_requests = {
+            e["job_id"]: e["request"]
+            for e in events
+            if e["event"] == "kv_load_dispatched"
+        }
+        kv_completion = {
+            job_requests[e["job_id"]]: e["completion_ns"]
+            for e in events
+            if e["event"] == "kv_all_rank_completion" and e["job_id"] in job_requests
+        }
+        eligibility = {e["step"]: e for e in late if e["event"] == "seal_eligibility"}
         cell_predictions = []
         for point in late:
             if (
@@ -156,6 +167,21 @@ def main():
                 if transport.get("seal_reason") == "candidate_target_ready":
                     assert transport["partial_ready_count"] >= transport["ready_target"]
                     assert transport["statuses"][:8] == [1] * 8
+                pending_kv = (
+                    set(eligibility[sealed["step"]]["candidates"])
+                    - set(transport["kv_ready"])
+                    - set(transport["cancelled"])
+                )
+                b = completed[sealed["step"]]
+                pending_at_start = finished_during_b = 0
+                if b.get("selected"):
+                    start = max(r[3] for r in b["execution_ranks"])
+                    end = max(r[3] + r[6] for r in b["execution_ranks"])
+                    assert pending_kv <= kv_completion.keys()
+                    pending_at_start = sum(kv_completion[x] > start for x in pending_kv)
+                    finished_during_b = sum(
+                        start <= kv_completion[x] < end for x in pending_kv
+                    )
                 load_only.append(
                     dict(
                         step=sealed["step"],
@@ -168,6 +194,9 @@ def main():
                         unready=n
                         - len(transport["cancelled"])
                         - transport["partial_ready_count"],
+                        kv_pending_at_seal=len(pending_kv),
+                        cohort_kv_pending_at_compute_start=pending_at_start,
+                        cohort_kv_completions_during_compute=finished_during_b,
                         wait_after_base_ms=(
                             transport["seal_ns"] - transport["base_ready_ns"]
                         )
@@ -383,6 +412,12 @@ def main():
                     load_only_seals=len(load_seals),
                     load_only_seals_with_unready_candidates=sum(
                         s["unready"] > 0 for s in load_seals
+                    ),
+                    partial_cohort_kv_completions_during_compute=sum(
+                        s["cohort_kv_completions_during_compute"] for s in load_seals
+                    ),
+                    load_only_compute_starts_with_pending_cohort_kv=sum(
+                        s["cohort_kv_pending_at_compute_start"] > 0 for s in load_seals
                     ),
                     load_only_wait_after_base_ms=helper.describe(
                         [s["wait_after_base_ms"] for s in load_seals]

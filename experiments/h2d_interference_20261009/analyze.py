@@ -53,8 +53,12 @@ def aggregate_cell(result):
             assert rank["validated_bytes"] == 99 * 3 * 64
             if cell["mode"] == "after_enqueued":
                 assert rank["compute_enqueued_ns"] <= rank["io_begin_ns"]
+                if "io_submission_stream" in rank:
+                    assert rank["io_submission_stream"] != rank["compute_stream"]
             elif cell["mode"] == "concurrent":
                 assert rank["io_enqueued_ns"] <= rank["compute_submit_begin_ns"]
+                if "io_submission_stream" in rank:
+                    assert rank["io_submission_stream"] == rank["compute_stream"]
         finish = max(r["completion_ns"][-1] for r in ranks)
         io_begin = min(r["io_begin_ns"] for r in ranks)
         ends_lower.append(finish)

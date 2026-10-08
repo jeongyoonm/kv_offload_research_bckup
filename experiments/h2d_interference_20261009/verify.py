@@ -17,6 +17,7 @@ def test_post_enqueue_copy_fence_uses_independent_stream(monkeypatch, mode):
     calibration.cell = dict(mode=mode, profile="4k", jobs=2)
     calibration.descriptors = {"4k": dict(src=None, dst=None, sizes=None)}
     calibration.submission_stream = object()
+    calibration.device = None
     calibration.current = {}
     calibration.handle = 1
     calibration.job = 0
@@ -38,6 +39,10 @@ def test_post_enqueue_copy_fence_uses_independent_stream(monkeypatch, mode):
     monkeypatch.setattr(
         "experiments.h2d_interference_20261009.worker.ops.submit_async_batch_memcpy",
         lambda *args: recorded.append(active[0]),
+    )
+    monkeypatch.setattr(
+        "experiments.h2d_interference_20261009.worker.torch.cuda.current_stream",
+        lambda _: SimpleNamespace(cuda_stream=0 if active[0] == "compute" else 1),
     )
     calibration.submit()
     expected = "independent" if mode == "after_enqueued" else "compute"
@@ -148,7 +153,7 @@ def test_copy_launch_respects_requested_compute_boundary(monkeypatch, mode, expe
     )
     monkeypatch.setattr(
         "experiments.h2d_interference_20261009.worker.torch.cuda.current_stream",
-        lambda _: None,
+        lambda _: SimpleNamespace(cuda_stream=0),
     )
     monkeypatch.setattr(
         "experiments.h2d_interference_20261009.worker.torch.cuda.nvtx.range_push",

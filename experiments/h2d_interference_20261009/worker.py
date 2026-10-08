@@ -118,6 +118,9 @@ class Calibration:
             else contextlib.nullcontext()
         )
         with context:
+            self.current["io_submission_stream"] = int(
+                torch.cuda.current_stream(self.device).cuda_stream
+            )
             for _ in range(self.cell["jobs"]):
                 self.job += 1
                 self.ids.append(self.job)
@@ -134,6 +137,7 @@ class Calibration:
             self.current = dict(
                 host_begin_ns=time.monotonic_ns(),
                 tokens=dict(scheduler_output.num_scheduled_tokens),
+                compute_stream=int(torch.cuda.current_stream(self.device).cuda_stream),
             )
             torch.cuda.nvtx.range_push(
                 f"calibration/{self.cell['mode']}/c{self.cell['chunk_mib']}/"

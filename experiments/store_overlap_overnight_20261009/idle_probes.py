@@ -15,7 +15,8 @@ ARTIFACTS = BASE / "store_overlap_overnight_20261009"
 
 
 def log(event, **fields):
-    record = dict(time=time.time(), event=event, **fields)
+    record = dict(time=time.time(), event=event)
+    record.update(fields)
     with (ARTIFACTS / "idle_probe_process_log.jsonl").open("a") as file:
         file.write(json.dumps(record) + "\n")
     print(json.dumps(record), flush=True)

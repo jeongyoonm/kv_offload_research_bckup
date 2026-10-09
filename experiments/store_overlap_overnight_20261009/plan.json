@@ -117,6 +117,14 @@
       "artifacts": "/mnt/localnvme/jeongyoon/so1",
       "hypothesis": "Assign selected GPU blocks in physical order to enable address-pair merging",
       "current_head": "052ae875b5a1812036a9e85359924c6020dd4d3c"
+    },
+    {
+      "branch": "experiment/kv-packet-aligned-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_kv_packet_coalescing_20261009",
+      "commit": "388902d",
+      "hypothesis": "Align coalesced descriptors to cumulative native packet boundaries to avoid underfilled copies",
+      "artifacts": "/mnt/localnvme/jeongyoon/sk1",
+      "status": "CPU mapping checks and six real GPU cases passed; serving comparison pending"
     }
   ],
   "constraints": [
@@ -142,7 +150,10 @@
     "native_async_wait_cpu": 4,
     "native_async_cpu_regression": 219,
     "preencoded_merged_cpu": 10,
-    "ascending_allocation_cpu": 21
+    "ascending_allocation_cpu": 21,
+    "native_d2h_real_gpu": 3,
+    "bounded_load_real_gpu": 10,
+    "packet_alignment_real_gpu": 6
   },
   "startup_issue": "First scoped launch rejected before measurement: long TMPDIR exceeded AF_UNIX socket limit; relaunched at short root sf1; same root stays under user storage path",
   "short_roots": {
@@ -187,5 +198,6 @@
     "conclusion": "Source-specific producer waits work but did not improve serving; retain negative repeat and retest arrival control if time remains."
   },
   "next_gpu_gate": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/idle_gate/summary.json",
-  "queued_runs_2": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/reviewed_queue_2.json"
+  "queued_runs_2": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/reviewed_queue_2.json",
+  "verification_gate": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/idle_gate/summary.json"
 }

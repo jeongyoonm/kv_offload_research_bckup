@@ -1101,3 +1101,72 @@ def test_coalesced_store_copies_correct_gpu_rows(default_vllm_config, dst_ids):
         assert not worker.get_finished()
     finally:
         worker.shutdown()
+
+
+@pytest.mark.parametrize("layout", ["private", "private_tensor"])
+def test_descriptor_preserve_order_glm_geometry(default_vllm_config, layout):
+    """All GLM layer pages survive layout changes, remapping and async retirement."""
+    fragmented = False
+    pages = [36864] * 78 + [8448] * 21
+    tensors = [
+        CanonicalKVCacheTensor(
+            torch.empty((64, page), dtype=torch.int8, device=DEVICE_TYPE), page
+        )
+        for page in pages
+    ]
+    refs = [[CanonicalKVCacheRef(i, page) for i, page in enumerate(pages)]]
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=128,
+        rank=0,
+        kv_bytes_per_block=round_up(
+            sum(pages), SharedOffloadRegion.BLOCK_SIZE_ALIGNMENT
+        ),
+        cpu_page_size=sum(pages),
+        memory_layout=layout,
+    )
+    worker = CPUOffloadingWorker(
+        CanonicalKVCaches(tensors, refs),
+        blocks_per_chunk=1,
+        num_cpu_blocks=128,
+        mmap_region=region,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8 * 1024**2,
+    )
+    worker.configure_experiment(
+        dict(
+            descriptor_preserve_order=True,
+            copy_pipeline_depth=2,
+            store_descriptor_coalescing=True,
+            load_descriptor_coalescing=True,
+            load_descriptor_packet_alignment=True,
+        )
+    )
+    gpu_ids = np.arange(48)
+    cpu_ids = np.arange(48) * (2 if fragmented else 1)
+    if fragmented:
+        gpu_ids = np.random.default_rng(9).permutation(gpu_ids)
+    gpu_spec = GPULoadStoreSpec(gpu_ids, group_sizes=(48,), block_indices=(0,))
+    cpu_spec = CPULoadStoreSpec(cpu_ids)
+    expected = []
+    try:
+        for index, tensor in enumerate(tensors):
+            values = (torch.arange(64, device=DEVICE_TYPE) + index).remainder(127)
+            tensor.tensor.copy_(values.to(torch.int8)[:, None])
+            expected.append(tensor.tensor.cpu())
+        assert worker.submit_store(1, gpu_spec, cpu_spec)
+        worker.wait({1})
+        assert [result.job_id for result in worker.get_finished()] == [1]
+        assert not worker.get_finished()
+        for tensor in tensors:
+            tensor.tensor.fill_(-1)
+        assert worker.submit_load(2, cpu_spec, gpu_spec)
+        worker.wait({2})
+        assert [result.job_id for result in worker.get_finished()] == [2]
+        assert not worker.get_finished()
+        for tensor, reference in zip(tensors, expected):
+            restored = tensor.tensor.cpu()
+            assert torch.equal(restored[gpu_ids], reference[gpu_ids])
+            assert torch.all(restored[48:] == -1)
+    finally:
+        worker.shutdown()

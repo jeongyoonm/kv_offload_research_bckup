@@ -65,7 +65,9 @@ def stream(tokens, name):
     )
 
 
-def cell(label, state, workload, seed, repeat, requests_count=75):
+def cell(
+    label, state, workload, seed, repeat, requests_count=75, *, require_preparation=True
+):
     directory = run.ROOT / "live" / workload / f"r{repeat}_{label}"
     if (directory / "result.json").exists():
         return json.loads((directory / "result.json").read_text())
@@ -204,7 +206,9 @@ def cell(label, state, workload, seed, repeat, requests_count=75):
         coverage["compact"] > 0 and coverage["pinned"] > 0
         for coverage in worker_coverage.values()
     )
-    accepted = accepted and preparation_verified
+    accepted = accepted and (
+        preparation_verified if require_preparation else not activated
+    )
     result = dict(
         accepted=accepted,
         label=label,
@@ -232,6 +236,7 @@ def cell(label, state, workload, seed, repeat, requests_count=75):
         recovered_compute_opportunities=len(activated & ready_during_compute),
         worker_preparation_coverage=worker_coverage,
         optimized_preparation_verified=preparation_verified,
+        preparation_required=require_preparation,
         responses=responses,
         metrics_before=before,
         metrics_after=after,

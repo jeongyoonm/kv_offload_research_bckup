@@ -1,0 +1,10 @@
+Initial readiness gate: 593 passed, 22 skipped, 3 failed.
+The same three failed on unchanged parent 130630e (parent_failures.log).
+Repair: initialize the constructor-bypassing fixture estimator; use the string
+control path carried by worker RPC metadata; restore the historical analysis
+helper from vllm_qwen38_fp8_merged_20261001 without changing its contents.
+Targeted rerun: 3 passed. No measured runtime source changed.
+The Path-valued notification helper limitation remains outside this experiment;
+actual serving paths are strings. No claim of general Path support is made.
+Helper SHA256: 2f1f9023df943a92f08d713cfd7984c49505200b33f3f96c1ae19df0bd630392
+Report validation against historical traces passed, including store metrics.

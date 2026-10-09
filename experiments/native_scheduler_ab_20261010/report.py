@@ -60,6 +60,20 @@ def diagnostics(directory):
         overlap = sum(max(0, min(end, b) - max(begin, a)) for a, b in intervals)
         exposed += end - begin - overlap
     return dict(
+        batch_shapes=[
+            dict(
+                step=e["step"],
+                requests=len(e["selected"]),
+                scheduled_tokens=sum(e["selected"].values()),
+                request_shapes=e["request_shapes"],
+                execution_envelope_ms=(
+                    max(r[3] + r[6] for r in e["execution_ranks"])
+                    - max(r[3] for r in e["execution_ranks"])
+                )
+                / 1e6,
+            )
+            for e in completed
+        ],
         compute_envelope_ms=sum(b - a for a, b in intervals) / 1e6,
         inter_compute_gap_ms=gap_ms,
         hold_without_compute_ms=exposed / 1e6,
@@ -125,6 +139,14 @@ def main():
         "inter_compute_gap_ms",
         "hold_without_compute_ms",
         *gaps.PHASES,
+        *(
+            kind + "_" + timing
+            for kind in gaps.PAIRS
+            for timing in ("full_ms", "exposed_ms")
+        ),
+        "compute_transitions",
+        "dispatched_before_A_end",
+        "forward_before_A_end",
     )
     levels, comparisons, bookends = [], [], []
     for result in raw:

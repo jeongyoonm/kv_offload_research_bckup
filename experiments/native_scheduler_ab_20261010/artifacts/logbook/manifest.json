@@ -1,0 +1,153 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/native_scheduler_ab_20261010",
+  "archive_sha256": "a55a76f7f96119287875a93af5d58950ea90b0a524c4d45e194c8aa309892c65",
+  "archive_bytes": 8970095,
+  "members": [
+    {
+      "path": "FINAL_AUDIT.json",
+      "bytes": 1546,
+      "sha256": "e32970f293fb7a085157bf2cc4e81a0a4492550dfef4295b7027851e0ca17349",
+      "link_to": null
+    },
+    {
+      "path": "GATE_NOTES.txt",
+      "bytes": 737,
+      "sha256": "63dc3779ccdff1839e60d9a48406b0e8436558dc3524c2b8af8329563b24559a",
+      "link_to": null
+    },
+    {
+      "path": "REPORT.txt",
+      "bytes": 5754,
+      "sha256": "a7fa104b2173d1d8b243d1d40123866789305de43c8ebebcf280c0d94f69ae69",
+      "link_to": null
+    },
+    {
+      "path": "archive.log",
+      "bytes": 174,
+      "sha256": "fd94acb0b4b1e327a7661abea8124f0fa9dbe5081bba9568f36de1a65911c80c",
+      "link_to": null
+    },
+    {
+      "path": "cpu_gate.log",
+      "bytes": 6582,
+      "sha256": "e048d4463487b1c5774e3d2a3223d5ef5867802f890076d73e6ede428ef884e9",
+      "link_to": null
+    },
+    {
+      "path": "cpu_gate_repaired.log",
+      "bytes": 592,
+      "sha256": "c4384aff8f3e9f903d007507bcfd2bf93df5b04c861f4fb561e86f7494521f82",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "driver.log",
+      "bytes": 3410,
+      "sha256": "95785b175a758768e5207f6f953268ed36830d21703fa9a51ebba5a7b35522b8",
+      "link_to": null
+    },
+    {
+      "path": "logbook_archive.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "link_to": null
+    },
+    {
+      "path": "parent_failures.log",
+      "bytes": 5903,
+      "sha256": "b456b8a006dd1ff820e6304309982563891489c7835080c23d2964b7f2e9dda1",
+      "link_to": null
+    },
+    {
+      "path": "preflight/loaded_predictor.json",
+      "bytes": 78014223,
+      "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+      "link_to": null
+    },
+    {
+      "path": "preflight/plan.json",
+      "bytes": 8667,
+      "sha256": "4000b0a2c501a4d560d0e00235bb145944064d65150f41bd141ab45d679746fa",
+      "link_to": null
+    },
+    {
+      "path": "preflight/source_provenance.json",
+      "bytes": 201,
+      "sha256": "c71529971a790839fdd1aa8d13b07ba8e8c0302f4645215dd4397e26868fc638",
+      "link_to": null
+    },
+    {
+      "path": "preflight_shared_collector/loaded_predictor.json",
+      "bytes": 78014223,
+      "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+      "link_to": "preflight/loaded_predictor.json"
+    },
+    {
+      "path": "preflight_shared_collector/plan.json",
+      "bytes": 8667,
+      "sha256": "4000b0a2c501a4d560d0e00235bb145944064d65150f41bd141ab45d679746fa",
+      "link_to": "preflight/plan.json"
+    },
+    {
+      "path": "preflight_shared_collector/source_provenance.json",
+      "bytes": 201,
+      "sha256": "c71529971a790839fdd1aa8d13b07ba8e8c0302f4645215dd4397e26868fc638",
+      "link_to": "preflight/source_provenance.json"
+    },
+    {
+      "path": "report.log",
+      "bytes": 9069,
+      "sha256": "52b8b5240e5f1bb0d32e888b82d08bcf075832c1a79bb2df372407bf2d8c2880",
+      "link_to": null
+    },
+    {
+      "path": "report_batch_shapes.log",
+      "bytes": 8886,
+      "sha256": "a5e8012f3179079fbce7ea2f3909813ba6e34ac4c97114a78b22eb0bbb080132",
+      "link_to": null
+    },
+    {
+      "path": "report_preflight/comparison.csv",
+      "bytes": 2233,
+      "sha256": "3d22eadb3f9ac1f4776f233448c7a7e6be33e03c5ae5527f5ccac63301e99f4d",
+      "link_to": null
+    },
+    {
+      "path": "report_preflight/comparison.json",
+      "bytes": 3038365,
+      "sha256": "25d9c1569177b25dd37f8046b5054e8ff18edceea51a6f56b641d17d3fbb19ee",
+      "link_to": null
+    },
+    {
+      "path": "report_preflight/summary.json",
+      "bytes": 391414,
+      "sha256": "6f5f754d56a3a696df97bd47bb1a04e9e11c9ac61653e1680819bb8a087166d8",
+      "link_to": null
+    },
+    {
+      "path": "report_preflight.log",
+      "bytes": 715,
+      "sha256": "476f355ff73b2d61dbc397e1ca4bdf539c3bcd723209e2966dc3a9a408e0eae5",
+      "link_to": null
+    },
+    {
+      "path": "report_preflight_retry.log",
+      "bytes": 5595,
+      "sha256": "72325566c815b2e4daa18036650e5d82c0b65ef6235495f783f56c2cbe572ecb",
+      "link_to": null
+    },
+    {
+      "path": "report_store_metrics.log",
+      "bytes": 8886,
+      "sha256": "a5e8012f3179079fbce7ea2f3909813ba6e34ac4c97114a78b22eb0bbb080132",
+      "link_to": "report_batch_shapes.log"
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

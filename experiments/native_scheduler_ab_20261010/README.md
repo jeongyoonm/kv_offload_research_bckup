@@ -45,3 +45,28 @@ PYTHONPATH="$PWD" .venv/bin/python \
   experiments/native_scheduler_ab_20261010/report.py \
   /mnt/localnvme/jeongyoon/ns1
 ```
+
+## Completed results
+
+All 16 measured cells passed acceptance. All owned serving processes were
+stopped. Throughput changes use paired geometric ratios across four pairs:
+
+| Workload | Worker only | Worker + scheduler | Gain |
+| --- | ---: | ---: | ---: |
+| 16K | 25.049 req/s | 26.040 req/s | 3.92% |
+| 60K | 7.608 req/s | 7.892 req/s | 3.79% |
+
+The 60K result is sensitive to its final worker-only episode: that cell
+had 1002 ms of gaps, versus 90–126 ms previously. All pairs remain in the
+primary result. The first three 60K pairs gained 1.97% together. These
+runs do not establish a reliable difference between workload gains.
+
+Mean TTFT improved 2.40%/3.45% for 16K/60K. Mean episode p95 worsened
+2.42% for 16K and improved 9.64% for 60K. These are package effects;
+preparation, sealing and deadline components were not separately ablated.
+
+See [the report](artifacts/notes/REPORT.txt) and
+[the final audit](artifacts/notes/FINAL_AUDIT.json). Verified archives in
+`artifacts/paired` and `artifacts/logbook` retain raw serving evidence,
+configuration, predictor state, validation logs and failed preflight logs.
+Environment credential fields are redacted in archives.

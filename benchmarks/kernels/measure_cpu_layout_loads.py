@@ -3,6 +3,7 @@
 """Measure native loads with actual block-major and tensor-major CPU mappings."""
 
 import argparse
+import ctypes
 import json
 import os
 import statistics
@@ -38,6 +39,10 @@ def main():
         text=True,
     ).strip()
     assert not occupied, f"GPUs occupied: {occupied}"
+    libc = ctypes.CDLL(None, use_errno=True)
+    if libc.prctl(41, 1, 0, 0, 0):
+        raise OSError(ctypes.get_errno(), "PR_SET_THP_DISABLE")
+    assert libc.prctl(42, 0, 0, 0, 0) == 1
     torch.set_num_threads(2)
     pages = [36864] * 78 + [8448] * 21
     rows, transferred = 1040, 912
@@ -173,6 +178,7 @@ def main():
             records=records,
             owner_pid=os.getpid(),
             bytes_per_load=transferred * sum(pages),
+            thp_disabled=True,
             depth=2,
             chunk_bytes=8 * 1024**2,
             definition="GPU zero, private tensors and actual mmap layouts. "

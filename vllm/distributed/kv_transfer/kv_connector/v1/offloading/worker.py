@@ -230,6 +230,16 @@ class OffloadingConnectorWorker:
                         (job_id, entry.src_spec, entry.dst_spec)
                     )
 
+        if (
+            kv_connector_metadata.jobs_to_flush
+            and kv_connector_metadata.experiment_options.get(
+                "store_critical_submission", False
+            )
+        ):
+            self._unsubmitted_store_jobs = self.worker.order_store_jobs(
+                self._unsubmitted_store_jobs, kv_connector_metadata.jobs_to_flush
+            )
+
         # Submit deferred stores from previous step (and jobs_to_flush above).
         if queue_stages.active and self._unsubmitted_store_jobs:
             queue_stages.emit(

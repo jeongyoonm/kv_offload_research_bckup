@@ -791,3 +791,19 @@ def test_invalid_copy_pipeline_depth_rejected(depth):
 
     with pytest.raises(ValueError):
         validate_experiment_options({"copy_pipeline_depth": depth})
+
+
+@pytest.mark.parametrize("overlap", [False, True])
+def test_critical_store_priority_preserves_destination_dependencies(overlap):
+    """Prioritize reuse-critical stores only when CPU destinations are disjoint."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    src = GPULoadStoreSpec([0], (1,), (0,))
+    jobs = [
+        (1, src, CPULoadStoreSpec([0])),
+        (2, src, CPULoadStoreSpec([0 if overlap else 1])),
+        (3, src, CPULoadStoreSpec([2])),
+    ]
+    ordered = worker.order_store_jobs(jobs, {2})
+    assert [job[0] for job in ordered] == ([1, 2, 3] if overlap else [2, 1, 3])
+    assert len(ordered) == len(jobs)
+    assert {id(job) for job in ordered} == {id(job) for job in jobs}

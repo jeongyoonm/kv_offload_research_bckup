@@ -570,6 +570,14 @@ class OffloadingWorker(ABC):
         """Order subsequent GPU writes after stores; default to a host wait."""
         self.wait(job_ids)
 
+    def order_store_jobs(
+        self,
+        jobs: list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]],
+        critical_ids: set[int],
+    ) -> list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]]:
+        """Backends may prioritize stores if destination independence is known."""
+        return jobs
+
     def shutdown(self) -> None:
         return
 

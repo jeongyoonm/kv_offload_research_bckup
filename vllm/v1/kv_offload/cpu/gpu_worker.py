@@ -28,6 +28,7 @@ from vllm.v1.kv_offload.base import (
     OffloadingWorker,
     TransferResult,
 )
+from vllm.v1.kv_offload.cpu.common import CPULoadStoreSpec
 from vllm.v1.kv_offload.cpu.shared_offload_region import SharedOffloadRegion
 from vllm.v1.kv_offload.cpu.swap_blocks_triton import (
     THRESHOLD_BYTES,
@@ -1040,6 +1041,21 @@ class CPUOffloadingWorker(OffloadingWorker):
     ) -> bool:
         """Async GPU -> CPU."""
         return self._store_handler.transfer_async(job_id, src_spec, dst_spec)
+
+    def order_store_jobs(
+        self,
+        jobs: list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]],
+        critical_ids: set[int],
+    ) -> list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]]:
+        destinations: set[int] = set()
+        for _, _, dst_spec in jobs:
+            if not isinstance(dst_spec, CPULoadStoreSpec):
+                return jobs
+            ids = set(map(int, dst_spec.block_ids))
+            if not destinations.isdisjoint(ids):
+                return jobs
+            destinations.update(ids)
+        return sorted(jobs, key=lambda job: job[0] not in critical_ids)
 
     def submit_load(
         self, job_id: int, src_spec: LoadStoreSpec, dst_spec: GPULoadStoreSpec

@@ -773,3 +773,32 @@ def test_register_kv_caches_uniform_type(backend):
     # opaque mapping rather than a certified, parallelism-agnostic one
     assert group_refs[0].mapping.parallelism_agnostic
     assert not group_refs[1].mapping.parallelism_agnostic
+
+
+def test_critical_store_submission_runs_once_before_reuse_fence():
+    """Reordering deferred jobs must not lose, duplicate or prematurely retire them."""
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    assert worker.worker is not None
+    worker.prepare_store_kv(_store_metadata(1))
+    metadata = _store_metadata(2)
+    metadata.jobs_to_flush = {2}
+    metadata.experiment_options = {
+        "store_critical_submission": True,
+        "store_reuse_gpu_fence": True,
+    }
+    calls = []
+    worker.worker.order_store_jobs.side_effect = lambda jobs, _: [jobs[1], jobs[0]]
+
+    def submit(jid, *_):
+        calls.append(jid)
+        return True
+
+    worker.worker.submit_store.side_effect = submit
+    worker.handle_preemptions(metadata)
+    worker.start_kv_transfers(_empty_metadata())
+    worker.worker.fence_store_reuse.assert_called_once_with({2})
+    assert calls == [2, 1]
+    assert not worker._unsubmitted_store_jobs
+    assert worker.build_connector_worker_meta() is None

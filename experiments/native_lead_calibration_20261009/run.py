@@ -53,7 +53,9 @@ def main():
     parser.add_argument("--requests", type=int, choices=(75, 300), default=300)
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--lead-ms", type=int, choices=(25, 50), default=25)
+    parser.add_argument("--allocation-timeout-seconds", type=int, default=7200)
     args = parser.parse_args()
+    assert 900 <= args.allocation_timeout_seconds <= 7200
     LEAD_US = args.lead_ms * 1000
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
@@ -91,6 +93,7 @@ def main():
             d2h_chunk_mib=D2H_CHUNK_MIB,
             d2h_depth=2,
             candidate_deadline_lead_ms=args.lead_ms,
+            allocation_timeout_seconds=args.allocation_timeout_seconds,
             prefix_working_set=75,
             policies=policies,
             repeats=args.repeats,
@@ -154,7 +157,9 @@ def main():
         collector.log("comparison_started", expected_cells=expected)
         proc = collector.launch()
         collector.save(root / "ownership.json", dict(server_pid=proc.pid))
-        timer = threading.Timer(7200, collector.stop_server, (proc,))
+        timer = threading.Timer(
+            args.allocation_timeout_seconds, collector.stop_server, (proc,)
+        )
         timer.daemon = True
         timer.start()
         deadline = time.monotonic() + 1800
@@ -173,7 +178,9 @@ def main():
         for repeat in range(args.repeats):
             order = ARMS if repeat % 2 == 0 else tuple(reversed(ARMS))
             for arm in order:
-                assert time.monotonic() - started < 7000, "Budget exhausted"
+                assert time.monotonic() - started < args.allocation_timeout_seconds, (
+                    "Budget exhausted"
+                )
                 results.append(cell(arm, 9301 + repeat, repeat, args.requests))
                 collector.save(
                     root / "progress.json",

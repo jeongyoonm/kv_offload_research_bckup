@@ -112,6 +112,13 @@ class CPUOffloadingSpec(OffloadingSpec):
             or type(self) is not CPUOffloadingSpec
         ):
             raise ValueError("worker layout supports direct sharded CPU caching only")
+        self.cpu_allocator_ascending = self.extra_config.get(
+            "cpu_allocator_ascending", False
+        )
+        if not isinstance(self.cpu_allocator_ascending, bool):
+            raise ValueError("cpu_allocator_ascending must be boolean")
+        if self.cpu_allocator_ascending and self.memory_layout != "private_tensor":
+            raise ValueError("ascending CPU assignment requires private_tensor")
         self.population_mode = self.extra_config.get("cpu_cache_population", "rank")
         self.population_workers = self.extra_config.get(
             "cpu_cache_population_workers", world_size
@@ -232,6 +239,7 @@ class CPUOffloadingSpec(OffloadingSpec):
                 enable_events=self.kv_events_config.enable_kv_cache_events,
                 store_threshold=store_threshold,
                 max_tracker_size=max_tracker_size,
+                ascending_block_assignment=self.cpu_allocator_ascending,
             )
         return self._manager
 

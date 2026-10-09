@@ -47,7 +47,9 @@ class CPUOffloadingManager(OffloadingManager):
         enable_events: bool = False,
         store_threshold: int = 1,
         max_tracker_size: int = 64_000,
+        ascending_block_assignment: bool = False,
     ):
+        self._ascending_block_assignment = ascending_block_assignment
         self.medium: Medium = Medium.CPU
         self._num_blocks: int = num_blocks
         self._num_allocated_blocks: int = 0
@@ -91,6 +93,10 @@ class CPUOffloadingManager(OffloadingManager):
         # allocate reused blocks
         for _ in range(num_reused):
             blocks.append(BlockStatus(self._free_list.pop()))
+        if self._ascending_block_assignment:
+            # Bind the unchanged selected IDs to keys in physical order.
+            # No allocation, eviction, ownership or completion rule changes.
+            blocks.sort(key=lambda block: block.block_id)
         return blocks
 
     def _free_block(self, block: BlockStatus) -> None:

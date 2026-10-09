@@ -1079,3 +1079,51 @@ def test_touch_forwards_req_context_to_policy(monkeypatch):
     assert len(received) == 1
     assert received[0][0] == keys
     assert received[0][1] is ctx
+
+
+@pytest.mark.parametrize("ascending", [False, True])
+def test_assignment_order_preserves_selected_pool(ascending):
+    manager = CPUOffloadingManager(10, ascending_block_assignment=ascending)
+    manager._num_allocated_blocks = 8
+    manager._free_list = [7, 3, 1, 4]
+    blocks = manager._allocate_blocks(to_keys([10, 11, 12, 13, 14, 15]))
+    expected = [1, 3, 4, 7, 8, 9] if ascending else [8, 9, 4, 1, 3, 7]
+    assert [block.block_id for block in blocks] == expected
+    assert manager._num_allocated_blocks == 10
+    assert manager._free_list == []
+    assert manager._get_num_free_blocks() == 0
+
+
+def test_ascending_recycled_assignment_preserves_hashes_and_live_loads():
+    manager = CPUOffloadingManager(4, ascending_block_assignment=True)
+    old_keys, new_keys = to_keys([0, 1, 2, 3]), to_keys([4, 5, 6])
+    initial = manager.prepare_store(old_keys, _EMPTY_REQ_CTX)
+    assert initial is not None
+    manager.complete_store(old_keys, _EMPTY_REQ_CTX)
+    held = manager.prepare_load(to_keys([2]), _EMPTY_REQ_CTX)
+    verify_load_output(held, [2])
+    replacement = manager.prepare_store(new_keys, _EMPTY_REQ_CTX)
+    assert replacement is not None
+    assert set(replacement.evicted_keys) == set(to_keys([0, 1, 3]))
+    assert list(replacement.store_spec.block_ids) == [0, 1, 3]
+    manager.complete_store(new_keys, _EMPTY_REQ_CTX)
+    verify_load_output(
+        manager.prepare_load(to_keys([6, 4, 5]), _EMPTY_REQ_CTX), [3, 0, 1]
+    )
+    manager.complete_load(to_keys([6, 4, 5]), _EMPTY_REQ_CTX)
+    manager.complete_load(to_keys([2]), _EMPTY_REQ_CTX)
+    verify_load_output(manager.prepare_load(to_keys([2]), _EMPTY_REQ_CTX), [2])
+    manager.complete_load(to_keys([2]), _EMPTY_REQ_CTX)
+
+
+def test_ascending_failed_store_releases_exact_selected_blocks():
+    manager = CPUOffloadingManager(4, ascending_block_assignment=True)
+    keys = to_keys([10, 11, 12, 13])
+    first = manager.prepare_store(keys, _EMPTY_REQ_CTX)
+    assert first is not None
+    manager.complete_store(keys, _EMPTY_REQ_CTX, success=False)
+    assert manager._get_num_free_blocks() == 4
+    second = manager.prepare_store(to_keys([20, 21, 22, 23]), _EMPTY_REQ_CTX)
+    assert second is not None
+    assert list(second.store_spec.block_ids) == [0, 1, 2, 3]
+    assert manager._get_num_free_blocks() == 0

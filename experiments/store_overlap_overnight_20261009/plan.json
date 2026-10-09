@@ -22,7 +22,7 @@
       "artifacts": "/mnt/localnvme/jeongyoon/sr1",
       "hypothesis": "Include future suffix reservations in per-request load gates",
       "implementation_head": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2",
-      "current_head": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2"
+      "current_head": "bbf91deb64a66504868e2242625335ed6c202f9c"
     },
     {
       "branch": "experiment/store-reuse-allocator-preference-20261009",
@@ -40,7 +40,7 @@
       "hypothesis": "Prioritize reuse-critical unsubmitted stores when CPU destinations are disjoint",
       "commit": "9b53089",
       "implementation_head": "9b5308951978a265e5a3bc96c6a6b77e2c859148",
-      "current_head": "9b5308951978a265e5a3bc96c6a6b77e2c859148"
+      "current_head": "53a075f614856016af4fada3d00565b12bed4a2e"
     },
     {
       "branch": "experiment/store-descriptor-coalescing-20261009",
@@ -102,14 +102,14 @@
       "source": "/mnt/localnvme/jeongyoon/vllm_store_contention_probe_20261009",
       "artifacts": "per-mode/probe roots in the requested storage",
       "hypothesis": "Measure same-context H2D/D2H driver submission on disjoint buffers",
-      "current_head": "beec3d0fc1e28b51e371ac2242c38a98e2f6b340"
+      "current_head": "9fec5d9d6fd3f253eb2722d8fd57832f69f789c5"
     },
     {
       "branch": "experiment/store-native-async-submission-20261009",
       "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
       "artifacts": "per-mode/probe roots in the requested storage",
       "hypothesis": "Move store driver calls to a separate native I/O worker; distinguish full-store and 8 MiB copies",
-      "current_head": "2ded8ee0d1105fc0f14a45c3074c77d48288ad30"
+      "current_head": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
     },
     {
       "branch": "experiment/kv-allocation-order-coalescing-20261009",
@@ -124,7 +124,8 @@
       "commit": "388902d",
       "hypothesis": "Align coalesced descriptors to cumulative native packet boundaries to avoid underfilled copies",
       "artifacts": "/mnt/localnvme/jeongyoon/sk1",
-      "status": "CPU mapping checks and six real GPU cases passed; serving comparison pending"
+      "status": "CPU mapping checks and six real GPU cases passed; serving comparison pending",
+      "current_head": "ddc170238fd450a48f840525975b0d9ab1a14bbf"
     },
     {
       "branch": "experiment/store-merged-serving-validation-20261009",
@@ -132,7 +133,8 @@
       "commit": "1b46fec",
       "hypothesis": "Verify accumulated physical-layout improvements with continuous 300-request episodes and no intermediate prime/reset",
       "artifacts": "/mnt/localnvme/jeongyoon/sm1",
-      "status": "configuration preflight passed; conditional on individual serving gains"
+      "status": "configuration preflight passed; conditional on individual serving gains",
+      "current_head": "1b46fecdcb11d1dadf66b7ab6e5b6775f647f8d4"
     },
     {
       "branch": "experiment/cpu-private-tensor-layout-20261009",
@@ -144,7 +146,32 @@
         "/mnt/localnvme/jeongyoon/stm"
       ],
       "verification": "48 CPU mapping/regression checks passed; GLM 99-page real-GPU roundtrip gate precedes serving",
-      "workload": "two continuous 300-request episodes per mode, working set 75 prefixes, four unique suffixes per prefix"
+      "workload": "two continuous 300-request episodes per mode, working set 75 prefixes, four unique suffixes per prefix",
+      "current_head": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+      "artifacts": "si1",
+      "hypothesis": "Avoid unrelated compute dependencies only when authoritative load destinations are independent",
+      "branch": "experiment/load-independent-ready-stream-20261009",
+      "commit": "b2b14676bc5f16f91b226178e9d10c47951ba0e5",
+      "current_head": "b2b14676bc5f16f91b226178e9d10c47951ba0e5"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_tensor_ceiling_20261009",
+      "artifacts": "sg3",
+      "hypothesis": "Match CPU resident controls with verified physical layout optimization",
+      "branch": "experiment/gpu-prefix-ceiling-tensor-controls-20261009",
+      "commit": "c545d9a760d5263c74de554c4a243063aaac72b0",
+      "current_head": "c545d9a760d5263c74de554c4a243063aaac72b0"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_descriptor_order_20261009",
+      "artifacts": "cpu_layout_loads.json, sdo1 conditional",
+      "hypothesis": "Avoid sorting descriptors when no physical merges exist",
+      "branch": "experiment/descriptor-order-preservation-20261009",
+      "commit": "2a65915af75121d96d91e06fd263c52390895411",
+      "current_head": "2a65915af75121d96d91e06fd263c52390895411"
     }
   ],
   "constraints": [

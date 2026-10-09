@@ -35,10 +35,15 @@ def cell_audit(directory, result):
     }
     assert len(computes) == result["compute_rounds"]
     assert all(e["valid"] and len(e["execution_ranks"]) == 8 for e in computes.values())
+    ordered_steps = sorted(computes)
+    following = dict(zip(ordered_steps, ordered_steps[1:]))
     predictions = {}
     for event in records:
         if event["event"] == "seal_prediction":
-            predictions.setdefault(event["predecessor_step"], event)
+            predecessor = event["predecessor_step"]
+            predictions.setdefault(predecessor, event)
+            if following.get(predecessor) == event["step"]:
+                predictions[predecessor] = event
     rows = []
     for step, prediction in predictions.items():
         if step not in computes:
@@ -69,6 +74,7 @@ def cell_audit(directory, result):
                 corrected_error_ms=corrected - truth,
                 applied_bias_ms=prediction["applied_prediction_bias_ns"] / 1e6,
                 fallback=prediction["shape_calibration_fallback"],
+                adjacent_compute=following.get(step) == prediction["step"],
             )
         )
     completions = {
@@ -120,15 +126,17 @@ def cell_audit(directory, result):
     end = max(max(r[3] + r[6] for r in e["execution_ranks"]) for e in computes.values())
     client_start = min(r["start_ns"] for r in result["responses"])
     client_end = max(r["end_ns"] for r in result["responses"])
+    adjacent = [r for r in rows if r["adjacent_compute"]]
     return dict(
         before_first_compute_ms=(first - client_start) / 1e6,
         gpu_span_ms=(end - first) / 1e6,
         after_last_compute_ms=(client_end - end) / 1e6,
         client_harness_overhead_ms=result["seconds"] * 1000
         - (client_end - client_start) / 1e6,
-        raw_prediction=error_metrics([r["bias_ms"] for r in rows]),
-        corrected_prediction=error_metrics([r["corrected_error_ms"] for r in rows]),
-        calibration_fallback_count=sum(r["fallback"] is True for r in rows),
+        raw_prediction=error_metrics([r["bias_ms"] for r in adjacent]),
+        corrected_prediction=error_metrics([r["corrected_error_ms"] for r in adjacent]),
+        calibration_fallback_count=sum(r["fallback"] is True for r in adjacent),
+        nonadjacent_prediction_count=len(rows) - len(adjacent),
         deadline_window_misses=len(window & missed),
         prepared_deadline_window_misses=len(prepared & missed),
         all_missed_compute_opportunities=len(missed),
@@ -217,7 +225,11 @@ def main():
         for arm, selected in groups.items():
             assert [r["seed"] for r in selected] == [r["seed"] for r in control]
             predictions = [
-                r for r in all_rows if r["workload"] == workload and r["arm"] == arm
+                r
+                for r in all_rows
+                if r["workload"] == workload
+                and r["arm"] == arm
+                and r["adjacent_compute"]
             ]
             opportunities = sum(r["kv_ready_during_compute"] for r in selected)
             levels.append(
@@ -276,7 +288,8 @@ def main():
         gaps=detailed_gaps,
         definitions="Arithmetic episode levels, paired geometric changes, "
         "episode p95 not pooled. "
-        "Prediction metrics use first logged forecast per preceding compute. "
+        "Prediction metrics use forecasts governing adjacent compute dispatches, "
+        "matching the training audit scope; nonadjacent rows remain marked. "
         "Gap phases partition measured conservative execution envelopes, "
         "not pure kernel time. "
         "Deadline-window misses are retrospective opportunities, "

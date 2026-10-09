@@ -1,0 +1,76 @@
+{
+  "workloads": {
+    "short16k": {
+      "prediction_errors": {
+        "raw_prediction_error_ms": {
+          "count": 34,
+          "mean": 33.87382044117647,
+          "mae": 34.79379885294118,
+          "minimum": -8.763298,
+          "maximum": 160.83077
+        },
+        "corrected_prediction_error_ms": {
+          "count": 34,
+          "mean": -56.12617955882353,
+          "mae": 65.01154379411764,
+          "minimum": -98.763298,
+          "maximum": 70.83077
+        },
+        "deadline_minus_A_end_ms": {
+          "count": 34,
+          "mean": -156.12617955882354,
+          "mae": 156.12617955882354,
+          "minimum": -198.763298,
+          "maximum": -29.16923
+        }
+      },
+      "counts": {
+        "opportunities": 258,
+        "recovered": 137,
+        "not_late_admitted": 121,
+        "deadline_seals": 27,
+        "unique_deadline_window_candidates": 115,
+        "unique_prepared_deadline_window_candidates": 75,
+        "deadline_window_and_never_late_admitted": 115,
+        "prepared_deadline_window_and_never_late_admitted": 75
+      }
+    },
+    "familiar60k": {
+      "prediction_errors": {
+        "raw_prediction_error_ms": {
+          "count": 42,
+          "mean": 96.4449345,
+          "mae": 96.4449345,
+          "minimum": 14.503669,
+          "maximum": 194.923288
+        },
+        "corrected_prediction_error_ms": {
+          "count": 42,
+          "mean": 6.4449345000000005,
+          "mae": 39.18090321428571,
+          "minimum": -75.496331,
+          "maximum": 104.923288
+        },
+        "deadline_minus_A_end_ms": {
+          "count": 42,
+          "mean": -93.5550655,
+          "mae": 93.78950778571429,
+          "minimum": -175.496331,
+          "maximum": 4.923288
+        }
+      },
+      "counts": {
+        "opportunities": 295,
+        "recovered": 264,
+        "not_late_admitted": 31,
+        "deadline_seals": 24,
+        "unique_deadline_window_candidates": 27,
+        "unique_prepared_deadline_window_candidates": 27,
+        "deadline_window_and_never_late_admitted": 27,
+        "prepared_deadline_window_and_never_late_admitted": 27
+      }
+    }
+  },
+  "definition": "Deadline window: published, not cancelled/admitted at a compute-deadline seal; actual all-rank KV completion after seal and before preceding compute's conservative all-rank end. Prepared means all eight successful acknowledgments in the seal snapshot. Unique requests are counted within episodes and summed. Prediction errors cover logged adjacent compute transitions, not every request. These are retrospective timing opportunities, not guaranteed counterfactual admissions or throughput gains.",
+  "candidate_details": "predictor_opportunity_candidates.json.gz"
+}

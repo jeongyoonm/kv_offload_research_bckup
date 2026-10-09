@@ -70,3 +70,34 @@ See [the report](artifacts/notes/REPORT.txt) and
 `artifacts/paired` and `artifacts/logbook` retain raw serving evidence,
 configuration, predictor state, validation logs and failed preflight logs.
 Environment credential fields are redacted in archives.
+
+## Frozen predictor and deadline audit
+
+Logged adjacent compute predictions show workload-dependent correction:
+
+| Workload | Raw bias ms | Corrected bias ms | Raw MAE ms | Corrected MAE ms |
+| --- | ---: | ---: | ---: | ---: |
+| 16K, 34 predictions | +33.9 | -56.1 | 34.8 | 65.0 |
+| 60K, 42 predictions | +96.4 | +6.4 | 96.4 | 39.2 |
+
+The fixed 90 ms subtraction is useful for 60K but overcorrects 16K. It
+does not remove variance or replace calibration across batch shapes.
+
+| Workload | Unrecovered / compute-period KV-ready | Deadline-window ACK-ready |
+| --- | ---: | ---: |
+| 16K | 121 / 258 (46.9%) | 75 |
+| 60K | 31 / 295 (10.5%) | 27 |
+
+Deadline-window candidates were published, not cancelled or activated,
+and already acknowledged by all eight ranks at a compute-deadline seal.
+Their actual all-rank KV completion occurred after that snapshot but
+before preceding compute ended. They also never received late admission
+at a later seal. Counts sum unique requests within four episodes.
+Another 40 short-workload candidates entered that KV window without
+complete preparation acknowledgments at the snapshot. These counts are
+retrospective timing opportunities, not guaranteed admissions or gains.
+
+The audit verifies snapshot acknowledgments and reconciles its opportunity
+counts with the serving report. Reproduce with `predictor_audit.py ROOT
+FRESH_OUTPUT`. Per-candidate timestamps and prediction summaries are in
+[the audit JSON](artifacts/notes/predictor_opportunity_audit.json).

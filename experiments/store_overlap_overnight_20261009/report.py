@@ -146,8 +146,9 @@ def main():
             ]
         )
         for arm, means in independent["means"].items():
+            label = "Ordinary dependency" if arm == "control" else "Independent stream"
             lines.append(
-                f"| {arm} | {means['throughput_rps']:.3f} | "
+                f"| {label} | {means['throughput_rps']:.3f} | "
                 f"{means['inter_compute_gap_ms']:.1f} | "
                 f"{means['mean_ttft_ms']:.1f} | {means['p95_ttft_ms']:.1f} |"
             )
@@ -156,6 +157,7 @@ def main():
     lead = None
     if current["snl"]["status"] == "complete":
         lead = read_run("snl")
+        lead_plan = json.loads((BASE / "snl/plan.json").read_text())
         lines.extend(
             [
                 "",
@@ -170,8 +172,11 @@ def main():
             ]
         )
         for arm, means in lead["means"].items():
+            milliseconds = (
+                100 if arm == "control" else lead_plan["candidate_deadline_lead_ms"]
+            )
             lines.append(
-                f"| {arm} | {means['throughput_rps']:.3f} | "
+                f"| Lead {milliseconds} ms | {means['throughput_rps']:.3f} | "
                 f"{means['inter_compute_gap_ms']:.1f} | "
                 f"{means['mean_ttft_ms']:.1f} | {means['p95_ttft_ms']:.1f} |"
             )

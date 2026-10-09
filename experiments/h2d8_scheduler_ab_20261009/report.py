@@ -58,6 +58,7 @@ def diagnostics(directory):
         overlap = sum(max(0, min(end, b) - max(begin, a)) for a, b in intervals)
         exposed += end - begin - overlap
     return dict(
+        compute_envelope_ms=sum(b - a for a, b in intervals) / 1e6,
         inter_compute_gap_ms=gap_ms,
         hold_without_compute_ms=exposed / 1e6,
         seal_reasons=dict(
@@ -94,6 +95,7 @@ def main():
         "late_admissions",
         "kv_ready_during_compute",
         "recovered_compute_opportunities",
+        "compute_envelope_ms",
         "inter_compute_gap_ms",
         "hold_without_compute_ms",
     )

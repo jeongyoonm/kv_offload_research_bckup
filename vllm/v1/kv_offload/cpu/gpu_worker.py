@@ -754,15 +754,15 @@ class SingleDirectionOffloadingHandler:
             op_idx = _coalesce_bounded_descriptors(
                 all_src, all_dst, all_sizes, op_idx, self._async_h2d_chunk_bytes
             )
-            if queue_stages.active:
-                queue_stages.emit(
-                    "load_descriptors_coalesced",
-                    job_id=job_id,
-                    num_bytes=num_transfer_bytes,
-                    original_descriptors=original_descriptors,
-                    num_descriptors=op_idx,
-                    max_descriptor_bytes=int(all_sizes[:op_idx].max()) if op_idx else 0,
-                )
+        if self._async_h2d_submission and queue_stages.active:
+            queue_stages.emit(
+                "load_descriptors_prepared",
+                job_id=job_id,
+                num_bytes=num_transfer_bytes,
+                original_descriptors=original_descriptors,
+                num_descriptors=op_idx,
+                max_descriptor_bytes=int(all_sizes[:op_idx].max()) if op_idx else 0,
+            )
         src = src[:op_idx]
         dst = dst[:op_idx]
         sizes = sizes[:op_idx]

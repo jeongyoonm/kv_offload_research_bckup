@@ -460,3 +460,32 @@ def test_partial_block_promotes_to_direct_full_block_hash(dcp_world_size: int):
     )
     assert pool.get_cached_block(promoted_full_hash, [kv_cache_group_id]) == [blocks[1]]
     assert pool.get_cached_block(partial_hash, [kv_cache_group_id]) is None
+
+
+@pytest.mark.parametrize("prefer", [False, True])
+@pytest.mark.parametrize("pending_ids", [{1, 2}, {1, 2, 3, 4, 5}])
+def test_store_aware_allocation_preserves_capacity_and_pending_ownership(
+    prefer, pending_ids
+):
+    """Prefer safe blocks, but preserve capacity when every block is fenced."""
+    pool = BlockPool(num_gpu_blocks=6, enable_caching=True, hash_block_size=16)
+    pending = {bid: {100 + bid} for bid in pending_ids}
+    pool.pending_store_blocks = pending
+    pool.prefer_unfenced_blocks = prefer
+    pool.audit_store_allocations = True
+    allocated = pool.get_new_blocks(3)
+    expected = [3, 4, 5] if prefer and pending_ids == {1, 2} else [1, 2, 3]
+    assert [block.block_id for block in allocated] == expected
+    assert len({block.block_id for block in allocated}) == 3
+    assert all(block.ref_cnt == 1 for block in allocated)
+    assert pool.get_num_free_blocks() == 2
+    assert pool.pending_store_blocks == {bid: {100 + bid} for bid in pending_ids}
+    assert pool.store_allocation_audit[-1]["allocated_pending"] == sum(
+        bid in pending_ids for bid in expected
+    )
+    pool.free_blocks(allocated)
+    assert pool.get_num_free_blocks() == 5
+    pending.clear()  # The connector's all-rank completion/reset is visible live.
+    allocated = pool.get_new_blocks(5)
+    assert {block.block_id for block in allocated} == {1, 2, 3, 4, 5}
+    assert pool.store_allocation_audit[-1]["allocated_pending"] == 0

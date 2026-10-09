@@ -565,6 +565,7 @@ class OffloadingConnectorScheduler:
         # protected by their ref_cnt) and for sliding window blocks (which can
         # be freed before a request finishes).
         self._block_id_to_pending_jobs: dict[int, set[int]] = {}
+        self._current_batch_load_reservations: dict[int, list[int]] = {}
 
         self._events_tracker = OffloadingEventsTracker(spec.kv_events_config)
 
@@ -1016,12 +1017,16 @@ class OffloadingConnectorScheduler:
         # per group
         group_sizes: list[int] = []
         block_indices: list[int] = []
+        reserved_block_ids: list[int] = []
         for group_config, group_state, group_blocks in zip(
             self.config.kv_group_configs,
             req_status.group_states,
             blocks.blocks,
         ):
             self._current_batch_allocated_block_ids.update(
+                block.block_id for block in group_blocks if block.block_id != 0
+            )
+            reserved_block_ids.extend(
                 block.block_id for block in group_blocks if block.block_id != 0
             )
 
@@ -1088,6 +1093,7 @@ class OffloadingConnectorScheduler:
         )
 
         load_job_id = self._generate_job_id()
+        self._current_batch_load_reservations[load_job_id] = reserved_block_ids
         self._current_batch_load_jobs[load_job_id] = TransferJob(
             req_id=request.request_id,
             src_spec=src_spec,
@@ -1554,7 +1560,7 @@ class OffloadingConnectorScheduler:
             or scheduler_output.kv_cache_block_copies
             or scheduler_output.preempted_req_ids
             or any(
-                job.req_id in scheduler_output.num_scheduled_tokens
+                scheduler_output.num_scheduled_tokens.get(job.req_id, 0) > 0
                 for job in self._current_batch_load_jobs.values()
             )
         ):
@@ -1570,7 +1576,13 @@ class OffloadingConnectorScheduler:
         load_fences: dict[int, set[int]] = {}
         for job_id, job in self._current_batch_load_jobs.items():
             assert isinstance(job.dst_spec, GPULoadStoreSpec)
-            matched = collision_array[np.isin(collision_array, job.dst_spec.block_ids)]
+            reserved = self._current_batch_load_reservations.get(job_id)
+            matched = collision_array[
+                np.isin(
+                    collision_array,
+                    reserved if reserved is not None else job.dst_spec.block_ids,
+                )
+            ]
             if len(matched):
                 load_collisions.update(map(int, matched))
                 load_fences[job_id] = {
@@ -1647,6 +1659,7 @@ class OffloadingConnectorScheduler:
             if not req_status.transfer_jobs:
                 del self._req_status[req_id]
         self._current_batch_load_jobs = {}
+        self._current_batch_load_reservations = {}
         self._current_batch_jobs_to_flush = set()
         self._current_batch_force_flush_on_host = False
         self._current_batch_allocated_block_ids = set()

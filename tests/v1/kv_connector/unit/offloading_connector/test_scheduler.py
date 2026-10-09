@@ -87,7 +87,10 @@ def _make_partial_tail_scheduler() -> OffloadingConnectorScheduler:
         "preempted_req_ids",
     ],
 )
-def test_store_reuse_classification_preserves_compute_and_load_hazards(unsafe):
+@pytest.mark.parametrize("reserved_suffix", [False, True])
+def test_store_reuse_classification_preserves_compute_and_load_hazards(
+    unsafe, reserved_suffix
+):
     """A store touching compute and load destinations still fences both."""
     scheduler = OffloadingConnectorScheduler.__new__(OffloadingConnectorScheduler)
     scheduler._current_batch_force_flush_on_host = False
@@ -97,6 +100,9 @@ def test_store_reuse_classification_preserves_compute_and_load_hazards(unsafe):
     scheduler._current_batch_load_jobs = {
         7: TransferJob("loading", MagicMock(), GPULoadStoreSpec([10, 30], (2,), (0,)))
     }
+    scheduler._current_batch_load_reservations = (
+        {7: [10, 20, 30]} if reserved_suffix else {}
+    )
     output = SimpleNamespace(
         has_sync_kv_loads=False,
         new_block_ids_to_zero=None,
@@ -107,7 +113,9 @@ def test_store_reuse_classification_preserves_compute_and_load_hazards(unsafe):
     if unsafe is not None:
         setattr(output, unsafe, True)
     compute, loads = scheduler._classify_store_reuse(output)
-    assert (compute, loads) == ((None, {}) if unsafe else ({1, 3}, {7: {1, 2}}))
+    assert (compute, loads) == (
+        (None, {}) if unsafe else ({3} if reserved_suffix else {1, 3}, {7: {1, 2}})
+    )
 
 
 def _make_partial_tail_request(

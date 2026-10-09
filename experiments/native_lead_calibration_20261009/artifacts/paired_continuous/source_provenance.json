@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+  "branch": "experiment/native-d2h-deadline-lead-calibration-20261009",
+  "commit": "05c3ac25c8777a06dd173524e1e5fcb2e98b0733"
+}

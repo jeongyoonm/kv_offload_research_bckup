@@ -109,8 +109,9 @@ def launch_gpu(root):
     return proc
 
 
-def gpu_cell(workload, seed, repeat, count):
-    directory = collector.ROOT / "live" / workload / f"r{repeat}_gpu_only"
+def gpu_cell(workload, seed, repeat, count, *, full_hits=True):
+    label = "gpu_only" if full_hits else "gpu_capacity_limited"
+    directory = collector.ROOT / "live" / workload / f"r{repeat}_{label}"
     directory.mkdir(parents=True, exist_ok=True)
     collector.reset(True)
     context, suffix = SHAPES[workload]
@@ -144,9 +145,14 @@ def gpu_cell(workload, seed, repeat, count):
     hits = after.get("vllm:prefix_cache_hits_total", 0) - before.get(
         "vllm:prefix_cache_hits_total", 0
     )
-    accepted = (
+    expected_hits = (
         restored == [context] * count
-        and hits == context * count
+        if full_hits
+        else all(0 <= value <= context for value in restored)
+    )
+    accepted = (
+        expected_hits
+        and hits == sum(restored)
         and after.get("vllm:num_preemptions_total", 0)
         == before.get("vllm:num_preemptions_total", 0)
         and after.get("vllm:kv_offload_load_bytes_total", 0)
@@ -156,7 +162,8 @@ def gpu_cell(workload, seed, repeat, count):
     ttft = [r["ttft_ms"] for r in responses]
     result = dict(
         accepted=accepted,
-        label="gpu_only",
+        label=label,
+        full_prefix_residency_required=full_hits,
         workload=workload,
         seed=seed,
         repeat=repeat,
@@ -167,9 +174,12 @@ def gpu_cell(workload, seed, repeat, count):
         mean_ttft_ms=statistics.mean(ttft),
         p50_ttft_ms=float(np.quantile(ttft, 0.5)),
         p95_ttft_ms=float(np.quantile(ttft, 0.95)),
-        expected_cached=[context] * count,
+        expected_cached=[context] * count if full_hits else None,
         observed_cached=restored,
         gpu_hit_tokens=hits,
+        target_prefix_tokens=context * count,
+        gpu_hit_target_fraction=hits / (context * count),
+        gpu_hit_prompt_fraction=hits / ((context + suffix) * count),
         metrics_before=before,
         metrics_after=after,
         responses=responses,
@@ -177,7 +187,7 @@ def gpu_cell(workload, seed, repeat, count):
     collector.save(directory / "result.json", result)
     collector.log(
         "live_cell",
-        label="gpu_only",
+        label=label,
         workload=workload,
         repeat=repeat,
         accepted=accepted,
@@ -193,8 +203,10 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--cache", choices=("cpu", "gpu"), required=True)
     parser.add_argument("--policy-overrides", type=Path)
+    parser.add_argument("--include-capacity-limited", action="store_true")
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
+    assert not args.include_capacity_limited or args.cache == "gpu"
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
     assert not (root / "plan.json").exists(), "Use a fresh artifact root"
@@ -215,6 +227,7 @@ def main():
     state = prior.state_for_chunk(json.loads(checkpoint.read_text()), 8)
     collector.save(root / "loaded_predictor.json", state)
     cells = [("familiar60k", 32, 10), ("short16k", 75, 4)]
+    expected_cells = 18 if args.include_capacity_limited else 14
     command, config = command_for(args.cache)
     collector.save(
         root / "plan.json",
@@ -226,7 +239,8 @@ def main():
             connector=config,
             policies=options(True),
             cells=cells,
-            measured_cells=14,
+            measured_cells=expected_cells,
+            capacity_limited_60k_75_requests=args.include_capacity_limited,
             concurrency=32,
             output_tokens=1,
             scope="60K: ten separately primed 32-request capacity-fitting waves, "
@@ -234,7 +248,10 @@ def main():
             "300 measured requests. GPU-only retains primed GPU blocks; CPU controls "
             "reset GPU cache after priming. Every request must hit the expected "
             "prefix and generate one token; no preemption. Priming is excluded. "
-            "GPU-only removes the connector, holds, and connector-dependent observers.",
+            "GPU-only removes the connector, holds, and connector-dependent observers. "
+            "Optional four 75-request 60K GPU-only episodes use seeds 9301–9304 "
+            "and permit capacity-related prefix misses. They are a separate "
+            "fixed-capacity reference, not an all-hits ceiling.",
         ),
     )
     collector.save(
@@ -276,7 +293,9 @@ def main():
         )
 
     try:
-        collector.log("comparison_started", cache=args.cache, expected_cells=14)
+        collector.log(
+            "comparison_started", cache=args.cache, expected_cells=expected_cells
+        )
         proc = launch_gpu(root) if args.cache == "gpu" else collector.launch()
         collector.save(root / "ownership.json", dict(server_pid=proc.pid))
         timer = threading.Timer(7100, collector.stop_server, (proc,))
@@ -305,8 +324,27 @@ def main():
                     root / "progress.json",
                     dict(
                         cells=len(results),
-                        expected_cells=14,
+                        expected_cells=expected_cells,
                         latest=dict(workload=workload, repeat=repeat),
+                    ),
+                )
+        if args.include_capacity_limited:
+            for repeat in range(4):
+                assert time.monotonic() - started < 7000, "Budget exhausted"
+                result = gpu_cell(
+                    "familiar60k", 9301 + repeat, repeat, 75, full_hits=False
+                )
+                results.append(result)
+                collector.save(
+                    root / "progress.json",
+                    dict(
+                        cells=len(results),
+                        expected_cells=expected_cells,
+                        latest=dict(
+                            workload="familiar60k",
+                            label="gpu_capacity_limited",
+                            repeat=repeat,
+                        ),
                     ),
                 )
         collector.log("comparison_complete", cells=len(results))
@@ -321,7 +359,7 @@ def main():
         collector.save(
             root / "summary.json",
             dict(
-                complete=len(results) == 14,
+                complete=len(results) == expected_cells,
                 results=results,
                 seconds=time.monotonic() - started,
                 stopped=proc is None or proc.poll() is not None,

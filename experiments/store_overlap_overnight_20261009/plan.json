@@ -172,6 +172,27 @@
       "branch": "experiment/descriptor-order-preservation-20261009",
       "commit": "2a65915af75121d96d91e06fd263c52390895411",
       "current_head": "2a65915af75121d96d91e06fd263c52390895411"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+      "artifacts": "stc",
+      "hypothesis": "Keep selected recycled CPU rows aligned with ascending GPU assignment",
+      "branch": "experiment/cpu-recycled-block-order-20261009",
+      "commit": "c5b54afeae36a02bdafa0b9f5a0913fec854e190"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_independent_ceiling_20261009",
+      "artifacts": "sg3 conditional",
+      "hypothesis": "Match resident CPU controls with the verified guarded independent load path",
+      "branch": "experiment/gpu-prefix-ceiling-independent-controls-20261009",
+      "commit": "5783f0d6c377ad54d8234c409af4cdd4952267e0"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+      "artifacts": "sg4",
+      "hypothesis": "Explicitly match and audit process-local THP policy for GPU-only resident controls",
+      "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
+      "commit": "c17a114232e06e47f279ee049ae06de626f3c899"
     }
   ],
   "constraints": [

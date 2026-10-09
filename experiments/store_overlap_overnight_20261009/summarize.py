@@ -36,6 +36,7 @@ RUNS = {
     "st0": "Continuous block-major control",
     "st1": "Continuous tensor-major only",
     "stm": "Continuous tensor-major plus merging",
+    "stc": "Continuous sorted recycled CPU rows",
     "si1": "Independent load ready stream",
     "sv1": "Preencoded allocator control",
     "sdo1": "Preserved descriptor order",
@@ -82,7 +83,7 @@ def overview():
                 for arm in data["means"]
             }
         result[name] = item
-    for name in ("sg1", "sg2", "sg3"):
+    for name in ("sg1", "sg2", "sg3", "sg4"):
         path = BASE / name / "ceiling_summary.json"
         if path.exists():
             data = json.loads(path.read_text())

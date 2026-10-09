@@ -175,6 +175,7 @@ def main():
     idle()
     result = dict(
         complete=True,
+        stopped=True,
         profiled=profiled,
         predecessor=str(args.predecessor),
         time=time.time(),
@@ -184,6 +185,11 @@ def main():
     (ARTIFACTS / "idle_probes_summary.json").write_text(
         json.dumps(result, indent=2) + "\n"
     )
+    gate = ARTIFACTS / "idle_gate"
+    gate.mkdir(exist_ok=True)
+    temporary = gate / "summary.tmp"
+    temporary.write_text(json.dumps(result, indent=2) + "\n")
+    temporary.replace(gate / "summary.json")
     log("all_probes_complete", **result)
 
 

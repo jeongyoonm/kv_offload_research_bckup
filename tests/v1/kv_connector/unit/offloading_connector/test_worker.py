@@ -375,12 +375,13 @@ def test_start_kv_transfers_non_writer_still_submits_load():
     ],
 )
 def test_load_ready_stream_requires_disjoint_authoritative_destinations(
-    condition, independent
+    condition, independent, monkeypatch
 ):
     """A private ready event cannot bypass any producer of a loaded GPU row."""
     from vllm.v1.core.kv_cache_utils import KVCacheBlockCopy
     from vllm.v1.core.sched.output import SchedulerOutput
 
+    monkeypatch.setattr(torch, "Event", lambda **kwargs: MagicMock(query=lambda: True))
     worker, _ = _make_worker(
         KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
     )
@@ -419,6 +420,73 @@ def test_load_ready_stream_requires_disjoint_authoritative_destinations(
     worker.start_kv_transfers(metadata, scheduler_output=output)
     assert worker.worker.submit_load_independently.call_count == int(independent)
     assert worker.worker.submit_load.call_count == int(not independent)
+
+
+@pytest.mark.parametrize("copy_write", [False, True])
+def test_independent_load_waits_for_earlier_destination_writes(monkeypatch, copy_write):
+    """A later dispatch cannot bypass an unfinished zero or copy on its rows."""
+    from vllm.v1.core.kv_cache_utils import KVCacheBlockCopy
+    from vllm.v1.core.sched.output import SchedulerOutput
+
+    first = MagicMock(query=lambda: True)
+    pending = MagicMock()
+    pending.query.return_value = False
+    events = iter((first, pending))
+    monkeypatch.setattr(torch, "Event", lambda **kwargs: next(events))
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    metadata = _empty_metadata()
+    metadata.experiment_options = {"load_independent_ready_stream": True}
+    output = SchedulerOutput.make_empty()
+    output.kv_connector_metadata = metadata
+    if copy_write:
+        output.kv_cache_block_copies = [KVCacheBlockCopy(4, 0)]
+    else:
+        output.new_block_ids_to_zero = [0]
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+
+    loaded = _load_metadata(10)
+    loaded.experiment_options = metadata.experiment_options
+    output = SchedulerOutput.make_empty()
+    output.kv_connector_metadata = loaded
+    worker.start_kv_transfers(loaded, scheduler_output=output)
+    worker.worker.submit_load.assert_called_once()
+    worker.worker.submit_load_independently.assert_not_called()
+
+    pending.query.return_value = True
+    worker.start_kv_transfers(loaded, scheduler_output=output)
+    worker.worker.submit_load_independently.assert_called_once()
+
+
+def test_independent_load_history_is_bounded_and_rearms_after_disabled(monkeypatch):
+    """Overflow and reactivation use a stream barrier until real completion."""
+    from vllm.v1.core.sched.output import SchedulerOutput
+
+    complete = MagicMock(query=lambda: True)
+    pending = MagicMock(query=lambda: False)
+    events = iter((complete, pending, pending))
+    monkeypatch.setattr(torch, "Event", lambda **kwargs: next(events))
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    metadata = _empty_metadata()
+    metadata.experiment_options = {"load_independent_ready_stream": True}
+    output = SchedulerOutput.make_empty()
+    output.kv_connector_metadata = metadata
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+    worker._load_write_history = [({i + 100}, pending) for i in range(64)]
+    output.new_block_ids_to_zero = [200]
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+    assert len(worker._load_write_history) == 0
+    assert worker._load_write_barrier is pending
+    metadata.experiment_options["load_independent_ready_stream"] = False
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+    assert not worker._load_write_history_active
+    metadata.experiment_options["load_independent_ready_stream"] = True
+    output.new_block_ids_to_zero = []
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+    assert worker._load_write_barrier is pending
 
 
 @pytest.mark.parametrize("grouped", [False, True])

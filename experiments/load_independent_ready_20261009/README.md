@@ -33,3 +33,18 @@ Only the new readiness policy differs. It uses continuous 300-request episodes
 with the reviewed 75-prefix CPU working set and distinct suffixes. Record guard
 reasons, actual compute-stream readiness and performance; do not infer overlap
 from the flag alone.
+
+## Earlier-dispatch writes
+
+The ready-stream proposal also tracks zeroing and copy-on-write accesses
+from earlier dispatches with real completion events. A later load whose
+destination intersects an unfinished access uses the ordinary stream.
+Enabling the flag or missing authoritative context records a conservative
+stream barrier. History is bounded to 64 events; overflow falls back to a
+stream barrier until completion. No zeroing, copy or completion wait is
+removed. Disabling and enabling the policy rearms this barrier.
+
+The added CPU checks cover unfinished zeroing and copies, release only
+after completion, bounded overflow and policy reactivation. The full
+worker CPU subset passed 32 checks with 8 GPU allocation checks excluded
+while the independent serving allocation was still pending.

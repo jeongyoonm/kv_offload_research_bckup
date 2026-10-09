@@ -60,6 +60,9 @@ class OffloadingConnectorWorker:
 
         # job_id -> req_id for in-flight loads.
         self._load_jobs: dict[int, ReqId] = {}
+        self._load_write_history: list[tuple[set[int], torch.Event]] = []
+        self._load_write_barrier: torch.Event | None = None
+        self._load_write_history_active = False
         self._grouped_load_completion = (
             spec.config.extra_config.get("grouped_load_completion", False) is True
         )
@@ -290,6 +293,7 @@ class OffloadingConnectorWorker:
         configure = getattr(self.worker, "configure_experiment", None)
         if configure is not None:
             configure(metadata.experiment_options)
+        self._track_load_destination_writes(metadata, scheduler_output)
         if queue_stages.active and self._unsubmitted_store_jobs:
             queue_stages.emit(
                 "deferred_store_submission_begin",
@@ -331,6 +335,51 @@ class OffloadingConnectorWorker:
             success = submit(job_id, entry.src_spec, entry.dst_spec)
             assert success
 
+    def _track_load_destination_writes(
+        self,
+        metadata: OffloadingConnectorMetadata,
+        scheduler_output: "SchedulerOutput | None",
+    ) -> None:
+        enabled = metadata.experiment_options.get(
+            "load_independent_ready_stream", False
+        )
+        if not enabled:
+            self._load_write_history_active = False
+            return
+        if not self._load_write_history_active:
+            self._load_write_history.clear()
+            self._load_write_barrier = torch.Event(device="cuda")
+            self._load_write_barrier.record()
+            self._load_write_history_active = True
+        barrier = self._load_write_barrier
+        if barrier is not None and barrier.query():
+            self._load_write_barrier = None
+            self._load_write_history.clear()
+        self._load_write_history = [
+            (blocks, event)
+            for blocks, event in self._load_write_history
+            if not event.query()
+        ]
+        if (
+            scheduler_output is None
+            or scheduler_output.kv_connector_metadata is not metadata
+        ):
+            self._load_write_barrier = torch.Event(device="cuda")
+            self._load_write_barrier.record()
+            return
+        blocks = set(scheduler_output.new_block_ids_to_zero or ())
+        for copy in scheduler_output.kv_cache_block_copies or ():
+            blocks.update((copy.src_block_id, copy.dst_block_id))
+        if not blocks:
+            return
+        event = torch.Event(device="cuda")
+        event.record()
+        if self._load_write_barrier is not None or len(self._load_write_history) >= 64:
+            self._load_write_barrier = event
+            self._load_write_history.clear()
+        else:
+            self._load_write_history.append((blocks, event))
+
     def _independent_load_reason(
         self,
         metadata: OffloadingConnectorMetadata,
@@ -355,6 +404,13 @@ class OffloadingConnectorWorker:
         ):
             return "other-cache-writes"
         destinations = set(map(int, destination.block_ids))
+        if self._load_write_barrier is not None:
+            return "prior-write-barrier"
+        if any(
+            not destinations.isdisjoint(blocks)
+            for blocks, _ in self._load_write_history
+        ):
+            return "prior-destination-write"
         if not destinations.isdisjoint(scheduler_output.new_block_ids_to_zero or ()):
             return "destination-zeroing"
         copies = scheduler_output.kv_cache_block_copies or ()

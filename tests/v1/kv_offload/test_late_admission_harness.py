@@ -269,6 +269,7 @@ def test_frozen_shape_correction_controls_deadline_and_preserves_snapshot(
     assert transport["prediction"]["shape_calibration_fallback"] is not supported
     assert set(acknowledged) & core.scheduler._late_kv_snapshot == {"early"}
     assert transport["statuses"][:8] == [1] * 8
+    clock.base_at = None  # The preparation acknowledgment file is retired at seal.
     clock.now += 1
     core._refresh_early_load_readiness()
     assert "late" in core.scheduler.finished_recving_kv_req_ids

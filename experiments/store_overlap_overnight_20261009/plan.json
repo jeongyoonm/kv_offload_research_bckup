@@ -81,7 +81,7 @@
       "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
       "hypothesis": "Validate cache-resident GPU-only ceiling with capacity-fitting matched controls",
       "status": "prepared, conditional on successful store fix",
-      "current_head": "2cc38df60ff754216ed2153c96648436b14a5127"
+      "current_head": "16549324b4a7f6e6cd89365c55724aa4f524f96a"
     },
     {
       "branch": "experiment/load-store-descriptor-coalescing-20261009",
@@ -109,14 +109,14 @@
       "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
       "artifacts": "per-mode/probe roots in the requested storage",
       "hypothesis": "Move store driver calls to a separate native I/O worker; distinguish full-store and 8 MiB copies",
-      "current_head": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
+      "current_head": "66b885baa13e156b12416ee316bb3b27fe547136"
     },
     {
       "branch": "experiment/kv-allocation-order-coalescing-20261009",
       "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
       "artifacts": "/mnt/localnvme/jeongyoon/so1",
       "hypothesis": "Assign selected GPU blocks in physical order to enable address-pair merging",
-      "current_head": "052ae875b5a1812036a9e85359924c6020dd4d3c"
+      "current_head": "2e3eb2ff0e2c2d33f2b536a62748aa413914c809"
     },
     {
       "branch": "experiment/kv-packet-aligned-coalescing-20261009",
@@ -147,7 +147,7 @@
       ],
       "verification": "48 CPU mapping/regression checks passed; GLM 99-page real-GPU roundtrip gate precedes serving",
       "workload": "two continuous 300-request episodes per mode, working set 75 prefixes, four unique suffixes per prefix",
-      "current_head": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+      "current_head": "cbfdb998395264934e5f019c27e9c6daada6e212"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
@@ -155,7 +155,8 @@
       "hypothesis": "Avoid unrelated compute dependencies only when authoritative load destinations are independent",
       "branch": "experiment/load-independent-ready-stream-20261009",
       "commit": "b2b14676bc5f16f91b226178e9d10c47951ba0e5",
-      "current_head": "b2b14676bc5f16f91b226178e9d10c47951ba0e5"
+      "current_head": "f2d7584a7c2e9cf764ca6588df18675b10daea3c",
+      "safety_audit": "f2d7584 adds bounded earlier-dispatch zero/COW completion tracking; 32 CPU subset checks passed before serving launch."
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_gpu_tensor_ceiling_20261009",
@@ -171,42 +172,47 @@
       "hypothesis": "Avoid sorting descriptors when no physical merges exist",
       "branch": "experiment/descriptor-order-preservation-20261009",
       "commit": "2a65915af75121d96d91e06fd263c52390895411",
-      "current_head": "2a65915af75121d96d91e06fd263c52390895411"
+      "current_head": "30721e442351ac75872e53e657e32d9d89398ad0"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
       "artifacts": "stc",
       "hypothesis": "Keep selected recycled CPU rows aligned with ascending GPU assignment",
       "branch": "experiment/cpu-recycled-block-order-20261009",
-      "commit": "c5b54afeae36a02bdafa0b9f5a0913fec854e190"
+      "commit": "c5b54afeae36a02bdafa0b9f5a0913fec854e190",
+      "current_head": "77856382ca35fcc841d7fc10b25b286a33229890"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_gpu_independent_ceiling_20261009",
       "artifacts": "sg3 conditional",
       "hypothesis": "Match resident CPU controls with the verified guarded independent load path",
       "branch": "experiment/gpu-prefix-ceiling-independent-controls-20261009",
-      "commit": "5783f0d6c377ad54d8234c409af4cdd4952267e0"
+      "commit": "5783f0d6c377ad54d8234c409af4cdd4952267e0",
+      "current_head": "5783f0d6c377ad54d8234c409af4cdd4952267e0"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
       "artifacts": "sg4",
       "hypothesis": "Explicitly match and audit process-local THP policy for GPU-only resident controls",
       "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
-      "commit": "c17a114232e06e47f279ee049ae06de626f3c899"
+      "commit": "c17a114232e06e47f279ee049ae06de626f3c899",
+      "current_head": "c17a114232e06e47f279ee049ae06de626f3c899"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
       "artifacts": "sg3 conditional",
       "hypothesis": "Use the verified native D2H candidate in matched CPU resident controls if it remains the best serving design",
       "branch": "experiment/gpu-prefix-ceiling-native-controls-20261009",
-      "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df"
+      "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df",
+      "current_head": "81833459891a76b5a3079f4a5120acd8ca48a7df"
     },
     {
       "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
       "artifacts": "snl conditional",
       "hypothesis": "Recalibrate the conservative setup lead after measured native D2H setup delay reduction",
       "branch": "experiment/native-d2h-deadline-lead-calibration-20261009",
-      "commit": "acc2fd2fd0a0996b2ee705aae29bb241ab869d72"
+      "commit": "acc2fd2fd0a0996b2ee705aae29bb241ab869d72",
+      "current_head": "acc2fd2fd0a0996b2ee705aae29bb241ab869d72"
     }
   ],
   "constraints": [

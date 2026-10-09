@@ -153,6 +153,30 @@ def main():
             )
         gain = independent["paired_changes_percent"]["gpu"]["throughput_rps"]
         lines.extend(["", f"Mean paired throughput change: {gain:+.2f}%."])
+    lead = None
+    if current["snl"]["status"] == "complete":
+        lead = read_run("snl")
+        lines.extend(
+            [
+                "",
+                "## Native store deadline lead",
+                "",
+                "Two matched continuous 300-request episodes per arm. Native full",
+                "store submission and the frozen predictor are fixed; only the",
+                "setup lead differs. The 90 ms prediction subtraction is fixed.",
+                "",
+                "| Mode | Req/s | Gaps ms | Mean TTFT ms | p95 TTFT ms |",
+                "| --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for arm, means in lead["means"].items():
+            lines.append(
+                f"| {arm} | {means['throughput_rps']:.3f} | "
+                f"{means['inter_compute_gap_ms']:.1f} | "
+                f"{means['mean_ttft_ms']:.1f} | {means['p95_ttft_ms']:.1f} |"
+            )
+        gain = lead["paired_changes_percent"]["gpu"]["throughput_rps"]
+        lines.extend(["", f"Mean paired throughput change: {gain:+.2f}%."])
     lines.extend(["", "## Resident-cache references", ""])
     reference_rows = {}
     for name in ("sg1", "sg2", "sg3", "sg4"):
@@ -173,6 +197,48 @@ def main():
                 f"{row['p95_ttft_ms']:.1f} |"
             )
         reference_rows[name] = current[name]["rows"]
+        lines.append("")
+    resident_comparisons = []
+    if all(name in current for name in ("sg2", "sg3", "sg4")):
+        references = {r["workload"]: r for r in current["sg4"]["rows"]}
+        lines.extend(
+            [
+                "## Matched resident working sets",
+                "",
+                "Independent allocations use identical seeds, request counts,",
+                "precision and cache capacities. GPU-only sg4 verifies full",
+                "prefix hits and process-local THP disabling on every worker.",
+                "CPU runs reset GPU cache and require full CPU restoration on",
+                "every request. Mean and p95 TTFT pool measured requests.",
+                "",
+                "| CPU run | Prompt | CPU/GPU req/s | Rate % | Mean TTFT % |",
+                "| --- | --- | ---: | ---: | ---: |",
+            ]
+        )
+        for name in ("sg2", "sg3"):
+            for row in current[name]["rows"]:
+                gpu = references[row["workload"]]
+                assert row["measured_requests"] == gpu["measured_requests"]
+                assert row["requests_per_episode"] == gpu["requests_per_episode"]
+                gain = 100 * (row["throughput_rps"] / gpu["throughput_rps"] - 1)
+                ttft = 100 * (1 - row["mean_ttft_ms"] / gpu["mean_ttft_ms"])
+                lines.append(
+                    f"| {name} | {row['workload']} | "
+                    f"{row['throughput_rps']:.3f}/{gpu['throughput_rps']:.3f} | "
+                    f"{gain:+.2f} | {ttft:+.2f} |"
+                )
+                resident_comparisons.append(
+                    dict(
+                        cpu_root=name,
+                        gpu_root="sg4",
+                        workload=row["workload"],
+                        throughput_change_percent=gain,
+                        mean_ttft_reduction_percent=ttft,
+                        p95_ttft_reduction_percent=(
+                            100 * (1 - row["p95_ttft_ms"] / gpu["p95_ttft_ms"])
+                        ),
+                    )
+                )
         lines.append("")
     lines.extend(
         [
@@ -206,6 +272,15 @@ def main():
         native=native,
         continuous=continuous,
         resident=reference_rows,
+        resident_comparisons=resident_comparisons,
+        native_lead=(
+            dict(
+                means=lead["means"],
+                paired_changes_percent=lead["paired_changes_percent"],
+            )
+            if lead
+            else None
+        ),
         independent=(
             dict(
                 means=independent["means"],

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Reuse the existing gap audit with explicit GPU-fence and store API markers."""
+"""Compare allocation preference with matched global GPU-fence controls."""
 
 import json
 import statistics
@@ -23,8 +23,10 @@ def main():
     comparison = json.loads((root / "comparison.json").read_text())
     comparison["definitions"]["inference"] = (
         "Four matched descriptive repeats, no significance claim. No changes to "
-        "trained weights. Store-before-overwrite dependencies are preserved; "
-        "the GPU arm replaces the host completion wait with a stream fence."
+        "trained weights. Both arms use global GPU reuse fences. Only the GPU "
+        "arm prefers free blocks not read by already-known pending stores. "
+        "Allocation audits are enabled in both arms; capacity, references and "
+        "completion-based retirement are unchanged."
     )
     (root / "comparison.json").write_text(json.dumps(comparison, indent=2) + "\n")
     rows = []

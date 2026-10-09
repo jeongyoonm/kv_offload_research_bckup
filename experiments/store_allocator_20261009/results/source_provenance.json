@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+  "branch": "experiment/store-reuse-allocator-preference-20261009",
+  "commit": "a9ed417b28607447f407f0a079e455ba5b0bfe98"
+}

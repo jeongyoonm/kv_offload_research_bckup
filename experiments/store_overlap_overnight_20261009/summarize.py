@@ -40,6 +40,7 @@ RUNS = {
     "si1": "Independent load ready stream",
     "sv1": "Preencoded allocator control",
     "sdo1": "Preserved descriptor order",
+    "snl": "Native D2H setup lead recalibration",
 }
 
 

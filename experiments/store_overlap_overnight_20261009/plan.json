@@ -200,6 +200,13 @@
       "hypothesis": "Use the verified native D2H candidate in matched CPU resident controls if it remains the best serving design",
       "branch": "experiment/gpu-prefix-ceiling-native-controls-20261009",
       "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+      "artifacts": "snl conditional",
+      "hypothesis": "Recalibrate the conservative setup lead after measured native D2H setup delay reduction",
+      "branch": "experiment/native-d2h-deadline-lead-calibration-20261009",
+      "commit": "acc2fd2fd0a0996b2ee705aae29bb241ab869d72"
     }
   ],
   "constraints": [

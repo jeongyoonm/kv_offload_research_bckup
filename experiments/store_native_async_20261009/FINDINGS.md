@@ -2,18 +2,21 @@
 
 All three independent allocations completed and stopped. Every mode measured
 four same-seed primed/reset episodes of 75 requests, with the exact expected
-CPU prefix restoration, zero GPU prefix hits, one output token and no preemption.
+CPU prefix restoration, zero GPU prefix hits, one output token and no
+preemption.
 All modes retain allocator avoidance and global GPU reuse fencing.
 
-| Mode | Req/s | Gain % | Gaps ms | Pre-forward ms |
+| Mode | Req/s | Gain % | Gaps ms | Exposed pre-fwd ms |
 | --- | ---: | ---: | ---: | ---: |
 | Synchronous | 7.792 | 0.00 | 152.1 | 108.3 |
 | Native full | 7.873 | +1.04 | 34.0 | 10.8 |
 | Native 8 MiB | 7.877 | +1.09 | 71.1 | 10.0 |
 
 Gains are mean same-seed throughput changes across separate allocations.
-Gaps and host boundaries are conservative all-rank diagnostics per episode,
-not additive latency components. Four descriptive repeats do not establish
+Gaps and exposed host phases are conservative all-rank diagnostics per
+episode, not additive latency components. The pre-forward column includes
+only overlap with inter-compute gaps, not total CPU preparation time. Four
+descriptive repeats do not establish
 statistical significance or equivalence between the two native modes.
 
 Native submission removed most main-worker store API work: summed conservative
@@ -46,3 +49,12 @@ The original nondeterministic sparse selector and model execution are unchanged.
 The full raw archives and replay inputs for all modes live in `artifacts`,
 with member hashes re-read and verified. The archived store diagnostics include
 all rank markers and explicitly avoid double-counting nested timing intervals.
+
+Full, unclipped batch setup measurements clarify this distinction. The
+per-batch maximum host interval across ranks from metadata completion to
+forward submission has a mean of 31.3 ms synchronous and 9.4 ms native full.
+Worker entry to forward submission averages 43.7 and 22.0 ms; native full
+has a median of 19.5 ms and maximum of 65.6 ms. These values do not include
+expected waiting behind A on the GPU. Unclipped forward-to-GPU-start waits
+include that overlap and must not be interpreted as exposed bubbles.
+See `FULL_SETUP_INTERVALS.json` for the individual batches and definition.

@@ -1,0 +1,7 @@
+INFO 10-09 14:49:45 [gpu_worker.py:984] Allocating 1 CPU tensors...
+INFO 10-09 14:49:45 [gpu_worker.py:370] KV transfer direction=D2H async_submission=False chunk_bytes=134217728 max_descriptors=4096 primitive=<function swap_blocks_batch at 0x7fef8272e980> canonical_layout=False page_sizes=[131072]
+INFO 10-09 14:49:45 [gpu_worker.py:370] KV transfer direction=H2D async_submission=False chunk_bytes=134217728 max_descriptors=4096 primitive=<function swap_blocks_batch at 0x7fef8272e980> canonical_layout=False page_sizes=[131072]
+INFO 10-09 14:49:45 [gpu_worker.py:984] Allocating 1 CPU tensors...
+INFO 10-09 14:49:45 [gpu_worker.py:370] KV transfer direction=D2H async_submission=False chunk_bytes=134217728 max_descriptors=4096 primitive=<function swap_blocks_batch at 0x7fef8272e980> canonical_layout=False page_sizes=[131072]
+INFO 10-09 14:49:45 [gpu_worker.py:370] KV transfer direction=H2D async_submission=False chunk_bytes=134217728 max_descriptors=4096 primitive=<function swap_blocks_batch at 0x7fef8272e980> canonical_layout=False page_sizes=[131072]
+[{'producer_busy': False, 'negative_control_detected': True, 'error': 'Store inherited later unrelated compute'}, {'producer_busy': True, 'negative_control_detected': True, 'error': 'Store inherited later unrelated compute'}]

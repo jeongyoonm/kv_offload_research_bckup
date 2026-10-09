@@ -1,0 +1,1 @@
+{"source": "/mnt/localnvme/jeongyoon/se2", "archive_sha256": "98769c6b6f08d69d43351ec758f9c17be04d2995317c30f0c03d84d633c55d6d", "archive_bytes": 13960135, "verified": true}

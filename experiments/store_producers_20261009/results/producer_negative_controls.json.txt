@@ -1,0 +1,12 @@
+[
+  {
+    "producer_busy": false,
+    "negative_control_detected": true,
+    "error": "Store inherited later unrelated compute"
+  },
+  {
+    "producer_busy": true,
+    "negative_control_detected": true,
+    "error": "Store inherited later unrelated compute"
+  }
+]

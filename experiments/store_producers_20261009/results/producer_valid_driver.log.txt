@@ -1,0 +1,13 @@
+{"event": "comparison_started", "time": 1791528869.8125887, "expected_cells": 8}
+{"event": "server_ready", "time": 1791529129.996344}
+{"event": "live_cell", "time": 1791529213.354718, "label": "control", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 6.577284886645109}
+{"event": "live_cell", "time": 1791529293.8965194, "label": "gpu", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 7.291519960667936}
+{"event": "live_cell", "time": 1791529471.5990295, "label": "control", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 7.810509595769646}
+{"event": "live_cell", "time": 1791529649.4037066, "label": "gpu", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 7.811592668864775}
+{"event": "live_cell", "time": 1791529828.526088, "label": "gpu", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 6.828572345197359}
+{"event": "live_cell", "time": 1791530006.6966453, "label": "control", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 7.788136423934651}
+{"event": "live_cell", "time": 1791530184.5789607, "label": "control", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 7.839387371569453}
+{"event": "live_cell", "time": 1791530362.6838546, "label": "gpu", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 7.844415144377799}
+{"event": "live_cell", "time": 1791530540.934723, "label": "gpu", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 7.7893517375743695}
+{"event": "live_cell", "time": 1791530719.715313, "label": "control", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 7.831089063162714}
+{"event": "comparison_complete", "time": 1791530719.8015907, "cells": 8}

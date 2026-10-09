@@ -24,7 +24,8 @@ def main():
     comparison["definitions"]["inference"] = (
         "Four matched descriptive repeats, no significance claim. No changes to "
         "trained weights. Store-before-overwrite dependencies are preserved; "
-        "the GPU arm replaces the host completion wait with a stream fence."
+        "both arms use GPU reuse fences; the GPU arm replaces broad compute "
+        "stream dependencies with captured KV producer events."
     )
     (root / "comparison.json").write_text(json.dumps(comparison, indent=2) + "\n")
     rows = []

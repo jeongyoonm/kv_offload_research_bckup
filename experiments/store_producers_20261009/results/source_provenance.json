@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+  "branch": "experiment/store-specific-producer-events-20261009",
+  "commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b"
+}

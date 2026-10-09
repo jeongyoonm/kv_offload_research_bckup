@@ -193,6 +193,13 @@
       "hypothesis": "Explicitly match and audit process-local THP policy for GPU-only resident controls",
       "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
       "commit": "c17a114232e06e47f279ee049ae06de626f3c899"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
+      "artifacts": "sg3 conditional",
+      "hypothesis": "Use the verified native D2H candidate in matched CPU resident controls if it remains the best serving design",
+      "branch": "experiment/gpu-prefix-ceiling-native-controls-20261009",
+      "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df"
     }
   ],
   "constraints": [

@@ -97,24 +97,26 @@ def main():
             )
         summary = json.loads((root / "summary.json").read_text())
         assert summary["complete"] and summary["stopped"], root
-        with (ARTIFACTS / f"{cell['label']}_report.log").open("w") as output:
+        if cell.get("report"):
+            with (ARTIFACTS / f"{cell['label']}_report.log").open("w") as output:
+                subprocess.run(
+                    [str(source / ".venv/bin/python"), cell["report"], str(root)],
+                    cwd=source,
+                    env=environment,
+                    stdout=output,
+                    stderr=output,
+                    check=True,
+                )
+        if cell.get("store_analysis", True):
             subprocess.run(
-                [str(source / ".venv/bin/python"), cell["report"], str(root)],
-                cwd=source,
-                env=environment,
-                stdout=output,
-                stderr=output,
+                [
+                    str(SOURCE / ".venv/bin/python"),
+                    str(Path(__file__).with_name("analyze_stores.py")),
+                    str(root),
+                ],
+                cwd=SOURCE,
                 check=True,
             )
-        subprocess.run(
-            [
-                str(SOURCE / ".venv/bin/python"),
-                str(Path(__file__).with_name("analyze_stores.py")),
-                str(root),
-            ],
-            cwd=SOURCE,
-            check=True,
-        )
         log(
             "run_complete",
             label=cell["label"],

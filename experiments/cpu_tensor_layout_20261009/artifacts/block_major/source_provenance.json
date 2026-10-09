@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+  "branch": "experiment/cpu-private-tensor-layout-20261009",
+  "commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+}

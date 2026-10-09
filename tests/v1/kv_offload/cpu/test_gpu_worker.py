@@ -240,6 +240,47 @@ def test_native_store_orders_delayed_producer_and_source_reuse(
         worker.shutdown()
 
 
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="Native D2H requires CUDA")
+@torch.inference_mode()
+def test_native_store_fifo_and_shutdown_preserve_overlapping_cpu_writes(
+    default_vllm_config,
+):
+    """Stores to one CPU page remain FIFO; shutdown drains the final native job."""
+    page_size = 64 * 1024
+    tensor = torch.empty((2, page_size), dtype=torch.int8, device=DEVICES[0])
+    tensor[0].fill_(0x11)
+    tensor[1].fill_(0x33)
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page_size)],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_d2h_submission=True,
+        async_d2h_chunk_bytes=8192,
+    )
+    cpu = worker._store_handler.dst_tensors[0]
+    try:
+        for job in (1, 2):
+            spec = GPULoadStoreSpec([job - 1], group_sizes=(1,), block_indices=(0,))
+            assert worker.submit_store(job, spec, CPULoadStoreSpec([0]))
+        worker.wait({1, 2})
+        assert [result.job_id for result in worker.get_finished()] == [1, 2]
+        assert not worker.get_finished()
+        torch.testing.assert_close(
+            cpu[0], torch.full((page_size,), 0x33, dtype=torch.int8)
+        )
+        spec = GPULoadStoreSpec([1], group_sizes=(1,), block_indices=(0,))
+        assert worker.submit_store(3, spec, CPULoadStoreSpec([1]))
+    finally:
+        worker.shutdown()
+    torch.testing.assert_close(cpu[1], torch.full((page_size,), 0x33, dtype=torch.int8))
+    assert worker._store_handler._async_submitter_handle is None
+
+
 @pytest.mark.parametrize("failing_handler", ["store", "load"])
 def test_worker_logs_handler_error_and_cleans_region(
     caplog_vllm, monkeypatch: pytest.MonkeyPatch, failing_handler

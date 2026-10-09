@@ -1,0 +1,11 @@
+{
+  "rows": 459,
+  "fallback": 0,
+  "clipped": 0,
+  "full_fit_training_mae_ms": 13.560275971677557,
+  "shadow_runtime_agreement": true,
+  "held_seed_mae_ms": 14.248975791747856,
+  "held_geometry_macro_mae_ms": 16.602895260371188,
+  "artifact_sha256": "34d61efc6f97eb5ad89aaaf4ba6cc6e25b41804880501d0e90bc9892413bcfde",
+  "caveat": "Full-fit query audit is training data only. Fresh serving validation pending."
+}

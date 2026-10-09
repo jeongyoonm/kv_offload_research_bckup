@@ -70,8 +70,17 @@ def analyze(root):
             allocation = defaultdict(list)
             load_descriptors = defaultdict(list)
             load_ready_states = Counter()
+            load_policy_reasons = Counter()
+            independent_compute_states = Counter()
+            geometry = []
             for event in events:
                 name = event["event"]
+                if name == "load_ready_policy":
+                    load_policy_reasons[event["reason"]] += 1
+                if name == "load_independent_stream":
+                    independent_compute_states[str(event["compute_stream_ready"])] += 1
+                if name == "copy_descriptor_geometry":
+                    geometry.append(event)
                 if name == "load_ready_dependency":
                     load_ready_states[str(event["current_stream_ready"])] += 1
                 if name == "store_specific_producer_dependency":
@@ -140,6 +149,9 @@ def analyze(root):
                     key: stats(values) for key, values in load_descriptors.items()
                 },
                 load_ready_states=dict(load_ready_states),
+                load_policy_reasons=dict(load_policy_reasons),
+                independent_compute_states=dict(independent_compute_states),
+                copy_descriptor_geometry=geometry,
             )
         rows.append(
             dict(
@@ -157,7 +169,9 @@ def analyze(root):
         "all-rank inter-compute gaps. Nested markers overlap: do not sum them as "
         "an additive latency breakdown. Producer/stream readiness is a CPU-side "
         "snapshot at dependency submission. Allocation counters describe the "
-        "selection from already-known pending stores only.",
+        "selection from already-known pending stores only. In the independent "
+        "load path, load_ready_states describes its private ready stream; "
+        "independent_compute_states records the original compute stream.",
     )
     (root / "store_diagnostics.json").write_text(json.dumps(output, indent=2) + "\n")
     return output

@@ -68,6 +68,7 @@ def analyze(root):
             descriptor_ratios, descriptors, original_descriptors = [], [], []
             producer_states = Counter()
             allocation = defaultdict(list)
+            load_descriptors = defaultdict(list)
             for event in events:
                 name = event["event"]
                 if name == "store_specific_producer_dependency":
@@ -82,15 +83,18 @@ def analyze(root):
                     original_descriptors.append(original)
                     descriptor_ratios.append(count / original if original else 1)
                 if name == "store_allocation_audit":
-                    for field, value in event.items():
-                        if field not in (
-                            "event",
-                            "time_ns",
-                            "rank",
-                            "generation",
-                            "pid",
-                        ) and isinstance(value, (int, float)):
-                            allocation[field].append(value)
+                    for record in event.get("allocations", []):
+                        for field, value in record.items():
+                            if isinstance(value, (int, float)):
+                                allocation[field].append(value)
+                if name in ("load_descriptors_coalesced", "load_descriptors_prepared"):
+                    for field in (
+                        "original_descriptors",
+                        "num_descriptors",
+                        "max_descriptor_bytes",
+                        "num_bytes",
+                    ):
+                        load_descriptors[field].append(event[field])
                 if name.startswith("store_") and name.endswith("_begin"):
                     pending[name[:-6], event.get("job_id")] = event["time_ns"]
                 elif name.startswith("store_") and name.endswith("_end"):
@@ -117,6 +121,21 @@ def analyze(root):
                 descriptor_ratio=stats(descriptor_ratios),
                 producer_states=dict(producer_states),
                 allocation={key: stats(values) for key, values in allocation.items()},
+                allocation_totals={
+                    key: sum(values)
+                    for key, values in allocation.items()
+                    if key
+                    in (
+                        "requested",
+                        "scanned",
+                        "skipped_pending",
+                        "allocated_pending",
+                        "duration_ns",
+                    )
+                },
+                load_descriptors={
+                    key: stats(values) for key, values in load_descriptors.items()
+                },
             )
         rows.append(
             dict(

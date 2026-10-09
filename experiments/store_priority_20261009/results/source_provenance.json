@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+  "branch": "experiment/store-critical-submission-20261009",
+  "commit": "9b5308951978a265e5a3bc96c6a6b77e2c859148"
+}

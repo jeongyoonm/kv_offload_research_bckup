@@ -19,6 +19,7 @@ collector = baseline.collector
 CURRENT_ARM = "control"
 ARMS = ("control",)
 NATIVE_STORE = False
+D2H_CHUNK_MIB = 8
 
 
 def options(active=False):
@@ -34,21 +35,23 @@ def server_command():
     command[command.index("--port") + 1] = "18436"
     extra = config["kv_connector_extra_config"]
     extra["async_d2h_submission"] = NATIVE_STORE
-    extra["async_d2h_chunk_bytes"] = 8 * 1024 * 1024
+    extra["async_d2h_chunk_bytes"] = D2H_CHUNK_MIB * 1024 * 1024
     command[command.index("--kv-transfer-config") + 1] = json.dumps(config)
     return command, config
 
 
 def main():
-    global CURRENT_ARM, NATIVE_STORE, ARMS
+    global CURRENT_ARM, NATIVE_STORE, ARMS, D2H_CHUNK_MIB
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=4)
     parser.add_argument("--requests", type=int, default=75)
     parser.add_argument("--preflight-only", action="store_true")
     parser.add_argument("--native-store", action="store_true")
+    parser.add_argument("--d2h-chunk-mib", type=int, choices=(8, 1024), default=8)
     args = parser.parse_args()
     NATIVE_STORE = args.native_store
+    D2H_CHUNK_MIB = args.d2h_chunk_mib
     ARMS = ("gpu",) if NATIVE_STORE else ("control",)
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
@@ -78,7 +81,7 @@ def main():
             chunk_mib=8,
             depth=2,
             native_store=NATIVE_STORE,
-            d2h_chunk_mib=8,
+            d2h_chunk_mib=D2H_CHUNK_MIB,
             d2h_depth=2 if NATIVE_STORE else None,
             policies=policies,
             repeats=args.repeats,

@@ -28,7 +28,7 @@ def main():
         "Four descriptive repeats in an independent allocation per mode, no "
         "significance claim. Allocator avoidance and global GPU reuse fences "
         "are selected in both modes. Native D2H moves submission to a separate "
-        "I/O worker with 8 MiB chunks and depth two. Source access remains "
+        "I/O worker with the plan's chunk size and depth two. Source access remains "
         "STREAM ordered after the caller's recorded producer. If reuse is "
         "necessary, native stores conservatively wait for actual completion "
         "on the host. Reset, lifetime and retirement remain completion based."

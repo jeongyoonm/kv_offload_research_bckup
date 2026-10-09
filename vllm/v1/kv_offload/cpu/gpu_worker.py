@@ -1029,6 +1029,7 @@ class CPUOffloadingWorker(OffloadingWorker):
             canonical_layout=canonical_layout,
             async_d2h_submission=async_d2h_submission,
             async_h2d_chunk_bytes=async_d2h_chunk_bytes,
+            async_h2d_max_descriptors=0,
         )
 
         try:

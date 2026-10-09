@@ -1,0 +1,16 @@
+{
+  "owned_pids": {
+    "67925": false,
+    "76482": false,
+    "79182": false,
+    "81636": false,
+    "84517": false,
+    "87088": false,
+    "90611": false,
+    "94219": false,
+    "97946": false,
+    "100844": false
+  },
+  "gpu_snapshot": "0, 0 MiB, 0 %\n1, 0 MiB, 0 %\n2, 0 MiB, 0 %\n3, 0 MiB, 0 %\n4, 0 MiB, 0 %\n5, 0 MiB, 0 %\n6, 0 MiB, 0 %\n7, 0 MiB, 0 %\n",
+  "gpu_processes": ""
+}

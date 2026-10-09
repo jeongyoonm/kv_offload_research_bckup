@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
+  "branch": "experiment/kv-allocation-order-coalescing-20261009",
+  "commit": "052ae875b5a1812036a9e85359924c6020dd4d3c"
+}

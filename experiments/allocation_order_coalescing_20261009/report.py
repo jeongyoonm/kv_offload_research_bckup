@@ -23,8 +23,9 @@ def main():
     comparison = json.loads((root / "comparison.json").read_text())
     comparison["definitions"]["inference"] = (
         "Four matched descriptive repeats, no significance claim. Both arms "
-        "use allocator avoidance, global GPU reuse fences and physically "
-        "coalesced D2H/H2D descriptors. The candidate assigns already-selected "
+        "use allocator avoidance, global GPU reuse fences and enabled "
+        "D2H/H2D coalescing. Actual descriptors did not merge because the "
+        "private CPU mapping is block-major. The candidate assigns already-selected "
         "new GPU blocks in ascending physical order. Selection capacity and "
         "references are unchanged. Logical block tables adopt that ordering "
         "before computation or loading. Native H2D descriptors stay bounded "

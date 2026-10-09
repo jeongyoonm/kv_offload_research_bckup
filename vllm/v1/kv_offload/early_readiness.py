@@ -74,6 +74,8 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "store_reuse_gpu_fence": False,
     "store_descriptor_coalescing": False,
     "load_descriptor_coalescing": False,
+    "store_reuse_allocator_preference": False,
+    "store_reuse_allocator_audit": False,
     "deferral_policy": "disabled",
     "deferral_hold_ms": 120,
     "deferral_target_gain": 2,

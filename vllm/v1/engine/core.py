@@ -2166,6 +2166,16 @@ class EngineCore:
         readiness.configure(early_load_completion, schedule_delay_ms)
         readiness.experiment_options = options
         self.scheduler._kv_experiment_options = options
+        cache_manager = getattr(self.scheduler, "kv_cache_manager", None)
+        if cache_manager is not None:
+            block_pool = cache_manager.block_pool
+            block_pool.prefer_unfenced_blocks = options[
+                "store_reuse_allocator_preference"
+            ]
+            block_pool.audit_store_allocations = options["store_reuse_allocator_audit"]
+            block_pool.store_allocation_audit = []
+        elif options["store_reuse_allocator_preference"]:
+            raise ValueError("Store-aware allocation requires a GPU block pool")
         assert self.vllm_config.kv_transfer_config is not None
         extra = self.vllm_config.kv_transfer_config.kv_connector_extra_config
         extra["early_load_completion"] = readiness.enabled

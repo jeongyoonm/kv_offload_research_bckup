@@ -23,13 +23,13 @@ from pathlib import Path
 from matrix import build
 
 SOURCE = Path(__file__).resolve().parents[2]
-ROOT = Path("/mnt/localnvme/glm53_dataset_coverage_20261007")
+ROOT = Path("/mnt/localnvme/jeongyoon/glm53_dataset_coverage_20261007")
 BASE = "http://127.0.0.1:18407"
 MODEL = (
     "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/"
     "snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8"
 )
-HIST = Path("/mnt/localnvme/glm53_predictor_overnight_20261006")
+HIST = Path("/mnt/localnvme/jeongyoon/glm53_predictor_overnight_20261006")
 
 
 def save(path, value):
@@ -90,7 +90,7 @@ def reset(external):
 
 def options(active=False):
     original = Path(
-        "/mnt/localnvme/glm53_predictor_overnight_20261006/dense_cached/micro_warm/p16384_f95_h100/n8/p16384_f95_h100/r0_micro/policy_setting.json"
+        "/mnt/localnvme/jeongyoon/glm53_predictor_overnight_20261006/dense_cached/micro_warm/p16384_f95_h100/n8/p16384_f95_h100/r0_micro/policy_setting.json"
     )
     result = json.loads(original.read_text())
     result.pop("early_load_completion", None)
@@ -360,7 +360,7 @@ def cohort(family, seed, repeat, split, *, retries=0):
 
 def server_command():
     old = Path(
-        "/mnt/localnvme/glm53_predictor_overnight_20261006/dense_cached/canary/gpu/server/command.json"
+        "/mnt/localnvme/jeongyoon/glm53_predictor_overnight_20261006/dense_cached/canary/gpu/server/command.json"
     )
     command = json.loads(old.read_text())
     command[1] = str(Path(__file__).resolve())
@@ -414,8 +414,8 @@ def launch():
         VLLM_DEFERRAL_FAST_FOREST=str(
             HIST / "fast_forest/build/libpredictor_forest_walk.so"
         ),
-        VLLM_CACHE_ROOT="/mnt/localnvme/cpu_cache_init_20261007/glm_canary_final/vllm_cache",
-        FLASHINFER_WORKSPACE_BASE="/mnt/localnvme/cpu_cache_init_20261007/glm_canary_final/flashinfer_workspace",
+        VLLM_CACHE_ROOT="/mnt/localnvme/jeongyoon/cpu_cache_init_20261007/glm_canary_final/vllm_cache",
+        FLASHINFER_WORKSPACE_BASE="/mnt/localnvme/jeongyoon/cpu_cache_init_20261007/glm_canary_final/flashinfer_workspace",
         TMPDIR=str(ROOT / "tmp"),
     )
     env["PATH"] = (

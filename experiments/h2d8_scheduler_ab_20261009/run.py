@@ -151,7 +151,10 @@ def main():
         assert result["accepted"], result
         if policy == "C":
             assert result["late_admissions"] == 0
-            assert not result["worker_preparation_coverage"]
+            assert all(
+                coverage["compact"] == coverage["pinned"] == 0
+                for coverage in result["worker_preparation_coverage"].values()
+            )
         return result
 
     try:

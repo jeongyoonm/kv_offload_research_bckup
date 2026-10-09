@@ -45,7 +45,7 @@ Accepted episodes require exact expected CPU-cache restoration counts,
 unchanged predictor state, one output token per request, no preemptions,
 and no unexpected GPU prefix-cache hits. D additionally requires compact
 and pinned preparation coverage on every rank. C requires no late
-admissions and no preparation entries.
+admissions and no compact or pinned preparation usage.
 
 After completion:
 

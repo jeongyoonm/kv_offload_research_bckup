@@ -1,0 +1,55 @@
+{
+  "episodes": [
+    {
+      "arm": "gpu",
+      "repeat": 0,
+      "client_elapsed_ms": 9622.777078000001,
+      "response_span_ms": 9622.315984,
+      "before_first_compute_ms": 235.169548,
+      "gpu_span_ms": 9329.928587,
+      "after_last_compute_ms": 57.217849,
+      "client_harness_overhead_ms": 0.46109400000023015
+    },
+    {
+      "arm": "gpu",
+      "repeat": 1,
+      "client_elapsed_ms": 9537.05351,
+      "response_span_ms": 9536.551163,
+      "before_first_compute_ms": 236.306544,
+      "gpu_span_ms": 9244.587453,
+      "after_last_compute_ms": 55.657166,
+      "client_harness_overhead_ms": 0.502346999999645
+    },
+    {
+      "arm": "gpu",
+      "repeat": 2,
+      "client_elapsed_ms": 9447.797086999999,
+      "response_span_ms": 9447.336571,
+      "before_first_compute_ms": 211.143254,
+      "gpu_span_ms": 9145.340385,
+      "after_last_compute_ms": 90.852932,
+      "client_harness_overhead_ms": 0.46051599999918835
+    },
+    {
+      "arm": "gpu",
+      "repeat": 3,
+      "client_elapsed_ms": 9499.665278,
+      "response_span_ms": 9499.141367,
+      "before_first_compute_ms": 217.460139,
+      "gpu_span_ms": 9228.591626,
+      "after_last_compute_ms": 53.089602,
+      "client_harness_overhead_ms": 0.5239110000002256
+    }
+  ],
+  "means": {
+    "gpu": {
+      "client_elapsed_ms": 9526.82323825,
+      "response_span_ms": 9526.33627125,
+      "before_first_compute_ms": 225.01987125,
+      "gpu_span_ms": 9237.11201275,
+      "after_last_compute_ms": 64.20438725,
+      "client_harness_overhead_ms": 0.4869669999998223
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

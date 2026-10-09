@@ -1,0 +1,5727 @@
+{
+  "complete": true,
+  "results": [
+    {
+      "accepted": true,
+      "label": "control",
+      "workload": "familiar60k",
+      "seed": 9301,
+      "repeat": 0,
+      "concurrency": 32,
+      "requests": 75,
+      "seconds": 9.622051071,
+      "throughput_rps": 7.794595917916429,
+      "mean_ttft_ms": 3550.7180148,
+      "p50_ttft_ms": 3706.663028,
+      "p95_ttft_ms": 4842.7479841,
+      "frozen_unchanged": true,
+      "checkpoint_sha256": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "compute_rounds": 12,
+      "expected_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "observed_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "late_admissions": 71,
+      "kv_ready_during_compute": 74,
+      "recovered_compute_opportunities": 71,
+      "worker_preparation_coverage": {
+        "0": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "1": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "2": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "3": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "4": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "5": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "6": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "7": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        }
+      },
+      "optimized_preparation_verified": true,
+      "preparation_required": true,
+      "responses": [
+        {
+          "request": "live-main-9301-0",
+          "start_ns": 2115355014354033,
+          "first_ns": 2115357270762743,
+          "end_ns": 2115357273823475,
+          "ttft_ms": 2256.40871,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-1",
+          "start_ns": 2115355017071694,
+          "first_ns": 2115355473817890,
+          "end_ns": 2115355473892753,
+          "ttft_ms": 456.746196,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-2",
+          "start_ns": 2115355019852218,
+          "first_ns": 2115356348222026,
+          "end_ns": 2115356352393774,
+          "ttft_ms": 1328.369808,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9301-3",
+          "start_ns": 2115355022382801,
+          "first_ns": 2115356348315962,
+          "end_ns": 2115356354977617,
+          "ttft_ms": 1325.933161,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "12"
+        },
+        {
+          "request": "live-main-9301-4",
+          "start_ns": 2115355025246834,
+          "first_ns": 2115355797537433,
+          "end_ns": 2115355797685091,
+          "ttft_ms": 772.290599,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-5",
+          "start_ns": 2115355027733980,
+          "first_ns": 2115355797637007,
+          "end_ns": 2115355800593401,
+          "ttft_ms": 769.903027,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-6",
+          "start_ns": 2115355030319554,
+          "first_ns": 2115356348117005,
+          "end_ns": 2115356348459277,
+          "ttft_ms": 1317.797451,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-7",
+          "start_ns": 2115355034477353,
+          "first_ns": 2115356348410946,
+          "end_ns": 2115356357807560,
+          "ttft_ms": 1313.933593,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "27"
+        },
+        {
+          "request": "live-main-9301-8",
+          "start_ns": 2115355037207431,
+          "first_ns": 2115357267591539,
+          "end_ns": 2115357270809812,
+          "ttft_ms": 2230.384108,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-9",
+          "start_ns": 2115355039765666,
+          "first_ns": 2115357279409003,
+          "end_ns": 2115357282342827,
+          "ttft_ms": 2239.643337,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-10",
+          "start_ns": 2115355042561046,
+          "first_ns": 2115357267696704,
+          "end_ns": 2115357276439853,
+          "ttft_ms": 2225.135658,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-11",
+          "start_ns": 2115355045184304,
+          "first_ns": 2115357267480094,
+          "end_ns": 2115357267836773,
+          "ttft_ms": 2222.29579,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-12",
+          "start_ns": 2115355047988397,
+          "first_ns": 2115357267789903,
+          "end_ns": 2115357279481445,
+          "ttft_ms": 2219.801506,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "13"
+        },
+        {
+          "request": "live-main-9301-13",
+          "start_ns": 2115355050750139,
+          "first_ns": 2115357273774466,
+          "end_ns": 2115357284952010,
+          "ttft_ms": 2223.024327,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-14",
+          "start_ns": 2115355055015241,
+          "first_ns": 2115358516798039,
+          "end_ns": 2115358519902945,
+          "ttft_ms": 3461.782798,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9301-15",
+          "start_ns": 2115355057633813,
+          "first_ns": 2115358519856848,
+          "end_ns": 2115358529251496,
+          "ttft_ms": 3462.223035,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-16",
+          "start_ns": 2115355060156593,
+          "first_ns": 2115358513765762,
+          "end_ns": 2115358537586539,
+          "ttft_ms": 3453.609169,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "7"
+        },
+        {
+          "request": "live-main-9301-17",
+          "start_ns": 2115355062709942,
+          "first_ns": 2115358513667198,
+          "end_ns": 2115358531923107,
+          "ttft_ms": 3450.957256,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-18",
+          "start_ns": 2115355065372025,
+          "first_ns": 2115358531865465,
+          "end_ns": 2115358534733651,
+          "ttft_ms": 3466.49344,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-19",
+          "start_ns": 2115355068143048,
+          "first_ns": 2115358513562369,
+          "end_ns": 2115358522797644,
+          "ttft_ms": 3445.419321,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9301-20",
+          "start_ns": 2115355070623897,
+          "first_ns": 2115358540380393,
+          "end_ns": 2115358540527764,
+          "ttft_ms": 3469.756496,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "30"
+        },
+        {
+          "request": "live-main-9301-21",
+          "start_ns": 2115355073304086,
+          "first_ns": 2115358513341866,
+          "end_ns": 2115358513814946,
+          "ttft_ms": 3440.03778,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-22",
+          "start_ns": 2115355075918750,
+          "first_ns": 2115358522751725,
+          "end_ns": 2115358526393574,
+          "ttft_ms": 3446.832975,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-23",
+          "start_ns": 2115355078504503,
+          "first_ns": 2115358513453038,
+          "end_ns": 2115358516843778,
+          "ttft_ms": 3434.948535,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-24",
+          "start_ns": 2115355081452151,
+          "first_ns": 2115359832996916,
+          "end_ns": 2115359838814060,
+          "ttft_ms": 4751.544765,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-25",
+          "start_ns": 2115355084082812,
+          "first_ns": 2115359838751496,
+          "end_ns": 2115359852623314,
+          "ttft_ms": 4754.668684,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-26",
+          "start_ns": 2115355086699054,
+          "first_ns": 2115359833184385,
+          "end_ns": 2115359849914613,
+          "ttft_ms": 4746.485331,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9301-27",
+          "start_ns": 2115355089276993,
+          "first_ns": 2115359827229903,
+          "end_ns": 2115359833302909,
+          "ttft_ms": 4737.95291,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-28",
+          "start_ns": 2115355092095403,
+          "first_ns": 2115359826890868,
+          "end_ns": 2115359827370343,
+          "ttft_ms": 4734.795465,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9301-29",
+          "start_ns": 2115355094864876,
+          "first_ns": 2115359833095637,
+          "end_ns": 2115359844307561,
+          "ttft_ms": 4738.230761,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-30",
+          "start_ns": 2115355097491339,
+          "first_ns": 2115359827324020,
+          "end_ns": 2115359836144091,
+          "ttft_ms": 4729.832681,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-31",
+          "start_ns": 2115355100277193,
+          "first_ns": 2115359832913978,
+          "end_ns": 2115359856575853,
+          "ttft_ms": 4732.636785,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-32",
+          "start_ns": 2115355473915570,
+          "first_ns": 2115359827054850,
+          "end_ns": 2115359830320694,
+          "ttft_ms": 4353.13928,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9301-33",
+          "start_ns": 2115355797713792,
+          "first_ns": 2115359827150341,
+          "end_ns": 2115359841660151,
+          "ttft_ms": 4029.436549,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-34",
+          "start_ns": 2115355800615585,
+          "first_ns": 2115359833260536,
+          "end_ns": 2115359847109258,
+          "ttft_ms": 4032.644951,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9301-35",
+          "start_ns": 2115356348490446,
+          "first_ns": 2115360237318310,
+          "end_ns": 2115360237626223,
+          "ttft_ms": 3888.827864,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "16"
+        },
+        {
+          "request": "live-main-9301-36",
+          "start_ns": 2115356352420820,
+          "first_ns": 2115360237498720,
+          "end_ns": 2115360243995659,
+          "ttft_ms": 3885.0779,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-37",
+          "start_ns": 2115356355007530,
+          "first_ns": 2115360237429148,
+          "end_ns": 2115360241232465,
+          "ttft_ms": 3882.421618,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-38",
+          "start_ns": 2115356357835084,
+          "first_ns": 2115360237580683,
+          "end_ns": 2115360246803057,
+          "ttft_ms": 3879.745599,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "17"
+        },
+        {
+          "request": "live-main-9301-39",
+          "start_ns": 2115357267866709,
+          "first_ns": 2115360934568510,
+          "end_ns": 2115360934653273,
+          "ttft_ms": 3666.701801,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-40",
+          "start_ns": 2115357270835736,
+          "first_ns": 2115360922829202,
+          "end_ns": 2115360923110393,
+          "ttft_ms": 3651.993466,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "12"
+        },
+        {
+          "request": "live-main-9301-41",
+          "start_ns": 2115357273859023,
+          "first_ns": 2115360922934009,
+          "end_ns": 2115360925973768,
+          "ttft_ms": 3649.074986,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-42",
+          "start_ns": 2115357276464201,
+          "first_ns": 2115360923063823,
+          "end_ns": 2115360931555746,
+          "ttft_ms": 3646.599622,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-43",
+          "start_ns": 2115357279507018,
+          "first_ns": 2115360925924388,
+          "end_ns": 2115360928789898,
+          "ttft_ms": 3646.41737,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-44",
+          "start_ns": 2115357282371060,
+          "first_ns": 2115362126543787,
+          "end_ns": 2115362127012779,
+          "ttft_ms": 4844.172727,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-45",
+          "start_ns": 2115357284982624,
+          "first_ns": 2115362127120004,
+          "end_ns": 2115362127512046,
+          "ttft_ms": 4842.13738,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9301-46",
+          "start_ns": 2115358513839035,
+          "first_ns": 2115362126757389,
+          "end_ns": 2115362127288910,
+          "ttft_ms": 3612.918354,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-47",
+          "start_ns": 2115358516871792,
+          "first_ns": 2115362127594313,
+          "end_ns": 2115362127715923,
+          "ttft_ms": 3610.722521,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9301-48",
+          "start_ns": 2115358519932995,
+          "first_ns": 2115362126959224,
+          "end_ns": 2115362127477676,
+          "ttft_ms": 3607.026229,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-49",
+          "start_ns": 2115358522831966,
+          "first_ns": 2115362127432094,
+          "end_ns": 2115362127670415,
+          "ttft_ms": 3604.600128,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-50",
+          "start_ns": 2115358526416182,
+          "first_ns": 2115362127243350,
+          "end_ns": 2115362127639947,
+          "ttft_ms": 3600.827168,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-51",
+          "start_ns": 2115358529274896,
+          "first_ns": 2115362126651950,
+          "end_ns": 2115362127167216,
+          "ttft_ms": 3597.377054,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-52",
+          "start_ns": 2115358531954355,
+          "first_ns": 2115362126863886,
+          "end_ns": 2115362127323955,
+          "ttft_ms": 3594.909531,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-53",
+          "start_ns": 2115358534757880,
+          "first_ns": 2115363802423622,
+          "end_ns": 2115363803135401,
+          "ttft_ms": 5267.665742,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "70"
+        },
+        {
+          "request": "live-main-9301-54",
+          "start_ns": 2115358537607534,
+          "first_ns": 2115363803220279,
+          "end_ns": 2115363803784423,
+          "ttft_ms": 5265.612745,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-55",
+          "start_ns": 2115358540551501,
+          "first_ns": 2115363803089865,
+          "end_ns": 2115363803752507,
+          "ttft_ms": 5262.538364,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-56",
+          "start_ns": 2115359827399518,
+          "first_ns": 2115363802316792,
+          "end_ns": 2115363802968774,
+          "ttft_ms": 3974.917274,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-57",
+          "start_ns": 2115359830347541,
+          "first_ns": 2115363802114855,
+          "end_ns": 2115363802576023,
+          "ttft_ms": 3971.767314,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9301-58",
+          "start_ns": 2115359833325706,
+          "first_ns": 2115363802213734,
+          "end_ns": 2115363802807739,
+          "ttft_ms": 3968.888028,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-59",
+          "start_ns": 2115359836165659,
+          "first_ns": 2115363802763338,
+          "end_ns": 2115363802840460,
+          "ttft_ms": 3966.597679,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9301-60",
+          "start_ns": 2115359838839591,
+          "first_ns": 2115363802524704,
+          "end_ns": 2115363803262910,
+          "ttft_ms": 3963.685113,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-61",
+          "start_ns": 2115359841681751,
+          "first_ns": 2115363802924201,
+          "end_ns": 2115363803005923,
+          "ttft_ms": 3961.24245,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9301-62",
+          "start_ns": 2115359844331170,
+          "first_ns": 2115363803588557,
+          "end_ns": 2115363803884253,
+          "ttft_ms": 3959.257387,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-63",
+          "start_ns": 2115359847130978,
+          "first_ns": 2115363803686106,
+          "end_ns": 2115363803923082,
+          "ttft_ms": 3956.555128,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9301-64",
+          "start_ns": 2115359849935500,
+          "first_ns": 2115363803484927,
+          "end_ns": 2115363803851629,
+          "ttft_ms": 3953.549427,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9301-65",
+          "start_ns": 2115359852652981,
+          "first_ns": 2115363802664615,
+          "end_ns": 2115363803300304,
+          "ttft_ms": 3950.011634,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "23"
+        },
+        {
+          "request": "live-main-9301-66",
+          "start_ns": 2115359856596499,
+          "first_ns": 2115363803387146,
+          "end_ns": 2115363803818659,
+          "ttft_ms": 3946.790647,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9301-67",
+          "start_ns": 2115360237652976,
+          "first_ns": 2115364146078683,
+          "end_ns": 2115364146324221,
+          "ttft_ms": 3908.425707,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9301-68",
+          "start_ns": 2115360241253565,
+          "first_ns": 2115364146172541,
+          "end_ns": 2115364146452957,
+          "ttft_ms": 3904.918976,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-69",
+          "start_ns": 2115360244024823,
+          "first_ns": 2115364146406420,
+          "end_ns": 2115364146484086,
+          "ttft_ms": 3902.381597,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "3"
+        },
+        {
+          "request": "live-main-9301-70",
+          "start_ns": 2115360246827714,
+          "first_ns": 2115364146276732,
+          "end_ns": 2115364146538953,
+          "ttft_ms": 3899.449018,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-71",
+          "start_ns": 2115360923133678,
+          "first_ns": 2115364635777233,
+          "end_ns": 2115364635887878,
+          "ttft_ms": 3712.643555,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9301-72",
+          "start_ns": 2115360926006047,
+          "first_ns": 2115364635657825,
+          "end_ns": 2115364635855209,
+          "ttft_ms": 3709.651778,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-73",
+          "start_ns": 2115360928812062,
+          "first_ns": 2115364635475090,
+          "end_ns": 2115364635702689,
+          "ttft_ms": 3706.663028,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9301-74",
+          "start_ns": 2115360931577359,
+          "first_ns": 2115364635568322,
+          "end_ns": 2115364635824591,
+          "ttft_ms": 3703.990963,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        }
+      ],
+      "metrics_before": {
+        "vllm:kv_offload_load_bytes_total": 712743321600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "metrics_after": {
+        "vllm:kv_offload_load_bytes_total": 2383235481600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      }
+    },
+    {
+      "accepted": true,
+      "label": "control",
+      "workload": "familiar60k",
+      "seed": 9302,
+      "repeat": 1,
+      "concurrency": 32,
+      "requests": 75,
+      "seconds": 9.656573029,
+      "throughput_rps": 7.766730472059272,
+      "mean_ttft_ms": 3548.041669306667,
+      "p50_ttft_ms": 3706.814656,
+      "p95_ttft_ms": 4888.499095,
+      "frozen_unchanged": true,
+      "checkpoint_sha256": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "compute_rounds": 12,
+      "expected_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "observed_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "late_admissions": 67,
+      "kv_ready_during_compute": 73,
+      "recovered_compute_opportunities": 66,
+      "worker_preparation_coverage": {
+        "0": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "1": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "2": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "3": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "4": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "5": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "6": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "7": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        }
+      },
+      "optimized_preparation_verified": true,
+      "preparation_required": true,
+      "responses": [
+        {
+          "request": "live-main-9302-0",
+          "start_ns": 2115533695931993,
+          "first_ns": 2115534528887621,
+          "end_ns": 2115534531944628,
+          "ttft_ms": 832.955628,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-1",
+          "start_ns": 2115533698657153,
+          "first_ns": 2115534206249771,
+          "end_ns": 2115534206333082,
+          "ttft_ms": 507.592618,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-2",
+          "start_ns": 2115533701180423,
+          "first_ns": 2115535081084605,
+          "end_ns": 2115535083818218,
+          "ttft_ms": 1379.904182,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-3",
+          "start_ns": 2115533703958075,
+          "first_ns": 2115535080961396,
+          "end_ns": 2115535086731516,
+          "ttft_ms": 1377.003321,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "98"
+        },
+        {
+          "request": "live-main-9302-4",
+          "start_ns": 2115533706467739,
+          "first_ns": 2115534528783881,
+          "end_ns": 2115534528937235,
+          "ttft_ms": 822.316142,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-5",
+          "start_ns": 2115533709300204,
+          "first_ns": 2115536022010194,
+          "end_ns": 2115536025754737,
+          "ttft_ms": 2312.70999,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "29"
+        },
+        {
+          "request": "live-main-9302-6",
+          "start_ns": 2115533711971190,
+          "first_ns": 2115535080852280,
+          "end_ns": 2115535081232763,
+          "ttft_ms": 1368.88109,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9302-7",
+          "start_ns": 2115533714571509,
+          "first_ns": 2115535081179717,
+          "end_ns": 2115535089499604,
+          "ttft_ms": 1366.608208,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-8",
+          "start_ns": 2115533717311668,
+          "first_ns": 2115536010222248,
+          "end_ns": 2115536022067082,
+          "ttft_ms": 2292.91058,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9302-9",
+          "start_ns": 2115533719851453,
+          "first_ns": 2115536007265226,
+          "end_ns": 2115536007635754,
+          "ttft_ms": 2287.413773,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "24"
+        },
+        {
+          "request": "live-main-9302-10",
+          "start_ns": 2115533722642864,
+          "first_ns": 2115536007585346,
+          "end_ns": 2115536016122573,
+          "ttft_ms": 2284.942482,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-11",
+          "start_ns": 2115533725214395,
+          "first_ns": 2115536013197949,
+          "end_ns": 2115536019062931,
+          "ttft_ms": 2287.983554,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "10"
+        },
+        {
+          "request": "live-main-9302-12",
+          "start_ns": 2115533727856362,
+          "first_ns": 2115536007482527,
+          "end_ns": 2115536013246175,
+          "ttft_ms": 2279.626165,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-13",
+          "start_ns": 2115533730396648,
+          "first_ns": 2115537375932386,
+          "end_ns": 2115537390483156,
+          "ttft_ms": 3645.535738,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-14",
+          "start_ns": 2115533733091162,
+          "first_ns": 2115536007378921,
+          "end_ns": 2115536010276876,
+          "ttft_ms": 2274.287759,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9302-15",
+          "start_ns": 2115533735873911,
+          "first_ns": 2115537387664290,
+          "end_ns": 2115537404724073,
+          "ttft_ms": 3651.790379,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-16",
+          "start_ns": 2115533738424578,
+          "first_ns": 2115537396247586,
+          "end_ns": 2115537396325110,
+          "ttft_ms": 3657.823008,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-17",
+          "start_ns": 2115533741051973,
+          "first_ns": 2115537381853880,
+          "end_ns": 2115537401663625,
+          "ttft_ms": 3640.801907,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "7"
+        },
+        {
+          "request": "live-main-9302-18",
+          "start_ns": 2115533743566705,
+          "first_ns": 2115537378900399,
+          "end_ns": 2115537381900490,
+          "ttft_ms": 3635.333694,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-19",
+          "start_ns": 2115533746390123,
+          "first_ns": 2115537384773179,
+          "end_ns": 2115537398941988,
+          "ttft_ms": 3638.383056,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "95"
+        },
+        {
+          "request": "live-main-9302-20",
+          "start_ns": 2115533748972601,
+          "first_ns": 2115537375617721,
+          "end_ns": 2115537378950902,
+          "ttft_ms": 3626.64512,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-21",
+          "start_ns": 2115533751591809,
+          "first_ns": 2115537375509699,
+          "end_ns": 2115537375984476,
+          "ttft_ms": 3623.91789,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-22",
+          "start_ns": 2115533754270302,
+          "first_ns": 2115537375834431,
+          "end_ns": 2115537384824560,
+          "ttft_ms": 3621.564129,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-23",
+          "start_ns": 2115533756739429,
+          "first_ns": 2115537387585665,
+          "end_ns": 2115537393408317,
+          "ttft_ms": 3630.846236,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-24",
+          "start_ns": 2115533759470093,
+          "first_ns": 2115538527075699,
+          "end_ns": 2115538530139370,
+          "ttft_ms": 4767.605606,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9302-25",
+          "start_ns": 2115533761944496,
+          "first_ns": 2115537375723436,
+          "end_ns": 2115537387711676,
+          "ttft_ms": 3613.77894,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9302-26",
+          "start_ns": 2115533764774476,
+          "first_ns": 2115538547178779,
+          "end_ns": 2115538550247940,
+          "ttft_ms": 4782.404303,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9302-27",
+          "start_ns": 2115533767271659,
+          "first_ns": 2115538547293994,
+          "end_ns": 2115538553232856,
+          "ttft_ms": 4780.022335,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-28",
+          "start_ns": 2115533769776078,
+          "first_ns": 2115538530094692,
+          "end_ns": 2115538533122511,
+          "ttft_ms": 4760.318614,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-29",
+          "start_ns": 2115533772472275,
+          "first_ns": 2115538527393340,
+          "end_ns": 2115538541644467,
+          "ttft_ms": 4754.921065,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-30",
+          "start_ns": 2115533775006916,
+          "first_ns": 2115538527293740,
+          "end_ns": 2115538547343353,
+          "ttft_ms": 4752.286824,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-31",
+          "start_ns": 2115533777845435,
+          "first_ns": 2115538526925015,
+          "end_ns": 2115538527441746,
+          "ttft_ms": 4749.07958,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-32",
+          "start_ns": 2115534206363273,
+          "first_ns": 2115538533075769,
+          "end_ns": 2115538544506645,
+          "ttft_ms": 4326.712496,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-33",
+          "start_ns": 2115534528963290,
+          "first_ns": 2115538527182742,
+          "end_ns": 2115538536071414,
+          "ttft_ms": 3998.219452,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "13"
+        },
+        {
+          "request": "live-main-9302-34",
+          "start_ns": 2115534531975088,
+          "first_ns": 2115538536023208,
+          "end_ns": 2115538538859478,
+          "ttft_ms": 4004.04812,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-35",
+          "start_ns": 2115535081260139,
+          "first_ns": 2115538951412583,
+          "end_ns": 2115538960200611,
+          "ttft_ms": 3870.152444,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-36",
+          "start_ns": 2115535083847263,
+          "first_ns": 2115538954396994,
+          "end_ns": 2115538957252989,
+          "ttft_ms": 3870.549731,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-37",
+          "start_ns": 2115535086764641,
+          "first_ns": 2115538951210641,
+          "end_ns": 2115538951460086,
+          "ttft_ms": 3864.446,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-38",
+          "start_ns": 2115535089523760,
+          "first_ns": 2115538951313694,
+          "end_ns": 2115538954439874,
+          "ttft_ms": 3861.789934,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-39",
+          "start_ns": 2115536007660730,
+          "first_ns": 2115539639040063,
+          "end_ns": 2115539642067726,
+          "ttft_ms": 3631.379333,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-40",
+          "start_ns": 2115536010303130,
+          "first_ns": 2115539639134925,
+          "end_ns": 2115539645040862,
+          "ttft_ms": 3628.831795,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "36"
+        },
+        {
+          "request": "live-main-9302-41",
+          "start_ns": 2115536013272660,
+          "first_ns": 2115539644992828,
+          "end_ns": 2115539650747977,
+          "ttft_ms": 3631.720168,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-42",
+          "start_ns": 2115536016150347,
+          "first_ns": 2115539639229631,
+          "end_ns": 2115539647896149,
+          "ttft_ms": 3623.079284,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-43",
+          "start_ns": 2115536019084373,
+          "first_ns": 2115539638906048,
+          "end_ns": 2115539639276898,
+          "ttft_ms": 3619.821675,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-44",
+          "start_ns": 2115536022098127,
+          "first_ns": 2115540717779625,
+          "end_ns": 2115540717926348,
+          "ttft_ms": 4695.681498,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "29"
+        },
+        {
+          "request": "live-main-9302-45",
+          "start_ns": 2115536025782465,
+          "first_ns": 2115540717185698,
+          "end_ns": 2115540717660767,
+          "ttft_ms": 4691.403233,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9302-46",
+          "start_ns": 2115537376044592,
+          "first_ns": 2115542293075876,
+          "end_ns": 2115542293219954,
+          "ttft_ms": 4917.031284,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9302-47",
+          "start_ns": 2115537378979938,
+          "first_ns": 2115540716915391,
+          "end_ns": 2115540717318426,
+          "ttft_ms": 3337.935453,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9302-48",
+          "start_ns": 2115537381927815,
+          "first_ns": 2115540717268743,
+          "end_ns": 2115540717694887,
+          "ttft_ms": 3335.340928,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "29"
+        },
+        {
+          "request": "live-main-9302-49",
+          "start_ns": 2115537384851224,
+          "first_ns": 2115542291624778,
+          "end_ns": 2115542292284831,
+          "ttft_ms": 4906.773554,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-50",
+          "start_ns": 2115537387735425,
+          "first_ns": 2115542292235855,
+          "end_ns": 2115542292813176,
+          "ttft_ms": 4904.50043,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-51",
+          "start_ns": 2115537390506316,
+          "first_ns": 2115540717402869,
+          "end_ns": 2115540717824525,
+          "ttft_ms": 3326.896553,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-52",
+          "start_ns": 2115537393425079,
+          "first_ns": 2115540717066835,
+          "end_ns": 2115540717553713,
+          "ttft_ms": 3323.641756,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-53",
+          "start_ns": 2115537396349094,
+          "first_ns": 2115540717505745,
+          "end_ns": 2115540717857135,
+          "ttft_ms": 3321.156651,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-54",
+          "start_ns": 2115537398962740,
+          "first_ns": 2115540717620202,
+          "end_ns": 2115540717893041,
+          "ttft_ms": 3318.657462,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-55",
+          "start_ns": 2115537401683945,
+          "first_ns": 2115542291842348,
+          "end_ns": 2115542292582219,
+          "ttft_ms": 4890.158403,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9302-56",
+          "start_ns": 2115537404749173,
+          "first_ns": 2115542292537136,
+          "end_ns": 2115542292611618,
+          "ttft_ms": 4887.787963,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "71"
+        },
+        {
+          "request": "live-main-9302-57",
+          "start_ns": 2115538527475224,
+          "first_ns": 2115542291743150,
+          "end_ns": 2115542292428480,
+          "ttft_ms": 3764.267926,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-58",
+          "start_ns": 2115538530169009,
+          "first_ns": 2115542894030855,
+          "end_ns": 2115542894203675,
+          "ttft_ms": 4363.861846,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-59",
+          "start_ns": 2115538533147293,
+          "first_ns": 2115542292984210,
+          "end_ns": 2115542293188449,
+          "ttft_ms": 3759.836917,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-60",
+          "start_ns": 2115538536096875,
+          "first_ns": 2115542292897588,
+          "end_ns": 2115542293154738,
+          "ttft_ms": 3756.800713,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-61",
+          "start_ns": 2115538538885838,
+          "first_ns": 2115542292083752,
+          "end_ns": 2115542292678847,
+          "ttft_ms": 3753.197914,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-62",
+          "start_ns": 2115538541672323,
+          "first_ns": 2115542292768161,
+          "end_ns": 2115542293120066,
+          "ttft_ms": 3751.095838,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-63",
+          "start_ns": 2115538544535885,
+          "first_ns": 2115542292380067,
+          "end_ns": 2115542292465440,
+          "ttft_ms": 3747.844182,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9302-64",
+          "start_ns": 2115538547370117,
+          "first_ns": 2115542291950569,
+          "end_ns": 2115542292642636,
+          "ttft_ms": 3744.580452,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-65",
+          "start_ns": 2115538550272020,
+          "first_ns": 2115542291480094,
+          "end_ns": 2115542292136224,
+          "ttft_ms": 3741.208074,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-66",
+          "start_ns": 2115538553256665,
+          "first_ns": 2115542894159169,
+          "end_ns": 2115542894261666,
+          "ttft_ms": 4340.902504,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-67",
+          "start_ns": 2115538951482265,
+          "first_ns": 2115542893491489,
+          "end_ns": 2115542893852431,
+          "ttft_ms": 3942.009224,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9302-68",
+          "start_ns": 2115538954464955,
+          "first_ns": 2115542893707994,
+          "end_ns": 2115542894078101,
+          "ttft_ms": 3939.243039,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "38"
+        },
+        {
+          "request": "live-main-9302-69",
+          "start_ns": 2115538957275014,
+          "first_ns": 2115542893806113,
+          "end_ns": 2115542893889380,
+          "ttft_ms": 3936.531099,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9302-70",
+          "start_ns": 2115538960227286,
+          "first_ns": 2115542893606738,
+          "end_ns": 2115542893925447,
+          "ttft_ms": 3933.379452,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9302-71",
+          "start_ns": 2115539639303703,
+          "first_ns": 2115543351655252,
+          "end_ns": 2115543351928188,
+          "ttft_ms": 3712.351549,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-72",
+          "start_ns": 2115539642097304,
+          "first_ns": 2115543351551262,
+          "end_ns": 2115543351804181,
+          "ttft_ms": 3709.453958,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "17"
+        },
+        {
+          "request": "live-main-9302-73",
+          "start_ns": 2115539645068396,
+          "first_ns": 2115543351883052,
+          "end_ns": 2115543351998868,
+          "ttft_ms": 3706.814656,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9302-74",
+          "start_ns": 2115539647920342,
+          "first_ns": 2115543351756681,
+          "end_ns": 2115543351966148,
+          "ttft_ms": 3703.836339,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        }
+      ],
+      "metrics_before": {
+        "vllm:kv_offload_load_bytes_total": 2383235481600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "metrics_after": {
+        "vllm:kv_offload_load_bytes_total": 4053727641600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      }
+    },
+    {
+      "accepted": true,
+      "label": "control",
+      "workload": "familiar60k",
+      "seed": 9303,
+      "repeat": 2,
+      "concurrency": 32,
+      "requests": 75,
+      "seconds": 9.672017841,
+      "throughput_rps": 7.754328128105032,
+      "mean_ttft_ms": 3556.057237586667,
+      "p50_ttft_ms": 3876.658455,
+      "p95_ttft_ms": 4849.8611629,
+      "frozen_unchanged": true,
+      "checkpoint_sha256": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "compute_rounds": 13,
+      "expected_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "observed_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "late_admissions": 68,
+      "kv_ready_during_compute": 73,
+      "recovered_compute_opportunities": 67,
+      "worker_preparation_coverage": {
+        "0": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "1": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "2": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "3": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "4": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "5": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "6": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        },
+        "7": {
+          "entries": 13,
+          "compact": 13,
+          "pinned": 13
+        }
+      },
+      "optimized_preparation_verified": true,
+      "preparation_required": true,
+      "responses": [
+        {
+          "request": "live-main-9303-0",
+          "start_ns": 2115712235462454,
+          "first_ns": 2115712887778620,
+          "end_ns": 2115712887847420,
+          "ttft_ms": 652.316166,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9303-1",
+          "start_ns": 2115712238257574,
+          "first_ns": 2115712593496763,
+          "end_ns": 2115712593569584,
+          "ttft_ms": 355.239189,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-2",
+          "start_ns": 2115712240732533,
+          "first_ns": 2115713332979640,
+          "end_ns": 2115713338783726,
+          "ttft_ms": 1092.247107,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "17"
+        },
+        {
+          "request": "live-main-9303-3",
+          "start_ns": 2115712243280508,
+          "first_ns": 2115713332891998,
+          "end_ns": 2115713333157822,
+          "ttft_ms": 1089.61149,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-4",
+          "start_ns": 2115712245751714,
+          "first_ns": 2115713333109776,
+          "end_ns": 2115713335962948,
+          "ttft_ms": 1087.358062,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-5",
+          "start_ns": 2115712248315606,
+          "first_ns": 2115713868858846,
+          "end_ns": 2115713874698880,
+          "ttft_ms": 1620.54324,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9303-6",
+          "start_ns": 2115712251098194,
+          "first_ns": 2115713868755012,
+          "end_ns": 2115713869115963,
+          "ttft_ms": 1617.656818,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9303-7",
+          "start_ns": 2115712253699493,
+          "first_ns": 2115713868950934,
+          "end_ns": 2115713871981102,
+          "ttft_ms": 1615.251441,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9303-8",
+          "start_ns": 2115712256258173,
+          "first_ns": 2115714809479612,
+          "end_ns": 2115714815253691,
+          "ttft_ms": 2553.221439,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9303-9",
+          "start_ns": 2115712258756512,
+          "first_ns": 2115713869068080,
+          "end_ns": 2115713877330131,
+          "ttft_ms": 1610.311568,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "98"
+        },
+        {
+          "request": "live-main-9303-10",
+          "start_ns": 2115712261309880,
+          "first_ns": 2115714805232970,
+          "end_ns": 2115714805314657,
+          "ttft_ms": 2543.92309,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-11",
+          "start_ns": 2115712263863071,
+          "first_ns": 2115714815207420,
+          "end_ns": 2115714823600480,
+          "ttft_ms": 2551.344349,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-12",
+          "start_ns": 2115712266588734,
+          "first_ns": 2115714809294552,
+          "end_ns": 2115714809733473,
+          "ttft_ms": 2542.705818,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-13",
+          "start_ns": 2115712269345009,
+          "first_ns": 2115714809666386,
+          "end_ns": 2115714817883541,
+          "ttft_ms": 2540.321377,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-14",
+          "start_ns": 2115712271889757,
+          "first_ns": 2115714809573327,
+          "end_ns": 2115714820603656,
+          "ttft_ms": 2537.68357,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-15",
+          "start_ns": 2115712274542435,
+          "first_ns": 2115716308911830,
+          "end_ns": 2115716312281271,
+          "ttft_ms": 4034.369395,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-16",
+          "start_ns": 2115712277349098,
+          "first_ns": 2115714809386189,
+          "end_ns": 2115714812282190,
+          "ttft_ms": 2532.037091,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9303-17",
+          "start_ns": 2115712279940040,
+          "first_ns": 2115716340354907,
+          "end_ns": 2115716340432332,
+          "ttft_ms": 4060.414867,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-18",
+          "start_ns": 2115712282487782,
+          "first_ns": 2115716329322871,
+          "end_ns": 2115716334767365,
+          "ttft_ms": 4046.835089,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-19",
+          "start_ns": 2115712285031934,
+          "first_ns": 2115716314955796,
+          "end_ns": 2115716326434203,
+          "ttft_ms": 4029.923862,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9303-20",
+          "start_ns": 2115712287671356,
+          "first_ns": 2115716312236326,
+          "end_ns": 2115716320995704,
+          "ttft_ms": 4024.56497,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-21",
+          "start_ns": 2115712290199293,
+          "first_ns": 2115716315061965,
+          "end_ns": 2115716331950671,
+          "ttft_ms": 4024.862672,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-22",
+          "start_ns": 2115712292849687,
+          "first_ns": 2115716334676703,
+          "end_ns": 2115716337659136,
+          "ttft_ms": 4041.827016,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9303-23",
+          "start_ns": 2115712295701106,
+          "first_ns": 2115716309142302,
+          "end_ns": 2115716323722383,
+          "ttft_ms": 4013.441196,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "96"
+        },
+        {
+          "request": "live-main-9303-24",
+          "start_ns": 2115712298297738,
+          "first_ns": 2115716309040765,
+          "end_ns": 2115716318082926,
+          "ttft_ms": 4010.743027,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-25",
+          "start_ns": 2115712301010777,
+          "first_ns": 2115716320946442,
+          "end_ns": 2115716329415936,
+          "ttft_ms": 4019.935665,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9303-26",
+          "start_ns": 2115712303567969,
+          "first_ns": 2115716308702189,
+          "end_ns": 2115716309198123,
+          "ttft_ms": 4005.13422,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-27",
+          "start_ns": 2115712306473451,
+          "first_ns": 2115716308815176,
+          "end_ns": 2115716315109080,
+          "ttft_ms": 4002.341725,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-28",
+          "start_ns": 2115712309025202,
+          "first_ns": 2115717311856190,
+          "end_ns": 2115717328437214,
+          "ttft_ms": 5002.830988,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-29",
+          "start_ns": 2115712311529949,
+          "first_ns": 2115717308673169,
+          "end_ns": 2115717311902338,
+          "ttft_ms": 4997.14322,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-30",
+          "start_ns": 2115712314418034,
+          "first_ns": 2115717322845219,
+          "end_ns": 2115717322928608,
+          "ttft_ms": 5008.427185,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-31",
+          "start_ns": 2115712317054537,
+          "first_ns": 2115717308571930,
+          "end_ns": 2115717308982607,
+          "ttft_ms": 4991.517393,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "17"
+        },
+        {
+          "request": "live-main-9303-32",
+          "start_ns": 2115712593599507,
+          "first_ns": 2115717308850653,
+          "end_ns": 2115717317547865,
+          "ttft_ms": 4715.251146,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9303-33",
+          "start_ns": 2115712887877604,
+          "first_ns": 2115717308771144,
+          "end_ns": 2115717314786518,
+          "ttft_ms": 4420.89354,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9303-34",
+          "start_ns": 2115713333185106,
+          "first_ns": 2115717314744348,
+          "end_ns": 2115717325574907,
+          "ttft_ms": 3981.559242,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-35",
+          "start_ns": 2115713335991338,
+          "first_ns": 2115717331225161,
+          "end_ns": 2115717331428483,
+          "ttft_ms": 3995.233823,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-36",
+          "start_ns": 2115713338806493,
+          "first_ns": 2115717308937422,
+          "end_ns": 2115717320266957,
+          "ttft_ms": 3970.130929,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "13"
+        },
+        {
+          "request": "live-main-9303-37",
+          "start_ns": 2115713869143828,
+          "first_ns": 2115717755449791,
+          "end_ns": 2115717758254868,
+          "ttft_ms": 3886.305963,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "48"
+        },
+        {
+          "request": "live-main-9303-38",
+          "start_ns": 2115713872010511,
+          "first_ns": 2115717751582668,
+          "end_ns": 2115717760764102,
+          "ttft_ms": 3879.572157,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9303-39",
+          "start_ns": 2115713874728972,
+          "first_ns": 2115717751387427,
+          "end_ns": 2115717751631803,
+          "ttft_ms": 3876.658455,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9303-40",
+          "start_ns": 2115713877360633,
+          "first_ns": 2115717751492227,
+          "end_ns": 2115717755495744,
+          "ttft_ms": 3874.131594,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9303-41",
+          "start_ns": 2115714805341279,
+          "first_ns": 2115718453289185,
+          "end_ns": 2115718456050078,
+          "ttft_ms": 3647.947906,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9303-42",
+          "start_ns": 2115714809759544,
+          "first_ns": 2115718455965924,
+          "end_ns": 2115718456096500,
+          "ttft_ms": 3646.20638,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-43",
+          "start_ns": 2115714812309492,
+          "first_ns": 2115718450243699,
+          "end_ns": 2115718450491691,
+          "ttft_ms": 3637.934207,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "12"
+        },
+        {
+          "request": "live-main-9303-44",
+          "start_ns": 2115714815280721,
+          "first_ns": 2115719510343767,
+          "end_ns": 2115719510458609,
+          "ttft_ms": 4695.063046,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9303-45",
+          "start_ns": 2115714817909053,
+          "first_ns": 2115718450345366,
+          "end_ns": 2115718453345469,
+          "ttft_ms": 3632.436313,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-46",
+          "start_ns": 2115714820627922,
+          "first_ns": 2115718450445736,
+          "end_ns": 2115718455886658,
+          "ttft_ms": 3629.817814,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-47",
+          "start_ns": 2115714823627558,
+          "first_ns": 2115719509626530,
+          "end_ns": 2115719510098175,
+          "ttft_ms": 4685.998972,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "23"
+        },
+        {
+          "request": "live-main-9303-48",
+          "start_ns": 2115716309222779,
+          "first_ns": 2115719509826002,
+          "end_ns": 2115719510267951,
+          "ttft_ms": 3200.603223,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-49",
+          "start_ns": 2115716312313589,
+          "first_ns": 2115719510177222,
+          "end_ns": 2115719510425666,
+          "ttft_ms": 3197.863633,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "66"
+        },
+        {
+          "request": "live-main-9303-50",
+          "start_ns": 2115716315134384,
+          "first_ns": 2115721104285734,
+          "end_ns": 2115721104908193,
+          "ttft_ms": 4789.15135,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9303-51",
+          "start_ns": 2115716318107526,
+          "first_ns": 2115721104394169,
+          "end_ns": 2115721104945803,
+          "ttft_ms": 4786.286643,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-52",
+          "start_ns": 2115716321027106,
+          "first_ns": 2115719509720039,
+          "end_ns": 2115719510229200,
+          "ttft_ms": 3188.692933,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-53",
+          "start_ns": 2115716323755408,
+          "first_ns": 2115719509525325,
+          "end_ns": 2115719510060321,
+          "ttft_ms": 3185.769917,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-54",
+          "start_ns": 2115716326458945,
+          "first_ns": 2115719509959137,
+          "end_ns": 2115719510389350,
+          "ttft_ms": 3183.500192,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9303-55",
+          "start_ns": 2115716329441429,
+          "first_ns": 2115721105103784,
+          "end_ns": 2115721105419943,
+          "ttft_ms": 4775.662355,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-56",
+          "start_ns": 2115716331976268,
+          "first_ns": 2115721104046650,
+          "end_ns": 2115721104480785,
+          "ttft_ms": 4772.070382,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-57",
+          "start_ns": 2115716334786848,
+          "first_ns": 2115719509409019,
+          "end_ns": 2115719509872675,
+          "ttft_ms": 3174.622171,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "24"
+        },
+        {
+          "request": "live-main-9303-58",
+          "start_ns": 2115716337681093,
+          "first_ns": 2115721104701595,
+          "end_ns": 2115721105453246,
+          "ttft_ms": 4767.020502,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-59",
+          "start_ns": 2115716340458708,
+          "first_ns": 2115721105187557,
+          "end_ns": 2115721105263799,
+          "ttft_ms": 4764.728849,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9303-60",
+          "start_ns": 2115717309039311,
+          "first_ns": 2115721105032490,
+          "end_ns": 2115721105387210,
+          "ttft_ms": 3795.993179,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-61",
+          "start_ns": 2115717311925641,
+          "first_ns": 2115721104865216,
+          "end_ns": 2115721105356411,
+          "ttft_ms": 3792.939575,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9303-62",
+          "start_ns": 2115717314816120,
+          "first_ns": 2115721104608355,
+          "end_ns": 2115721105234527,
+          "ttft_ms": 3789.792235,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-63",
+          "start_ns": 2115717317570557,
+          "first_ns": 2115721104194284,
+          "end_ns": 2115721104546142,
+          "ttft_ms": 3786.623727,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-64",
+          "start_ns": 2115717320285616,
+          "first_ns": 2115721104784319,
+          "end_ns": 2115721105298545,
+          "ttft_ms": 3784.498703,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-65",
+          "start_ns": 2115717322951091,
+          "first_ns": 2115721103903886,
+          "end_ns": 2115721104441837,
+          "ttft_ms": 3780.952795,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-66",
+          "start_ns": 2115717325601078,
+          "first_ns": 2115721692078341,
+          "end_ns": 2115721692329939,
+          "ttft_ms": 4366.477263,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-67",
+          "start_ns": 2115717328462507,
+          "first_ns": 2115721104122583,
+          "end_ns": 2115721104516353,
+          "ttft_ms": 3775.660076,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9303-68",
+          "start_ns": 2115717331449471,
+          "first_ns": 2115721692284455,
+          "end_ns": 2115721692613658,
+          "ttft_ms": 4360.834984,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-69",
+          "start_ns": 2115717751657461,
+          "first_ns": 2115721692175717,
+          "end_ns": 2115721692572576,
+          "ttft_ms": 3940.518256,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "13"
+        },
+        {
+          "request": "live-main-9303-70",
+          "start_ns": 2115717755516234,
+          "first_ns": 2115721692420601,
+          "end_ns": 2115721692770445,
+          "ttft_ms": 3936.904367,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9303-71",
+          "start_ns": 2115717758281237,
+          "first_ns": 2115721692521800,
+          "end_ns": 2115721692812474,
+          "ttft_ms": 3934.240563,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "58"
+        },
+        {
+          "request": "live-main-9303-72",
+          "start_ns": 2115717760785260,
+          "first_ns": 2115721692719329,
+          "end_ns": 2115721692845823,
+          "ttft_ms": 3931.934069,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9303-73",
+          "start_ns": 2115718450516160,
+          "first_ns": 2115721906762857,
+          "end_ns": 2115721906894625,
+          "ttft_ms": 3456.246697,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9303-74",
+          "start_ns": 2115718453371277,
+          "first_ns": 2115721906849665,
+          "end_ns": 2115721906932612,
+          "ttft_ms": 3453.478388,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        }
+      ],
+      "metrics_before": {
+        "vllm:kv_offload_load_bytes_total": 4053727641600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "metrics_after": {
+        "vllm:kv_offload_load_bytes_total": 5724219801600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      }
+    },
+    {
+      "accepted": true,
+      "label": "control",
+      "workload": "familiar60k",
+      "seed": 9304,
+      "repeat": 3,
+      "concurrency": 32,
+      "requests": 75,
+      "seconds": 9.551152458,
+      "throughput_rps": 7.852455536627975,
+      "mean_ttft_ms": 3516.1193945333334,
+      "p50_ttft_ms": 3787.19885,
+      "p95_ttft_ms": 4860.131274599999,
+      "frozen_unchanged": true,
+      "checkpoint_sha256": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "compute_rounds": 12,
+      "expected_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "observed_cached": [
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368,
+        58368
+      ],
+      "late_admissions": 68,
+      "kv_ready_during_compute": 73,
+      "recovered_compute_opportunities": 68,
+      "worker_preparation_coverage": {
+        "0": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "1": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "2": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "3": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "4": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "5": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "6": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        },
+        "7": {
+          "entries": 12,
+          "compact": 11,
+          "pinned": 11
+        }
+      },
+      "optimized_preparation_verified": true,
+      "preparation_required": true,
+      "responses": [
+        {
+          "request": "live-main-9304-0",
+          "start_ns": 2115890307201272,
+          "first_ns": 2115891601517098,
+          "end_ns": 2115891601877320,
+          "ttft_ms": 1294.315826,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9304-1",
+          "start_ns": 2115890309851120,
+          "first_ns": 2115890723300463,
+          "end_ns": 2115890723378994,
+          "ttft_ms": 413.449343,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-2",
+          "start_ns": 2115890312382114,
+          "first_ns": 2115891051087254,
+          "end_ns": 2115891053974126,
+          "ttft_ms": 738.70514,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-3",
+          "start_ns": 2115890315364327,
+          "first_ns": 2115891050983099,
+          "end_ns": 2115891051131226,
+          "ttft_ms": 735.618772,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "17"
+        },
+        {
+          "request": "live-main-9304-4",
+          "start_ns": 2115890317840826,
+          "first_ns": 2115891601825250,
+          "end_ns": 2115891610515608,
+          "ttft_ms": 1283.984424,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-5",
+          "start_ns": 2115890320324881,
+          "first_ns": 2115892530083689,
+          "end_ns": 2115892530162200,
+          "ttft_ms": 2209.758808,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9304-6",
+          "start_ns": 2115890323022399,
+          "first_ns": 2115891601635013,
+          "end_ns": 2115891604863622,
+          "ttft_ms": 1278.612614,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "12"
+        },
+        {
+          "request": "live-main-9304-7",
+          "start_ns": 2115890325615296,
+          "first_ns": 2115891601729019,
+          "end_ns": 2115891607648263,
+          "ttft_ms": 1276.113723,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-8",
+          "start_ns": 2115890328320859,
+          "first_ns": 2115892533229263,
+          "end_ns": 2115892542294001,
+          "ttft_ms": 2204.908404,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-9",
+          "start_ns": 2115890330982648,
+          "first_ns": 2115892533467923,
+          "end_ns": 2115892545086071,
+          "ttft_ms": 2202.485275,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9304-10",
+          "start_ns": 2115890333675555,
+          "first_ns": 2115892533311239,
+          "end_ns": 2115892536578304,
+          "ttft_ms": 2199.635684,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-11",
+          "start_ns": 2115890336339393,
+          "first_ns": 2115892533389190,
+          "end_ns": 2115892547665608,
+          "ttft_ms": 2197.049797,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-12",
+          "start_ns": 2115890339147668,
+          "first_ns": 2115892533134937,
+          "end_ns": 2115892533656091,
+          "ttft_ms": 2193.987269,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-13",
+          "start_ns": 2115890341794808,
+          "first_ns": 2115892533557016,
+          "end_ns": 2115892539492600,
+          "ttft_ms": 2191.762208,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9304-14",
+          "start_ns": 2115890344382287,
+          "first_ns": 2115894154548534,
+          "end_ns": 2115894177708031,
+          "ttft_ms": 3810.166247,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-15",
+          "start_ns": 2115890347066063,
+          "first_ns": 2115894157827811,
+          "end_ns": 2115894174873186,
+          "ttft_ms": 3810.761748,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-16",
+          "start_ns": 2115890349891863,
+          "first_ns": 2115894141446782,
+          "end_ns": 2115894160989583,
+          "ttft_ms": 3791.554919,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-17",
+          "start_ns": 2115890352472848,
+          "first_ns": 2115894151631381,
+          "end_ns": 2115894158077750,
+          "ttft_ms": 3799.158533,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-18",
+          "start_ns": 2115890355103879,
+          "first_ns": 2115894157934734,
+          "end_ns": 2115894166665704,
+          "ttft_ms": 3802.830855,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-19",
+          "start_ns": 2115890357761432,
+          "first_ns": 2115894141102091,
+          "end_ns": 2115894141603630,
+          "ttft_ms": 3783.340659,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-20",
+          "start_ns": 2115890360337583,
+          "first_ns": 2115894158030737,
+          "end_ns": 2115894169374666,
+          "ttft_ms": 3797.693154,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9304-21",
+          "start_ns": 2115890363154242,
+          "first_ns": 2115894141226257,
+          "end_ns": 2115894144612892,
+          "ttft_ms": 3778.072015,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-22",
+          "start_ns": 2115890365744221,
+          "first_ns": 2115894141343139,
+          "end_ns": 2115894154597135,
+          "ttft_ms": 3775.598918,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9304-23",
+          "start_ns": 2115890368415820,
+          "first_ns": 2115894144563709,
+          "end_ns": 2115894148645669,
+          "ttft_ms": 3776.147889,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9304-24",
+          "start_ns": 2115890371060561,
+          "first_ns": 2115894141557390,
+          "end_ns": 2115894151677965,
+          "ttft_ms": 3770.496829,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9304-25",
+          "start_ns": 2115890373730080,
+          "first_ns": 2115894160928930,
+          "end_ns": 2115894163835181,
+          "ttft_ms": 3787.19885,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-26",
+          "start_ns": 2115890376436982,
+          "first_ns": 2115894148599308,
+          "end_ns": 2115894172014042,
+          "ttft_ms": 3772.162326,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-27",
+          "start_ns": 2115890379034054,
+          "first_ns": 2115895011302118,
+          "end_ns": 2115895016878642,
+          "ttft_ms": 4632.268064,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "7"
+        },
+        {
+          "request": "live-main-9304-28",
+          "start_ns": 2115890381661572,
+          "first_ns": 2115895026276970,
+          "end_ns": 2115895026364984,
+          "ttft_ms": 4644.615398,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9304-29",
+          "start_ns": 2115890384297066,
+          "first_ns": 2115895005391976,
+          "end_ns": 2115895011461674,
+          "ttft_ms": 4621.09491,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "7"
+        },
+        {
+          "request": "live-main-9304-30",
+          "start_ns": 2115890386799065,
+          "first_ns": 2115895011412655,
+          "end_ns": 2115895023491188,
+          "ttft_ms": 4624.61359,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-31",
+          "start_ns": 2115890389554585,
+          "first_ns": 2115895005496392,
+          "end_ns": 2115895014020809,
+          "ttft_ms": 4615.941807,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-32",
+          "start_ns": 2115890723406083,
+          "first_ns": 2115895005164695,
+          "end_ns": 2115895005545853,
+          "ttft_ms": 4281.758612,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-33",
+          "start_ns": 2115891051156967,
+          "first_ns": 2115895005283473,
+          "end_ns": 2115895008181336,
+          "ttft_ms": 3954.126506,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "77"
+        },
+        {
+          "request": "live-main-9304-34",
+          "start_ns": 2115891054009270,
+          "first_ns": 2115895016819435,
+          "end_ns": 2115895020690104,
+          "ttft_ms": 3962.810165,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-35",
+          "start_ns": 2115891601913684,
+          "first_ns": 2115895465738253,
+          "end_ns": 2115895468735538,
+          "ttft_ms": 3863.824569,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-36",
+          "start_ns": 2115891604893404,
+          "first_ns": 2115895461492162,
+          "end_ns": 2115895465781700,
+          "ttft_ms": 3856.598758,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "33"
+        },
+        {
+          "request": "live-main-9304-37",
+          "start_ns": 2115891607673342,
+          "first_ns": 2115895461590982,
+          "end_ns": 2115895471498460,
+          "ttft_ms": 3853.91764,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-38",
+          "start_ns": 2115891610546746,
+          "first_ns": 2115895461378383,
+          "end_ns": 2115895461639993,
+          "ttft_ms": 3850.831637,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "19"
+        },
+        {
+          "request": "live-main-9304-39",
+          "start_ns": 2115892530193808,
+          "first_ns": 2115897482585994,
+          "end_ns": 2115897483172253,
+          "ttft_ms": 4952.392186,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "4"
+        },
+        {
+          "request": "live-main-9304-40",
+          "start_ns": 2115892533688483,
+          "first_ns": 2115896170802456,
+          "end_ns": 2115896174025186,
+          "ttft_ms": 3637.113973,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-41",
+          "start_ns": 2115892536607357,
+          "first_ns": 2115896170992742,
+          "end_ns": 2115896179615341,
+          "ttft_ms": 3634.385385,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "13"
+        },
+        {
+          "request": "live-main-9304-42",
+          "start_ns": 2115892539518057,
+          "first_ns": 2115896167745200,
+          "end_ns": 2115896171090078,
+          "ttft_ms": 3628.227143,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-43",
+          "start_ns": 2115892542324023,
+          "first_ns": 2115896170897502,
+          "end_ns": 2115896176805478,
+          "ttft_ms": 3628.573479,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-44",
+          "start_ns": 2115892545109119,
+          "first_ns": 2115896167614233,
+          "end_ns": 2115896167805342,
+          "ttft_ms": 3622.505114,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-45",
+          "start_ns": 2115892547691880,
+          "first_ns": 2115897483124647,
+          "end_ns": 2115897483507362,
+          "ttft_ms": 4935.432767,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-46",
+          "start_ns": 2115894141634671,
+          "first_ns": 2115897482264717,
+          "end_ns": 2115897482731272,
+          "ttft_ms": 3340.630046,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-47",
+          "start_ns": 2115894144650560,
+          "first_ns": 2115899016389188,
+          "end_ns": 2115899016463255,
+          "ttft_ms": 4871.738628,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9304-48",
+          "start_ns": 2115894148676450,
+          "first_ns": 2115899017370091,
+          "end_ns": 2115899017814773,
+          "ttft_ms": 4868.693641,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-49",
+          "start_ns": 2115894151709124,
+          "first_ns": 2115897483420001,
+          "end_ns": 2115897483616986,
+          "ttft_ms": 3331.710877,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-50",
+          "start_ns": 2115894154625478,
+          "first_ns": 2115897483292548,
+          "end_ns": 2115897483581734,
+          "ttft_ms": 3328.66707,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-51",
+          "start_ns": 2115894158107461,
+          "first_ns": 2115897482964339,
+          "end_ns": 2115897483469025,
+          "ttft_ms": 3324.856878,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-52",
+          "start_ns": 2115894161029305,
+          "first_ns": 2115899017490994,
+          "end_ns": 2115899017849624,
+          "ttft_ms": 4856.461689,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "55"
+        },
+        {
+          "request": "live-main-9304-53",
+          "start_ns": 2115894163863297,
+          "first_ns": 2115897482482265,
+          "end_ns": 2115897483040886,
+          "ttft_ms": 3318.618968,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-54",
+          "start_ns": 2115894166696566,
+          "first_ns": 2115899016166208,
+          "end_ns": 2115899016507493,
+          "ttft_ms": 4849.469642,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "6"
+        },
+        {
+          "request": "live-main-9304-55",
+          "start_ns": 2115894169398543,
+          "first_ns": 2115897482375918,
+          "end_ns": 2115897482874988,
+          "ttft_ms": 3312.977375,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-56",
+          "start_ns": 2115894172037878,
+          "first_ns": 2115897482679649,
+          "end_ns": 2115897483219169,
+          "ttft_ms": 3310.641771,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-57",
+          "start_ns": 2115894174900979,
+          "first_ns": 2115897482830520,
+          "end_ns": 2115897483335664,
+          "ttft_ms": 3307.929541,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-58",
+          "start_ns": 2115894177737839,
+          "first_ns": 2115899016960489,
+          "end_ns": 2115899017575887,
+          "ttft_ms": 4839.22265,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-59",
+          "start_ns": 2115895005584209,
+          "first_ns": 2115899016285833,
+          "end_ns": 2115899016736211,
+          "ttft_ms": 4010.701624,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "1"
+        },
+        {
+          "request": "live-main-9304-60",
+          "start_ns": 2115895008213698,
+          "first_ns": 2115899017728404,
+          "end_ns": 2115899017881115,
+          "ttft_ms": 4009.514706,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-61",
+          "start_ns": 2115895011494581,
+          "first_ns": 2115899016600121,
+          "end_ns": 2115899017417480,
+          "ttft_ms": 4005.10554,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9304-62",
+          "start_ns": 2115895014044789,
+          "first_ns": 2115899017060393,
+          "end_ns": 2115899017612514,
+          "ttft_ms": 4003.015604,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "9"
+        },
+        {
+          "request": "live-main-9304-63",
+          "start_ns": 2115895016910090,
+          "first_ns": 2115899016859413,
+          "end_ns": 2115899017536181,
+          "ttft_ms": 3999.949323,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-64",
+          "start_ns": 2115895020716401,
+          "first_ns": 2115899017245520,
+          "end_ns": 2115899017776184,
+          "ttft_ms": 3996.529119,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-65",
+          "start_ns": 2115895023521641,
+          "first_ns": 2115899017148698,
+          "end_ns": 2115899017647671,
+          "ttft_ms": 3993.627057,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "22"
+        },
+        {
+          "request": "live-main-9304-66",
+          "start_ns": 2115895026389210,
+          "first_ns": 2115899016689879,
+          "end_ns": 2115899016768898,
+          "ttft_ms": 3990.300669,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-67",
+          "start_ns": 2115895461674434,
+          "first_ns": 2115899372504111,
+          "end_ns": 2115899372609577,
+          "ttft_ms": 3910.829677,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-68",
+          "start_ns": 2115895465808726,
+          "first_ns": 2115899372172409,
+          "end_ns": 2115899372380785,
+          "ttft_ms": 3906.363683,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "2"
+        },
+        {
+          "request": "live-main-9304-69",
+          "start_ns": 2115895468765488,
+          "first_ns": 2115899372339734,
+          "end_ns": 2115899372562613,
+          "ttft_ms": 3903.574246,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "7"
+        },
+        {
+          "request": "live-main-9304-70",
+          "start_ns": 2115895471520434,
+          "first_ns": 2115899372273232,
+          "end_ns": 2115899372416081,
+          "ttft_ms": 3900.752798,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-71",
+          "start_ns": 2115896167843631,
+          "first_ns": 2115899857622766,
+          "end_ns": 2115899857824352,
+          "ttft_ms": 3689.779135,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": " kv"
+        },
+        {
+          "request": "live-main-9304-72",
+          "start_ns": 2115896171119734,
+          "first_ns": 2115899857429164,
+          "end_ns": 2115899857668179,
+          "ttft_ms": 3686.30943,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "5"
+        },
+        {
+          "request": "live-main-9304-73",
+          "start_ns": 2115896174053799,
+          "first_ns": 2115899857527938,
+          "end_ns": 2115899857788590,
+          "ttft_ms": 3683.474139,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        },
+        {
+          "request": "live-main-9304-74",
+          "start_ns": 2115896176835613,
+          "first_ns": 2115899857742745,
+          "end_ns": 2115899857860654,
+          "ttft_ms": 3680.907132,
+          "usage": {
+            "prompt_tokens": 61440,
+            "total_tokens": 61441,
+            "completion_tokens": 1,
+            "prompt_tokens_details": {
+              "cached_tokens": 58368
+            }
+          },
+          "output": "8"
+        }
+      ],
+      "metrics_before": {
+        "vllm:kv_offload_load_bytes_total": 5724219801600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      },
+      "metrics_after": {
+        "vllm:kv_offload_load_bytes_total": 7394711961600.0,
+        "vllm:prefix_cache_hits_total": 0.0,
+        "vllm:num_preemptions_total": 0.0
+      }
+    }
+  ],
+  "seconds": 1062.2089193398133,
+  "stopped": true
+}

@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+  "branch": "experiment/store-native-async-submission-20261009",
+  "commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
+}

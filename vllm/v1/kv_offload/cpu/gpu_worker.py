@@ -798,6 +798,11 @@ class SingleDirectionOffloadingHandler:
 
                     if queue_stages.active:
                         queue_stages.emit(
+                            "load_ready_dependency",
+                            job_id=job_id,
+                            current_stream_ready=current_platform.current_stream().query(),
+                        )
+                        queue_stages.emit(
                             "load_submit",
                             job_id=job_id,
                             num_bytes=num_transfer_bytes,

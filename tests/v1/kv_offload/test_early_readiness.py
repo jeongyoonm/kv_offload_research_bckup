@@ -1096,6 +1096,7 @@ def test_completed_timing_survives_collection(tmp_path, monkeypatch):
     timing.steps = {}
     timing.registrations = {}
     timing.events = []
+    timing.seal_estimator = MagicMock()
     monkeypatch.setattr("vllm.v1.kv_offload.step_timing.time.monotonic_ns", lambda: 100)
     try:
         assert timing.register(dict(step=7, dispatch_ns=10))
@@ -2863,11 +2864,13 @@ def test_late_control_rejects_stale_identity_and_duplicate_publication(tmp_path)
 
     path = tmp_path / "control"
     path.write_bytes(struct.pack("<QQ", 9, 8) + bytes(8))
+    # Worker RPC metadata carries the control path as a string.
+    control = str(path)
     with pytest.raises(RuntimeError, match="identity"):
-        signal_prepared(path, 8, 0, 1)
-    signal_prepared(path, 9, 0, 1)
+        signal_prepared(control, 8, 0, 1)
+    signal_prepared(control, 9, 0, 1)
     with pytest.raises(RuntimeError, match="duplicate"):
-        signal_prepared(path, 9, 0, 1)
+        signal_prepared(control, 9, 0, 1)
     assert path.read_bytes()[16:] == bytes([1]) + bytes(7)
 
 

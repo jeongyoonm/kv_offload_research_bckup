@@ -24,7 +24,10 @@ CPU checks cover each footprint guard and authoritative context forwarding.
 Two real GPU cases hold unrelated compute while submitting a load: ordinary
 submission must wait, and independent submission must complete before the held
 compute. Both cases validate loaded and untouched bytes and retire exactly once.
-Run GPU checks only between serving allocations.
+Both GPU cases passed in the serialized idle gate. The 36 CPU guard and
+context tests passed with GPU allocation cases excluded. Logs are retained
+in `GPU_TESTS.txt` and `CPU_TESTS.txt`. Run GPU checks only between serving
+allocations.
 
 The serving comparison keeps tensor-major storage, allocator avoidance, ascending
 GPU assignment, descriptor merging, packet alignment, model, original selector,

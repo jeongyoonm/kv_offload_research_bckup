@@ -11,6 +11,31 @@ FEATURES = [
     "context_sum_per_960000",
     "raw_duration_per_1000_ms",
 ]
+GEOMETRY_FEATURES = FEATURES + [
+    "suffix_sum_per_61440",
+    "mean_suffix_per_4096",
+    "max_suffix_per_4096",
+    "prefix_index_pairs_per_1e9",
+]
+
+
+def shape_query(raw_duration_ns, x, features):
+    """Build the same causal shape basis for frozen fitting and inference."""
+    values = dict(
+        intercept=1,
+        mean_context_per_60000=x[3] / x[1] / 60000,
+        requests_per_16=x[1] / 16,
+        context_sum_per_960000=x[3] / 960000,
+        raw_duration_per_1000_ms=raw_duration_ns / 1e9,
+        suffix_sum_per_61440=x[0] / 61440,
+        mean_suffix_per_4096=x[0] / x[1] / 4096,
+        max_suffix_per_4096=x[5] / 4096,
+    )
+    if "prefix_index_pairs_per_1e9" in features:
+        if len(x) < 24 or not np.isfinite(x[23]):
+            return None
+        values["prefix_index_pairs_per_1e9"] = x[23] / 1e9
+    return np.array([values[name] for name in features])
 
 
 class BatchShapeCalibration:
@@ -24,20 +49,25 @@ class BatchShapeCalibration:
             "provenance",
         }
         schema = state.get("schema") if isinstance(state, dict) else None
-        if schema == 2:
+        if schema in (2, 3):
             required.add("geometry_support")
         if (
             not isinstance(state, dict)
             or set(state) != required
-            or schema not in (1, 2)
-            or state["features"] != FEATURES
+            or schema not in (1, 2, 3)
+            or (schema in (1, 2) and state["features"] != FEATURES)
+            or not isinstance(state["features"], list)
+            or not state["features"]
+            or any(f not in GEOMETRY_FEATURES for f in state["features"])
+            or len(set(state["features"])) != len(state["features"])
         ):
             raise ValueError("invalid shape calibration schema")
+        self.features = tuple(state["features"])
         self.coefficients = np.asarray(state["coefficients"], dtype=float)
         self.bounds = np.asarray(state["bias_bounds_ms"], dtype=float)
         self.support = state["support"]
         if (
-            self.coefficients.shape != (5,)
+            self.coefficients.shape != (len(self.features),)
             or not np.isfinite(self.coefficients).all()
             or self.bounds.shape != (2,)
             or not np.isfinite(self.bounds).all()
@@ -56,7 +86,7 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid shape calibration support")
         self.geometry_bounds = None
-        if schema == 2:
+        if schema in (2, 3):
             geometry = state["geometry_support"]
             if not isinstance(geometry, dict) or set(geometry) != {
                 "suffix_per_context"
@@ -92,9 +122,9 @@ class BatchShapeCalibration:
             lower, upper = self.geometry_bounds
             if x[4] / x[7] < lower or x[5] / x[6] > upper:
                 return fallback_ns, True
-        query = np.array(
-            [1, x[3] / x[1] / 60000, x[1] / 16, x[3] / 960000, raw_duration_ns / 1e9]
-        )
+        query = shape_query(raw_duration_ns, x, self.features)
+        if query is None:
+            return fallback_ns, True
         bias = float(query @ self.coefficients)
         if not np.isfinite(bias):
             raise RuntimeError("nonfinite shape calibration result")

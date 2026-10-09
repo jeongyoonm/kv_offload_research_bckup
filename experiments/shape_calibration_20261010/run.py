@@ -19,7 +19,14 @@ from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
 SOURCE = Path(__file__).resolve().parents[2]
 module, collector = baseline.module, baseline.collector
 CURRENT_ARM = "control"
-LEADS = {"control": 100_000, "shape100": 100_000, "shape50": 50_000}
+LEADS = {
+    "control": 100_000,
+    "shape100": 100_000,
+    "shape50": 50_000,
+    "guard50": 50_000,
+    "basis100": 100_000,
+    "basis50": 50_000,
+}
 PREFIX_WORKING_SETS = {
     "short16k": 300,
     "mid32k": 150,
@@ -48,12 +55,18 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--fit", type=Path, required=True)
+    parser.add_argument("--arm-fit", action="append", default=[], metavar="ARM=PATH")
     parser.add_argument("--repeats", type=int, default=2)
     parser.add_argument("--requests", type=int, choices=(75, 300), default=75)
     parser.add_argument(
         "--workloads", nargs="+", default=["short16k", "mid32k", "familiar60k"]
     )
-    parser.add_argument("--arms", nargs="+", choices=tuple(LEADS), default=list(LEADS))
+    parser.add_argument(
+        "--arms",
+        nargs="+",
+        choices=tuple(LEADS),
+        default=["control", "shape100", "shape50"],
+    )
     parser.add_argument("--seed-start", type=int, default=9501)
     parser.add_argument("--allocation-timeout", type=int, default=7200)
     parser.add_argument("--preflight-only", action="store_true")
@@ -78,14 +91,22 @@ def main():
     base = baseline.native.baseline.prior.state_for_chunk(
         json.loads(checkpoint.read_text()), 8
     )
-    calibration = json.loads(args.fit.read_text())["calibration"]
+    fit_paths = {arm: args.fit for arm in args.arms if arm != "control"}
+    for value in args.arm_fit:
+        arm, path = value.split("=", 1)
+        assert arm in fit_paths, "Override only selected calibrated arms"
+        fit_paths[arm] = Path(path)
+    calibrations = {
+        arm: json.loads(path.read_text())["calibration"]
+        for arm, path in fit_paths.items()
+    }
     states, policies = {}, {}
     for arm in args.arms:
         CURRENT_ARM = arm
         states[arm] = copy.deepcopy(base)
         if arm != "control":
             states[arm]["latency_surface"]["checkpoint"]["duration_calibration"] = (
-                calibration
+                calibrations[arm]
             )
             restored = copy.deepcopy(states[arm])
             restored["latency_surface"]["checkpoint"].pop("duration_calibration")
@@ -106,7 +127,7 @@ def main():
         }
         assert changed <= {"late_seal_compute_deadline_lead_us"}
     collector.save(root / "loaded_predictor.json", base)
-    collector.save(root / "calibration.json", calibration)
+    collector.save(root / "calibrations.json", calibrations)
     command, config = server_command()
     expected = len(args.arms) * len(args.workloads) * args.repeats
     collector.save(
@@ -124,8 +145,13 @@ def main():
             prefix_working_sets=PREFIX_WORKING_SETS if args.requests == 300 else None,
             seeds=[args.seed_start + i for i in range(args.repeats)],
             checkpoint_sha256=digest,
-            fit_sha256=hashlib.sha256(args.fit.read_bytes()).hexdigest(),
-            calibration=calibration,
+            fit_sources={
+                arm: dict(
+                    path=str(path), sha256=hashlib.sha256(path.read_bytes()).hexdigest()
+                )
+                for arm, path in fit_paths.items()
+            },
+            calibrations=calibrations,
             measured_cells=expected,
             command=command,
             connector=config,

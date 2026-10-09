@@ -118,6 +118,55 @@ def test_joint_guard_rejects_invalid_support_before_checkpoint_publication(bound
         BatchShapeCalibration(state)
 
 
+def test_explicit_suffix_basis_changes_bias_with_equal_context_and_request_count():
+    """Crossed suffix length must influence correction independently of context."""
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    state.update(
+        schema=3,
+        features=["intercept", "suffix_sum_per_61440"],
+        coefficients=[10, 100],
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+    )
+    correction = BatchShapeCalibration(state)
+    x = np.zeros(28)
+    x[:9] = [3072, 1, 0, 15552, 3072, 3072, 15552, 15552, 0]
+    assert correction.bias_ns(200_000_000, x, 90_000_000) == (15_000_000, False)
+    x[0], x[4], x[5] = 832, 832, 832
+    value, fallback = correction.bias_ns(200_000_000, x, 90_000_000)
+    assert 11_000_000 < value < 12_000_000 and not fallback
+
+
+def test_attention_basis_falls_back_when_required_work_feature_is_missing():
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    state.update(
+        schema=3,
+        features=["prefix_index_pairs_per_1e9"],
+        coefficients=[100],
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+    )
+    correction = BatchShapeCalibration(state)
+    x = np.array([832, 1, 0, 15552, 832, 832, 15552, 15552, 0, 0, 0])
+    assert correction.bias_ns(200_000_000, x, 90_000_000) == (90_000_000, True)
+    expanded = np.r_[x, np.zeros(12), 100_000_000]
+    assert correction.bias_ns(200_000_000, expanded, 90_000_000) == (10_000_000, False)
+
+
+def test_calibration_schema_rejects_elapsed_and_unknown_features():
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    state.update(schema=3, geometry_support=dict(suffix_per_context=[0.01, 0.25]))
+    for feature in ("elapsed_execution_ms", "unrecognized"):
+        state["features"] = [feature]
+        state["coefficients"] = [1]
+        with pytest.raises(ValueError, match="schema"):
+            BatchShapeCalibration(state)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
     """Even an elapsed-sensitive component cannot move an offset deadline."""

@@ -197,6 +197,7 @@ class BlockPool:
         self.metrics_collector = metrics_collector
         self.pending_store_blocks: dict[int, set[int]] = {}
         self.prefer_unfenced_blocks = False
+        self.ascending_new_blocks = False
         self.audit_store_allocations = False
         self.store_allocation_audit: list[dict[str, int]] = []
 
@@ -684,6 +685,8 @@ class BlockPool:
                 deficit = num_blocks - len(ret)
                 ret.extend(skipped[:deficit])
                 self.free_block_queue.prepend_n(skipped[deficit:])
+        if self.ascending_new_blocks:
+            ret.sort(key=lambda block: block.block_id)
         if self.audit_store_allocations:
             self.store_allocation_audit.append(
                 dict(

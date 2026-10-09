@@ -489,3 +489,30 @@ def test_store_aware_allocation_preserves_capacity_and_pending_ownership(
     allocated = pool.get_new_blocks(5)
     assert {block.block_id for block in allocated} == {1, 2, 3, 4, 5}
     assert pool.store_allocation_audit[-1]["allocated_pending"] == 0
+
+
+@pytest.mark.parametrize("pending_ids", [set(), {1, 2}, {1, 2, 3, 4, 5, 6}])
+def test_ascending_assignment_preserves_selected_set_and_pool_references(pending_ids):
+    """Reorder selected blocks without changing capacity or reuse fallback."""
+    pools = [
+        BlockPool(num_gpu_blocks=7, enable_caching=True, hash_block_size=16)
+        for _ in range(2)
+    ]
+    for pool in pools:
+        blocks = pool.get_new_blocks(6)
+        pool.free_blocks([blocks[i - 1] for i in (6, 2, 3, 1, 5, 4)])
+        pool.pending_store_blocks = {bid: {100 + bid} for bid in pending_ids}
+        pool.prefer_unfenced_blocks = True
+    pools[1].ascending_new_blocks = True
+    allocated = [pool.get_new_blocks(4) for pool in pools]
+    ids = [[block.block_id for block in blocks] for blocks in allocated]
+    assert ids[1] == sorted(ids[0])
+    assert all(pool.get_num_free_blocks() == 2 for pool in pools)
+    assert all(block.ref_cnt == 1 for blocks in allocated for block in blocks)
+    remaining = [[block.block_id for block in pool.get_new_blocks(2)] for pool in pools]
+    assert set(remaining[0]) == set(remaining[1])
+    assert all(pool.get_num_free_blocks() == 0 for pool in pools)
+    for pool, blocks in zip(pools, allocated):
+        pool.free_blocks(blocks)
+        assert pool.get_num_free_blocks() == 4
+        assert pool.pending_store_blocks == {bid: {100 + bid} for bid in pending_ids}

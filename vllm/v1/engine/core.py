@@ -2173,8 +2173,14 @@ class EngineCore:
                 "store_reuse_allocator_preference"
             ]
             block_pool.audit_store_allocations = options["store_reuse_allocator_audit"]
+            block_pool.ascending_new_blocks = bool(
+                options["ascending_gpu_block_assignment"]
+            )
             block_pool.store_allocation_audit = []
-        elif options["store_reuse_allocator_preference"]:
+        elif (
+            options["store_reuse_allocator_preference"]
+            or options["ascending_gpu_block_assignment"]
+        ):
             raise ValueError("Store-aware allocation requires a GPU block pool")
         assert self.vllm_config.kv_transfer_config is not None
         extra = self.vllm_config.kv_transfer_config.kv_connector_extra_config

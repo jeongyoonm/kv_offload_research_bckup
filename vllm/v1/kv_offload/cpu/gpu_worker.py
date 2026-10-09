@@ -1170,6 +1170,30 @@ class CPUOffloadingWorker(OffloadingWorker):
         """Async CPU -> GPU."""
         return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
 
+    def submit_load_independently(
+        self, job_id: int, src_spec: LoadStoreSpec, dst_spec: GPULoadStoreSpec
+    ) -> bool:
+        if (
+            not self._load_handler._async_h2d_submission
+            or not current_platform.is_cuda()
+        ):
+            return self.submit_load(job_id, src_spec, dst_spec)
+        from vllm.v1.kv_offload import queue_stages
+
+        stream = getattr(self, "_independent_load_stream", None)
+        if stream is None:
+            stream = current_platform.Stream()
+            self._independent_load_stream = stream
+        queue_stages.emit(
+            "load_independent_stream",
+            job_id=job_id,
+            compute_stream_ready=current_platform.current_stream().query(),
+        )
+        # The connector has checked the authoritative step's destination
+        # footprints and store dependencies. No wait on unrelated compute.
+        with current_platform.stream(stream):
+            return self.submit_load(job_id, src_spec, dst_spec)
+
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
         self._store_handler._coalesce_store_descriptors = bool(
             options.get("store_descriptor_coalescing", False)

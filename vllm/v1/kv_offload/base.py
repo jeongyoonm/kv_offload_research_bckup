@@ -570,6 +570,12 @@ class OffloadingWorker(ABC):
         """Order subsequent GPU writes after stores; default to a host wait."""
         self.wait(job_ids)
 
+    def submit_load_independently(
+        self, job_id: int, src_spec: LoadStoreSpec, dst_spec: GPULoadStoreSpec
+    ) -> bool:
+        """Submit a destination-safe load; other media retain ordinary ordering."""
+        return self.submit_load(job_id, src_spec, dst_spec)
+
     def shutdown(self) -> None:
         return
 

@@ -354,6 +354,73 @@ def test_start_kv_transfers_non_writer_still_submits_load():
     assert worker.build_connector_worker_meta() is None
 
 
+@pytest.mark.parametrize(
+    "condition,independent",
+    [
+        ("safe", True),
+        ("unrelated-zero", True),
+        ("unrelated-copy", True),
+        ("disabled", False),
+        ("missing-context", False),
+        ("wrong-context", False),
+        ("synchronous", False),
+        ("preempted", False),
+        ("store-reuse", False),
+        ("destination-zero", False),
+        ("copy-source", False),
+        ("copy-destination", False),
+        ("speculative", False),
+        ("encoder", False),
+        ("mamba", False),
+    ],
+)
+def test_load_ready_stream_requires_disjoint_authoritative_destinations(
+    condition, independent
+):
+    """A private ready event cannot bypass any producer of a loaded GPU row."""
+    from vllm.v1.core.kv_cache_utils import KVCacheBlockCopy
+    from vllm.v1.core.sched.output import SchedulerOutput
+
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    metadata = _load_metadata(10)
+    metadata.experiment_options = {"load_independent_ready_stream": True}
+    output = SchedulerOutput.make_empty()
+    output.kv_connector_metadata = metadata
+    if condition == "disabled":
+        metadata.experiment_options["load_independent_ready_stream"] = False
+    elif condition == "missing-context":
+        output = None
+    elif condition == "wrong-context":
+        output.kv_connector_metadata = _empty_metadata()
+    elif condition == "synchronous":
+        output.has_sync_kv_loads = True
+    elif condition == "preempted":
+        output.preempted_req_ids = {"old"}
+    elif condition == "store-reuse":
+        metadata.jobs_to_flush = {9}
+    elif condition in ("destination-zero", "unrelated-zero"):
+        output.new_block_ids_to_zero = [0 if condition == "destination-zero" else 5]
+    elif condition in ("copy-source", "copy-destination", "unrelated-copy"):
+        output.kv_cache_block_copies = [
+            KVCacheBlockCopy(
+                0 if condition == "copy-source" else 5,
+                0 if condition == "copy-destination" else 6,
+            )
+        ]
+    elif condition == "speculative":
+        output.scheduled_spec_decode_tokens = {"old": [1]}
+    elif condition == "encoder":
+        output.scheduled_encoder_inputs = {"old": [1]}
+    elif condition == "mamba":
+        worker.kv_cache_config = MagicMock()
+        worker.kv_cache_config.has_mamba_layers = True
+    worker.start_kv_transfers(metadata, scheduler_output=output)
+    assert worker.worker.submit_load_independently.call_count == int(independent)
+    assert worker.worker.submit_load.call_count == int(not independent)
+
+
 @pytest.mark.parametrize("grouped", [False, True])
 def test_load_group_waits_for_all_jobs_without_delaying_stores(grouped):
     """Partial loads must not release grouped requests or scheduler fences early."""

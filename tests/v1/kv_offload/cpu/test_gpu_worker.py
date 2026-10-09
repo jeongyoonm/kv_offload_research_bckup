@@ -38,6 +38,52 @@ NUM_MAPPINGS = [3]
 NUM_MAPPINGS_PER_GROUP = [2]
 
 
+@pytest.mark.parametrize("independent", [False, True])
+@torch.inference_mode()
+def test_independent_load_ready_bypasses_only_unrelated_compute(
+    default_vllm_config, independent
+):
+    """DMA can finish during unrelated compute; ordinary submission waits for it."""
+    tensor = torch.empty((64, 512), dtype=torch.int8, device=DEVICE_TYPE)
+    caches = CanonicalKVCaches(
+        [CanonicalKVCacheTensor(tensor, 512)], [[CanonicalKVCacheRef(0, 512)]]
+    )
+    worker = CPUOffloadingWorker(
+        caches,
+        blocks_per_chunk=1,
+        num_cpu_blocks=64,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8192,
+    )
+    worker._load_handler.src_tensors[0].fill_(11)
+    busy = torch.cuda.Stream()
+    finished = torch.Event(device=DEVICE_TYPE)
+    try:
+        with torch.cuda.stream(busy):
+            tensor[48:].fill_(55)
+            torch.cuda._sleep(1_000_000_000)
+            finished.record()
+            submit = (
+                worker.submit_load_independently if independent else worker.submit_load
+            )
+            assert submit(
+                1,
+                CPULoadStoreSpec(list(range(32))),
+                GPULoadStoreSpec(
+                    list(range(32)), group_sizes=(32,), block_indices=(0,)
+                ),
+            )
+        worker.wait({1})
+        assert finished.query() is not independent
+        assert [result.job_id for result in worker.get_finished()] == [1]
+        assert not worker.get_finished()
+        assert torch.all(tensor[:32].cpu() == 11)
+    finally:
+        finished.synchronize()
+        assert torch.all(tensor[48:].cpu() == 55)
+        worker.shutdown()
+
+
 @pytest.mark.parametrize("fragmented", [False, True])
 @torch.inference_mode()
 def test_private_tensor_glm_geometry_store_load_bytes(default_vllm_config, fragmented):

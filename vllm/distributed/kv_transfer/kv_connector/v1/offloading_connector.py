@@ -102,7 +102,12 @@ class OffloadingConnector(KVConnectorBase_V1, SupportsHMA):
     def start_load_kv(self, forward_context: "ForwardContext", **kwargs) -> None:
         assert self.connector_worker is not None
         assert isinstance(self._connector_metadata, OffloadingConnectorMetadata)
-        self.connector_worker.start_kv_transfers(self._connector_metadata)
+        if "scheduler_output" in kwargs:
+            self.connector_worker.start_kv_transfers(
+                self._connector_metadata, scheduler_output=kwargs["scheduler_output"]
+            )
+        else:
+            self.connector_worker.start_kv_transfers(self._connector_metadata)
 
     def wait_for_layer_load(self, layer_name: str) -> None:
         pass

@@ -69,6 +69,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "optimistic_min_ranks": 7,
     "optimistic_window_ms": 20,
     "early_submission": False,
+    "load_independent_ready_stream": False,
     "background_prepare": False,
     "copy_pipeline_depth": 1,
     "store_reuse_gpu_fence": False,
@@ -99,6 +100,8 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         and not result["load_descriptor_coalescing"]
     ):
         raise ValueError("packet alignment requires load descriptor coalescing")
+    if result["load_independent_ready_stream"] and not result["early_submission"]:
+        raise ValueError("independent load readiness requires early submission")
     if result["late_seal_calibration"] not in ("legacy", "raw", "shape"):
         raise ValueError("invalid experimental option: late_seal_calibration")
     for key, upper in (

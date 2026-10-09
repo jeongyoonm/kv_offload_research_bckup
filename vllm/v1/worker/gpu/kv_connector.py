@@ -77,7 +77,12 @@ class ActiveKVConnector(KVConnector):
                     "early_load_submission_begin",
                     step=getattr(scheduler_output, "readiness_timeline_step", None),
                 )
-            self._start_load_kv()
+            if getattr(kv_connector_metadata, "experiment_options", {}).get(
+                "load_independent_ready_stream", False
+            ):
+                self._start_load_kv(scheduler_output=scheduler_output)
+            else:
+                self._start_load_kv()
             if early_submission:
                 timeline.emit(
                     "early_load_submission_end",
@@ -88,14 +93,19 @@ class ActiveKVConnector(KVConnector):
             # their host-side submission cost off the critical path.
             self._pending_load_start = True
 
-    def _start_load_kv(self) -> None:
+    def _start_load_kv(
+        self, *, scheduler_output: "SchedulerOutput | None" = None
+    ) -> None:
         self._pending_load_start = False
+        kwargs = (
+            {} if scheduler_output is None else {"scheduler_output": scheduler_output}
+        )
         # TODO: sort out KV Connectors' use of forward_context
         if is_forward_context_available():
-            self.kv_connector.start_load_kv(get_forward_context())
+            self.kv_connector.start_load_kv(get_forward_context(), **kwargs)
         else:
             with set_forward_context(None, self.vllm_config):
-                self.kv_connector.start_load_kv(get_forward_context())
+                self.kv_connector.start_load_kv(get_forward_context(), **kwargs)
 
     def post_forward(
         self, finished_req_ids: set[str], wait_for_save: bool = True

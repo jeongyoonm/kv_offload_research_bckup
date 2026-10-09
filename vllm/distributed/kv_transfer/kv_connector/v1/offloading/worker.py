@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 from collections import defaultdict
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 import torch
 
@@ -34,6 +35,9 @@ from vllm.v1.kv_offload.base import (
 )
 
 logger = init_logger(__name__)
+
+if TYPE_CHECKING:
+    from vllm.v1.core.sched.output import SchedulerOutput
 
 
 class OffloadingConnectorWorker:
@@ -276,7 +280,12 @@ class OffloadingConnectorWorker:
             if queue_stages.active:
                 queue_stages.emit(f"{phase}_end")
 
-    def start_kv_transfers(self, metadata: OffloadingConnectorMetadata):
+    def start_kv_transfers(
+        self,
+        metadata: OffloadingConnectorMetadata,
+        *,
+        scheduler_output: "SchedulerOutput | None" = None,
+    ):
         assert self.worker is not None
         configure = getattr(self.worker, "configure_experiment", None)
         if configure is not None:
@@ -309,8 +318,52 @@ class OffloadingConnectorWorker:
         for job_id, entry in metadata.load_jobs.items():
             self._load_jobs[job_id] = entry.req_id
             assert isinstance(entry.dst_spec, GPULoadStoreSpec)
-            success = self.worker.submit_load(job_id, entry.src_spec, entry.dst_spec)
+            reason = self._independent_load_reason(
+                metadata, scheduler_output, entry.dst_spec
+            )
+            if metadata.experiment_options.get("load_independent_ready_stream", False):
+                queue_stages.emit("load_ready_policy", job_id=job_id, reason=reason)
+            submit = (
+                self.worker.submit_load_independently
+                if reason == "independent"
+                else self.worker.submit_load
+            )
+            success = submit(job_id, entry.src_spec, entry.dst_spec)
             assert success
+
+    def _independent_load_reason(
+        self,
+        metadata: OffloadingConnectorMetadata,
+        scheduler_output: "SchedulerOutput | None",
+        destination: GPULoadStoreSpec,
+    ) -> str:
+        if not metadata.experiment_options.get("load_independent_ready_stream", False):
+            return "disabled"
+        if (
+            scheduler_output is None
+            or scheduler_output.kv_connector_metadata is not metadata
+        ):
+            return "missing-authoritative-context"
+        if scheduler_output.has_sync_kv_loads:
+            return "synchronous-load"
+        if scheduler_output.preempted_req_ids or metadata.jobs_to_flush:
+            return "preemption-or-store-reuse"
+        if (
+            self.kv_cache_config.has_mamba_layers
+            or scheduler_output.scheduled_spec_decode_tokens
+            or scheduler_output.scheduled_encoder_inputs
+        ):
+            return "other-cache-writes"
+        destinations = set(map(int, destination.block_ids))
+        if not destinations.isdisjoint(scheduler_output.new_block_ids_to_zero or ()):
+            return "destination-zeroing"
+        copies = scheduler_output.kv_cache_block_copies or ()
+        if any(
+            copy.src_block_id in destinations or copy.dst_block_id in destinations
+            for copy in copies
+        ):
+            return "destination-copy"
+        return "independent"
 
     def prepare_store_kv(self, metadata: OffloadingConnectorMetadata):
         for job_id, entry in metadata.store_jobs.items():

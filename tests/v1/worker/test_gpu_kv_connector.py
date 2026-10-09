@@ -110,3 +110,22 @@ def test_early_submission_can_be_disabled_on_following_batch(monkeypatch):
     assert events == ["handle", "bind"]
     connector.post_forward(set())
     assert events == ["handle", "bind", "start", "wait", "clear"]
+
+
+def test_independent_ready_load_receives_authoritative_scheduler_context(monkeypatch):
+    events: list[str] = []
+    connector = _make_connector(monkeypatch, events)
+    output = _scheduler_output(False)
+    output.kv_connector_metadata = SimpleNamespace(
+        experiment_options={
+            "early_submission": True,
+            "load_independent_ready_stream": True,
+        }
+    )
+    contexts = []
+    connector.kv_connector.start_load_kv.side_effect = (
+        lambda _, **kwargs: contexts.append(kwargs["scheduler_output"])
+    )
+    connector.pre_forward(output)
+    connector.post_forward(set())
+    assert contexts == [output]

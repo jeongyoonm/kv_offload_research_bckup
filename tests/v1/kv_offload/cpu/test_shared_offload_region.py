@@ -399,6 +399,53 @@ def test_private_worker_regions_preserve_capacity_without_sharing_pages(iid):
             assert not os.path.exists(region.mmap_path)
 
 
+def test_private_tensor_views_cover_disjoint_layers_and_registered_bytes(iid):
+    """Changing physical layout preserves block capacity and every layer's bytes."""
+    workers, blocks, pages = 2, 11, (PAGE_SIZE, 128, 512)
+    slot = sum(pages)
+    row = ((workers * slot + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    regions = []
+    try:
+        for rank in range(workers):
+            region = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                num_workers=workers,
+                memory_layout="private_tensor",
+            )
+            regions.append(region)
+            offset = 0
+            for layer, page in enumerate(pages):
+                view = region.create_next_worker_view(page)
+                assert view.shape == (blocks, page)
+                assert view.stride() == (page, 1)
+                view.fill_(rank * 10 + layer + 1)
+                del view
+                length = blocks * page
+                assert region.mmap_obj[offset : offset + length] == (
+                    bytes([rank * 10 + layer + 1]) * length
+                )
+                offset += length
+            assert offset <= region.registration_size_bytes == region.total_size_bytes
+            with pytest.raises(AssertionError, match="Worker offset"):
+                region.create_next_worker_view(1)
+            with pytest.raises(ValueError, match="canonical"):
+                region.create_next_canonical_view(128)
+            with pytest.raises(ValueError, match="secondary-tier"):
+                region.create_kv_memoryview()
+        assert len({os.fstat(region.fd).st_ino for region in regions}) == workers
+        assert sum(region.total_size_bytes for region in regions) == (
+            regions[0].cache_size_bytes
+        )
+    finally:
+        for region in regions:
+            region.cleanup()
+            assert not os.path.exists(region.mmap_path)
+
+
 # ---------------------------------------------------------------------------
 # create_next_worker_view — shape, stride and storage offset
 # ---------------------------------------------------------------------------

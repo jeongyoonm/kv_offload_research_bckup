@@ -102,8 +102,10 @@ class CPUOffloadingSpec(OffloadingSpec):
 
         world_size = config.parallel.world_size
         self.memory_layout = self.extra_config.get("cpu_cache_layout", "block")
-        if self.memory_layout not in ("block", "worker", "private"):
-            raise ValueError("cpu_cache_layout must be block, worker or private")
+        if self.memory_layout not in ("block", "worker", "private", "private_tensor"):
+            raise ValueError(
+                "cpu_cache_layout must be block, worker, private or private_tensor"
+            )
         if self.memory_layout != "block" and (
             config.replicated_layout
             or config.canonical_layout

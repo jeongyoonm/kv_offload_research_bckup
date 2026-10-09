@@ -115,12 +115,14 @@ class SharedOffloadRegion:
             population_barrier = True
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
-        if memory_layout not in ("block", "worker", "private"):
-            raise ValueError("memory_layout must be block, worker or private")
+        if memory_layout not in ("block", "worker", "private", "private_tensor"):
+            raise ValueError(
+                "memory_layout must be block, worker, private or private_tensor"
+            )
         if memory_layout != "block" and (rank is None or not 0 <= rank < num_workers):
             raise ValueError("worker layout requires a valid worker rank")
         if (
-            memory_layout == "private"
+            memory_layout in ("private", "private_tensor")
             and population_mode == "contiguous"
             and (population_workers != num_workers)
         ):
@@ -144,11 +146,13 @@ class SharedOffloadRegion:
             self.registration_offset = rank * self._worker_span
             self.registration_size_bytes = self._worker_span
         self.cache_size_bytes = self.total_size_bytes
-        if memory_layout == "private":
+        if memory_layout in ("private", "private_tensor"):
             self.total_size_bytes = self._worker_span
             self.registration_offset = 0
 
-        suffix = f"_rank_{rank}" if memory_layout == "private" else ""
+        suffix = (
+            f"_rank_{rank}" if memory_layout in ("private", "private_tensor") else ""
+        )
         self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}{suffix}.mmap"
         self._creator = False  # set True only if this worker creates the file
         self.rank = rank
@@ -160,6 +164,8 @@ class SharedOffloadRegion:
             if memory_layout != "block":
                 self._worker_offset = self.registration_offset
                 self._worker_area_end = self._worker_offset + cpu_page_size
+                if memory_layout == "private_tensor":
+                    self._worker_area_end = num_blocks * cpu_page_size
         try:
             try:
                 self.fd: int | None = os.open(
@@ -253,7 +259,7 @@ class SharedOffloadRegion:
                     owner = process_rank // step
                     start_block = num_blocks * owner // population_workers
                     end_block = num_blocks * (owner + 1) // population_workers
-                    if memory_layout == "private":
+                    if memory_layout in ("private", "private_tensor"):
                         start = 0
                         end = self.total_size_bytes
                     elif memory_layout == "worker":
@@ -359,11 +365,19 @@ class SharedOffloadRegion:
         (row_stride, 1).  Using int8 keeps stride == bytes, so swap_blocks
         address arithmetic works without any dtype conversion.
 
+        The opt-in private_tensor layout instead concatenates all rows of each
+        tensor within this rank's mapping. Its row stride is tensor_page_size;
+        logical block IDs, tensor shapes and mapping capacity are unchanged.
+
         Args:
             tensor_page_size: Bytes per block for this  tensor.
         """
         assert self.rank is not None
-        new_offset = self._worker_offset + tensor_page_size
+        tensor_major = self.memory_layout == "private_tensor"
+        view_bytes = (
+            tensor_page_size * self.num_blocks if tensor_major else tensor_page_size
+        )
+        new_offset = self._worker_offset + view_bytes
         assert new_offset <= self._worker_area_end, (
             f"Worker offset {new_offset} exceeds worker area end "
             f"{self._worker_area_end} (overflowed by "
@@ -372,7 +386,7 @@ class SharedOffloadRegion:
         worker_layer_view = torch.as_strided(
             self._base,
             size=(self.num_blocks, tensor_page_size),
-            stride=(self._row_stride, 1),
+            stride=(tensor_page_size if tensor_major else self._row_stride, 1),
             storage_offset=self._worker_offset,
         )
         self._worker_offset = new_offset

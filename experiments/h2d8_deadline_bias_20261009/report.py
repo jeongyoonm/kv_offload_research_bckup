@@ -209,7 +209,7 @@ def main():
     }
     means, paired = {}, {}
     for arm, rows in groups.items():
-        assert [r["seed"] for r in rows] == [r["seed"] for r in groups["control"]]
+        assert [r["seed"] for r in rows] == [r["seed"] for r in groups[ARMS[0]]]
         means[arm] = {m: statistics.mean(r[m] for r in rows) for m in metrics}
         opportunities = sum(r["kv_ready_during_compute"] for r in rows)
         means[arm]["recovered_opportunity_percent"] = (
@@ -239,7 +239,7 @@ def main():
             * (
                 math.exp(
                     statistics.mean(
-                        math.log(r[m] / c[m]) for r, c in zip(rows, groups["control"])
+                        math.log(r[m] / c[m]) for r, c in zip(rows, groups[ARMS[0]])
                     )
                 )
                 - 1
@@ -252,7 +252,7 @@ def main():
                 throughput_change_percent=100
                 * (r["throughput_rps"] / c["throughput_rps"] - 1),
             )
-            for r, c in zip(rows, groups["control"])
+            for r, c in zip(rows, groups[ARMS[0]])
         ]
     result = dict(
         means=means,

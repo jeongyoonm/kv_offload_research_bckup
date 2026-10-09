@@ -100,6 +100,20 @@ def audit(root):
     log = (root / "server/server.log").read_text(errors="replace")
     capacities = sorted(set(re.findall(r"GPU KV cache size: ([\d,]+) tokens", log)))
     assert capacities == ["2,160,960"], (root, capacities)
+    native_ranks = []
+    if extra.get("async_d2h_submission", False):
+        native_ranks = sorted(
+            {
+                int(rank)
+                for rank, chunk in re.findall(
+                    r"Worker_TP(\d+).*KV transfer direction=D2H "
+                    r"async_submission=True chunk_bytes=(\d+)",
+                    log,
+                )
+                if int(chunk) == extra["async_d2h_chunk_bytes"]
+            }
+        )
+        assert native_ranks == list(range(8)), (root, native_ranks)
     return dict(
         root=str(root),
         model=model,
@@ -107,6 +121,7 @@ def audit(root):
         cpu_bytes=extra.get("cpu_bytes_to_use"),
         cpu_layout=extra.get("cpu_cache_layout"),
         native_d2h=extra.get("async_d2h_submission", False),
+        native_d2h_verified_ranks=native_ranks,
         measured_cells=len(results),
         measured_requests=sum(r["requests"] for r in results),
         accepted=True,

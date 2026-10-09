@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+  "branch": "experiment/gpu-prefix-ceiling-controls-20261009",
+  "commit": "16549324b4a7f6e6cd89365c55724aa4f524f96a"
+}

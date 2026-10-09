@@ -17,3 +17,8 @@ selector, FP8 KV, cache sizes, native H2D depth two and scheduling remain fixed.
 CPU byte-map and packing checks and six real GPU row/producer/retirement checks
 are required before serving. Actual merge rate and serving effects determine
 whether this calculation matters to the model workload.
+
+Verification completed: ten CPU mapping/packing checks and six GPU cases passed.
+For dense measured GLM geometry, packet alignment recovers 332, 89 and 18 native
+chunks for 60K prefixes, 16K prefixes and 60K suffixes respectively, matching the
+byte-capacity lower bounds. This confirms packing, not serving performance.

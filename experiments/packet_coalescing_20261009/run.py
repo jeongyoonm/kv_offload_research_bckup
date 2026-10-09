@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-"""Matched original versus physically coalesced D2H copy descriptors."""
+"""Compare ordinary and packet-aligned splitting of merged H2D descriptors."""
 
 import argparse
 import hashlib

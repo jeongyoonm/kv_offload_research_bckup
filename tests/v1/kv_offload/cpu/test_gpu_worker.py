@@ -86,6 +86,88 @@ def test_worker_shutdown_releases_region_and_runs_both_handlers() -> None:
     assert worker._mmap_region is None
 
 
+def test_store_reuse_fence_enqueues_only_pending_store_events(monkeypatch) -> None:
+    """Stream ordering must not synchronize or retire the store on the host."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    event = MagicMock()
+    worker._store_handler = MagicMock()
+    worker._store_handler._transfer_events = {1: event}
+    stream = MagicMock()
+    monkeypatch.setattr(current_platform, "is_cuda", lambda: True)
+    monkeypatch.setattr(current_platform, "current_stream", lambda: stream)
+
+    worker.fence_store_reuse({1, 2})
+
+    stream.wait_event.assert_called_once_with(event)
+    event.synchronize.assert_not_called()
+    assert worker._store_handler._transfer_events == {1: event}
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA stream fence test")
+@torch.inference_mode()
+@pytest.mark.parametrize("async_h2d_submission", [False, True])
+@pytest.mark.parametrize("overwrite", ["forward", "load"])
+def test_gpu_store_reuse_fence_orders_forward_and_independent_h2d(
+    default_vllm_config, async_h2d_submission, overwrite
+) -> None:
+    """Overwriting a store's source must preserve the old CPU bytes."""
+    page_size = 128 * 1024
+    gpu_tensor = torch.full((2, page_size), 0x11, dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[
+                CanonicalKVCacheTensor(tensor=gpu_tensor, page_size_bytes=page_size)
+            ],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=async_h2d_submission,
+        async_h2d_chunk_bytes=8192,
+    )
+    worker.configure_experiment(
+        {"copy_pipeline_depth": 2 if async_h2d_submission else 1}
+    )
+    cpu_tensor = worker._load_handler.src_tensors[0]
+    cpu_tensor[1].fill_(0x5A)
+    spec = GPULoadStoreSpec([0], group_sizes=(1,), block_indices=(0,))
+    try:
+        torch.accelerator.synchronize()
+        assert worker.submit_store(1, spec, CPULoadStoreSpec([0]))
+        transfer = worker._store_handler._transfers[-1]
+        # Extend the store with a delayed DMA read, independently of whether
+        # the driver's batched copy API blocks during the initial submission.
+        with current_platform.stream(transfer.stream):
+            torch.cuda._sleep(100_000_000)
+            cpu_tensor[0].copy_(gpu_tensor[0], non_blocking=True)
+            transfer.end_event.record(transfer.stream)
+        worker.fence_store_reuse({1})
+        assert not transfer.end_event.query(), "GPU fence unexpectedly waited on CPU"
+
+        if overwrite == "forward":
+            gpu_tensor[0].fill_(0x5A)
+        else:
+            assert worker.submit_load(2, CPULoadStoreSpec([1]), spec)
+
+        worker.wait({1, 2})
+        torch.accelerator.synchronize()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        torch.testing.assert_close(
+            gpu_tensor[0].cpu(), torch.full((page_size,), 0x5A, dtype=torch.int8)
+        )
+        finished = worker.get_finished()
+        assert {result.job_id for result in finished} == (
+            {1} if overwrite == "forward" else {1, 2}
+        )
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()
+
+
 @pytest.mark.parametrize("failing_handler", ["store", "load"])
 def test_worker_logs_handler_error_and_cleans_region(
     caplog_vllm, monkeypatch: pytest.MonkeyPatch, failing_handler

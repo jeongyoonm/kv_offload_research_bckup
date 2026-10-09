@@ -537,6 +537,7 @@ class OffloadingConnectorScheduler:
         self._req_status: dict[ReqId, RequestOffloadState] = {}
         self._current_batch_load_jobs: dict[int, TransferJob] = {}
         self._current_batch_jobs_to_flush: set[int] = set()
+        self._current_batch_force_flush_on_host = False
         # GPU block IDs allocated in the current engine step
         self._current_batch_allocated_block_ids: set[int] = set()
         # if GPU prefix caching is enabled,
@@ -1579,6 +1580,7 @@ class OffloadingConnectorScheduler:
             load_jobs=self._current_batch_load_jobs,
             store_jobs=partial_store_jobs | normal_store_jobs,
             jobs_to_flush=self._current_batch_jobs_to_flush,
+            force_flush_on_host=self._current_batch_force_flush_on_host,
         )
 
         # All prepare_store calls for finished requests have been issued.
@@ -1596,6 +1598,7 @@ class OffloadingConnectorScheduler:
                 del self._req_status[req_id]
         self._current_batch_load_jobs = {}
         self._current_batch_jobs_to_flush = set()
+        self._current_batch_force_flush_on_host = False
         self._current_batch_allocated_block_ids = set()
         return meta
 
@@ -1785,6 +1788,7 @@ class OffloadingConnectorScheduler:
 
         # Flush all in-flight jobs
         self._current_batch_jobs_to_flush.update(self._jobs.keys())
+        self._current_batch_force_flush_on_host = True
 
         for req_id, status in list(self._req_status.items()):
             if status.req.is_finished():

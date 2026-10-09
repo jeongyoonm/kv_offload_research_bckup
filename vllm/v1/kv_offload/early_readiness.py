@@ -71,6 +71,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "early_submission": False,
     "background_prepare": False,
     "copy_pipeline_depth": 1,
+    "store_reuse_gpu_fence": False,
     "deferral_policy": "disabled",
     "deferral_hold_ms": 120,
     "deferral_target_gain": 2,

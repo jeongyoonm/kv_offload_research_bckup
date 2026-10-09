@@ -592,6 +592,11 @@ class SingleDirectionOffloadingHandler:
     def transfer_async(
         self, job_id: int, src_spec: LoadStoreSpec, dst_spec: LoadStoreSpec
     ) -> bool:
+        from vllm.v1.kv_offload import queue_stages
+
+        trace_store = self.gpu_to_cpu and queue_stages.active
+        if trace_store:
+            queue_stages.emit("store_descriptors_begin", job_id=job_id)
         assert isinstance(src_spec, BlockIDsLoadStoreSpec)
         assert isinstance(dst_spec, BlockIDsLoadStoreSpec)
 
@@ -699,6 +704,13 @@ class SingleDirectionOffloadingHandler:
         src = src[:op_idx]
         dst = dst[:op_idx]
         sizes = sizes[:op_idx]
+        if trace_store:
+            queue_stages.emit(
+                "store_descriptors_end",
+                job_id=job_id,
+                num_bytes=num_transfer_bytes,
+                num_descriptors=op_idx,
+            )
 
         if self._async_h2d_submission:
             transfer = AsyncTransfer(
@@ -743,6 +755,8 @@ class SingleDirectionOffloadingHandler:
                     raise
             return True
 
+        if trace_store:
+            queue_stages.emit("store_stream_dependencies_begin", job_id=job_id)
         stream = (
             self._stream_pool.pop() if self._stream_pool else current_platform.Stream()
         )
@@ -769,6 +783,8 @@ class SingleDirectionOffloadingHandler:
             last_event = last_transfer.end_event
             # assure job will start only after the previous one completes
             stream.wait_event(last_event)
+        if trace_store:
+            queue_stages.emit("store_stream_dependencies_end", job_id=job_id)
         # CPU->GPU reads from host pinned memory, which is never written
         # by a concurrent GPU stream, so CU_MEMCPY_SRC_ACCESS_ORDER_ANY is
         # safe and lets the driver pipeline source reads. GPU->CPU reads
@@ -776,6 +792,8 @@ class SingleDirectionOffloadingHandler:
         # writing; we must keep STREAM ordering so source reads are gated
         # by the transfer stream's wait_stream(compute) barrier.
         is_src_access_order_any = not self.gpu_to_cpu
+        if trace_store:
+            queue_stages.emit("store_copy_enqueue_begin", job_id=job_id)
         with current_platform.stream(stream):
             start_event.record(stream)
             if op_idx > 0:
@@ -787,6 +805,8 @@ class SingleDirectionOffloadingHandler:
                     is_src_access_order_any=is_src_access_order_any,
                 )
             end_event.record(stream)
+        if trace_store:
+            queue_stages.emit("store_copy_enqueue_end", job_id=job_id)
 
         self._transfer_events[job_id] = end_event
         self._transfers.append(
@@ -1043,6 +1063,19 @@ class CPUOffloadingWorker(OffloadingWorker):
     def wait(self, job_ids: set[int]) -> None:
         self._store_handler.wait(job_ids)
         self._load_handler.wait(job_ids)
+
+    def fence_store_reuse(self, job_ids: set[int]) -> None:
+        """Keep store source blocks intact without waiting on the CPU."""
+        if not current_platform.is_cuda():
+            self.wait(job_ids)
+            return
+        stream = current_platform.current_stream()
+        for job_id in job_ids:
+            event = self._store_handler._transfer_events.get(job_id)
+            if event is not None:
+                stream.wait_event(event)
+        # Native H2D submission records its ready event on this same stream,
+        # propagating the store fence to its independent copy stream too.
 
     def shutdown(self) -> None:
         handler_failed = False

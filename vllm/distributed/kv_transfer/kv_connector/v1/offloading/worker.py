@@ -248,14 +248,25 @@ class OffloadingConnectorWorker:
         self._unsubmitted_store_jobs.clear()
 
         if kv_connector_metadata.jobs_to_flush:
+            gpu_fence = (
+                kv_connector_metadata.experiment_options.get(
+                    "store_reuse_gpu_fence", False
+                )
+                and not kv_connector_metadata.force_flush_on_host
+                and kv_connector_metadata.jobs_to_flush.isdisjoint(self._load_jobs)
+            )
+            phase = "store_reuse_fence_enqueue" if gpu_fence else "store_flush_wait"
             if queue_stages.active:
                 queue_stages.emit(
-                    "store_flush_wait_begin",
+                    f"{phase}_begin",
                     jobs=list(kv_connector_metadata.jobs_to_flush),
                 )
-            self.worker.wait(kv_connector_metadata.jobs_to_flush)
+            if gpu_fence:
+                self.worker.fence_store_reuse(kv_connector_metadata.jobs_to_flush)
+            else:
+                self.worker.wait(kv_connector_metadata.jobs_to_flush)
             if queue_stages.active:
-                queue_stages.emit("store_flush_wait_end")
+                queue_stages.emit(f"{phase}_end")
 
     def start_kv_transfers(self, metadata: OffloadingConnectorMetadata):
         assert self.worker is not None

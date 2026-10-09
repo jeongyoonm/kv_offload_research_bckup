@@ -566,6 +566,10 @@ class OffloadingWorker(ABC):
     @abstractmethod
     def wait(self, job_ids: set[int]) -> None: ...
 
+    def fence_store_reuse(self, job_ids: set[int]) -> None:
+        """Order subsequent GPU writes after stores; default to a host wait."""
+        self.wait(job_ids)
+
     def shutdown(self) -> None:
         return
 

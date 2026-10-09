@@ -2114,6 +2114,7 @@ def test_reset_cache(request_runner, async_scheduling: bool):
     # In-flight load jobs must be queued for flushing to prevent CUDA stream
     # races between old loads and new post-reset stores.
     assert load_job_ids <= runner.connector_scheduler._current_batch_jobs_to_flush
+    assert runner.connector_scheduler._current_batch_force_flush_on_host
 
     # All internal job tracking must be cleared.
     assert not runner.connector_scheduler._jobs
@@ -2130,6 +2131,13 @@ def test_reset_cache(request_runner, async_scheduling: bool):
     for req_status in runner.connector_scheduler._req_status.values():
         for group_state in req_status.group_states:
             assert group_state.next_stored_chunk_idx == 0
+
+    metadata = runner.connector_scheduler.build_connector_meta(
+        SchedulerOutput.make_empty()
+    )
+    assert metadata.force_flush_on_host
+    assert load_job_ids <= metadata.jobs_to_flush
+    assert not runner.connector_scheduler._current_batch_force_flush_on_host
 
 
 @pytest.mark.parametrize("async_scheduling", [True, False])

@@ -16,5 +16,6 @@ legacy sorted, and preserved coalescing. Each case checks every loaded byte,
 untouched rows, and exactly-once native retirement. The matrix identifies
 transfer path cost; it does not identify a particular GPU hardware mechanism.
 
-CPU verification: 10 targeted helper tests passed. GPU and serving findings
-will be recorded after the serialized validation gate completes.
+CPU verification: 10 targeted helper tests passed. Two store/load GPU byte
+checks and the 12-case actual-layout matrix passed. See `FINDINGS.md`: the
+order-preservation proposal did not help and is not promoted.

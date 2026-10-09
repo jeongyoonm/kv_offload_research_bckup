@@ -1,0 +1,563 @@
+{
+  "complete": true,
+  "records": [
+    {
+      "layout": "private",
+      "gpu_order": "ascending",
+      "mode": "off",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 0.881509,
+          "wall_ms": 63.105547,
+          "gpu_ms": 61.125344067811966
+        },
+        {
+          "cpu_submit_ms": 0.884828,
+          "wall_ms": 62.956915,
+          "gpu_ms": 60.97062386572361
+        },
+        {
+          "cpu_submit_ms": 0.876934,
+          "wall_ms": 63.106214,
+          "gpu_ms": 61.13177624344826
+        },
+        {
+          "cpu_submit_ms": 0.878394,
+          "wall_ms": 62.949525,
+          "gpu_ms": 60.970912262797356
+        },
+        {
+          "cpu_submit_ms": 0.872467,
+          "wall_ms": 62.93934,
+          "gpu_ms": 60.969408094882965
+        },
+        {
+          "cpu_submit_ms": 0.872998,
+          "wall_ms": 62.917019,
+          "gpu_ms": 60.94627211987973
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 0.877664,
+        "wall_ms": 62.95322,
+        "gpu_ms": 60.97076806426048
+      }
+    },
+    {
+      "layout": "private",
+      "gpu_order": "ascending",
+      "mode": "sorted",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 2.129255,
+          "wall_ms": 57.70823,
+          "gpu_ms": 54.51209610700607
+        },
+        {
+          "cpu_submit_ms": 2.118396,
+          "wall_ms": 57.681615,
+          "gpu_ms": 54.498208090662956
+        },
+        {
+          "cpu_submit_ms": 2.135033,
+          "wall_ms": 57.662361,
+          "gpu_ms": 54.458719968795776
+        },
+        {
+          "cpu_submit_ms": 2.09445,
+          "wall_ms": 57.619209,
+          "gpu_ms": 54.45523199439049
+        },
+        {
+          "cpu_submit_ms": 2.085766,
+          "wall_ms": 57.628773,
+          "gpu_ms": 54.46896003186703
+        },
+        {
+          "cpu_submit_ms": 2.212475,
+          "wall_ms": 58.498196,
+          "gpu_ms": 55.21644812822342
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 2.1238255,
+        "wall_ms": 57.671988,
+        "gpu_ms": 54.48358406126499
+      }
+    },
+    {
+      "layout": "private",
+      "gpu_order": "ascending",
+      "mode": "preserved",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 2.093963,
+          "wall_ms": 64.182065,
+          "gpu_ms": 60.98688001930714
+        },
+        {
+          "cpu_submit_ms": 2.092517,
+          "wall_ms": 64.130902,
+          "gpu_ms": 60.938432082533836
+        },
+        {
+          "cpu_submit_ms": 2.064208,
+          "wall_ms": 64.085507,
+          "gpu_ms": 60.92819198966026
+        },
+        {
+          "cpu_submit_ms": 2.026418,
+          "wall_ms": 64.10118,
+          "gpu_ms": 60.982528209686286
+        },
+        {
+          "cpu_submit_ms": 2.0393,
+          "wall_ms": 64.33186,
+          "gpu_ms": 61.198688089847565
+        },
+        {
+          "cpu_submit_ms": 2.047842,
+          "wall_ms": 64.074675,
+          "gpu_ms": 60.930399954319
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 2.056025,
+        "wall_ms": 64.116041,
+        "gpu_ms": 60.96048014611006
+      }
+    },
+    {
+      "layout": "private",
+      "gpu_order": "descending",
+      "mode": "off",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 0.963067,
+          "wall_ms": 63.060779,
+          "gpu_ms": 60.99974398314953
+        },
+        {
+          "cpu_submit_ms": 0.866561,
+          "wall_ms": 63.147397,
+          "gpu_ms": 61.175360053777695
+        },
+        {
+          "cpu_submit_ms": 1.010953,
+          "wall_ms": 64.580921,
+          "gpu_ms": 62.46790401637554
+        },
+        {
+          "cpu_submit_ms": 0.877031,
+          "wall_ms": 62.895785,
+          "gpu_ms": 60.9211842417717
+        },
+        {
+          "cpu_submit_ms": 0.852277,
+          "wall_ms": 62.862003,
+          "gpu_ms": 60.91024005413056
+        },
+        {
+          "cpu_submit_ms": 0.845136,
+          "wall_ms": 62.891247,
+          "gpu_ms": 60.95302414894104
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 0.871796,
+        "wall_ms": 62.97828199999999,
+        "gpu_ms": 60.976384066045284
+      }
+    },
+    {
+      "layout": "private",
+      "gpu_order": "descending",
+      "mode": "sorted",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 2.114574,
+          "wall_ms": 60.372613,
+          "gpu_ms": 57.18521596491337
+        },
+        {
+          "cpu_submit_ms": 2.074276,
+          "wall_ms": 58.43653,
+          "gpu_ms": 55.295264072716236
+        },
+        {
+          "cpu_submit_ms": 2.111656,
+          "wall_ms": 60.496706,
+          "gpu_ms": 57.314144022762775
+        },
+        {
+          "cpu_submit_ms": 2.081936,
+          "wall_ms": 57.682763,
+          "gpu_ms": 54.53452788293362
+        },
+        {
+          "cpu_submit_ms": 2.073824,
+          "wall_ms": 60.517376,
+          "gpu_ms": 57.37894397228956
+        },
+        {
+          "cpu_submit_ms": 2.064108,
+          "wall_ms": 57.733726,
+          "gpu_ms": 54.601248033344746
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 2.078106,
+        "wall_ms": 59.4045715,
+        "gpu_ms": 56.2402400188148
+      }
+    },
+    {
+      "layout": "private",
+      "gpu_order": "descending",
+      "mode": "preserved",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 2.051433,
+          "wall_ms": 64.12245,
+          "gpu_ms": 60.974143996834755
+        },
+        {
+          "cpu_submit_ms": 2.119266,
+          "wall_ms": 64.127199,
+          "gpu_ms": 60.91247999668121
+        },
+        {
+          "cpu_submit_ms": 2.044712,
+          "wall_ms": 64.032431,
+          "gpu_ms": 60.890591859817505
+        },
+        {
+          "cpu_submit_ms": 2.006325,
+          "wall_ms": 63.995556,
+          "gpu_ms": 60.89481593668461
+        },
+        {
+          "cpu_submit_ms": 1.963018,
+          "wall_ms": 64.006241,
+          "gpu_ms": 60.94716803729534
+        },
+        {
+          "cpu_submit_ms": 2.033704,
+          "wall_ms": 64.451664,
+          "gpu_ms": 61.32064005732536
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 2.0392080000000004,
+        "wall_ms": 64.0774405,
+        "gpu_ms": 60.92982401698828
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "ascending",
+      "mode": "off",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 0.884474,
+          "wall_ms": 62.706696,
+          "gpu_ms": 60.77103979885579
+        },
+        {
+          "cpu_submit_ms": 0.883976,
+          "wall_ms": 62.699461,
+          "gpu_ms": 60.76646347343922
+        },
+        {
+          "cpu_submit_ms": 0.874153,
+          "wall_ms": 62.73143,
+          "gpu_ms": 60.80633570253849
+        },
+        {
+          "cpu_submit_ms": 0.860564,
+          "wall_ms": 62.740198,
+          "gpu_ms": 60.82694366574288
+        },
+        {
+          "cpu_submit_ms": 1.223194,
+          "wall_ms": 63.047942,
+          "gpu_ms": 60.77302387356758
+        },
+        {
+          "cpu_submit_ms": 0.866675,
+          "wall_ms": 62.729377,
+          "gpu_ms": 60.81007954478264
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 0.8790644999999999,
+        "wall_ms": 62.7304035,
+        "gpu_ms": 60.789679788053036
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "ascending",
+      "mode": "sorted",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 430,
+      "native_chunks": 332,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 1.698628,
+          "wall_ms": 55.216775,
+          "gpu_ms": 52.47094398736954
+        },
+        {
+          "cpu_submit_ms": 1.702483,
+          "wall_ms": 55.244863,
+          "gpu_ms": 52.47084793448448
+        },
+        {
+          "cpu_submit_ms": 1.663496,
+          "wall_ms": 55.188265,
+          "gpu_ms": 52.47715198993683
+        },
+        {
+          "cpu_submit_ms": 1.638761,
+          "wall_ms": 55.155662,
+          "gpu_ms": 52.47023995220661
+        },
+        {
+          "cpu_submit_ms": 1.632191,
+          "wall_ms": 55.182115,
+          "gpu_ms": 52.491231888532646
+        },
+        {
+          "cpu_submit_ms": 1.660187,
+          "wall_ms": 55.170533,
+          "gpu_ms": 52.46364790201187
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 1.6618415,
+        "wall_ms": 55.185190000000006,
+        "gpu_ms": 52.47089596092701
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "ascending",
+      "mode": "preserved",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 430,
+      "native_chunks": 332,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 1.552329,
+          "wall_ms": 55.078569,
+          "gpu_ms": 52.479103803634644
+        },
+        {
+          "cpu_submit_ms": 1.537001,
+          "wall_ms": 55.042785,
+          "gpu_ms": 52.463647946715355
+        },
+        {
+          "cpu_submit_ms": 1.533138,
+          "wall_ms": 55.047919,
+          "gpu_ms": 52.46639992296696
+        },
+        {
+          "cpu_submit_ms": 1.524422,
+          "wall_ms": 55.049015,
+          "gpu_ms": 52.47667196393013
+        },
+        {
+          "cpu_submit_ms": 1.519684,
+          "wall_ms": 55.036363,
+          "gpu_ms": 52.47449587285519
+        },
+        {
+          "cpu_submit_ms": 1.525621,
+          "wall_ms": 55.090443,
+          "gpu_ms": 52.49200005829335
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 1.5293795,
+        "wall_ms": 55.048467,
+        "gpu_ms": 52.47558391839266
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "descending",
+      "mode": "off",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 0.881326,
+          "wall_ms": 62.725732,
+          "gpu_ms": 60.78089573979378
+        },
+        {
+          "cpu_submit_ms": 0.98054,
+          "wall_ms": 62.780875,
+          "gpu_ms": 60.75014370679855
+        },
+        {
+          "cpu_submit_ms": 0.89971,
+          "wall_ms": 62.70977,
+          "gpu_ms": 60.756031826138496
+        },
+        {
+          "cpu_submit_ms": 0.887806,
+          "wall_ms": 62.753853,
+          "gpu_ms": 60.81548756361008
+        },
+        {
+          "cpu_submit_ms": 0.879008,
+          "wall_ms": 62.719395,
+          "gpu_ms": 60.79001574218273
+        },
+        {
+          "cpu_submit_ms": 0.862732,
+          "wall_ms": 62.680612,
+          "gpu_ms": 60.76732780039311
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 0.884566,
+        "wall_ms": 62.7225635,
+        "gpu_ms": 60.77411177009344
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "descending",
+      "mode": "sorted",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 1.778609,
+          "wall_ms": 63.636112,
+          "gpu_ms": 60.8043517768383
+        },
+        {
+          "cpu_submit_ms": 1.869272,
+          "wall_ms": 63.69738,
+          "gpu_ms": 60.776607632637024
+        },
+        {
+          "cpu_submit_ms": 1.882513,
+          "wall_ms": 63.717521,
+          "gpu_ms": 60.78294375538826
+        },
+        {
+          "cpu_submit_ms": 1.861502,
+          "wall_ms": 63.688722,
+          "gpu_ms": 60.766911789774895
+        },
+        {
+          "cpu_submit_ms": 1.809476,
+          "wall_ms": 63.669686,
+          "gpu_ms": 60.8043197542429
+        },
+        {
+          "cpu_submit_ms": 1.824131,
+          "wall_ms": 63.673281,
+          "gpu_ms": 60.790239721536636
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 1.8428165,
+        "wall_ms": 63.6810015,
+        "gpu_ms": 60.78659173846245
+      }
+    },
+    {
+      "layout": "private_tensor",
+      "gpu_order": "descending",
+      "mode": "preserved",
+      "raw_descriptors": 90288,
+      "effective_descriptors": 90288,
+      "native_chunks": 333,
+      "bytes_validated": 2784153600,
+      "samples": [
+        {
+          "cpu_submit_ms": 1.634623,
+          "wall_ms": 63.46424,
+          "gpu_ms": 60.77670367062092
+        },
+        {
+          "cpu_submit_ms": 1.640963,
+          "wall_ms": 63.495136,
+          "gpu_ms": 60.79190392792225
+        },
+        {
+          "cpu_submit_ms": 1.763271,
+          "wall_ms": 63.624185,
+          "gpu_ms": 60.81193570792675
+        },
+        {
+          "cpu_submit_ms": 1.791439,
+          "wall_ms": 63.653897,
+          "gpu_ms": 60.80700773000718
+        },
+        {
+          "cpu_submit_ms": 1.798434,
+          "wall_ms": 63.629431,
+          "gpu_ms": 60.78028780221939
+        },
+        {
+          "cpu_submit_ms": 1.692831,
+          "wall_ms": 63.542539,
+          "gpu_ms": 60.78895974159241
+        }
+      ],
+      "medians": {
+        "cpu_submit_ms": 1.728051,
+        "wall_ms": 63.583361999999994,
+        "gpu_ms": 60.79043183475733
+      }
+    }
+  ],
+  "owner_pid": 766243,
+  "bytes_per_load": 2784153600,
+  "thp_disabled": true,
+  "depth": 2,
+  "chunk_bytes": 8388608,
+  "definition": "GPU zero, private tensors and actual mmap layouts. Each case excludes two warmups, retires every native job exactly once and checks all copied bytes and untouched rows. CPU submission includes descriptor work; GPU time is the native transfer envelope. No model or concurrent compute is present. Descriptor group order changes do not identify a specific GPU hardware mechanism."
+}

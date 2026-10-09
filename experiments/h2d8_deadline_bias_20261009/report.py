@@ -109,7 +109,7 @@ def audit_cell(directory, stages, spans):
         prediction = transport.get("prediction")
         deadline = transport.get("compute_seal_deadline_ns")
         raw_error = corrected_error = None
-        if prediction and deadline:
+        if prediction and deadline and "raw_scaled_duration_ns" in prediction:
             assert prediction["predecessor_step"] == previous["step"]
             raw_error = (
                 prediction["gpu_start_upper_ns"]

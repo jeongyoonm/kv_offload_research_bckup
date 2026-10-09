@@ -69,8 +69,11 @@ def analyze(root):
             producer_states = Counter()
             allocation = defaultdict(list)
             load_descriptors = defaultdict(list)
+            load_ready_states = Counter()
             for event in events:
                 name = event["event"]
+                if name == "load_ready_dependency":
+                    load_ready_states[str(event["current_stream_ready"])] += 1
                 if name == "store_specific_producer_dependency":
                     producer_states[
                         f"producer_ready={event['producer_ready']},"
@@ -136,6 +139,7 @@ def analyze(root):
                 load_descriptors={
                     key: stats(values) for key, values in load_descriptors.items()
                 },
+                load_ready_states=dict(load_ready_states),
             )
         rows.append(
             dict(

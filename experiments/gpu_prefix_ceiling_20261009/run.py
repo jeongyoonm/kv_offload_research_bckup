@@ -4,6 +4,7 @@
 
 import argparse
 import concurrent.futures
+import ctypes
 import hashlib
 import json
 import os
@@ -21,7 +22,7 @@ from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 
 SOURCE = Path(__file__).resolve().parents[2]
 collector = baseline.collector
-PORT = 18432
+PORT = 18445
 SHAPES = {"familiar60k": (58368, 3072), "short16k": (15552, 832)}
 
 
@@ -52,6 +53,11 @@ def launch_gpu(root):
         text=True,
     ).strip()
     assert not occupied, f"GPUs occupied: {occupied}"
+    libc = ctypes.CDLL(None, use_errno=True)
+    if libc.prctl(41, 1, 0, 0, 0):
+        raise OSError(ctypes.get_errno(), "PR_SET_THP_DISABLE")
+    assert libc.prctl(42, 0, 0, 0, 0) == 1
+    collector.save(root / "thp_policy.json", dict(thp_disabled=True, inherited=True))
     command, config = command_for("gpu")
     # The CPU experiment observer requires a connector. Ordinary GPU caching
     # uses the same model/worker settings without that experimental observer.

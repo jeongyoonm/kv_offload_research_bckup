@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+import time
 from collections.abc import Iterable, Sequence
 from typing import Any
 
@@ -194,6 +195,10 @@ class BlockPool:
         self.kv_event_queue: list[KVCacheEvent] = []
 
         self.metrics_collector = metrics_collector
+        self.pending_store_blocks: dict[int, set[int]] = {}
+        self.prefer_unfenced_blocks = False
+        self.audit_store_allocations = False
+        self.store_allocation_audit: list[dict[str, int]] = []
 
     def get_cached_block(
         self, block_hash: BlockHash, kv_cache_group_ids: list[int]
@@ -658,7 +663,39 @@ class BlockPool:
         if num_blocks > self.get_num_free_blocks():
             raise ValueError(f"Cannot get {num_blocks} free blocks from the pool")
 
+        started = time.monotonic_ns() if self.audit_store_allocations else 0
+        free_before = self.free_block_queue.num_free_blocks
         ret: list[KVCacheBlock] = self.free_block_queue.popleft_n(num_blocks)
+        pending = self.pending_store_blocks
+        skipped: list[KVCacheBlock] = []
+        scanned = num_blocks
+        if self.prefer_unfenced_blocks and pending:
+            skipped = [block for block in ret if block.block_id in pending]
+            if skipped:
+                ret = [block for block in ret if block.block_id not in pending]
+                while len(ret) < num_blocks and self.free_block_queue.num_free_blocks:
+                    block = self.free_block_queue.popleft()
+                    scanned += 1
+                    if block.block_id in pending:
+                        skipped.append(block)
+                    else:
+                        ret.append(block)
+                # Preserve capacity: reuse still-fenced blocks when necessary.
+                deficit = num_blocks - len(ret)
+                ret.extend(skipped[:deficit])
+                self.free_block_queue.prepend_n(skipped[deficit:])
+        if self.audit_store_allocations:
+            self.store_allocation_audit.append(
+                dict(
+                    requested=num_blocks,
+                    free_before=free_before,
+                    scanned=scanned,
+                    skipped_pending=len(skipped),
+                    allocated_pending=sum(block.block_id in pending for block in ret),
+                    pending_blocks=len(pending),
+                    duration_ns=time.monotonic_ns() - started,
+                )
+            )
 
         # In order to only iterate the list once, we duplicated code a bit
         if self.enable_caching:

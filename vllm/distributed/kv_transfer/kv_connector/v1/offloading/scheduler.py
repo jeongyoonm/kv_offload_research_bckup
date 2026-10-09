@@ -28,6 +28,7 @@ from vllm.distributed.kv_transfer.kv_connector.v1.offloading.metrics import (
 )
 from vllm.logger import init_logger
 from vllm.utils.math_utils import cdiv, round_down
+from vllm.v1.core.block_pool import BlockPool
 from vllm.v1.core.kv_cache_manager import KVCacheBlocks
 from vllm.v1.core.sched.output import SchedulerOutput
 from vllm.v1.kv_cache_interface import (
@@ -563,6 +564,7 @@ class OffloadingConnectorScheduler:
         # protected by their ref_cnt) and for sliding window blocks (which can
         # be freed before a request finishes).
         self._block_id_to_pending_jobs: dict[int, set[int]] = {}
+        self.gpu_block_pool: BlockPool | None = None
 
         self._events_tracker = OffloadingEventsTracker(spec.kv_events_config)
 
@@ -1593,6 +1595,9 @@ class OffloadingConnectorScheduler:
                 or any(g.requires_cow_source for g in self.config.kv_group_configs)
             ),
         )
+        if self.gpu_block_pool is not None:
+            meta.store_allocation_audit = self.gpu_block_pool.store_allocation_audit
+            self.gpu_block_pool.store_allocation_audit = []
 
         # All prepare_store calls for finished requests have been issued.
         # Signal on_request_finished and clean up state where possible.

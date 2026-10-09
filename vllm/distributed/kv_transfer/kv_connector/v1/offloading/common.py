@@ -76,6 +76,7 @@ class OffloadingConnectorMetadata(KVConnectorMetadata):
     force_flush_on_host: bool = False
     computed_request_ids: list[str] = field(default_factory=list)
     store_producer_safe: bool = False
+    store_allocation_audit: list[dict[str, int]] = field(default_factory=list)
 
 
 @dataclass

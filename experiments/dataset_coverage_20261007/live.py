@@ -15,23 +15,35 @@ import numpy as np
 import run
 
 
+def request_payload(tokens, name):
+    return json.dumps(
+        dict(
+            model="glm53-compat",
+            prompt=tokens,
+            request_id=name,
+            max_tokens=1,
+            temperature=0,
+            seed=0,
+            ignore_eos=True,
+            stream=True,
+            stream_options=dict(include_usage=True),
+        )
+    ).encode()
+
+
 def stream(tokens, name):
     start = time.monotonic_ns()
+    return stream_payload(request_payload(tokens, name), name, start=start)
+
+
+def stream_payload(payload, name, *, start=None, gate=None):
+    if gate is not None:
+        gate.wait(timeout=30)
+    if start is None:
+        start = time.monotonic_ns()
     request = urllib.request.Request(
         run.BASE + "/v1/completions",
-        data=json.dumps(
-            dict(
-                model="glm53-compat",
-                prompt=tokens,
-                request_id=name,
-                max_tokens=1,
-                temperature=0,
-                seed=0,
-                ignore_eos=True,
-                stream=True,
-                stream_options=dict(include_usage=True),
-            )
-        ).encode(),
+        data=payload,
         headers={"Content-Type": "application/json"},
     )
     first = None
@@ -66,7 +78,15 @@ def stream(tokens, name):
 
 
 def cell(
-    label, state, workload, seed, repeat, requests_count=75, *, require_preparation=True
+    label,
+    state,
+    workload,
+    seed,
+    repeat,
+    requests_count=75,
+    *,
+    require_preparation=True,
+    preencoded=False,
 ):
     directory = run.ROOT / "live" / workload / f"r{repeat}_{label}"
     if (directory / "result.json").exists():
@@ -103,11 +123,31 @@ def cell(
         before = run.counters()
         offsets = run.snapshots()
         late_before = set((run.ROOT / "server/timing/late_admission").glob("*.json"))
+        payloads = (
+            [
+                request_payload(p, f"live-main-{seed}-{i}")
+                for i, p in enumerate(requests)
+            ]
+            if preencoded
+            else []
+        )
+        gate = threading.Barrier(min(32, requests_count)) if preencoded else None
         start = time.monotonic_ns()
-        futures = [
-            pool.submit(stream, p, f"live-main-{seed}-{i}")
-            for i, p in enumerate(requests)
-        ]
+        if preencoded:
+            futures = [
+                pool.submit(
+                    stream_payload,
+                    body,
+                    f"live-main-{seed}-{i}",
+                    gate=gate if i < 32 else None,
+                )
+                for i, body in enumerate(payloads)
+            ]
+        else:
+            futures = [
+                pool.submit(stream, p, f"live-main-{seed}-{i}")
+                for i, p in enumerate(requests)
+            ]
         responses = [f.result() for f in futures]
         elapsed = (time.monotonic_ns() - start) / 1e9
     events = run.traces(offsets, directory)
@@ -237,6 +277,12 @@ def cell(
         worker_preparation_coverage=worker_coverage,
         optimized_preparation_verified=preparation_verified,
         preparation_required=require_preparation,
+        preencoded_client=preencoded,
+        first_wave_client_start_spread_ms=(
+            max(r["start_ns"] for r in responses[:32])
+            - min(r["start_ns"] for r in responses[:32])
+        )
+        / 1e6,
         responses=responses,
         metrics_before=before,
         metrics_after=after,

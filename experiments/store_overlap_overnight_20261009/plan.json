@@ -11,27 +11,68 @@
       "commit": "1f526ff",
       "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
       "artifacts": "/mnt/localnvme/jeongyoon/sf1",
-      "hypothesis": "Fences for future H2D destinations need not block unrelated compute"
+      "hypothesis": "Fences for future H2D destinations need not block unrelated compute",
+      "implementation_head": "26c4cb717cbee6337523cf3c5f5d0e7a4feac02a"
     },
     {
       "branch": "experiment/store-reuse-load-reservations-20261009",
-      "commit": "afd4163",
+      "commit": "b48977e",
       "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
       "artifacts": "/mnt/localnvme/jeongyoon/sr1",
-      "hypothesis": "Include future suffix reservations in per-request load gates"
+      "hypothesis": "Include future suffix reservations in per-request load gates",
+      "implementation_head": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2"
     },
     {
       "branch": "experiment/store-reuse-allocator-preference-20261009",
       "commit": "a9ed417",
       "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
       "artifacts": "/mnt/localnvme/jeongyoon/sa1",
-      "hypothesis": "Prefer free blocks not read by pending stores"
+      "hypothesis": "Prefer free blocks not read by pending stores",
+      "implementation_head": "a9ed417b28607447f407f0a079e455ba5b0bfe98"
     },
     {
       "branch": "experiment/store-critical-submission-20261009",
       "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
       "artifacts": "/mnt/localnvme/jeongyoon/sp1",
-      "hypothesis": "Prioritize reuse-critical unsubmitted stores when CPU destinations are disjoint"
+      "hypothesis": "Prioritize reuse-critical unsubmitted stores when CPU destinations are disjoint",
+      "commit": "9b53089",
+      "implementation_head": "9b5308951978a265e5a3bc96c6a6b77e2c859148"
+    },
+    {
+      "branch": "experiment/store-descriptor-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sc1",
+      "hypothesis": "Merge physically contiguous D2H address pairs to reduce descriptor submission work",
+      "implementation_head": "8d999c11282a5b08322a245063813f8663295e05"
+    },
+    {
+      "branch": "experiment/store-driver-chunk-sweep-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_chunks_20261009",
+      "artifacts": "short roots selected per cap",
+      "hypothesis": "Existing CUDA descriptor caps may reduce bulk driver submission stalls",
+      "commit": "d514e5c",
+      "implementation_head": "d514e5c5f6a58d287ca91eda5cdf529b74a79842"
+    },
+    {
+      "branch": "experiment/store-specific-producer-events-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/se2",
+      "hypothesis": "Wait on the recorded source producer, avoiding newer unrelated compute on the current stream",
+      "implementation_head": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+      "failed_startup_artifacts": "/mnt/localnvme/jeongyoon/se1"
+    },
+    {
+      "branch": "experiment/store-noncritical-after-forward-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_after_forward_20261009",
+      "commit": "48f716c",
+      "artifacts": "/mnt/localnvme/jeongyoon/sw1",
+      "hypothesis": "Submit known-producer noncritical stores after forward to hide driver work"
+    },
+    {
+      "branch": "experiment/gpu-prefix-ceiling-controls-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+      "hypothesis": "Validate cache-resident GPU-only ceiling with capacity-fitting matched controls",
+      "status": "prepared, conditional on successful store fix"
     }
   ],
   "constraints": [
@@ -47,7 +88,30 @@
     "allocator_regression": 205,
     "reservation_tests": 18,
     "priority_backend": 2,
-    "priority_connector": 5
+    "priority_connector": 5,
+    "reservation_regression": 220,
+    "producer_regression": 211,
+    "producer_real_gpu": 7,
+    "producer_negative_controls": 2,
+    "coalescing_real_gpu": 9,
+    "after_forward_cpu": 16
   },
-  "startup_issue": "First scoped launch rejected before measurement: long TMPDIR exceeded AF_UNIX socket limit; relaunched at short root sf1; same root stays under user storage path"
+  "startup_issue": "First scoped launch rejected before measurement: long TMPDIR exceeded AF_UNIX socket limit; relaunched at short root sf1; same root stays under user storage path",
+  "short_roots": {
+    "scoped": "/mnt/localnvme/jeongyoon/sf1",
+    "reservations": "/mnt/localnvme/jeongyoon/sr1",
+    "allocator": "/mnt/localnvme/jeongyoon/sa1",
+    "priority": "/mnt/localnvme/jeongyoon/sp1"
+  },
+  "scoped_result": {
+    "complete": true,
+    "paired_tps_percent": 0.12814469169839526,
+    "mean_tps_control": 7.80769246092102,
+    "mean_tps_scoped": 7.817641876013232,
+    "mean_gap_ms_control": 145.71620025,
+    "mean_gap_ms_scoped": 217.246425,
+    "conclusion": "Narrow fences change the placement of waiting but do not establish throughput improvement; retain negative GPU-gap result and test suffix reservations/source dependencies."
+  },
+  "queued_runs": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/reviewed_queue_1.json",
+  "producer_partial_observation": "r1_gpu: first 473.4 ms load-only seal stall preceded first changed store dependency by14.0 ms. Keep this negative throughput repeat; it cannot establish a causal producer regression."
 }

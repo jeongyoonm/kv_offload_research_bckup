@@ -133,6 +133,18 @@
       "hypothesis": "Verify accumulated physical-layout improvements with continuous 300-request episodes and no intermediate prime/reset",
       "artifacts": "/mnt/localnvme/jeongyoon/sm1",
       "status": "configuration preflight passed; conditional on individual serving gains"
+    },
+    {
+      "branch": "experiment/cpu-private-tensor-layout-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+      "hypothesis": "Private block-major CPU row stride prevents all physical merges; transpose physical layer storage within existing rank mappings",
+      "artifacts": [
+        "/mnt/localnvme/jeongyoon/st0",
+        "/mnt/localnvme/jeongyoon/st1",
+        "/mnt/localnvme/jeongyoon/stm"
+      ],
+      "verification": "48 CPU mapping/regression checks passed; GLM 99-page real-GPU roundtrip gate precedes serving",
+      "workload": "two continuous 300-request episodes per mode, working set 75 prefixes, four unique suffixes per prefix"
     }
   ],
   "constraints": [

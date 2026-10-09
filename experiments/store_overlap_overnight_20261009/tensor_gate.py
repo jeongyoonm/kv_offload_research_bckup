@@ -35,14 +35,30 @@ def main():
         expected_passes=2,
     )
     idle_probes.idle()
+    independent = idle_probes.BASE / "vllm_load_independent_ready_20261009"
+    idle_probes.run(
+        "independent_ready_real_gpu_tests",
+        independent,
+        [
+            str(independent / ".venv/bin/python"),
+            "-m",
+            "pytest",
+            "tests/v1/kv_offload/cpu/test_gpu_worker.py",
+            "-q",
+            "-k",
+            "independent_load_ready_bypasses",
+        ],
+        expected_passes=2,
+    )
+    idle_probes.idle()
     gate = idle_probes.ARTIFACTS / "tensor_gate"
     gate.mkdir(exist_ok=True)
     temporary = gate / "summary.tmp"
     temporary.write_text(
-        json.dumps(dict(complete=True, stopped=True, tests=2, time=time.time())) + "\n"
+        json.dumps(dict(complete=True, stopped=True, tests=4, time=time.time())) + "\n"
     )
     temporary.replace(gate / "summary.json")
-    idle_probes.log("tensor_gate_complete", tests=2)
+    idle_probes.log("tensor_gate_complete", tests=4)
 
 
 if __name__ == "__main__":

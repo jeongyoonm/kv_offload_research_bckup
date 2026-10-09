@@ -51,14 +51,43 @@ def main():
         expected_passes=2,
     )
     idle_probes.idle()
+    descriptor = idle_probes.BASE / "vllm_descriptor_order_20261009"
+    idle_probes.run(
+        "actual_cpu_layout_load_matrix",
+        descriptor,
+        [
+            "numactl",
+            "--physcpubind=0-15,128-143",
+            "--membind=0",
+            str(descriptor / ".venv/bin/python"),
+            "benchmarks/kernels/measure_cpu_layout_loads.py",
+            "--output",
+            str(idle_probes.ARTIFACTS / "cpu_layout_loads.json"),
+            "--repeats",
+            "6",
+        ],
+        env={"VLLM_KV_OFFLOAD_MAX_BATCH_DESCRIPTORS": "0"},
+    )
+    matrix = json.loads((idle_probes.ARTIFACTS / "cpu_layout_loads.json").read_text())
+    assert matrix["complete"] and len(matrix["records"]) == 12
+    idle_probes.idle()
     gate = idle_probes.ARTIFACTS / "tensor_gate"
     gate.mkdir(exist_ok=True)
     temporary = gate / "summary.tmp"
     temporary.write_text(
-        json.dumps(dict(complete=True, stopped=True, tests=4, time=time.time())) + "\n"
+        json.dumps(
+            dict(
+                complete=True,
+                stopped=True,
+                tests=4,
+                load_matrix_cases=12,
+                time=time.time(),
+            )
+        )
+        + "\n"
     )
     temporary.replace(gate / "summary.json")
-    idle_probes.log("tensor_gate_complete", tests=4)
+    idle_probes.log("tensor_gate_complete", tests=4, load_matrix_cases=12)
 
 
 if __name__ == "__main__":

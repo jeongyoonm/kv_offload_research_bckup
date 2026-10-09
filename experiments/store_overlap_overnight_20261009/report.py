@@ -82,7 +82,7 @@ def main():
             "300 measured requests each. The gain compares matching seed/size",
             "episodes across allocations, rather than alternating in one server.",
             "",
-            "| Mode | Req/s | Gain % | Gaps ms | Pre-forward ms |",
+            "| Mode | Req/s | Gain % | Gaps ms | Exposed pre-fwd ms |",
             "| --- | ---: | ---: | ---: | ---: |",
         ]
     )

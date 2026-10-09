@@ -66,7 +66,15 @@ def stream(tokens, name):
 
 
 def cell(
-    label, state, workload, seed, repeat, requests_count=75, *, require_preparation=True
+    label,
+    state,
+    workload,
+    seed,
+    repeat,
+    requests_count=75,
+    *,
+    require_preparation=True,
+    prefix_working_set=None,
 ):
     directory = run.ROOT / "live" / workload / f"r{repeat}_{label}"
     if (directory / "result.json").exists():
@@ -74,20 +82,28 @@ def cell(
     directory.mkdir(parents=True, exist_ok=True)
     run.reset(True)
     homogeneous = workload in ("familiar60k", "short16k")
+    if prefix_working_set is not None:
+        assert homogeneous and 0 < prefix_working_set <= requests_count
     context, suffix = {
         "familiar60k": (58368, 3072),
         "short16k": (15552, 832),
         "heterogeneous": (24576, 8192),
     }[workload]
     requests, primes, expected = [], [], []
+    shared_prefixes = {}
     for i in range(requests_count):
         c = context if homogeneous or i % 2 else 4096
         s = suffix if homogeneous or i % 3 else 2048
         prefix, tail = run.prompt(c, s, seed * 100000 + i)
+        if prefix_working_set is not None:
+            slot = i % prefix_working_set
+            if slot not in shared_prefixes:
+                shared_prefixes[slot] = prefix
+            prefix = shared_prefixes[slot]
         hit = homogeneous or i % 2 == 0
         expected.append(c if hit else 0)
         requests.append(prefix + tail)
-        if hit:
+        if hit and (prefix_working_set is None or i < prefix_working_set):
             primes.append(prefix + [31700] * 64)
     with concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
         run.configure()
@@ -110,7 +126,9 @@ def cell(
         ]
         responses = [f.result() for f in futures]
         elapsed = (time.monotonic_ns() - start) / 1e9
+    trace_drain_start = time.monotonic_ns()
     events = run.traces(offsets, directory)
+    trace_drain_ms = (time.monotonic_ns() - trace_drain_start) / 1e6
     engine_records, late_sources, worker_exports, engine_exports = [], [], [], []
     for path in sorted(
         set((run.ROOT / "server/timing/late_admission").glob("*.json")) - late_before
@@ -217,6 +235,8 @@ def cell(
         repeat=repeat,
         concurrency=32,
         requests=requests_count,
+        prefix_working_set=prefix_working_set,
+        post_response_trace_drain_ms=trace_drain_ms,
         seconds=elapsed,
         throughput_rps=requests_count / elapsed,
         mean_ttft_ms=statistics.mean(ttft),

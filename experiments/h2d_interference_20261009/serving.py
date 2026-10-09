@@ -3,6 +3,7 @@
 """Small serving validation with the latest frozen predictor and seal policy."""
 
 import argparse
+import copy
 import hashlib
 import importlib.util
 import json
@@ -11,6 +12,20 @@ import subprocess
 import threading
 import time
 from pathlib import Path
+
+
+def state_for_chunk(original, chunk_mib):
+    """Retarget only transfer identity for this controlled frozen-weight study."""
+    assert original["context"]["h2d_chunk_bytes"] == 128 * 1024**2
+    state = copy.deepcopy(original)
+    state["context"]["h2d_chunk_bytes"] = chunk_mib * 1024**2
+    assert {k: v for k, v in state.items() if k != "context"} == {
+        k: v for k, v in original.items() if k != "context"
+    }
+    assert {k: v for k, v in state["context"].items() if k != "h2d_chunk_bytes"} == {
+        k: v for k, v in original["context"].items() if k != "h2d_chunk_bytes"
+    }
+    return state
 
 
 def main():
@@ -61,7 +76,24 @@ def main():
     freeze = json.loads((module.driver.MODEL_ROOT / "freeze.json").read_text())
     digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
     assert digest == freeze["models"]["matched_offset"]
-    state = json.loads(checkpoint.read_text())
+    original_state = json.loads(checkpoint.read_text())
+    state = state_for_chunk(original_state, args.chunk_mib)
+    collector.save(root / "loaded_predictor.json", state)
+    collector.save(
+        root / "predictor_compatibility.json",
+        dict(
+            original_file_sha256=digest,
+            changed_context_fields={
+                k: [original_state["context"][k], v]
+                for k, v in state["context"].items()
+                if original_state["context"][k] != v
+            },
+            learned_state_unchanged=True,
+            note="Snapshot remains trained at 128 MiB; explicitly retarget only "
+            "h2d_chunk_bytes identity for a frozen-weight configuration comparison. "
+            "Production compatibility validation remains active; no retraining.",
+        ),
+    )
     workloads = ("short16k", "familiar60k", "heterogeneous")
     collector.save(
         root / "source_provenance.json",

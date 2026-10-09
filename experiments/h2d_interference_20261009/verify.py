@@ -11,6 +11,23 @@ import pytest
 from experiments.h2d_interference_20261009.worker import Calibration
 
 
+def test_chunk_comparison_preserves_predictor_weights_and_other_identity():
+    from experiments.h2d_interference_20261009.serving import state_for_chunk
+
+    original = dict(
+        context=dict(h2d_chunk_bytes=134217728, tensor_parallel=8),
+        latency_surface=dict(weights=[[1, 2]]),
+        samples=[[1, 2]],
+    )
+    result = state_for_chunk(original, 8)
+    assert result == dict(
+        original, context=dict(h2d_chunk_bytes=8388608, tensor_parallel=8)
+    )
+    result["latency_surface"]["weights"][0][0] = 3
+    assert original["latency_surface"]["weights"] == [[1, 2]]
+    assert original["context"]["h2d_chunk_bytes"] == 134217728
+
+
 @pytest.mark.parametrize("mode", ["concurrent", "after_enqueued"])
 def test_post_enqueue_copy_fence_uses_independent_stream(monkeypatch, mode):
     calibration = Calibration.__new__(Calibration)

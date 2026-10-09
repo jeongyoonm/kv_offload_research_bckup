@@ -266,6 +266,30 @@ def _new_descriptor_buffers(
     )
 
 
+def _coalesce_descriptors(src, dst, sizes, count):
+    """Merge contiguous pointer pairs; copies within a CUDA batch are unordered."""
+    if count < 2:
+        return count
+    order = np.argsort(src[:count], kind="stable")
+    src[:count], dst[:count], sizes[:count] = (
+        src[:count][order],
+        dst[:count][order],
+        sizes[:count][order],
+    )
+    joins = (src[: count - 1] + sizes[: count - 1] == src[1:count]) & (
+        dst[: count - 1] + sizes[: count - 1] == dst[1:count]
+    )
+    if not joins.any():
+        return count
+    starts = np.concatenate(([0], np.flatnonzero(~joins) + 1))
+    merged_sizes = np.add.reduceat(sizes[:count], starts)
+    merged_count = len(starts)
+    src[:merged_count] = src[starts]
+    dst[:merged_count] = dst[starts]
+    sizes[:merged_count] = merged_sizes
+    return merged_count
+
+
 class SingleDirectionOffloadingHandler:
     """
     Handles transfers for a single direction, either CPU->GPU or GPU->CPU.
@@ -336,6 +360,7 @@ class SingleDirectionOffloadingHandler:
             cpu_tensors if gpu_to_cpu else gpu_tensors
         )
         self.gpu_to_cpu: bool = gpu_to_cpu
+        self._coalesce_store_descriptors = False
         self.layer_refs_per_group = layer_refs_per_group
         self._async_h2d_submission = async_h2d_submission
         if self._async_h2d_submission:
@@ -701,6 +726,9 @@ class SingleDirectionOffloadingHandler:
         # Writer rotation may skip non-writer blocks, leaving op_idx below
         # the sized upper bound
         assert op_idx <= num_copy_ops
+        original_descriptors = op_idx
+        if self.gpu_to_cpu and getattr(self, "_coalesce_store_descriptors", False):
+            op_idx = _coalesce_descriptors(all_src, all_dst, all_sizes, op_idx)
         src = src[:op_idx]
         dst = dst[:op_idx]
         sizes = sizes[:op_idx]
@@ -710,6 +738,7 @@ class SingleDirectionOffloadingHandler:
                 job_id=job_id,
                 num_bytes=num_transfer_bytes,
                 num_descriptors=op_idx,
+                original_descriptors=original_descriptors,
             )
 
         if self._async_h2d_submission:
@@ -1048,6 +1077,9 @@ class CPUOffloadingWorker(OffloadingWorker):
         return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
 
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
+        self._store_handler._coalesce_store_descriptors = bool(
+            options.get("store_descriptor_coalescing", False)
+        )
         depth = int(options.get("copy_pipeline_depth", 1))
         if depth == getattr(self, "_copy_pipeline_depth", 1):
             return

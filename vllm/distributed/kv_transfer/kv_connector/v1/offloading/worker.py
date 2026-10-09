@@ -215,6 +215,9 @@ class OffloadingConnectorWorker:
 
     def handle_preemptions(self, kv_connector_metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
+        configure = getattr(self.worker, "configure_experiment", None)
+        if configure is not None:
+            configure(kv_connector_metadata.experiment_options)
 
         # Pop jobs_to_flush from store_jobs into _unsubmitted_store_jobs
         # so the existing submission loop below submits them before wait().

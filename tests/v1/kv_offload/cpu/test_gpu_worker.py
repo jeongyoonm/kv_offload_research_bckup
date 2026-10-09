@@ -6,6 +6,7 @@ import time
 import uuid
 from unittest.mock import MagicMock
 
+import numpy as np
 import pytest
 import torch
 
@@ -791,3 +792,76 @@ def test_invalid_copy_pipeline_depth_rejected(depth):
 
     with pytest.raises(ValueError):
         validate_experiment_options({"copy_pipeline_depth": depth})
+
+
+@pytest.mark.parametrize("reverse_destination", [False, True])
+def test_store_descriptor_coalescing_preserves_exact_byte_mapping(reverse_destination):
+    """Merge only equally adjacent source and destination ranges, in any order."""
+    src = np.array([120, 100, 110, 200], dtype=np.int64)
+    dst = np.array([320, 300, 310, 500], dtype=np.int64)
+    if reverse_destination:
+        dst[:3] = [300, 320, 310]
+    sizes = np.array([10, 10, 10, 7], dtype=np.int64)
+
+    def mapping(src, dst, sizes, count):
+        return {
+            int(d + i): int(s + i)
+            for s, d, n in zip(src[:count], dst[:count], sizes[:count])
+            for i in range(int(n))
+        }
+
+    expected = mapping(src, dst, sizes, 4)
+    count = gpu_worker._coalesce_descriptors(src, dst, sizes, 4)
+    assert mapping(src, dst, sizes, count) == expected
+    assert count == (4 if reverse_destination else 2)
+    assert sum(sizes[:count]) == 37
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA copy test")
+@torch.inference_mode()
+@pytest.mark.parametrize("dst_ids", [[3, 0, 1, 2], [0, 3, 2, 1]])
+def test_coalesced_store_copies_correct_gpu_rows(default_vllm_config, dst_ids):
+    """Physical descriptor merging preserves row identity and producer ordering."""
+    page_size = 65536
+    gpu_tensor = (
+        torch.arange(8, dtype=torch.int8, device=DEVICES[0])[:, None]
+        .expand(-1, page_size)
+        .contiguous()
+    )
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[
+                CanonicalKVCacheTensor(tensor=gpu_tensor, page_size_bytes=page_size)
+            ],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=8,
+    )
+    worker.configure_experiment({"store_descriptor_coalescing": True})
+    original_swap = worker._store_handler._swap_blocks_batch
+    counts = []
+
+    def swap(src, *args, **kwargs):
+        counts.append(len(src))
+        return original_swap(src, *args, **kwargs)
+
+    worker._store_handler._swap_blocks_batch = swap
+    src_ids = [3, 0, 1, 2]
+    try:
+        assert worker.submit_store(
+            1, GPULoadStoreSpec(src_ids, (4,), (0,)), CPULoadStoreSpec(dst_ids)
+        )
+        worker.wait({1})
+        cpu = worker._store_handler.dst_tensors[0]
+        for src_id, dst_id in zip(src_ids, dst_ids):
+            torch.testing.assert_close(
+                cpu[dst_id], torch.full((page_size,), src_id, dtype=torch.int8)
+            )
+        assert counts == [1 if dst_ids == src_ids else 4]
+        assert [result.job_id for result in worker.get_finished()] == [1]
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()

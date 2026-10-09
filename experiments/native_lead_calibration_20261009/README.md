@@ -1,9 +1,11 @@
 # Recalibrate setup lead after native store submission
 
-The measured native full-submission path reduced pre-forward CPU delay from
-108.3 to 10.8 ms per 75-request episode, while GPU forward entry still took
-about 8 ms. Under the unchanged 100 ms setup lead it recovered fewer batching
-opportunities and used 12.75 rather than 12.25 compute rounds.
+The native full-submission path reduced exposed pre-forward intervals
+from 108.3 to 10.8 ms per 75-request episode. Unclipped worker entry to
+forward submission averages 22.0 ms, with a 19.5 ms median and 65.6 ms
+maximum across measured batches. Under the unchanged 100 ms setup lead it
+recovered fewer batching opportunities and used 12.75 rather than 12.25
+compute rounds. The clipped exposed times are not total setup latency.
 
 This comparison keeps the frozen predictor and 90 ms prediction subtraction.
 Both arms use the verified native D2H implementation with full submissions,

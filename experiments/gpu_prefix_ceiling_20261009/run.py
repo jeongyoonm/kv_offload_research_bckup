@@ -318,6 +318,25 @@ def main():
         else:
             raise TimeoutError("Serving startup timeout")
         collector.log("server_ready")
+        if args.cache == "gpu":
+            pids = subprocess.check_output(
+                [
+                    "nvidia-smi",
+                    "--query-compute-apps=pid",
+                    "--format=csv,noheader,nounits",
+                ],
+                text=True,
+            ).splitlines()
+            policy = {}
+            for pid in set(pids):
+                status = Path(f"/proc/{pid.strip()}/status").read_text()
+                fields = dict(line.split(":", 1) for line in status.splitlines())
+                assert fields.get("THP_enabled", "").strip() == "0", pid
+                policy[pid.strip()] = dict(
+                    thp_enabled=0, process=fields["Name"].strip()
+                )
+            assert policy, "No model workers to audit"
+            collector.save(root / "gpu_worker_thp_policy.json", policy)
         for workload, _, _ in cells:
             cell(workload, 9390, "warmup", 32)
         for workload, count, repeats in cells:

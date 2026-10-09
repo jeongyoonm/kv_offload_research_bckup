@@ -236,14 +236,43 @@ def test_compute_deadline_seals_while_a_is_held_and_clips_sleep(deadline_core, l
     assert not core.batch_queue[-1][0].poll()
 
 
+@pytest.mark.parametrize(
+    "bias_us,lead_us,expected",
+    [
+        (0, 5000, 1_115_000_000),
+        (90_000, 5000, 1_025_000_000),
+        (0, 100_000, 1_020_000_000),
+        (90_000, 100_000, 1_001_000_000),
+        (300_000, 5000, 1_001_000_000),
+    ],
+)
+def test_prediction_bias_and_setup_lead_seal_without_waiting_for_a(
+    deadline_core, bias_us, lead_us, expected
+):
+    """Correction and setup reserve advance sealing, retaining the base-ack gate."""
+    core, _ = deadline_core(lead_us=lead_us)
+    core.scheduler._late_seal_prediction_bias_us = bias_us
+    stage_rpc(core, 9, [_request("base")], [_request("pending")])
+    transport = core.scheduler._late_transport
+    prediction = transport["prediction"]
+    assert transport["seal_ns"] == expected
+    assert transport["seal_reason"] == "compute_seal_deadline"
+    assert prediction["raw_scaled_duration_ns"] == 120_000_000
+    assert prediction["predicted_duration_ns"] == max(1, 120_000_000 - bias_us * 1000)
+    assert prediction["prediction_bias_us"] == bias_us
+    assert not core.batch_queue[-1][0].poll()
+
+
 @pytest.mark.parametrize("duration", [90_000_000, 180_000_000, 2_000_000_000])
+@pytest.mark.parametrize("bias_us", [0, 10_000])
 def test_refinement_moves_seal_once_without_extending_safety_cap(
-    deadline_core, duration
+    deadline_core, duration, bias_us
 ):
     """Only observed all-rank CPU submission can revise an unexpired deadline."""
     import numpy as np
 
     core, clock = deadline_core()
+    core.scheduler._late_seal_prediction_bias_us = bias_us
     core.scheduler._late_record_enabled = True
     estimator = core.deferral_timing.seal_estimator
     estimator.refinement_surface = SimpleNamespace(
@@ -268,10 +297,13 @@ def test_refinement_moves_seal_once_without_extending_safety_cap(
     )
     stage_rpc(core, 9, [_request("base")], [_request("pending")])
     transport = core.scheduler._late_transport
-    expected = min(1_000_000_000 + duration, 2_001_000_000)
+    expected = min(1_000_000_000 + duration - bias_us * 1000, 2_001_000_000)
     assert transport["seal_ns"] == expected
-    assert transport["prediction"]["predicted_duration_ns"] == 120_000_000
-    assert transport["refinement"]["predicted_duration_ns"] == duration
+    assert transport["prediction"]["predicted_duration_ns"] == (
+        120_000_000 - bias_us * 1000
+    )
+    assert transport["refinement"]["raw_scaled_duration_ns"] == duration
+    assert transport["refinement"]["predicted_duration_ns"] == duration - bias_us * 1000
     records = core.scheduler._late_admission_records
     assert sum(r["event"] == "seal_prediction_refined" for r in records) == 1
     assert all(b - a >= 10_000_000 for a, b in zip(calls, calls[1:]))

@@ -65,6 +65,7 @@ class SchedulerInterface(ABC):
     _late_seal_wait_trace: bool
     _late_seal_prediction_reserve_us: int
     _late_seal_prediction_scale_percent: int
+    _late_seal_prediction_bias_us: int
     _late_seal_safety_us: int
     _late_seal_when_all_candidates_ready: bool
     _late_candidate_slots: int

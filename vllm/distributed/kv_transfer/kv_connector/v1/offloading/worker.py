@@ -22,7 +22,7 @@ from vllm.v1.kv_cache_interface import (
     UniformTypeKVCacheSpecs,
     group_kernel_blocks,
 )
-from vllm.v1.kv_offload import timeline
+from vllm.v1.kv_offload import queue_stages, timeline
 from vllm.v1.kv_offload.base import (
     CanonicalKVCacheRef,
     CanonicalKVCaches,
@@ -231,23 +231,50 @@ class OffloadingConnectorWorker:
                     )
 
         # Submit deferred stores from previous step (and jobs_to_flush above).
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_begin",
+                scope="handle_preemptions",
+                jobs=[job[0] for job in self._unsubmitted_store_jobs],
+            )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
             assert isinstance(src_spec, GPULoadStoreSpec)
             success = self.worker.submit_store(job_id, src_spec, dst_spec)
             assert success
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_end", scope="handle_preemptions"
+            )
         self._unsubmitted_store_jobs.clear()
 
         if kv_connector_metadata.jobs_to_flush:
+            if queue_stages.active:
+                queue_stages.emit(
+                    "store_flush_wait_begin",
+                    jobs=list(kv_connector_metadata.jobs_to_flush),
+                )
             self.worker.wait(kv_connector_metadata.jobs_to_flush)
+            if queue_stages.active:
+                queue_stages.emit("store_flush_wait_end")
 
     def start_kv_transfers(self, metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
         configure = getattr(self.worker, "configure_experiment", None)
         if configure is not None:
             configure(metadata.experiment_options)
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_begin",
+                scope="start_kv_transfers",
+                jobs=[job[0] for job in self._unsubmitted_store_jobs],
+            )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
             success = self.worker.submit_store(job_id, src_spec, dst_spec)
             assert success
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_end", scope="start_kv_transfers"
+            )
         self._unsubmitted_store_jobs.clear()
 
         if self._grouped_load_completion and metadata.load_jobs:

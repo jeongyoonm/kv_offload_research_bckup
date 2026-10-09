@@ -2136,6 +2136,9 @@ class EngineCore:
             self.scheduler._late_seal_prediction_scale_percent = options[
                 "late_seal_prediction_scale_percent"
             ]
+            self.scheduler._late_seal_prediction_bias_us = options[
+                "late_seal_prediction_bias_us"
+            ]
             self.scheduler._late_seal_safety_us = options["late_seal_safety_us"]
             self.scheduler._late_seal_when_all_candidates_ready = options[
                 "late_seal_when_all_candidates_ready"

@@ -3261,6 +3261,18 @@ def test_prediction_to_readiness_requires_predictive_policy(policy):
         )
 
 
+@pytest.mark.parametrize("bias", [-1, 300001, 1.0, True])
+def test_prediction_bias_rejects_invalid_values(bias):
+    with pytest.raises(ValueError, match="late_seal_prediction_bias_us"):
+        early.validate_experiment_options({"late_seal_prediction_bias_us": bias})
+
+
+def test_prediction_bias_requires_predictive_policy():
+    with pytest.raises(ValueError, match="prediction bias requires predictive"):
+        early.validate_experiment_options({"late_seal_prediction_bias_us": 90000})
+    assert early.validate_experiment_options({})["late_seal_prediction_bias_us"] == 0
+
+
 def test_prediction_to_readiness_is_opt_in():
     assert not early.validate_experiment_options({})[
         "late_seal_prediction_to_readiness"

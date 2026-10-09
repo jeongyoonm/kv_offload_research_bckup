@@ -488,6 +488,9 @@ def stage_rpc(core, step, base, candidates):
     compute_deadline_lead_us = getattr(
         core.scheduler, "_late_seal_compute_deadline_lead_us", 0
     )
+    prediction_bias_us = getattr(core.scheduler, "_late_seal_prediction_bias_us", 0)
+    if type(prediction_bias_us) is not int:
+        prediction_bias_us = 0
     hybrid_transition_ns = None
     hybrid_polling_ns = None
     full_prediction_wait = getattr(
@@ -871,6 +874,10 @@ def stage_rpc(core, step, base, candidates):
                                     * core.scheduler._late_seal_prediction_scale_percent
                                     // 100
                                 )
+                                raw_duration_ns = predicted
+                                predicted = max(
+                                    1, predicted - prediction_bias_us * 1000
+                                )
                                 reserve_ns = timing.seal_estimator.preparation_reserve(
                                     core.scheduler._late_seal_prediction_reserve_us
                                     * 1000
@@ -882,6 +889,8 @@ def stage_rpc(core, step, base, candidates):
                                     predecessor_step=a_step,
                                     gpu_start_upper_ns=max(r[3] for r in records),
                                     predicted_duration_ns=predicted,
+                                    raw_scaled_duration_ns=raw_duration_ns,
+                                    prediction_bias_us=prediction_bias_us,
                                     deadline_ns=predicted_deadline_ns,
                                     features=timing.seal_estimator.features(
                                         data
@@ -988,6 +997,8 @@ def stage_rpc(core, step, base, candidates):
                                     * core.scheduler._late_seal_prediction_scale_percent
                                     // 100
                                 )
+                                raw_duration_ns = duration
+                                duration = max(1, duration - prediction_bias_us * 1000)
                                 old_expiry = effective_seal_expiry_ns
                                 compute_seal_deadline_ns = (
                                     max(r[3] for r in execution)
@@ -1008,6 +1019,8 @@ def stage_rpc(core, step, base, candidates):
                                     predecessor_step=a_step,
                                     forecast_ns=forecast_ns,
                                     predicted_duration_ns=duration,
+                                    raw_scaled_duration_ns=raw_duration_ns,
+                                    prediction_bias_us=prediction_bias_us,
                                     previous_expiry_ns=old_expiry,
                                     effective_expiry_ns=effective_seal_expiry_ns,
                                     primary_snapshot=primary,

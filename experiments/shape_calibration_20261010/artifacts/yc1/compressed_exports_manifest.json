@@ -1,0 +1,20 @@
+{
+  "verified": true,
+  "exports": [
+    {
+      "path": "summary.json.gz",
+      "sha256": "a30fdd07b8879071dc351b0f48c9ff527fe21c3f77ddfe9bed332689f0d43ed9",
+      "uncompressed_sha256": "e0884b2d6d9975f5e977cdc21c43247872bb980fddaf9cbc4f94e3d54848eb62"
+    },
+    {
+      "path": "comparison.json.gz",
+      "sha256": "289fd77b29344f5d08d5babd586ab9d064c0aeeaf2fbf5b0978575e94aabc666",
+      "uncompressed_sha256": "25749fa4457793f4761cf471d77ccad50c10cd46ab65c94b2d6e7d1b1d5dc5ca"
+    },
+    {
+      "path": "loaded_predictor.json.gz",
+      "sha256": "8694fd34ee88e158561e2166b7bc0f1f265e11ea1711d7e22cd6b148017efa3f",
+      "uncompressed_sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3"
+    }
+  ]
+}

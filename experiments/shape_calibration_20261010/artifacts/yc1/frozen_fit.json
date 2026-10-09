@@ -1,0 +1,79 @@
+{
+  "calibration": {
+    "schema": 1,
+    "features": [
+      "intercept",
+      "mean_context_per_60000",
+      "requests_per_16",
+      "context_sum_per_960000",
+      "raw_duration_per_1000_ms"
+    ],
+    "coefficients": [
+      -34.1052271232615,
+      36.25890113651097,
+      57.41716461153076,
+      -1183.1887131604537,
+      607.421567159387
+    ],
+    "support": {
+      "requests": [
+        1,
+        16
+      ],
+      "context": [
+        15552,
+        58368
+      ],
+      "suffix": [
+        832,
+        3072
+      ]
+    },
+    "bias_bounds_ms": [
+      -500,
+      500
+    ],
+    "provenance": {
+      "input_sha256": "969cfe5a67eb147c09dde8481561fd3859d2b2822af2049339875374aa8ab513",
+      "rows": 76,
+      "alpha": 0.01,
+      "group": "repeat across paired workloads",
+      "elapsed_feature": false,
+      "selection": "shape_raw, alpha=.01 before live tests",
+      "worker": "GLM 5.3 TP8 H2D8/depth2, native D2H1GiB/depth2, allocator avoidance"
+    }
+  },
+  "held_episode_out": {
+    "count": 76,
+    "mean": -0.21575495113870916,
+    "mae": 14.947429601624686,
+    "p90_absolute": 38.47614393743228
+  },
+  "fixed90": {
+    "count": 76,
+    "mean": -21.547406000000002,
+    "mae": 50.73671610526316,
+    "p90_absolute": 85.079062
+  },
+  "raw": {
+    "count": 76,
+    "mean": 68.452594,
+    "mae": 68.86416328947368,
+    "p90_absolute": 145.8005365
+  },
+  "per_workload": {
+    "familiar60k": {
+      "count": 42,
+      "mean": -0.2006878712702816,
+      "mae": 13.854232680195924,
+      "p90_absolute": 31.664348190014383
+    },
+    "short16k": {
+      "count": 34,
+      "mean": -0.23436722627029544,
+      "mae": 16.297849328095516,
+      "p90_absolute": 49.208754433285776
+    }
+  },
+  "caveat": "Grouped cross-validation follows a small exploratory screen. Independent live seeds and context are the validation gate."
+}

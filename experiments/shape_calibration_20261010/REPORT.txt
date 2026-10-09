@@ -1,0 +1,56 @@
+Frozen batch-shape calibration: independent75-request validation
+
+Status: completed initial comparison; exploration and300-request confirmation pending.
+Source branch: experiment/shape-calibration-20261010
+Raw allocation: /mnt/localnvme/jeongyoon/yc1
+18 accepted measured cells;1350 measured requests;9 excluded32-request warmups.
+Seeds9501/9502 were absent from ns1 training9401-9404. Order reversed on repeat1.
+Frozen base weights/history unchanged. Only calibration and100/50ms lead vary.
+Same GLM5.3 TP8, H2D8MiB/depth2, nativeD2H1GiB/depth2, allocator avoidance,
+privateCPU2,130,300,354,560 bytes, GPU96GiB/rank, original selector/model.
+CPU mechanism gate244 passed9 skipped; artifact roundtrip/preflight passed.
+
+Arithmetic episode levels; paired geometric changes; p95 is episode p95.
+Recovery pools unique ready-during-compute requests across repeats.
+MAE uses forecasts governing adjacent compute dispatches, matching training audit.
+Gaps are between conservative all-rank execution envelopes, not pure kernel time.
+
+Workload | Arm | req/s | meanTTFTms | p95TTFTms | MAEms | recovery% | gapms | rounds
+short16k | control | 26.172 | 1033.698 | 1307.271 | 50.377 | 50.365 | 180.138 | 11.500
+short16k | shape100 | 27.785 | 1013.812 | 1348.766 | 15.214 | 62.937 | 70.873 | 11.500
+short16k | shape50 | 28.359 | 970.511 | 1275.996 | 16.526 | 90.845 | 36.535 | 11.500
+mid32k | control | 11.825 | 2336.023 | 3212.155 | 51.645 | 75.000 | 464.326 | 11.500
+mid32k | shape100 | 12.544 | 2183.637 | 2844.392 | 52.485 | 76.027 | 22.536 | 12.500
+mid32k | shape50 | 12.446 | 2201.178 | 2936.848 | 53.848 | 81.757 | 9.006 | 12.000
+familiar60k | control | 7.849 | 3521.668 | 4619.464 | 38.419 | 90.345 | 14.011 | 13.000
+familiar60k | shape100 | 7.889 | 3496.184 | 4554.755 | 11.766 | 88.435 | 32.325 | 12.500
+familiar60k | shape50 | 7.866 | 3482.766 | 4676.787 | 13.778 | 96.528 | 216.962 | 13.000
+
+Paired changes relative to original90ms correction/100ms lead:
+Workload | Arm | throughput% | meanTTFT% | p95TTFT%
+short16k | shape100 | +6.117 | -1.948 | +3.145
+short16k | shape50 | +8.358 | -6.114 | -2.389
+mid32k | shape100 | +6.194 | -6.495 | -11.435
+mid32k | shape50 | +5.373 | -5.731 | -8.647
+familiar60k | shape100 | +0.506 | -0.721 | -1.378
+familiar60k | shape50 | +0.217 | -1.102 | +1.265
+
+Interpretation and limits:
+16K: calibration50 gives+8.36% paired throughput and-6.11% meanTTFT.
+Recovery increases50.36->90.85%; gaps180.14->36.54ms per episode.
+Mean compute rounds stay11.5; this is not a claim of fewer rounds.
+The interval audit also shows compute envelopes shorter by118.48ms,
+while first-compute time rises52.68ms. Report the full serving result.
+32K: correction MAE does not improve; gains include avoiding large
+load-only candidate-target holds in one control episode. Keep both pairs.
+60K: MAE improves strongly but throughput gain is only0.2-0.5%.
+50ms cells show~205ms initial load-only gaps, not large deadline gaps.
+Current corrected32K bias remains about-46 to-54ms. Context and suffix
+were correlated in the fit; crossed geometry must establish joint behavior.
+Two matched75-request repeats are directional, not a confidence interval.
+Retrospective candidate windows are not guaranteed throughput counterfactuals.
+The scalar correction CPU timing is~8us/call, descriptive with serving active.
+
+Next: frozen crossed15552/3072 and58368/832 at100/50 leads versuscontrol;
+then use fresh validation seeds for any refit and continuous300 confirmation.
+All initial servers stopped; raw archive verified member and archive hashes.

@@ -39,7 +39,7 @@ CPU mechanism gate: 244 passed, 9 skipped before serving. Initialization,
 priming and warmup are not serving throughput measurements.
 
 Code/data are under `/mnt/localnvme/jeongyoon`. Branch:
-`experiment/shape-calibration-20261010`. First allocation root: `sc1`.
+`experiment/shape-calibration-20261010`. First allocation root: `yc1`.
 The total exploration starts 2026-10-09 22:19:54 UTC and is bounded at
 2026-10-10 05:19:54 UTC, reserving time to drain and archive. New
 mechanisms require independent branches and evidence from prior runs.
@@ -50,6 +50,6 @@ PYTHONPATH="$PWD" .venv/bin/python \
 
 PYTHONPATH="$PWD" .venv/bin/python \
   experiments/shape_calibration_20261010/run.py \
-  --output /mnt/localnvme/jeongyoon/sc1 \
+  --output /mnt/localnvme/jeongyoon/yc1 \
   --fit /mnt/localnvme/jeongyoon/shape_calibration_20261010/frozen_fit.json
 ```

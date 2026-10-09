@@ -1,0 +1,8 @@
+{
+  "potentially_contaminated_pairs": [
+    2
+  ],
+  "clean_paired_tps_change_percent": 0.3502312695874199,
+  "reason": "Preexisting GPU-allocation tests ran during the r2 control priming/measurement window. They were terminated and later tests are CPU-filtered. Preserve all cells and exclude this pair for a serving gain estimate.",
+  "audit_file": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/test_isolation_audit.json"
+}

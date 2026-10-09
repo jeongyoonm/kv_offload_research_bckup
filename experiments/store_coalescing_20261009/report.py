@@ -23,8 +23,11 @@ def main():
     comparison = json.loads((root / "comparison.json").read_text())
     comparison["definitions"]["inference"] = (
         "Four matched descriptive repeats, no significance claim. No changes to "
-        "trained weights. Store-before-overwrite dependencies are preserved; "
-        "the GPU arm replaces the host completion wait with a stream fence."
+        "trained weights. Both arms use global GPU reuse fences. The candidate "
+        "sorts and merges physically contiguous D2H address pairs; all producer "
+        "dependencies and completion-based retirement remain unchanged. "
+        "The r2 control episode may overlap preexisting GPU allocation tests; "
+        "exclude that matched pair when estimating a serving gain."
     )
     (root / "comparison.json").write_text(json.dumps(comparison, indent=2) + "\n")
     rows = []

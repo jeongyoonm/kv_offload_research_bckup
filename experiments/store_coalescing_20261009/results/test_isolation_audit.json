@@ -1,0 +1,10 @@
+{
+  "time": 1791534164.1243114,
+  "queue_root": "/mnt/localnvme/jeongyoon/sc1",
+  "issue": "Two broad regression invocations included preexisting register_kv_caches GPU allocations. Both were terminated; only filtered CPU cases will run during serving. Canonical GPU roundtrip file was last and was not reached in the first run. Preserve this audit; treat coinciding coalescing measurement as potentially contaminated and rerun if throughput conclusion matters.",
+  "logs": [
+    "native_async_regression.log",
+    "native_async_cpu_regression.log"
+  ],
+  "followup": "native_async_cpu_regression_filtered.log"
+}

@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+  "branch": "experiment/store-descriptor-coalescing-20261009",
+  "commit": "8d999c11282a5b08322a245063813f8663295e05"
+}

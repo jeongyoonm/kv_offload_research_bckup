@@ -93,6 +93,8 @@ def main():
             slow_gap_copy_api_overlap_ms=sum(overlap(g, copies) for g in slow) / 1e6,
             top10_gap_copy_overlap_count=sum(overlap(g, copies) > 0 for g in top),
             matched_gpu_kernels=len(kernels),
+            first_gpu_kernel_lag_ms=(kernel_windows[0][0] - a) / 1e6,
+            last_gpu_kernel_from_host_ms=(kernel_windows[-1][1] - a) / 1e6,
             gpu_kernel_span_ms=kernel_span,
             gpu_kernel_busy_union_ms=kernel_busy,
             gpu_kernel_gap_ms=kernel_span - kernel_busy,

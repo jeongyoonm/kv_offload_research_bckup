@@ -96,3 +96,19 @@ Run `report.py` on the artifact root after all serving stages, then
 `plot_serving.py` using the plotting environment. These small reset/primed
 episodes have allocation/order confounds and do not replace a continuous
 300-request evaluation or establish model accuracy.
+
+## Completed results
+
+Read [the findings](results/FINDINGS.md) for calibration, diagnostic and serving
+tables, assumptions and limitations. The branch archives raw JSON records,
+process logs, the Nsight report, reproduction metadata and file hashes under
+`results/`. Full working artifacts and exported SQLite remain at
+`/mnt/localnvme/h2d_interference_20261009`.
+
+The screen and confirmation passed 1,143 unprofiled cells; seven profiled
+diagnostic cells and all 18 measured serving episodes also passed. Nine CPU
+checks pass. Depth 2 with 8–16 MiB reduces submission interference and improves
+cached-workload serving throughput relative to the current 128 MiB setting;
+mixed-workload throughput is essentially unchanged. These small serving episodes
+do not establish a unique optimum between 8 and 16 MiB. Production defaults are
+unchanged and all owned GPU processes were stopped.

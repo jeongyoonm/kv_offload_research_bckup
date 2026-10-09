@@ -1,0 +1,115 @@
+{
+  "scores": [
+    {
+      "chunk_mib": 8,
+      "depth": 2,
+      "joint_speedup": 1.1095730944154918,
+      "worst_joint_speedup": 1.0039045706590162,
+      "enqueue_speedup": 1.2586959481962132,
+      "first_ready_speedup": 1.019241165440156
+    },
+    {
+      "chunk_mib": 16,
+      "depth": 2,
+      "joint_speedup": 1.0993559926330148,
+      "worst_joint_speedup": 1.0027662873568366,
+      "enqueue_speedup": 1.196677549561798,
+      "first_ready_speedup": 1.0410218604268446
+    },
+    {
+      "chunk_mib": 32,
+      "depth": 2,
+      "joint_speedup": 1.0750920390799679,
+      "worst_joint_speedup": 1.0020107772671025,
+      "enqueue_speedup": 1.1037316630916714,
+      "first_ready_speedup": 1.036509821431537
+    },
+    {
+      "chunk_mib": 64,
+      "depth": 2,
+      "joint_speedup": 1.0413236507045767,
+      "worst_joint_speedup": 1.00112860413878,
+      "enqueue_speedup": 1.0413288315960665,
+      "first_ready_speedup": 1.0175210496788338
+    },
+    {
+      "chunk_mib": 128,
+      "depth": 2,
+      "joint_speedup": 1.0,
+      "worst_joint_speedup": 1.0,
+      "enqueue_speedup": 1.0,
+      "first_ready_speedup": 1.0
+    },
+    {
+      "chunk_mib": 8,
+      "depth": 1,
+      "joint_speedup": 0.9888488608561963,
+      "worst_joint_speedup": 0.6584866520701618,
+      "enqueue_speedup": 1.3161874354996044,
+      "first_ready_speedup": 0.6226568185137773
+    },
+    {
+      "chunk_mib": 16,
+      "depth": 1,
+      "joint_speedup": 0.987352499115997,
+      "worst_joint_speedup": 0.6734267576265559,
+      "enqueue_speedup": 1.2877921198727424,
+      "first_ready_speedup": 0.641059974225387
+    },
+    {
+      "chunk_mib": 32,
+      "depth": 1,
+      "joint_speedup": 0.9776243008716305,
+      "worst_joint_speedup": 0.6823217397245678,
+      "enqueue_speedup": 1.2348315625465014,
+      "first_ready_speedup": 0.6471791501096952
+    },
+    {
+      "chunk_mib": 64,
+      "depth": 1,
+      "joint_speedup": 0.9485081957599393,
+      "worst_joint_speedup": 0.6849787646524637,
+      "enqueue_speedup": 1.1225186738139175,
+      "first_ready_speedup": 0.6585420040606478
+    },
+    {
+      "chunk_mib": 128,
+      "depth": 1,
+      "joint_speedup": 0.9483283314814234,
+      "worst_joint_speedup": 0.6943165949754185,
+      "enqueue_speedup": 1.1166577580313628,
+      "first_ready_speedup": 0.6637957391247236
+    }
+  ],
+  "joint_nominee": {
+    "chunk_mib": 8,
+    "depth": 2,
+    "joint_speedup": 1.1095730944154918,
+    "worst_joint_speedup": 1.0039045706590162,
+    "enqueue_speedup": 1.2586959481962132,
+    "first_ready_speedup": 1.019241165440156
+  },
+  "readiness_nominee": {
+    "chunk_mib": 16,
+    "depth": 2,
+    "joint_speedup": 1.0993559926330148,
+    "worst_joint_speedup": 1.0027662873568366,
+    "enqueue_speedup": 1.196677549561798,
+    "first_ready_speedup": 1.0410218604268446
+  },
+  "confirmation_configs": [
+    [
+      128,
+      2
+    ],
+    [
+      8,
+      2
+    ],
+    [
+      16,
+      2
+    ]
+  ],
+  "rule": "Equal weight across nine compute/transfer geometries; best joint completion plus fastest first readiness among candidates within 3% of best joint score and no geometry over 3% slower than current. These are nominees, not production recommendations."
+}

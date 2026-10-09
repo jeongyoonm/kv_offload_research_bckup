@@ -66,6 +66,63 @@ def main():
     )
     for extension in ("png", "pdf", "svg"):
         fig.savefig(root / f"serving_comparison.{extension}", dpi=200)
+    plt.close(fig)
+
+    raw = {
+        chunk: json.loads((root / f"serving_{chunk}mib/summary.json").read_text())[
+            "results"
+        ]
+        for chunk in chunks
+    }
+    baseline = {(r["workload"], r["repeat"]): r for r in raw[128]}
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4.8))
+    for axis, (metric, _) in zip(axes, metrics):
+        sign = 1 if metric == "throughput_rps" else -1
+        for i, (chunk, color) in enumerate(zip((8, 16), colors[1:])):
+            selected = {r["workload"]: r for r in data if r["chunk_mib"] == chunk}
+            x = [j + (i - 0.5) * 0.28 for j in range(len(workloads))]
+            ys = [sign * selected[w][metric + "_change_percent"] for w in workloads]
+            axis.bar(x, ys, width=0.26, color=color, label=f"{chunk} MiB / depth 2")
+            for j, workload in enumerate(workloads):
+                points = [
+                    sign
+                    * 100
+                    * (r[metric] / baseline[workload, r["repeat"]][metric] - 1)
+                    for r in raw[chunk]
+                    if r["workload"] == workload
+                ]
+                axis.scatter(
+                    [x[j]] * len(points), points, color="black", s=12, zorder=5
+                )
+        axis.set_xticks(range(3), ["16K cached", "60K cached", "Mixed"])
+        axis.set_ylabel(
+            {
+                "throughput_rps": "Throughput gain (%) ↑",
+                "mean_ttft_ms": "Mean TTFT reduction (%) ↑",
+                "p95_ttft_ms": "Episode p95 TTFT reduction (%) ↑",
+            }[metric]
+        )
+        axis.axhline(0, color="#777777", linestyle="--", lw=0.8)
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.grid(axis="y", alpha=0.2)
+        axis.set_axisbelow(True)
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper center", bbox_to_anchor=(0.5, 0.92), ncol=2)
+    fig.suptitle("GLM 5.3 TP8 · changes relative to 128 MiB / depth 2")
+    fig.subplots_adjust(left=0.07, right=0.99, bottom=0.23, top=0.79, wspace=0.35)
+    fig.text(
+        0.5,
+        0.05,
+        "Bars: geometric mean of two matched episode ratios; "
+        "dots: individual pairs. Separate allocations; concurrency 32.\n"
+        "Small reset/primed validation; not a continuous 300-request "
+        "evaluation or a significance test.",
+        ha="center",
+        fontsize=9,
+    )
+    for extension in ("png", "pdf", "svg"):
+        fig.savefig(root / f"serving_gains.{extension}", dpi=200)
+    plt.close(fig)
 
 
 if __name__ == "__main__":

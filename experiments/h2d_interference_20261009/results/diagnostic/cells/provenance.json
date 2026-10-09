@@ -1,0 +1,21 @@
+{
+  "source": "/mnt/localnvme/vllm_h2d_interference_20261009",
+  "commit": "a0656190b0e5d704ff2f989b03078fbd102d5a5a",
+  "environment": {
+    "HF_HOME": "/mnt/localnvme/huggingface",
+    "HF_HUB_OFFLINE": "1",
+    "CUDA_HOME": "/usr/local/cuda-13.0",
+    "VLLM_USE_V2_MODEL_RUNNER": "1",
+    "VLLM_CACHE_ROOT": "/mnt/localnvme/cpu_cache_init_20261007/glm_canary_final/vllm_cache",
+    "FLASHINFER_WORKSPACE_BASE": "/mnt/localnvme/cpu_cache_init_20261007/glm_canary_final/flashinfer_workspace",
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "2",
+    "TMPDIR": "/mnt/localnvme/h2d_interference_20261009/diagnostic/cells/tmp",
+    "PATH": "/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin:/usr/local/cuda-13.0/bin:/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin:/usr/local/cuda-13.0/bin:/usr/local/cuda/bin:/opt/aiext/bin:/opt/rh/gcc-toolset-12/root/usr/bin:/root/.codex/packages/app-server-daemon/releases/0.162.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0G6q6Vg:/root/.codex/tmp/arg0/codex-arg0vw1Dkf:/root/.codex/packages/app-server-daemon/releases/0.161.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0Md1HEJ:/root/.codex/packages/app-server-daemon/releases/0.160.1-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0LDyB13:/root/.codex/packages/app-server-daemon/releases/0.160.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0FpkKLb:/root/.codex/packages/app-server-daemon/releases/0.159.3-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0Lowwo3:/root/.codex/packages/app-server-daemon/releases/0.159.2-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg07kDJaz:/root/.codex/packages/app-server-daemon/releases/0.159.1-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0GHlDgJ:/root/.codex/packages/app-server-daemon/releases/0.159.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg06LBZxW:/root/.codex/packages/app-server-daemon/releases/0.158.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0YTcK7t:/root/.codex/packages/app-server-daemon/releases/0.157.1-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0cDmKEq:/root/.codex/packages/app-server-daemon/releases/0.157.0-x86_64-unknown-linux-musl/codex-path:/root/.codex/tmp/arg0/codex-arg0oKc3fu:/root/.codex/packages/standalone/releases/0.157.0-x86_64-unknown-linux-musl/codex-path:/usr/local/cuda/bin:/opt/aiext/bin:/opt/rh/gcc-toolset-12/root/usr/bin:/root/.local/bin:/usr/local/cuda/bin:/usr/share/Modules/bin:/opt/aiext/bin:/opt/rh/gcc-toolset-12/root/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/opt/mellanox/doca/tools/:/root/bin:/opt/mellanox/doca/tools/:/root/bin:/opt/mellanox/doca/tools/:/root/bin"
+  },
+  "hashes": {
+    "experiments/h2d_interference_20261009/run.py": "0c36a645b2192abe45d4380b36060c3b3932c871ba3fb3aec24f4b46e4fce947",
+    "experiments/h2d_interference_20261009/worker.py": "1f2cd0ae87be0447bd4160ff6593a444e2a1f580b2e75b58d393d263e99639a2"
+  },
+  "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8"
+}

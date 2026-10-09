@@ -1,0 +1,6 @@
+{
+  "inputs": 80,
+  "predictions_identical": true,
+  "trained_state_sha256": "20624b030d8a1e1d79f0c565f5da0784958deac9c895ad0069556c3452bff22b",
+  "scope": "CPU replay of control request-shape events; exact prediction equality after metadata-only retargeting. Does not assert equal live prediction accuracy under altered I/O interference."
+}

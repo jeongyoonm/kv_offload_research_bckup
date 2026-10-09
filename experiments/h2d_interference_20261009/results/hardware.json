@@ -1,0 +1,72 @@
+{
+  "gpus": "0, NVIDIA L20D        , GPU-cfae694a-4504-caf8-3fb8-f8ba095ed6ec, 00000000:1A:00.0, 615.71.09, 275040\n1, NVIDIA L20D        , GPU-c0ea5149-64a7-7fac-8cef-beb32b4187e8, 00000000:3C:00.0, 615.71.09, 275040\n2, NVIDIA L20D        , GPU-f5599760-ad42-5896-dd5f-22ff94df931e, 00000000:76:00.0, 615.71.09, 275040\n3, NVIDIA L20D        , GPU-bf553d48-0bda-da95-cbfc-b0ea3a5f3fad, 00000000:7D:00.0, 615.71.09, 275040\n4, NVIDIA L20D        , GPU-58a3ba00-1997-571c-d44a-cd6deec3645e, 00000000:9A:00.0, 615.71.09, 275040\n5, NVIDIA L20D        , GPU-eada1440-7115-25ee-2669-fcc8e60cfc8d, 00000000:DA:00.0, 615.71.09, 275040\n6, NVIDIA L20D        , GPU-ac1e478f-9f47-7da4-349c-c7b52e49a04e, 00000000:F3:00.0, 615.71.09, 275040\n7, NVIDIA L20D        , GPU-ce716549-ca25-c145-d5df-33875b57edd7, 00000000:FA:00.0, 615.71.09, 275040\n",
+  "cpu": "Architecture:        x86_64\nCPU op-mode(s):      32-bit, 64-bit\nByte Order:          Little Endian\nCPU(s):              256\nOn-line CPU(s) list: 0-255\nThread(s) per core:  2\nCore(s) per socket:  64\nSocket(s):           2\nNUMA node(s):        2\nVendor ID:           GenuineIntel\nBIOS Vendor ID:      Intel(R) Corporation\nCPU family:          6\nModel:               173\nModel name:          Intel(R) Xeon(R) 6767P\nBIOS Model name:     Intel(R) Xeon(R) 6767P\nStepping:            1\nCPU MHz:             3599.823\nCPU max MHz:         3900.0000\nCPU min MHz:         800.0000\nBogoMIPS:            4800.00\nVirtualization:      VT-x\nL1d cache:           48K\nL1i cache:           64K\nL2 cache:            2048K\nL3 cache:            344064K\nNUMA node0 CPU(s):   0-63,128-191\nNUMA node1 CPU(s):   64-127,192-255\nFlags:               fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf tsc_known_freq pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cat_l2 cdp_l3 intel_ppin cdp_l2 ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb intel_pt avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local split_lock_detect avx_vnni avx512_bf16 wbnoinvd dtherm ida arat pln pts hwp hwp_act_window hwp_epp hwp_pkg_req hfi vnmi avx512vbmi umip pku ospke waitpkg avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg tme avx512_vpopcntdq la57 rdpid bus_lock_detect cldemote movdiri movdir64b enqcmd fsrm md_clear serialize tsxldtrk pconfig arch_lbr ibt amx_bf16 avx512_fp16 amx_tile amx_int8 flush_l1d arch_capabilities\n",
+  "native_unchanged": {
+    "borrowed_environment": "/mnt/localnvme/glm53-compat-venv",
+    "binaries": {
+      "vllm/_C_stable_libtorch.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_C_stable_libtorch.abi3.so",
+        "sha256": "0375f3ec05f823961476dfe3450cb67df385eb9541eeed29e5daccc28a142ecb"
+      },
+      "vllm/_flashkda_C.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashkda_C.abi3.so",
+        "sha256": "c03adf54b109aaed7d15c565d65c7d9ece1c5e165e95bc50e5608e2fdc5ccef3"
+      },
+      "vllm/_flashmla_C.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashmla_C.abi3.so",
+        "sha256": "83f1dd7ac31d734ec19da78b417d85b91de79b40c645660ee48e51621d6aa048"
+      },
+      "vllm/_flashmla_extension_C.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashmla_extension_C.abi3.so",
+        "sha256": "c9b6fd42b4fa294846a6bd4661be33eb954342014fc716ae07f827da5019a0e8"
+      },
+      "vllm/_glm53_async.so": {
+        "target": "/mnt/localnvme/vllm_glm53_coalesced_notify_20261004/vllm/_glm53_async.so",
+        "sha256": "55b3038d62154fa44ecd20d5b8412422bb964b2809145994104eaa6d5628bdc3"
+      },
+      "vllm/_moe_C_stable_libtorch.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_moe_C_stable_libtorch.abi3.so",
+        "sha256": "b08ed3949171409258e259ff58b3d8f85765bae9ffb79445481a6cf93293e6e4"
+      },
+      "vllm/_qutlass_C.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_qutlass_C.abi3.so",
+        "sha256": "8c491acd0ee844ec79346e153f61f876c475e1f62f0a177535148e0c0611d852"
+      },
+      "vllm/_rust_tool_parser.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_rust_tool_parser.abi3.so",
+        "sha256": "c5f089d1755688f6d4a2b78c37a711e74f0ed171b9605cc9952d835bf847e921"
+      },
+      "vllm/cumem_allocator.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/cumem_allocator.abi3.so",
+        "sha256": "6e74676bc7f1cc264cefd097992cfe39d8d5b859e6ee10bef20f6920463460d9"
+      },
+      "vllm/fs_io_C.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/fs_io_C.abi3.so",
+        "sha256": "33a2230eee458b5585a1da6a02fa3a2927891e7c29608e2cab1490bec1e9a3f5"
+      },
+      "vllm/spinloop.abi3.so": {
+        "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/spinloop.abi3.so",
+        "sha256": "d9611e3b08ab8ed4ec80c28d483371aad10b212ab597603e60452ab0e8549b7f"
+      },
+      "vllm/vllm_flash_attn/_vllm_fa2_C.abi3.so": {
+        "target": "/mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/vllm/vllm_flash_attn/_vllm_fa2_C.abi3.so",
+        "sha256": "22fcb3bcfc51bc08d7f6469caf56d009356eac81c35c953f52f5ac5efae89c62"
+      },
+      "vllm/vllm_flash_attn/_vllm_fa3_C.abi3.so": {
+        "target": "/mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/vllm/vllm_flash_attn/_vllm_fa3_C.abi3.so",
+        "sha256": "8759be32480e0a4b0d964bd880da8b108d5647f6a46ff00472597f700d70c70e"
+      }
+    },
+    "vendor_source": "/mnt/localnvme/vllm_glm53_efficient_wait_ab_20261009/vllm/third_party",
+    "attempts": [
+      {
+        "stage": "pilot",
+        "failure": "Missing FlashAttention binary links; failed before model load"
+      },
+      {
+        "stage": "pilot_retry",
+        "failure": "ninja absent from subprocess PATH; model load failed before measurement"
+      }
+    ]
+  }
+}

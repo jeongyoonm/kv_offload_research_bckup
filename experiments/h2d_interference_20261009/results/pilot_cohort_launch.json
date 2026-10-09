@@ -1,0 +1,19 @@
+{
+  "pid": 1109374,
+  "pgid": 1109374,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=60s",
+    "4h",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin/python",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d_interference_20261009/run.py",
+    "--output",
+    "/mnt/localnvme/h2d_interference_20261009/pilot_cohort",
+    "--pilot",
+    "--confirmation",
+    "--repeats",
+    "1"
+  ],
+  "log": "/mnt/localnvme/h2d_interference_20261009/pilot_cohort.log"
+}

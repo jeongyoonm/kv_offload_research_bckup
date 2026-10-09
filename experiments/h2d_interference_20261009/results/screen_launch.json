@@ -1,0 +1,17 @@
+{
+  "pid": 1223254,
+  "pgid": 1223254,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=60s",
+    "4h",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin/python",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d_interference_20261009/run.py",
+    "--output",
+    "/mnt/localnvme/h2d_interference_20261009/screen",
+    "--repeats",
+    "5"
+  ],
+  "log": "/mnt/localnvme/h2d_interference_20261009/screen.log"
+}

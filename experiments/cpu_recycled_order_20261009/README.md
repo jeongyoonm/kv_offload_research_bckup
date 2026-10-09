@@ -11,6 +11,7 @@ The selected IDs, eviction candidates, capacity, load/store references, store
 completion and cache policy remain unchanged. Logical cache keys are assigned
 to their new physical rows before any DMA descriptor is published.
 
+All 31 CPU manager tests passed; the raw output is in `CPU_TESTS.txt`.
 CPU checks cover mixed fresh/reused allocation, protected live load references,
 key-to-row mapping across eviction, failed stores and original default behavior.
 The existing contiguous and fragmented tensor-major GPU byte tests verify the

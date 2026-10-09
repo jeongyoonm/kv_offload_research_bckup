@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_client_controls_20261009",
+  "branch": "experiment/store-preencoded-client-controls-20261009",
+  "commit": "52020ebf65623ecf20502c75fddfe8a890a60fdc"
+}

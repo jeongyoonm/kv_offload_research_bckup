@@ -1,0 +1,103 @@
+{
+  "episodes": [
+    {
+      "arm": "control",
+      "repeat": 0,
+      "client_elapsed_ms": 9548.306245,
+      "response_span_ms": 9546.810862,
+      "before_first_compute_ms": 223.327644,
+      "gpu_span_ms": 9248.439493,
+      "after_last_compute_ms": 75.043725,
+      "client_harness_overhead_ms": 1.4953829999994923
+    },
+    {
+      "arm": "gpu",
+      "repeat": 0,
+      "client_elapsed_ms": 9633.850629999999,
+      "response_span_ms": 9587.233807,
+      "before_first_compute_ms": 490.248657,
+      "gpu_span_ms": 8963.513372,
+      "after_last_compute_ms": 133.471778,
+      "client_harness_overhead_ms": 46.616822999998476
+    },
+    {
+      "arm": "gpu",
+      "repeat": 1,
+      "client_elapsed_ms": 9543.460676,
+      "response_span_ms": 9541.911655,
+      "before_first_compute_ms": 394.917952,
+      "gpu_span_ms": 9104.339948,
+      "after_last_compute_ms": 42.653755,
+      "client_harness_overhead_ms": 1.549021000000721
+    },
+    {
+      "arm": "control",
+      "repeat": 1,
+      "client_elapsed_ms": 9661.110795999999,
+      "response_span_ms": 9659.469086,
+      "before_first_compute_ms": 286.013725,
+      "gpu_span_ms": 9299.76446,
+      "after_last_compute_ms": 73.690901,
+      "client_harness_overhead_ms": 1.6417099999998754
+    },
+    {
+      "arm": "control",
+      "repeat": 2,
+      "client_elapsed_ms": 9670.010080999999,
+      "response_span_ms": 9668.546567,
+      "before_first_compute_ms": 366.058065,
+      "gpu_span_ms": 9217.144505,
+      "after_last_compute_ms": 85.343997,
+      "client_harness_overhead_ms": 1.4635139999991225
+    },
+    {
+      "arm": "gpu",
+      "repeat": 2,
+      "client_elapsed_ms": 9656.251562,
+      "response_span_ms": 9654.786965,
+      "before_first_compute_ms": 261.999156,
+      "gpu_span_ms": 9303.400001,
+      "after_last_compute_ms": 89.387808,
+      "client_harness_overhead_ms": 1.4645970000001398
+    },
+    {
+      "arm": "gpu",
+      "repeat": 3,
+      "client_elapsed_ms": 9707.171391,
+      "response_span_ms": 9705.65331,
+      "before_first_compute_ms": 517.948743,
+      "gpu_span_ms": 9144.594217,
+      "after_last_compute_ms": 43.11035,
+      "client_harness_overhead_ms": 1.5180810000001657
+    },
+    {
+      "arm": "control",
+      "repeat": 3,
+      "client_elapsed_ms": 9574.004837,
+      "response_span_ms": 9572.510313,
+      "before_first_compute_ms": 267.904105,
+      "gpu_span_ms": 9202.954987,
+      "after_last_compute_ms": 101.651221,
+      "client_harness_overhead_ms": 1.4945239999997284
+    }
+  ],
+  "means": {
+    "control": {
+      "client_elapsed_ms": 9613.357989749999,
+      "response_span_ms": 9611.834207,
+      "before_first_compute_ms": 285.82588475,
+      "gpu_span_ms": 9242.07586125,
+      "after_last_compute_ms": 83.932461,
+      "client_harness_overhead_ms": 1.5237827499995547
+    },
+    "gpu": {
+      "client_elapsed_ms": 9635.18356475,
+      "response_span_ms": 9622.39643425,
+      "before_first_compute_ms": 416.27862700000003,
+      "gpu_span_ms": 9128.9618845,
+      "after_last_compute_ms": 77.15592275,
+      "client_harness_overhead_ms": 12.787130499999876
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

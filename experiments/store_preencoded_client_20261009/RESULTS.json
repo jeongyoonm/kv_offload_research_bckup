@@ -1,0 +1,177 @@
+{
+  "means": {
+    "control": {
+      "throughput_rps": 7.801882305589508,
+      "mean_ttft_ms": 3544.63829043,
+      "p50_ttft_ms": 3714.71459775,
+      "p95_ttft_ms": 4519.366284725,
+      "compute_rounds": 12,
+      "late_admissions": 67.75,
+      "kv_ready_during_compute": 71.75,
+      "recovered_compute_opportunities": 67,
+      "compute_envelope_ms": 9074.246268249999,
+      "inter_compute_gap_ms": 167.829593,
+      "hold_without_compute_ms": 17.05415625,
+      "dispatched_before_A_end": 9.75,
+      "forward_before_A_end": 8.5,
+      "compute_transitions": 11,
+      "before_schedule": 0.0,
+      "scheduler": 11.41552125,
+      "dispatch_to_worker": 2.88695725,
+      "request_state": 3.20299625,
+      "prepare_to_copy": 0.15150149999999998,
+      "input_copy_to_return": 0.53627775,
+      "attention_metadata": 5.303699,
+      "pre_forward": 77.45012125000001,
+      "forward_to_gpu_start": 66.88251875,
+      "deferred_store_submission_begin_full_ms": 281.465343,
+      "deferred_store_submission_begin_exposed_ms": 54.715588000000004,
+      "store_flush_wait_begin_full_ms": 0.0,
+      "store_flush_wait_begin_exposed_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_full_ms": 0.09586525,
+      "store_reuse_fence_enqueue_begin_exposed_ms": 0.0284325,
+      "store_descriptors_begin_full_ms": 32.28063125,
+      "store_descriptors_begin_exposed_ms": 4.725094749999999,
+      "store_stream_dependencies_begin_full_ms": 5.904725,
+      "store_stream_dependencies_begin_exposed_ms": 1.85941625,
+      "store_copy_enqueue_begin_full_ms": 245.100381,
+      "store_copy_enqueue_begin_exposed_ms": 49.441438500000004,
+      "recovered_opportunity_percent": 93.37979094076655,
+      "raw_prediction_error_ms": 89.24181397435898,
+      "raw_prediction_error_ms_mae": 89.24181397435898,
+      "raw_prediction_error_ms_positive_count": 39,
+      "raw_prediction_error_ms_count": 39,
+      "corrected_prediction_error_ms": -0.7581860256410253,
+      "corrected_prediction_error_ms_mae": 43.15184766666667,
+      "corrected_prediction_error_ms_positive_count": 22,
+      "corrected_prediction_error_ms_count": 39,
+      "deadline_minus_A_end_ms": -100.75818602564102,
+      "deadline_minus_A_end_ms_mae": 101.34173833333334,
+      "deadline_minus_A_end_ms_positive_count": 1,
+      "deadline_minus_A_end_ms_count": 39,
+      "seal_minus_A_end_ms": -367.3666048636364,
+      "seal_minus_A_end_ms_mae": 367.74224263636364,
+      "seal_minus_A_end_ms_positive_count": 4,
+      "seal_minus_A_end_ms_count": 44,
+      "transition_seal_reasons": {
+        "compute_seal_deadline": 19,
+        "candidate_target_ready": 20,
+        "predecessor_compute_finished": 5
+      }
+    },
+    "gpu": {
+      "throughput_rps": 7.784267283361085,
+      "mean_ttft_ms": 3572.2767585033334,
+      "p50_ttft_ms": 3825.67153925,
+      "p95_ttft_ms": 4841.731598925,
+      "compute_rounds": 11.75,
+      "late_admissions": 68.75,
+      "kv_ready_during_compute": 72,
+      "recovered_compute_opportunities": 67.5,
+      "compute_envelope_ms": 9038.3389825,
+      "inter_compute_gap_ms": 90.622902,
+      "hold_without_compute_ms": 27.906353,
+      "dispatched_before_A_end": 9.75,
+      "forward_before_A_end": 8.25,
+      "compute_transitions": 10.75,
+      "before_schedule": 24.28429925,
+      "scheduler": 12.16357725,
+      "dispatch_to_worker": 3.09728025,
+      "request_state": 2.2600455,
+      "prepare_to_copy": 0.11002050000000001,
+      "input_copy_to_return": 0.37711525,
+      "attention_metadata": 2.7061432500000002,
+      "pre_forward": 40.44276125,
+      "forward_to_gpu_start": 5.1816595,
+      "deferred_store_submission_begin_full_ms": 236.38357575,
+      "deferred_store_submission_begin_exposed_ms": 23.181535999999998,
+      "store_flush_wait_begin_full_ms": 0.0,
+      "store_flush_wait_begin_exposed_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_full_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_exposed_ms": 0.0,
+      "store_descriptors_begin_full_ms": 30.69622775,
+      "store_descriptors_begin_exposed_ms": 1.8861495000000001,
+      "store_stream_dependencies_begin_full_ms": 3.701687,
+      "store_stream_dependencies_begin_exposed_ms": 0.52341225,
+      "store_copy_enqueue_begin_full_ms": 202.79937,
+      "store_copy_enqueue_begin_exposed_ms": 21.0739805,
+      "recovered_opportunity_percent": 93.75,
+      "raw_prediction_error_ms": 84.20091956410256,
+      "raw_prediction_error_ms_mae": 84.20091956410256,
+      "raw_prediction_error_ms_positive_count": 39,
+      "raw_prediction_error_ms_count": 39,
+      "corrected_prediction_error_ms": -5.7990804358974355,
+      "corrected_prediction_error_ms_mae": 34.55417941025641,
+      "corrected_prediction_error_ms_positive_count": 22,
+      "corrected_prediction_error_ms_count": 39,
+      "deadline_minus_A_end_ms": -105.79908043589744,
+      "deadline_minus_A_end_ms_mae": 105.79908043589744,
+      "deadline_minus_A_end_ms_positive_count": 0,
+      "deadline_minus_A_end_ms_count": 39,
+      "seal_minus_A_end_ms": -357.9877975116279,
+      "seal_minus_A_end_ms_mae": 363.9326514651163,
+      "seal_minus_A_end_ms_positive_count": 1,
+      "seal_minus_A_end_ms_count": 43,
+      "transition_seal_reasons": {
+        "candidate_target_ready": 23,
+        "compute_seal_deadline": 17,
+        "null": 1,
+        "predecessor_compute_finished": 2
+      }
+    }
+  },
+  "paired_changes_percent": {
+    "control": {
+      "throughput_rps": 0.0,
+      "mean_ttft_ms": 0.0,
+      "p95_ttft_ms": 0.0,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "throughput_change_percent": 0.0
+        },
+        {
+          "repeat": 1,
+          "throughput_change_percent": 0.0
+        },
+        {
+          "repeat": 2,
+          "throughput_change_percent": 0.0
+        },
+        {
+          "repeat": 3,
+          "throughput_change_percent": 0.0
+        }
+      ]
+    },
+    "gpu": {
+      "throughput_rps": -0.22615097356225577,
+      "mean_ttft_ms": 0.7794250358763799,
+      "p95_ttft_ms": 7.064017480015328,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "throughput_change_percent": -0.887956314514704
+        },
+        {
+          "repeat": 1,
+          "throughput_change_percent": 1.232782572215818
+        },
+        {
+          "repeat": 2,
+          "throughput_change_percent": 0.14248302161206094
+        },
+        {
+          "repeat": 3,
+          "throughput_change_percent": -1.3718368475853282
+        }
+      ]
+    }
+  },
+  "source_commit": "52020eb",
+  "allocation_pending_instances": {
+    "control": 7632,
+    "candidate": 0
+  },
+  "decision": "Allocator mechanism is confirmed; no reliable throughput improvement is established in this client-controlled retest."
+}

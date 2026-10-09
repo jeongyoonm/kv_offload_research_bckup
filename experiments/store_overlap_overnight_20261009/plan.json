@@ -125,6 +125,14 @@
       "hypothesis": "Align coalesced descriptors to cumulative native packet boundaries to avoid underfilled copies",
       "artifacts": "/mnt/localnvme/jeongyoon/sk1",
       "status": "CPU mapping checks and six real GPU cases passed; serving comparison pending"
+    },
+    {
+      "branch": "experiment/store-merged-serving-validation-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_merged_validation_20261009",
+      "commit": "1b46fec",
+      "hypothesis": "Verify accumulated physical-layout improvements with continuous 300-request episodes and no intermediate prime/reset",
+      "artifacts": "/mnt/localnvme/jeongyoon/sm1",
+      "status": "configuration preflight passed; conditional on individual serving gains"
     }
   ],
   "constraints": [

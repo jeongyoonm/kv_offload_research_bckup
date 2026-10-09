@@ -1,0 +1,66 @@
+{
+  "verified": true,
+  "members": [
+    {
+      "path": "contention_cap0.json",
+      "bytes": 30402,
+      "sha256": "cdd8eb87875a6b54c3dd36c98cd754392225aa4d84d1dd62aa7410c7d04581ff"
+    },
+    {
+      "path": "contention_cap0.log",
+      "bytes": 2258,
+      "sha256": "322158c59e33c5872dddf6d000f88ea45ee79960dc205a2effef06a6c37c0744"
+    },
+    {
+      "path": "contention_cap256.json",
+      "bytes": 30365,
+      "sha256": "0ff6636113ad8027d1c811f7f40e19e93671640649c4de6077546929dfdd4517"
+    },
+    {
+      "path": "contention_cap256.log",
+      "bytes": 2217,
+      "sha256": "ff26ee4a3993a30ba7d1e660ad53137869b0abf32e881f321cf949e2dbd59a62"
+    },
+    {
+      "path": "contention_cap512.json",
+      "bytes": 30383,
+      "sha256": "15bb9d0ff442d62ffe3ad4699cda885ad0d32b057494656fbe98b2e62378a400"
+    },
+    {
+      "path": "contention_cap512.log",
+      "bytes": 2238,
+      "sha256": "afe780b5b545f865f83bc1b44e3a7e0d30ff6b2a074f1e58d884876140b6f87e"
+    },
+    {
+      "path": "contention_profiled.json",
+      "bytes": 7426,
+      "sha256": "b51d9966fece0e430f369b3a9ee5c12b3c45c555aa13ff3f3892b7c6f3156e9f"
+    },
+    {
+      "path": "contention_profile.log",
+      "bytes": 3445,
+      "sha256": "dfdfa24d3426e807030dde4af981918a31113a186fbf58b102a0f5d3bc2e10c6"
+    },
+    {
+      "path": "contention_sqlite_export.log",
+      "bytes": 8101,
+      "sha256": "9c6a88d18d671d78f5abf732fd0f40eee99a0ee97eef9ce30fe02ef40a1f4260"
+    },
+    {
+      "path": "contention_nsys.nsys-rep",
+      "bytes": 2509768,
+      "sha256": "638d8083f3b02ff3bec390d148e82fa260a15c8836a1deb1c65ef45c408aabb2"
+    },
+    {
+      "path": "contention_nsys.sqlite",
+      "bytes": 6893568,
+      "sha256": "575a648d4b5cbd7c915e291b49f9b606826f15f98470f6dc7426b362b6b829ef"
+    },
+    {
+      "path": "contention_trace_analysis.json",
+      "bytes": 6770,
+      "sha256": "735e9295c27b85b5001a4f7b084e6f55cf18ee819be4ae892ee613a973dd78c0"
+    }
+  ],
+  "archive_sha256": "15eff3ded080701f01594abfc44e799850b417c59092963d8a49dca44ebce3a3"
+}

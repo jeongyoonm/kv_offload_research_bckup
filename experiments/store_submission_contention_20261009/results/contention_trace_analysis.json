@@ -1,0 +1,247 @@
+{
+  "episodes": [
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "0",
+      "repeat": "2",
+      "store_submit_ms": 3.747016,
+      "store_cuda_api_ms": 3.161182,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "0",
+      "repeat": "3",
+      "store_submit_ms": 3.704742,
+      "store_cuda_api_ms": 3.150369,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "2",
+      "repeat": "2",
+      "store_submit_ms": 6.050275,
+      "store_cuda_api_ms": 5.128821,
+      "simultaneous_h2d_api_ms": 5.007765,
+      "overlapping_h2d_calls": 25
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "2",
+      "repeat": "3",
+      "store_submit_ms": 6.058312,
+      "store_cuda_api_ms": 5.123782,
+      "simultaneous_h2d_api_ms": 5.004815,
+      "overlapping_h2d_calls": 25
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "0",
+      "repeat": "2",
+      "store_submit_ms": 0.722078,
+      "store_cuda_api_ms": 0.071902,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "0",
+      "repeat": "3",
+      "store_submit_ms": 0.700606,
+      "store_cuda_api_ms": 0.074339,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "2",
+      "repeat": "2",
+      "store_submit_ms": 1.037282,
+      "store_cuda_api_ms": 0.10207,
+      "simultaneous_h2d_api_ms": 0.10207,
+      "overlapping_h2d_calls": 6
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "2",
+      "repeat": "3",
+      "store_submit_ms": 1.022314,
+      "store_cuda_api_ms": 0.104432,
+      "simultaneous_h2d_api_ms": 0.104432,
+      "overlapping_h2d_calls": 6
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "0",
+      "repeat": "2",
+      "store_submit_ms": 3.705465,
+      "store_cuda_api_ms": 3.141143,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "0",
+      "repeat": "3",
+      "store_submit_ms": 3.702205,
+      "store_cuda_api_ms": 3.157044,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "2",
+      "repeat": "2",
+      "store_submit_ms": 6.067712,
+      "store_cuda_api_ms": 5.152638,
+      "simultaneous_h2d_api_ms": 5.028038,
+      "overlapping_h2d_calls": 24
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "2",
+      "repeat": "3",
+      "store_submit_ms": 6.06486,
+      "store_cuda_api_ms": 5.134194,
+      "simultaneous_h2d_api_ms": 5.014053,
+      "overlapping_h2d_calls": 24
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "0",
+      "repeat": "2",
+      "store_submit_ms": 3.802629,
+      "store_cuda_api_ms": 3.154821,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "0",
+      "repeat": "3",
+      "store_submit_ms": 3.787136,
+      "store_cuda_api_ms": 3.156029,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "2",
+      "repeat": "2",
+      "store_submit_ms": 6.010808,
+      "store_cuda_api_ms": 5.102101,
+      "simultaneous_h2d_api_ms": 4.980727,
+      "overlapping_h2d_calls": 24
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "2",
+      "repeat": "3",
+      "store_submit_ms": 6.04963,
+      "store_cuda_api_ms": 5.132881,
+      "simultaneous_h2d_api_ms": 5.011288,
+      "overlapping_h2d_calls": 24
+    }
+  ],
+  "summaries": [
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "0",
+      "samples": 2,
+      "store_submit_ms": 3.725879,
+      "store_cuda_api_ms": 3.1557755,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0.0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "False",
+      "background": "2",
+      "samples": 2,
+      "store_submit_ms": 6.0542935,
+      "store_cuda_api_ms": 5.1263015,
+      "simultaneous_h2d_api_ms": 5.00629,
+      "overlapping_h2d_calls": 25.0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "0",
+      "samples": 2,
+      "store_submit_ms": 0.7113419999999999,
+      "store_cuda_api_ms": 0.0731205,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0.0
+    },
+    {
+      "layout": "contiguous",
+      "coalesced": "True",
+      "background": "2",
+      "samples": 2,
+      "store_submit_ms": 1.029798,
+      "store_cuda_api_ms": 0.103251,
+      "simultaneous_h2d_api_ms": 0.103251,
+      "overlapping_h2d_calls": 6.0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "0",
+      "samples": 2,
+      "store_submit_ms": 3.7038349999999998,
+      "store_cuda_api_ms": 3.1490935,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0.0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "False",
+      "background": "2",
+      "samples": 2,
+      "store_submit_ms": 6.066286,
+      "store_cuda_api_ms": 5.143416,
+      "simultaneous_h2d_api_ms": 5.0210455,
+      "overlapping_h2d_calls": 24.0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "0",
+      "samples": 2,
+      "store_submit_ms": 3.7948825,
+      "store_cuda_api_ms": 3.155425,
+      "simultaneous_h2d_api_ms": 0.0,
+      "overlapping_h2d_calls": 0.0
+    },
+    {
+      "layout": "reverse_source",
+      "coalesced": "True",
+      "background": "2",
+      "samples": 2,
+      "store_submit_ms": 6.030219,
+      "store_cuda_api_ms": 5.117491,
+      "simultaneous_h2d_api_ms": 4.9960075,
+      "overlapping_h2d_calls": 24.0
+    }
+  ],
+  "definition": "Two measured repeats per case, following two excluded warmups. CUDA API durations are profiled observations, not mutex wait measurements. Simultaneous H2D time intersects other-thread batch-copy calls with the D2H batch-copy call. Disjoint buffers eliminate source-reuse dependencies but not shared driver, PCIe, or CPU resources."
+}

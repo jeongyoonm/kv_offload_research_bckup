@@ -92,6 +92,7 @@ def test_store_reuse_fence_enqueues_only_pending_store_events(monkeypatch) -> No
     event = MagicMock()
     worker._store_handler = MagicMock()
     worker._store_handler._transfer_events = {1: event}
+    worker._store_handler._async_submitter_handle = None
     stream = MagicMock()
     monkeypatch.setattr(current_platform, "is_cuda", lambda: True)
     monkeypatch.setattr(current_platform, "current_stream", lambda: stream)
@@ -161,6 +162,77 @@ def test_gpu_store_reuse_fence_orders_forward_and_independent_h2d(
         )
         finished = worker.get_finished()
         assert {result.job_id for result in finished} == (
+            {1} if overwrite == "forward" else {1, 2}
+        )
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()
+
+
+def test_native_store_reuse_waits_for_completion_without_early_retirement():
+    """An unrecorded native completion cannot be used as a CUDA stream fence."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    worker._store_handler = MagicMock()
+    worker._store_handler._async_submitter_handle = 17
+    worker.fence_store_reuse({3, 4})
+    worker._store_handler.wait.assert_called_once_with({3, 4})
+    worker._store_handler.get_finished.assert_not_called()
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="Native D2H requires CUDA")
+@torch.inference_mode()
+@pytest.mark.parametrize("overwrite", ["forward", "load"])
+def test_native_store_orders_delayed_producer_and_source_reuse(
+    default_vllm_config, overwrite
+):
+    """Capture the source producer before native submission and retain old bytes."""
+    page_size = 128 * 1024
+    tensor = torch.zeros((2, page_size), dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page_size)],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8192,
+        async_d2h_submission=True,
+        async_d2h_chunk_bytes=8192,
+    )
+    worker.configure_experiment({"copy_pipeline_depth": 2})
+    cpu_tensor = worker._load_handler.src_tensors[0]
+    cpu_tensor[1].fill_(0x5A)
+    spec = GPULoadStoreSpec([0], group_sizes=(1,), block_indices=(0,))
+    try:
+        torch.accelerator.synchronize()
+        torch.cuda._sleep(500_000_000)
+        tensor[0].fill_(0x11)
+        producer = torch.Event()
+        producer.record(current_platform.current_stream())
+        assert worker.submit_store(1, spec, CPULoadStoreSpec([0]))
+        assert not producer.query(), "Store submission waited for its producer"
+        assert not worker.get_finished(), "Store retired before producer completion"
+        worker.fence_store_reuse({1})
+        assert producer.query()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        if overwrite == "forward":
+            tensor[0].fill_(0x5A)
+        else:
+            assert worker.submit_load(2, CPULoadStoreSpec([1]), spec)
+        worker.wait({1, 2})
+        torch.accelerator.synchronize()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        torch.testing.assert_close(
+            tensor[0].cpu(), torch.full((page_size,), 0x5A, dtype=torch.int8)
+        )
+        assert {result.job_id for result in worker.get_finished()} == (
             {1} if overwrite == "forward" else {1, 2}
         )
         assert not worker.get_finished()

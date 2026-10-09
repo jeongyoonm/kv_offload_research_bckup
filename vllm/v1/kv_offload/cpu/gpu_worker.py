@@ -288,6 +288,7 @@ class SingleDirectionOffloadingHandler:
         async_h2d_completion_ring_path: str = "",
         async_h2d_completion_session: int = 0,
         force_h2d_dma: bool = False,
+        async_d2h_submission: bool = False,
     ):
         """
         Initialize a SingleDirectionOffloadingHandler.
@@ -337,13 +338,15 @@ class SingleDirectionOffloadingHandler:
         )
         self.gpu_to_cpu: bool = gpu_to_cpu
         self.layer_refs_per_group = layer_refs_per_group
-        self._async_h2d_submission = async_h2d_submission
-        if self._async_h2d_submission:
-            if self.gpu_to_cpu:
+        self._async_submission = async_h2d_submission or async_d2h_submission
+        if self._async_submission:
+            if async_h2d_submission and self.gpu_to_cpu:
                 raise ValueError("async_h2d_submission only supports CPU-to-GPU")
+            if async_d2h_submission and not self.gpu_to_cpu:
+                raise ValueError("async_d2h_submission only supports GPU-to-CPU")
             if not current_platform.is_cuda():
                 raise RuntimeError(
-                    "async_h2d_submission requires CUDA; "
+                    "native async transfer submission requires CUDA; "
                     f"current platform is {current_platform.device_name}"
                 )
             device_index = gpu_tensors[0].device.index
@@ -370,10 +373,10 @@ class SingleDirectionOffloadingHandler:
             "KV transfer direction=%s async_submission=%s chunk_bytes=%d "
             "max_descriptors=%d primitive=%s canonical_layout=%s page_sizes=%s",
             "D2H" if gpu_to_cpu else "H2D",
-            async_h2d_submission,
+            self._async_submission,
             async_h2d_chunk_bytes,
             async_h2d_max_descriptors,
-            "cuMemcpyBatchAsync" if async_h2d_submission else self._swap_blocks_batch,
+            "cuMemcpyBatchAsync" if self._async_submission else self._swap_blocks_batch,
             canonical_layout,
             sorted(
                 {r.page_size_bytes for group in layer_refs_per_group for r in group}
@@ -712,7 +715,7 @@ class SingleDirectionOffloadingHandler:
                 num_descriptors=op_idx,
             )
 
-        if self._async_h2d_submission:
+        if self._async_submission:
             transfer = AsyncTransfer(
                 job_id=job_id,
                 num_bytes=num_transfer_bytes,
@@ -724,9 +727,12 @@ class SingleDirectionOffloadingHandler:
             with self._async_transfer_lock:
                 self._async_transfers.append(transfer)
                 try:
+                    event_name = (
+                        "store_async_submit" if self.gpu_to_cpu else "load_submit"
+                    )
                     if timeline.enabled():
                         timeline.emit(
-                            "load_submit",
+                            event_name,
                             job_id=job_id,
                             num_bytes=num_transfer_bytes,
                             device=torch.accelerator.current_device_index(),
@@ -735,19 +741,23 @@ class SingleDirectionOffloadingHandler:
 
                     if queue_stages.active:
                         queue_stages.emit(
-                            "load_submit",
+                            event_name,
                             job_id=job_id,
                             num_bytes=num_transfer_bytes,
                             device=queue_stages.device_index,
                         )
+                    if trace_store:
+                        queue_stages.emit("store_async_enqueue_begin", job_id=job_id)
                     ops.submit_async_batch_memcpy(
                         self._async_submitter_handle,
                         job_id,
                         src,
                         dst,
                         sizes,
-                        src_access_any=True,
+                        src_access_any=not self.gpu_to_cpu,
                     )
+                    if trace_store:
+                        queue_stages.emit("store_async_enqueue_end", job_id=job_id)
                 except Exception:
                     popped = self._async_transfers.pop()
                     assert popped is transfer
@@ -826,7 +836,7 @@ class SingleDirectionOffloadingHandler:
         return True
 
     def get_finished(self) -> list[TransferResult]:
-        if self._async_h2d_submission:
+        if self._async_submission:
             assert self._async_submitter_handle is not None
             with self._async_transfer_lock:
                 job_ids, transfer_durations_ms = ops.poll_async_batch_memcpy(
@@ -887,7 +897,7 @@ class SingleDirectionOffloadingHandler:
         return results
 
     def wait(self, job_ids: set[int]):
-        if self._async_h2d_submission:
+        if self._async_submission:
             assert self._async_submitter_handle is not None
             ops.wait_async_batch_memcpy(self._async_submitter_handle, list(job_ids))
             return
@@ -955,6 +965,8 @@ class CPUOffloadingWorker(OffloadingWorker):
         async_h2d_completion_ring_path: str = "",
         async_h2d_completion_session: int = 0,
         force_h2d_dma: bool = False,
+        async_d2h_submission: bool = False,
+        async_d2h_chunk_bytes: int = 8 * 1024 * 1024,
     ):
         assert not canonical_layout or mmap_region is not None
         # The caller owns mmap_region until this constructor returns. After a
@@ -1014,9 +1026,15 @@ class CPUOffloadingWorker(OffloadingWorker):
             layer_refs_per_group=kv_caches.group_data_refs,
             gpu_to_cpu=True,
             canonical_layout=canonical_layout,
+            async_d2h_submission=async_d2h_submission,
+            async_h2d_chunk_bytes=async_d2h_chunk_bytes,
         )
 
         try:
+            if async_d2h_submission:
+                handle = self._store_handler._async_submitter_handle
+                assert handle is not None
+                ops.configure_async_batch_memcpy_pipeline(handle, 2)
             self._load_handler = SingleDirectionOffloadingHandler(
                 gpu_tensors=gpu_tensors,
                 cpu_tensors=cpu_tensors,
@@ -1065,7 +1083,12 @@ class CPUOffloadingWorker(OffloadingWorker):
         self._load_handler.wait(job_ids)
 
     def fence_store_reuse(self, job_ids: set[int]) -> None:
-        """Keep store source blocks intact without waiting on the CPU."""
+        """Preserve source bytes; native stores use a completion-wait fallback."""
+        if self._store_handler._async_submitter_handle is not None:
+            # Native jobs have no caller-owned recorded completion event.
+            # Waiting for real completion is the conservative reuse fallback.
+            self._store_handler.wait(job_ids)
+            return
         if not current_platform.is_cuda():
             self.wait(job_ids)
             return

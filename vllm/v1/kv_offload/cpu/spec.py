@@ -187,6 +187,19 @@ class CPUOffloadingSpec(OffloadingSpec):
             raise ValueError("async_h2d_chunk_bytes must be a positive integer")
         self.async_h2d_submission = async_h2d_submission
         self.async_h2d_chunk_bytes = async_h2d_chunk_bytes
+        self.async_d2h_submission = self.extra_config.get("async_d2h_submission", False)
+        if not isinstance(self.async_d2h_submission, bool):
+            raise ValueError("async_d2h_submission must be a boolean")
+        if self.async_d2h_submission and not current_platform.is_cuda():
+            raise RuntimeError("async_d2h_submission requires CUDA")
+        self.async_d2h_chunk_bytes = self.extra_config.get(
+            "async_d2h_chunk_bytes", 8 * 1024 * 1024
+        )
+        if (
+            type(self.async_d2h_chunk_bytes) is not int
+            or self.async_d2h_chunk_bytes <= 0
+        ):
+            raise ValueError("async_d2h_chunk_bytes must be a positive integer")
         self.async_h2d_max_descriptors = self.extra_config.get(
             "async_h2d_max_descriptors", 4096
         )
@@ -279,6 +292,8 @@ class CPUOffloadingSpec(OffloadingSpec):
                 async_h2d_completion_ring_path=(self.async_h2d_completion_ring_path),
                 async_h2d_completion_session=self.async_h2d_completion_session,
                 force_h2d_dma=self.force_h2d_dma,
+                async_d2h_submission=self.async_d2h_submission,
+                async_d2h_chunk_bytes=self.async_d2h_chunk_bytes,
             )
         except Exception:
             if mmap_region is not None:

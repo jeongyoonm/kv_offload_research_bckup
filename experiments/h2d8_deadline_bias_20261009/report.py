@@ -69,6 +69,7 @@ def audit_cell(directory, stages, spans):
         step = current["step"]
         end = max(r[3] + r[6] for r in previous["execution_ranks"])
         start = max(r[3] for r in current["execution_ranks"])
+        gap_end = max(end, start)
         rank_stages = {str(r): stages[step, r] for r in range(8)}
         points = [max(stages[step, r][s] for r in range(8)) for s in STAGES]
         bounds = [
@@ -78,12 +79,12 @@ def audit_cell(directory, stages, spans):
             *points,
             start,
         ]
-        clipped = [max(end, min(start, t)) for t in bounds]
+        clipped = [max(end, min(gap_end, t)) for t in bounds]
         assert sorted(clipped) == clipped, (directory, step, bounds)
         phases = {
             name: (b - a) / 1e6 for name, a, b in zip(PHASES, clipped, clipped[1:])
         }
-        assert abs(sum(phases.values()) - (start - end) / 1e6) < 1e-6
+        assert abs(sum(phases.values()) - (gap_end - end) / 1e6) < 1e-6
         store_times = {}
         for kind in PAIRS:
             rank_values = []
@@ -124,7 +125,8 @@ def audit_cell(directory, stages, spans):
             dict(
                 step=step,
                 preceding_step=previous["step"],
-                gap_ms=(start - end) / 1e6,
+                gap_ms=(gap_end - end) / 1e6,
+                envelope_overlap_ms=max(0, end - start) / 1e6,
                 phases_ms=phases,
                 A_end_ns=end,
                 B_start_upper_ns=start,
@@ -259,7 +261,8 @@ def main():
         gaps=gaps,
         definitions=dict(
             phases="All-rank maximum host boundaries clipped to inter-compute gaps; "
-            "these phases partition each gap.",
+            "these phases partition each gap. Overlapping envelopes have zero "
+            "gap and their overlap is recorded separately.",
             store_times="Sum across compute transitions of the largest per-rank "
             "store call duration. Exposed clips each rank's calls to GPU gaps. "
             "These diagnostics overlap the pre-forward phase and are not additive "

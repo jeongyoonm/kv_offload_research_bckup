@@ -256,13 +256,32 @@ class OffloadingConnectorWorker:
                 and kv_connector_metadata.jobs_to_flush.isdisjoint(self._load_jobs)
             )
             phase = "store_reuse_fence_enqueue" if gpu_fence else "store_flush_wait"
+            scoped = (
+                gpu_fence
+                and kv_connector_metadata.experiment_options.get(
+                    "store_reuse_scoped_fence", False
+                )
+                and kv_connector_metadata.compute_store_fences is not None
+            )
+            compute_jobs = (
+                kv_connector_metadata.compute_store_fences
+                if scoped
+                else kv_connector_metadata.jobs_to_flush
+            )
+            assert compute_jobs is not None
             if queue_stages.active:
                 queue_stages.emit(
                     f"{phase}_begin",
                     jobs=list(kv_connector_metadata.jobs_to_flush),
+                    scoped=scoped,
+                    compute_jobs=list(compute_jobs),
+                    load_jobs={
+                        str(jid): list(deps)
+                        for jid, deps in kv_connector_metadata.load_store_fences.items()
+                    },
                 )
             if gpu_fence:
-                self.worker.fence_store_reuse(kv_connector_metadata.jobs_to_flush)
+                self.worker.fence_store_reuse(compute_jobs)
             else:
                 self.worker.wait(kv_connector_metadata.jobs_to_flush)
             if queue_stages.active:
@@ -301,7 +320,30 @@ class OffloadingConnectorWorker:
         for job_id, entry in metadata.load_jobs.items():
             self._load_jobs[job_id] = entry.req_id
             assert isinstance(entry.dst_spec, GPULoadStoreSpec)
-            success = self.worker.submit_load(job_id, entry.src_spec, entry.dst_spec)
+            store_fences = metadata.load_store_fences.get(job_id, set())
+            scoped = (
+                metadata.experiment_options.get("store_reuse_gpu_fence", False)
+                and metadata.experiment_options.get("store_reuse_scoped_fence", False)
+                and metadata.compute_store_fences is not None
+                and not metadata.force_flush_on_host
+                and bool(store_fences)
+            )
+            if scoped:
+                if queue_stages.active:
+                    queue_stages.emit(
+                        "load_reuse_gate_begin",
+                        job_id=job_id,
+                        stores=list(store_fences),
+                    )
+                success = self.worker.submit_load_with_store_fence(
+                    job_id, entry.src_spec, entry.dst_spec, store_fences
+                )
+                if queue_stages.active:
+                    queue_stages.emit("load_reuse_gate_end", job_id=job_id)
+            else:
+                success = self.worker.submit_load(
+                    job_id, entry.src_spec, entry.dst_spec
+                )
             assert success
 
     def prepare_store_kv(self, metadata: OffloadingConnectorMetadata):

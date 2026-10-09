@@ -1047,6 +1047,31 @@ class CPUOffloadingWorker(OffloadingWorker):
         """Async CPU -> GPU."""
         return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
 
+    def submit_load_with_store_fence(
+        self,
+        job_id: int,
+        src_spec: LoadStoreSpec,
+        dst_spec: GPULoadStoreSpec,
+        store_job_ids: set[int],
+    ) -> bool:
+        if not current_platform.is_cuda():
+            return super().submit_load_with_store_fence(
+                job_id, src_spec, dst_spec, store_job_ids
+            )
+        gate = getattr(self, "_load_reuse_gate", None)
+        if gate is None:
+            gate = current_platform.Stream()
+            self._load_reuse_gate = gate
+        gate.wait_stream(current_platform.current_stream())
+        for store_job_id in store_job_ids:
+            event = self._store_handler._transfer_events.get(store_job_id)
+            if event is not None:
+                gate.wait_event(event)
+        # Native H2D records its ready event on the calling stream. A private
+        # gate preserves copy-before-overwrite without fencing unrelated compute.
+        with current_platform.stream(gate):
+            return self.submit_load(job_id, src_spec, dst_spec)
+
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
         depth = int(options.get("copy_pipeline_depth", 1))
         if depth == getattr(self, "_copy_pipeline_depth", 1):

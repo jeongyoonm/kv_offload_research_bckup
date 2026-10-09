@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from itertools import chain, islice
 from typing import Any, NamedTuple
 
+import numpy as np
+
 from vllm.config import VllmConfig
 from vllm.distributed.kv_events import KVCacheEvent
 from vllm.distributed.kv_transfer.kv_connector.utils import yield_req_data
@@ -1541,6 +1543,51 @@ class OffloadingConnectorScheduler:
 
         return store_jobs
 
+    def _classify_store_reuse(
+        self, scheduler_output: SchedulerOutput
+    ) -> tuple[set[int] | None, dict[int, set[int]]]:
+        """Separate asynchronous load destinations from current GPU writes."""
+        if (
+            self._current_batch_force_flush_on_host
+            or scheduler_output.has_sync_kv_loads
+            or scheduler_output.new_block_ids_to_zero
+            or scheduler_output.kv_cache_block_copies
+            or scheduler_output.preempted_req_ids
+            or any(
+                job.req_id in scheduler_output.num_scheduled_tokens
+                for job in self._current_batch_load_jobs.values()
+            )
+        ):
+            return None, {}
+        collision_ids = (
+            self._current_batch_allocated_block_ids
+            & self._block_id_to_pending_jobs.keys()
+        )
+        if not collision_ids:
+            return set(self._current_batch_jobs_to_flush), {}
+        collision_array = np.fromiter(collision_ids, dtype=np.int64)
+        load_collisions: set[int] = set()
+        load_fences: dict[int, set[int]] = {}
+        for job_id, job in self._current_batch_load_jobs.items():
+            assert isinstance(job.dst_spec, GPULoadStoreSpec)
+            matched = collision_array[np.isin(collision_array, job.dst_spec.block_ids)]
+            if len(matched):
+                load_collisions.update(map(int, matched))
+                load_fences[job_id] = {
+                    jid
+                    for bid in matched
+                    for jid in self._block_id_to_pending_jobs[int(bid)]
+                }
+        compute_fences = {
+            jid
+            for bid in collision_ids - load_collisions
+            for jid in self._block_id_to_pending_jobs[bid]
+        }
+        # A flush caused by another lifecycle rule remains a global dependency.
+        covered = compute_fences | set().union(*load_fences.values())
+        compute_fences.update(self._current_batch_jobs_to_flush - covered)
+        return compute_fences, load_fences
+
     def build_connector_meta(
         self, scheduler_output: SchedulerOutput
     ) -> KVConnectorMetadata:
@@ -1576,11 +1623,14 @@ class OffloadingConnectorScheduler:
 
         partial_store_jobs = self._build_partial_tail_store_jobs(scheduler_output)
         normal_store_jobs = self._build_store_jobs(scheduler_output)
+        compute_fences, load_fences = self._classify_store_reuse(scheduler_output)
         meta = OffloadingConnectorMetadata(
             load_jobs=self._current_batch_load_jobs,
             store_jobs=partial_store_jobs | normal_store_jobs,
             jobs_to_flush=self._current_batch_jobs_to_flush,
             force_flush_on_host=self._current_batch_force_flush_on_host,
+            compute_store_fences=compute_fences,
+            load_store_fences=load_fences,
         )
 
         # All prepare_store calls for finished requests have been issued.

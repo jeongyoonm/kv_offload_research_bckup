@@ -106,7 +106,7 @@ def test_store_reuse_fence_enqueues_only_pending_store_events(monkeypatch) -> No
 @pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA stream fence test")
 @torch.inference_mode()
 @pytest.mark.parametrize("async_h2d_submission", [False, True])
-@pytest.mark.parametrize("overwrite", ["forward", "load"])
+@pytest.mark.parametrize("overwrite", ["forward", "load", "scoped_load"])
 def test_gpu_store_reuse_fence_orders_forward_and_independent_h2d(
     default_vllm_config, async_h2d_submission, overwrite
 ) -> None:
@@ -143,13 +143,23 @@ def test_gpu_store_reuse_fence_orders_forward_and_independent_h2d(
             torch.cuda._sleep(100_000_000)
             cpu_tensor[0].copy_(gpu_tensor[0], non_blocking=True)
             transfer.end_event.record(transfer.stream)
-        worker.fence_store_reuse({1})
+        if overwrite != "scoped_load":
+            worker.fence_store_reuse({1})
         assert not transfer.end_event.query(), "GPU fence unexpectedly waited on CPU"
 
         if overwrite == "forward":
             gpu_tensor[0].fill_(0x5A)
-        else:
+        elif overwrite == "load":
             assert worker.submit_load(2, CPULoadStoreSpec([1]), spec)
+        else:
+            assert worker.submit_load_with_store_fence(
+                2, CPULoadStoreSpec([1]), spec, {1}
+            )
+            gpu_tensor[1].fill_(0x33)
+            unrelated_done = torch.cuda.Event()
+            unrelated_done.record()
+            unrelated_done.synchronize()
+            assert not transfer.end_event.query(), "Unrelated compute was fenced"
 
         worker.wait({1, 2})
         torch.accelerator.synchronize()

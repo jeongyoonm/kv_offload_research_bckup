@@ -340,6 +340,33 @@ def test_store_reuse_gpu_fence_preserves_reset_and_load_host_waits(
     assert not worker._unsubmitted_store_jobs
 
 
+def test_scoped_store_fences_leave_load_only_dependencies_off_compute():
+    """All stores submit once, but unrelated compute never waits for load reuse."""
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    assert worker.worker is not None
+    metadata = _store_metadata(10)
+    metadata.jobs_to_flush = {10, 11}
+    metadata.compute_store_fences = {11}
+    metadata.load_store_fences = {20: {10}}
+    metadata.experiment_options = {
+        "store_reuse_gpu_fence": True,
+        "store_reuse_scoped_fence": True,
+    }
+    metadata.load_jobs = _load_metadata(20).load_jobs
+    worker.handle_preemptions(metadata)
+    worker.start_kv_transfers(metadata)
+    worker.worker.fence_store_reuse.assert_called_once_with({11})
+    entry = metadata.load_jobs[20]
+    worker.worker.submit_load_with_store_fence.assert_called_once_with(
+        20, entry.src_spec, entry.dst_spec, {10}
+    )
+    worker.worker.wait.assert_not_called()
+    worker.worker.submit_store.assert_called_once()
+    assert not worker._unsubmitted_store_jobs
+
+
 def test_start_kv_transfers_non_writer_still_submits_load():
     worker, _ = _make_worker(
         KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[]),

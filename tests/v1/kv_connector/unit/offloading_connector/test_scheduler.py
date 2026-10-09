@@ -21,6 +21,7 @@ from vllm.distributed.kv_events import MEDIUM_CPU, BlockRemoved, BlockStored
 from vllm.distributed.kv_transfer.kv_connector.v1.offloading.common import (
     OffloadingConnectorMetadata,
     OffloadingWorkerMetadata,
+    TransferJob,
 )
 from vllm.distributed.kv_transfer.kv_connector.v1.offloading.config import (
     build_offloading_config,
@@ -74,6 +75,39 @@ def _make_partial_tail_scheduler() -> OffloadingConnectorScheduler:
     kv_cache_config = _make_mamba_hybrid_kv_cache_config()
     spec = MockOffloadingSpec(build_offloading_config(vllm_config, kv_cache_config))
     return OffloadingConnectorScheduler(spec, vllm_config, kv_cache_config)
+
+
+@pytest.mark.parametrize(
+    "unsafe",
+    [
+        None,
+        "has_sync_kv_loads",
+        "new_block_ids_to_zero",
+        "kv_cache_block_copies",
+        "preempted_req_ids",
+    ],
+)
+def test_store_reuse_classification_preserves_compute_and_load_hazards(unsafe):
+    """A store touching compute and load destinations still fences both."""
+    scheduler = OffloadingConnectorScheduler.__new__(OffloadingConnectorScheduler)
+    scheduler._current_batch_force_flush_on_host = False
+    scheduler._current_batch_allocated_block_ids = {10, 20, 30}
+    scheduler._block_id_to_pending_jobs = {10: {1}, 20: {1}, 30: {2}}
+    scheduler._current_batch_jobs_to_flush = {1, 2, 3}
+    scheduler._current_batch_load_jobs = {
+        7: TransferJob("loading", MagicMock(), GPULoadStoreSpec([10, 30], (2,), (0,)))
+    }
+    output = SimpleNamespace(
+        has_sync_kv_loads=False,
+        new_block_ids_to_zero=None,
+        kv_cache_block_copies=None,
+        preempted_req_ids=None,
+        num_scheduled_tokens={"computing": 1},
+    )
+    if unsafe is not None:
+        setattr(output, unsafe, True)
+    compute, loads = scheduler._classify_store_reuse(output)
+    assert (compute, loads) == ((None, {}) if unsafe else ({1, 3}, {7: {1, 2}}))
 
 
 def _make_partial_tail_request(

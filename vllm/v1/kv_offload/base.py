@@ -570,6 +570,17 @@ class OffloadingWorker(ABC):
         """Order subsequent GPU writes after stores; default to a host wait."""
         self.wait(job_ids)
 
+    def submit_load_with_store_fence(
+        self,
+        job_id: int,
+        src_spec: LoadStoreSpec,
+        dst_spec: GPULoadStoreSpec,
+        store_job_ids: set[int],
+    ) -> bool:
+        """Protect a load's destinations; generic backends use a host wait."""
+        self.wait(store_job_ids)
+        return self.submit_load(job_id, src_spec, dst_spec)
+
     def shutdown(self) -> None:
         return
 

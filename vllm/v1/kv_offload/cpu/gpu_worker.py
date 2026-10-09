@@ -290,7 +290,9 @@ def _coalesce_descriptors(src, dst, sizes, count):
     return merged_count
 
 
-def _coalesce_bounded_descriptors(src, dst, sizes, count, max_bytes):
+def _coalesce_bounded_descriptors(
+    src, dst, sizes, count, max_bytes, *, packet_aligned=False
+):
     """Merge physical ranges, then split them within the native chunk limit."""
     if not count or max_bytes <= 0 or np.any(sizes[:count] > max_bytes):
         return count
@@ -298,14 +300,40 @@ def _coalesce_bounded_descriptors(src, dst, sizes, count, max_bytes):
     if merged == count:
         return count
     lengths = sizes[:merged].copy()
-    parts = (lengths + max_bytes - 1) // max_bytes
+    ends = np.cumsum(lengths)
+    starts = ends - lengths
+    first_packets = starts // max_bytes
+    parts = (
+        (ends - 1) // max_bytes - first_packets + 1
+        if packet_aligned
+        else (lengths + max_bytes - 1) // max_bytes
+    )
+    if parts.sum() > count:
+        packet_aligned = False
+        parts = (lengths + max_bytes - 1) // max_bytes
     expanded = int(parts.sum())
     assert expanded <= count
     first = np.cumsum(parts) - parts
-    offsets = (np.arange(expanded) - np.repeat(first, parts)) * max_bytes
+    within = np.arange(expanded) - np.repeat(first, parts)
+    if packet_aligned:
+        positions = np.maximum(
+            np.repeat(starts, parts),
+            (np.repeat(first_packets, parts) + within) * max_bytes,
+        )
+        offsets = positions - np.repeat(starts, parts)
+        piece_sizes = (
+            np.minimum(
+                np.repeat(ends, parts),
+                (np.repeat(first_packets, parts) + within + 1) * max_bytes,
+            )
+            - positions
+        )
+    else:
+        offsets = within * max_bytes
+        piece_sizes = np.minimum(max_bytes, np.repeat(lengths, parts) - offsets)
     src[:expanded] = np.repeat(src[:merged].copy(), parts) + offsets
     dst[:expanded] = np.repeat(dst[:merged].copy(), parts) + offsets
-    sizes[:expanded] = np.minimum(max_bytes, np.repeat(lengths, parts) - offsets)
+    sizes[:expanded] = piece_sizes
     return expanded
 
 
@@ -384,6 +412,7 @@ class SingleDirectionOffloadingHandler:
         self._async_h2d_submission = async_h2d_submission
         self._async_h2d_chunk_bytes = async_h2d_chunk_bytes
         self._coalesce_load_descriptors = False
+        self._load_packet_alignment = False
         if self._async_h2d_submission:
             if self.gpu_to_cpu:
                 raise ValueError("async_h2d_submission only supports CPU-to-GPU")
@@ -752,7 +781,12 @@ class SingleDirectionOffloadingHandler:
             op_idx = _coalesce_descriptors(all_src, all_dst, all_sizes, op_idx)
         elif self._async_h2d_submission and self._coalesce_load_descriptors:
             op_idx = _coalesce_bounded_descriptors(
-                all_src, all_dst, all_sizes, op_idx, self._async_h2d_chunk_bytes
+                all_src,
+                all_dst,
+                all_sizes,
+                op_idx,
+                self._async_h2d_chunk_bytes,
+                packet_aligned=getattr(self, "_load_packet_alignment", False),
             )
         if self._async_h2d_submission and queue_stages.active:
             queue_stages.emit(
@@ -1121,6 +1155,9 @@ class CPUOffloadingWorker(OffloadingWorker):
         )
         self._load_handler._coalesce_load_descriptors = bool(
             options.get("load_descriptor_coalescing", False)
+        )
+        self._load_handler._load_packet_alignment = bool(
+            options.get("load_descriptor_packet_alignment", False)
         )
         depth = int(options.get("copy_pipeline_depth", 1))
         if depth == getattr(self, "_copy_pipeline_depth", 1):

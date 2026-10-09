@@ -74,6 +74,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "store_reuse_gpu_fence": False,
     "store_descriptor_coalescing": False,
     "load_descriptor_coalescing": False,
+    "load_descriptor_packet_alignment": False,
     "store_reuse_allocator_preference": False,
     "store_reuse_allocator_audit": False,
     "ascending_gpu_block_assignment": False,
@@ -93,6 +94,11 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         if key not in result or type(value) is not type(result[key]):
             raise ValueError(f"invalid experimental option: {key}")
         result[key] = value
+    if (
+        result["load_descriptor_packet_alignment"]
+        and not result["load_descriptor_coalescing"]
+    ):
+        raise ValueError("packet alignment requires load descriptor coalescing")
     if result["late_seal_calibration"] not in ("legacy", "raw", "shape"):
         raise ValueError("invalid experimental option: late_seal_calibration")
     for key, upper in (

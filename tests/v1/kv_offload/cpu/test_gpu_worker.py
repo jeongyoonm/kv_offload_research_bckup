@@ -847,11 +847,62 @@ def test_load_coalescing_preserves_byte_mapping_and_chunk_bound(
         assert count == 4
 
 
+@pytest.mark.parametrize(
+    "src_ids,sizes,limit,expected_chunks",
+    [
+        ([0, 10, 20, 100, 110, 120], [10] * 6, 20, 3),
+        ([0, 100, 110], [9, 10, 10], 10, 3),
+    ],
+)
+def test_packet_alignment_keeps_byte_mapping_and_descriptor_ownership(
+    src_ids, sizes, limit, expected_chunks
+):
+    """Pack across disjoint ranges; fall back when splitting would need more slots."""
+    src = np.array(src_ids, dtype=np.int64)
+    dst = src + 1000
+    lengths = np.array(sizes, dtype=np.int64)
+    expected = {
+        int(d + i): int(s + i)
+        for s, d, n in zip(src, dst, lengths)
+        for i in range(int(n))
+    }
+    count = gpu_worker._coalesce_bounded_descriptors(
+        src, dst, lengths, len(src), limit, packet_aligned=True
+    )
+    actual = {
+        int(d + i): int(s + i)
+        for s, d, n in zip(src[:count], dst[:count], lengths[:count])
+        for i in range(int(n))
+    }
+    assert actual == expected
+    assert count <= len(src_ids) and lengths[:count].max() <= limit
+    chunks, filled = 1, 0
+    for size in lengths[:count]:
+        if filled + size > limit:
+            chunks += 1
+            filled = 0
+        filled += size
+    assert chunks == expected_chunks
+
+
 @pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA copy test")
 @torch.inference_mode()
-@pytest.mark.parametrize("dst_ids", [[3, 0, 1, 2], [0, 3, 2, 1]])
+@pytest.mark.parametrize("packet_alignment", [False, True])
+@pytest.mark.parametrize(
+    "src_ids,dst_ids,expected_descriptors",
+    [
+        ([3, 0, 1, 2], [3, 0, 1, 2], 2),
+        ([3, 0, 1, 2], [0, 3, 2, 1], 4),
+        ([4, 2, 0, 5, 1, 3], [6, 2, 0, 7, 1, 5], 4),
+    ],
+)
 def test_coalesced_async_load_preserves_rows_and_waits_for_gpu_writes(
-    default_vllm_config, dst_ids, monkeypatch
+    default_vllm_config,
+    src_ids,
+    dst_ids,
+    expected_descriptors,
+    packet_alignment,
+    monkeypatch,
 ):
     """Bounded merging must retain destination-write ordering and real retirement."""
     page_size = 65536
@@ -871,7 +922,11 @@ def test_coalesced_async_load_preserves_rows_and_waits_for_gpu_writes(
         async_h2d_chunk_bytes=2 * page_size,
     )
     worker.configure_experiment(
-        {"copy_pipeline_depth": 2, "load_descriptor_coalescing": True}
+        {
+            "copy_pipeline_depth": 2,
+            "load_descriptor_coalescing": True,
+            "load_descriptor_packet_alignment": packet_alignment,
+        }
     )
     cpu = worker._store_handler.dst_tensors[0]
     for row in range(8):
@@ -879,18 +934,19 @@ def test_coalesced_async_load_preserves_rows_and_waits_for_gpu_writes(
     original = gpu_worker._coalesce_bounded_descriptors
     counts = []
 
-    def coalesce(*args):
-        count = original(*args)
+    def coalesce(*args, **kwargs):
+        count = original(*args, **kwargs)
         counts.append(count)
         return count
 
     monkeypatch.setattr(gpu_worker, "_coalesce_bounded_descriptors", coalesce)
-    src_ids = [3, 0, 1, 2]
     try:
         torch.cuda._sleep(100_000_000)
         gpu_tensor.fill_(127)
         assert worker.submit_load(
-            1, CPULoadStoreSpec(src_ids), GPULoadStoreSpec(dst_ids, (4,), (0,))
+            1,
+            CPULoadStoreSpec(src_ids),
+            GPULoadStoreSpec(dst_ids, (len(src_ids),), (0,)),
         )
         worker.wait({1})
         torch.accelerator.synchronize()
@@ -899,7 +955,7 @@ def test_coalesced_async_load_preserves_rows_and_waits_for_gpu_writes(
                 gpu_tensor[dst_id].cpu(),
                 torch.full((page_size,), src_id, dtype=torch.int8),
             )
-        assert counts == [2 if dst_ids == src_ids else 4]
+        assert counts == [expected_descriptors]
         assert [result.job_id for result in worker.get_finished()] == [1]
         assert not worker.get_finished()
     finally:

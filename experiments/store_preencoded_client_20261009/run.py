@@ -18,6 +18,7 @@ from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 SOURCE = Path(__file__).resolve().parents[2]
 collector = baseline.collector
 CURRENT_ARM = "control"
+STRATEGY = "allocator"
 ARMS = ("control", "gpu")
 
 
@@ -25,7 +26,13 @@ def options(active=False):
     baseline.CURRENT_ARM = "both"
     result = baseline.options(active)
     result["store_reuse_gpu_fence"] = active
-    result["store_specific_producer"] = active and CURRENT_ARM == "gpu"
+    result["store_specific_producer"] = (
+        active and STRATEGY == "producer" and CURRENT_ARM == "gpu"
+    )
+    result["store_reuse_allocator_audit"] = active and STRATEGY == "allocator"
+    result["store_reuse_allocator_preference"] = (
+        active and STRATEGY == "allocator" and CURRENT_ARM == "gpu"
+    )
     return result
 
 
@@ -36,13 +43,17 @@ def server_command():
 
 
 def main():
-    global CURRENT_ARM
+    global CURRENT_ARM, STRATEGY
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--repeats", type=int, default=4)
     parser.add_argument("--requests", type=int, default=75)
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument(
+        "--strategy", choices=("allocator", "producer"), default="allocator"
+    )
     args = parser.parse_args()
+    STRATEGY = args.strategy
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
     assert not (root / "plan.json").exists(), "Use a fresh artifact root"
@@ -66,13 +77,18 @@ def main():
         validate_experiment_options(policies[arm])
     assert {
         k for k in policies["control"] if policies["control"][k] != policies["gpu"][k]
-    } == {"store_specific_producer"}
+    } == {
+        "store_specific_producer"
+        if STRATEGY == "producer"
+        else "store_reuse_allocator_preference"
+    }
     command, config = server_command()
     expected = len(ARMS) * args.repeats
     collector.save(
         root / "plan.json",
         dict(
             model="GLM 5.3 NVFP4",
+            strategy=STRATEGY,
             preencoded_client=True,
             first_wave_barrier=True,
             parallelism="TP8",
@@ -91,8 +107,9 @@ def main():
             scope="Matched primed/reset 75-request episodes at 61,440 prompt "
             "tokens and 95% CPU-prefix hits. The control is the latest prototype "
             "with 90 ms prediction subtraction and 100 ms setup lead. The only "
-            "policy difference is the store source dependency: broad stream wait "
-            "versus the KV-producing batch event. Reset and load drains remain host "
+            "policy difference is the selected store strategy: pending-store "
+            "allocator preference or specific source-producer events. Reset "
+            "and load drains remain host "
             "waits. Same frozen predictor, preparation, H2D pipeline and model. "
             "Request bodies are encoded outside the timer and the first client "
             "wave starts at a barrier. This allocation is a new harness control "
@@ -112,7 +129,7 @@ def main():
         ),
     )
     if args.preflight_only:
-        print("Preencoded-client producer configuration validation passed", flush=True)
+        print("Preencoded-client strategy configuration validation passed", flush=True)
         return
     shutil.copy2(
         "/mnt/localnvme/jeongyoon/glm53_dataset_coverage_20261007/libseal_execution_observer.so",

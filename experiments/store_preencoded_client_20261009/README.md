@@ -11,3 +11,8 @@ do not attribute differences from historical harness runs to server changes.
 Frozen predictor, prefixes, suffixes, model execution and server flags match.
 Every measured cell retains cache-hit, output-token, preemption and preparation
 validation. Report first-wave start spread as a manipulation check.
+
+`--strategy allocator` is the default and retests the measured allocator fix.
+`--strategy producer` retests the source-event proposal. Each allocation changes
+only its selected strategy flag between arms; allocator audits are shared when
+that strategy is selected. Neither strategy is enabled while priming.

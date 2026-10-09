@@ -1,0 +1,53 @@
+{
+  "start_utc": "2026-10-09 05:47:40",
+  "deadline_utc": "2026-10-09 15:47:40",
+  "model": "GLM 5.3 NVFP4",
+  "parallelism": "TP8",
+  "data_root": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009",
+  "baseline": "6aeab52",
+  "proposals": [
+    {
+      "branch": "experiment/store-reuse-scoped-fences-20261009",
+      "commit": "1f526ff",
+      "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sf1",
+      "hypothesis": "Fences for future H2D destinations need not block unrelated compute"
+    },
+    {
+      "branch": "experiment/store-reuse-load-reservations-20261009",
+      "commit": "afd4163",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sr1",
+      "hypothesis": "Include future suffix reservations in per-request load gates"
+    },
+    {
+      "branch": "experiment/store-reuse-allocator-preference-20261009",
+      "commit": "a9ed417",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sa1",
+      "hypothesis": "Prefer free blocks not read by pending stores"
+    },
+    {
+      "branch": "experiment/store-critical-submission-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sp1",
+      "hypothesis": "Prioritize reuse-critical unsubmitted stores when CPU destinations are disjoint"
+    }
+  ],
+  "constraints": [
+    "Keep model, weights, original sparse selector and FP8 KV unchanged",
+    "96 GiB GPU KV pool per GPU, 2130300354560-byte aggregate private CPU pool",
+    "H2D 8 MiB chunks, depth 2; frozen estimator and 90 ms subtraction/100 ms setup lead",
+    "Feature flags default disabled; reset and retirement remain actual completion waits",
+    "GPU-only ceiling conditional on successful fix and sufficient remaining time; validate actual cache hits and resident capacity"
+  ],
+  "initial_verification": {
+    "scoped_tests": 22,
+    "allocator_targeted": 4,
+    "allocator_regression": 205,
+    "reservation_tests": 18,
+    "priority_backend": 2,
+    "priority_connector": 5
+  },
+  "startup_issue": "First scoped launch rejected before measurement: long TMPDIR exceeded AF_UNIX socket limit; relaunched at short root sf1; same root stays under user storage path"
+}

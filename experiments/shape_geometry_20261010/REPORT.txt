@@ -1,0 +1,14 @@
+Crossed-geometry calibration audit
+
+GLM 5.3 NVFP4 TP8; same native D2H1GiB/depth2, H2D8MiB/depth2, private CPU layout, allocator avoidance, preparation, original selector and frozen base forest. Fresh seeds9601/9602, 75 requests/cell, concurrency32, output1. 12 measured cells accepted; six excluded warmups. Arms control: original90ms correction/100ms lead; shape100 and shape50: frozen five-feature correction with100ms and50ms lead. Lead is an advance before predicted A finish, not a hold.
+
+short_long_suffix control: 9.2029req/s; paired gain+0.000%; MAE60.078ms; recovered79.84%; mean rounds10; mean gaps390.078ms.
+short_long_suffix shape100: 9.3326req/s; paired gain+1.376%; MAE316.796ms; recovered82.64%; mean rounds9.5; mean gaps348.111ms.
+short_long_suffix shape50: 9.3461req/s; paired gain+1.524%; MAE285.591ms; recovered84.92%; mean rounds10; mean gaps345.111ms.
+long_short_suffix control: 13.1724req/s; paired gain+0.000%; MAE106.507ms; recovered89.47%; mean rounds32; mean gaps389.474ms.
+long_short_suffix shape100: 13.5040req/s; paired gain+2.510%; MAE154.175ms; recovered95.49%; mean rounds30; mean gaps513.704ms.
+long_short_suffix shape50: 13.4948req/s; paired gain+2.448%; MAE147.777ms; recovered99.26%; mean rounds30.5; mean gaps390.106ms.
+
+The first calibration worsens crossed prediction accuracy despite small serving gains. Marginal support admits context/suffix combinations absent from training. This motivates the joint-support fallback and a broader explicit geometry fit in separate branches. These short episodes do not establish final300-request gains or confidence intervals; small seed/order variation remains. Retain all results, including regressions.
+
+Raw archive SHA256: 6d54026f1d0ae88c5dac00276e88f3609ce5c44f74226b6b88af210d7d155bc5; all members reopened and verified. Summary complete/stopped, with CUDA process cleanup checked separately before reallocation.

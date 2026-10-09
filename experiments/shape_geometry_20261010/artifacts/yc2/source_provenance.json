@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010",
+  "branch": "experiment/shape-geometry-calibration-20261010",
+  "commit": "6ac0b8e3745c14f5612b419488f27d9029ce7663"
+}

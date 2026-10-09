@@ -1,0 +1,17 @@
+[
+  {
+    "path": "summary.json.gz",
+    "sha256": "84ee7f60a4049fa4d37b410e347d5acf5de0f91516ef2fdd185d155ebee5e296",
+    "uncompressed_sha256": "1825f2d7a07c3e79d98f5ef613f191c2c51271ba7b5ab5e39c564c8b22700922"
+  },
+  {
+    "path": "comparison.json.gz",
+    "sha256": "b46bc478d253d4bb62268a51bf1844096a73cb2b9e7ac5de89d89fddb03039df",
+    "uncompressed_sha256": "c4d24fe47a1222607215fc5d0b00244563da7013beb9f75dd9a254b96a8c2f5a"
+  },
+  {
+    "path": "loaded_predictor.json.gz",
+    "sha256": "8694fd34ee88e158561e2166b7bc0f1f265e11ea1711d7e22cd6b148017efa3f",
+    "uncompressed_sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3"
+  }
+]

@@ -76,6 +76,15 @@ def main():
                 held[~train] = x[~train] @ solve(x[train], y[train], alpha)
             error = (raw - held if "residual" in recipe else held) - truth
             by_workload = {w: metrics(error[mask]) for w, mask in masks.items()}
+            geometry_held = np.empty_like(y)
+            for mask in masks.values():
+                geometry_held[mask] = x[mask] @ solve(x[~mask], y[~mask], alpha)
+            geometry_error = (
+                raw - geometry_held if "residual" in recipe else geometry_held
+            ) - truth
+            geometry_workloads = {
+                w: metrics(geometry_error[mask]) for w, mask in masks.items()
+            }
             candidates.append(
                 dict(
                     recipe=recipe,
@@ -87,6 +96,10 @@ def main():
                         np.mean([m["mae"] for m in by_workload.values()])
                     ),
                     workloads=by_workload,
+                    leave_geometry_out=geometry_workloads,
+                    geometry_macro_mae=float(
+                        np.mean([m["mae"] for m in geometry_workloads.values()])
+                    ),
                     rank=int(np.linalg.matrix_rank(x)),
                     columns=x.shape[1],
                 )
@@ -135,7 +148,9 @@ def main():
         rows=len(rows),
         groups=sorted(set(groups)),
         caveat="Grouped development selection, not final held-out serving accuracy. "
-        "Use independent seeds for frozen300-request confirmations.",
+        "Leave-geometry-out queries are shadow extrapolation before support/clip "
+        "guards; they diagnose generalization but are not live accuracy. "
+        "Use independent seeds and new geometry for frozen300 confirmations.",
     )
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     print(

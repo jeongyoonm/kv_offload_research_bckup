@@ -47,3 +47,10 @@ Runtime tests cover suffix sensitivity at equal context/count, missing
 attention-work fallback, forbidden elapsed features, and prior guard
 behavior. Run the CPU mechanism gate before any schema 3 serving run.
 No new checkpoint is loaded into the ongoing `yc2` allocation.
+
+Also retain leave-geometry-out shadow errors for every candidate. These
+extrapolation diagnostics do not select the artifact and bypass support
+guards; they expose weak generalization hidden by within-geometry seed
+validation. The fresh 48K-prefix/1536-token suffix workload is absent
+from the fitting rows. Its 90-prefix working set exceeds GPU capacity,
+while the conservative CPU footprint is 4,890,240 tokens.

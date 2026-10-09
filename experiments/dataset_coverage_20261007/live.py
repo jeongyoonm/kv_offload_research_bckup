@@ -71,6 +71,7 @@ WORKLOAD_SHAPES = {
     "mid32k": (30720, 2048),
     "short_long_suffix": (15552, 3072),
     "long_short_suffix": (58368, 832),
+    "unseen48k": (49152, 1536),
     "heterogeneous": (24576, 8192),
 }
 

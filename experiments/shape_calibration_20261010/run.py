@@ -33,6 +33,7 @@ PREFIX_WORKING_SETS = {
     "familiar60k": 75,
     "short_long_suffix": 250,
     "long_short_suffix": 75,
+    "unseen48k": 90,
 }
 
 

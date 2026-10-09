@@ -899,7 +899,8 @@ class SingleDirectionOffloadingHandler:
     def wait(self, job_ids: set[int]):
         if self._async_submission:
             assert self._async_submitter_handle is not None
-            ops.wait_async_batch_memcpy(self._async_submitter_handle, list(job_ids))
+            with self._async_transfer_lock:
+                ops.wait_async_batch_memcpy(self._async_submitter_handle, list(job_ids))
             return
         for job_id in job_ids:
             event = self._transfer_events.get(job_id)

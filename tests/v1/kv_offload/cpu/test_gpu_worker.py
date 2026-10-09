@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+import concurrent.futures
 import logging
 import random
+import threading
 import time
 import uuid
 from unittest.mock import MagicMock
@@ -177,6 +179,40 @@ def test_native_store_reuse_waits_for_completion_without_early_retirement():
     worker.fence_store_reuse({3, 4})
     worker._store_handler.wait.assert_called_once_with({3, 4})
     worker._store_handler.get_finished.assert_not_called()
+
+
+def test_native_wait_cannot_skip_a_job_during_registration(monkeypatch):
+    """A concurrent waiter must not consult native jobs before insertion finishes."""
+    handler = gpu_worker.SingleDirectionOffloadingHandler.__new__(
+        gpu_worker.SingleDirectionOffloadingHandler
+    )
+    handler._async_submission = True
+    handler._async_submitter_handle = 17
+    handler._async_transfer_lock = threading.Lock()
+    entered, registered, called = (
+        threading.Event(),
+        threading.Event(),
+        threading.Event(),
+    )
+
+    def native_wait(handle, jobs):
+        called.set()
+        assert registered.is_set(), "Wait skipped an incompletely registered job"
+        assert handle == 17 and jobs == [3]
+
+    def wait_task():
+        entered.set()
+        handler.wait({3})
+
+    monkeypatch.setattr(ops, "wait_async_batch_memcpy", native_wait)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with handler._async_transfer_lock:
+            future = executor.submit(wait_task)
+            assert entered.wait(1)
+            assert not called.wait(0.1)
+            registered.set()
+        future.result(timeout=1)
+    assert called.is_set()
 
 
 @pytest.mark.skipif(not current_platform.is_cuda(), reason="Native D2H requires CUDA")

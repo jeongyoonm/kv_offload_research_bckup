@@ -1,0 +1,160 @@
+{
+  "means": {
+    "control": {
+      "throughput_rps": 7.845232616784091,
+      "mean_ttft_ms": 3912.1647939,
+      "p50_ttft_ms": 4050.2409860000002,
+      "p95_ttft_ms": 4683.008484525,
+      "compute_rounds": 43.5,
+      "late_admissions": 263.5,
+      "kv_ready_during_compute": 265.5,
+      "recovered_compute_opportunities": 238.5,
+      "compute_envelope_ms": 36244.5583165,
+      "inter_compute_gap_ms": 1678.375571,
+      "hold_without_compute_ms": 745.6418639999999,
+      "dispatched_before_A_end": 41.5,
+      "forward_before_A_end": 39,
+      "compute_transitions": 42.5,
+      "before_schedule": 97.39456299999999,
+      "scheduler": 16.877549,
+      "dispatch_to_worker": 10.244434,
+      "request_state": 8.078255500000001,
+      "prepare_to_copy": 0.254326,
+      "input_copy_to_return": 0.8314205,
+      "attention_metadata": 7.828785,
+      "pre_forward": 52.93515,
+      "forward_to_gpu_start": 1483.931088,
+      "deferred_store_submission_begin_full_ms": 225.575043,
+      "deferred_store_submission_begin_exposed_ms": 9.29509,
+      "store_flush_wait_begin_full_ms": 0.0,
+      "store_flush_wait_begin_exposed_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_full_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_exposed_ms": 0.0,
+      "store_descriptors_begin_full_ms": 173.60251399999999,
+      "store_descriptors_begin_exposed_ms": 7.0435795,
+      "store_stream_dependencies_begin_full_ms": 6.4047355,
+      "store_stream_dependencies_begin_exposed_ms": 0.335906,
+      "store_copy_enqueue_begin_full_ms": 44.953486,
+      "store_copy_enqueue_begin_exposed_ms": 1.9739565,
+      "recovered_opportunity_percent": 89.83050847457628,
+      "raw_prediction_error_ms": 69.9667490375,
+      "raw_prediction_error_ms_mae": 71.9574665875,
+      "raw_prediction_error_ms_positive_count": 76,
+      "raw_prediction_error_ms_count": 80,
+      "corrected_prediction_error_ms": -20.0332509625,
+      "corrected_prediction_error_ms_mae": 34.9795379125,
+      "corrected_prediction_error_ms_positive_count": 31,
+      "corrected_prediction_error_ms_count": 80,
+      "deadline_minus_A_end_ms": -120.0332509625,
+      "deadline_minus_A_end_ms_mae": 120.0332509625,
+      "deadline_minus_A_end_ms_positive_count": 0,
+      "deadline_minus_A_end_ms_count": 80,
+      "seal_minus_A_end_ms": -473.66733468235293,
+      "seal_minus_A_end_ms_mae": 479.04245164705884,
+      "seal_minus_A_end_ms_positive_count": 2,
+      "seal_minus_A_end_ms_count": 85,
+      "transition_seal_reasons": {
+        "null": 2,
+        "compute_seal_deadline": 28,
+        "candidate_target_ready": 53,
+        "deadline": 2
+      }
+    },
+    "gpu": {
+      "throughput_rps": 7.462277476219835,
+      "mean_ttft_ms": 4112.640059541667,
+      "p50_ttft_ms": 4116.581371249999,
+      "p95_ttft_ms": 4916.958298924999,
+      "compute_rounds": 36.5,
+      "late_admissions": 221.5,
+      "kv_ready_during_compute": 243,
+      "recovered_compute_opportunities": 179,
+      "compute_envelope_ms": 35710.683516000005,
+      "inter_compute_gap_ms": 4128.683903,
+      "hold_without_compute_ms": 2115.9792115,
+      "dispatched_before_A_end": 28,
+      "forward_before_A_end": 27,
+      "compute_transitions": 35.5,
+      "before_schedule": 298.108255,
+      "scheduler": 682.8661035,
+      "dispatch_to_worker": 255.939671,
+      "request_state": 141.6929445,
+      "prepare_to_copy": 1.0120449999999999,
+      "input_copy_to_return": 20.448823,
+      "attention_metadata": 40.4107585,
+      "pre_forward": 245.8918925,
+      "forward_to_gpu_start": 2442.3134099999997,
+      "deferred_store_submission_begin_full_ms": 210.4437835,
+      "deferred_store_submission_begin_exposed_ms": 52.980902500000006,
+      "store_flush_wait_begin_full_ms": 0.0,
+      "store_flush_wait_begin_exposed_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_full_ms": 0.0,
+      "store_reuse_fence_enqueue_begin_exposed_ms": 0.0,
+      "store_descriptors_begin_full_ms": 163.12259849999998,
+      "store_descriptors_begin_exposed_ms": 39.9185035,
+      "store_stream_dependencies_begin_full_ms": 6.2108985,
+      "store_stream_dependencies_begin_exposed_ms": 1.8497379999999999,
+      "store_copy_enqueue_begin_full_ms": 40.8561105,
+      "store_copy_enqueue_begin_exposed_ms": 11.3819215,
+      "recovered_opportunity_percent": 73.66255144032922,
+      "raw_prediction_error_ms": 83.12531296078431,
+      "raw_prediction_error_ms_mae": 83.8483144117647,
+      "raw_prediction_error_ms_positive_count": 50,
+      "raw_prediction_error_ms_count": 51,
+      "corrected_prediction_error_ms": -6.8746870392156865,
+      "corrected_prediction_error_ms_mae": 39.755034411764704,
+      "corrected_prediction_error_ms_positive_count": 28,
+      "corrected_prediction_error_ms_count": 51,
+      "deadline_minus_A_end_ms": -106.87468703921569,
+      "deadline_minus_A_end_ms_mae": 107.30317343137256,
+      "deadline_minus_A_end_ms_positive_count": 1,
+      "deadline_minus_A_end_ms_count": 51,
+      "seal_minus_A_end_ms": -446.064980056338,
+      "seal_minus_A_end_ms_mae": 500.4248391830986,
+      "seal_minus_A_end_ms_positive_count": 15,
+      "seal_minus_A_end_ms_count": 71,
+      "transition_seal_reasons": {
+        "null": 12,
+        "compute_seal_deadline": 8,
+        "candidate_target_ready": 44,
+        "deadline": 6,
+        "predecessor_compute_finished": 1
+      }
+    }
+  },
+  "paired_changes_percent": {
+    "control": {
+      "throughput_rps": 0.0,
+      "mean_ttft_ms": 0.0,
+      "p95_ttft_ms": 0.0,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "throughput_change_percent": 0.0
+        },
+        {
+          "repeat": 1,
+          "throughput_change_percent": 0.0
+        }
+      ]
+    },
+    "gpu": {
+      "throughput_rps": -4.846524775367744,
+      "mean_ttft_ms": 5.16338449107161,
+      "p95_ttft_ms": 4.804324803288318,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "throughput_change_percent": -1.7198967762310224
+        },
+        {
+          "repeat": 1,
+          "throughput_change_percent": -7.873683987595204
+        }
+      ]
+    }
+  },
+  "source_commit": "f2d7584",
+  "decision": "Keep independent load readiness disabled; both matched repeats regress.",
+  "selection_audit": "All 600 candidate loads per rank used the independent path. Rank-zero original compute stream was busy for 263 and 256 loads in the two repeats."
+}

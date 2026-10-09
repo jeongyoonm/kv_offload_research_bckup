@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+  "branch": "experiment/load-independent-ready-stream-20261009",
+  "commit": "f2d7584a7c2e9cf764ca6588df18675b10daea3c"
+}

@@ -1,0 +1,63 @@
+{
+  "episodes": [
+    {
+      "arm": "control",
+      "repeat": 0,
+      "client_elapsed_ms": 39320.707001,
+      "response_span_ms": 39319.415561,
+      "before_first_compute_ms": 104.03758,
+      "gpu_span_ms": 39078.151752,
+      "after_last_compute_ms": 137.226229,
+      "client_harness_overhead_ms": 1.2914400000008754
+    },
+    {
+      "arm": "gpu",
+      "repeat": 0,
+      "client_elapsed_ms": 40008.817361,
+      "response_span_ms": 40007.530116,
+      "before_first_compute_ms": 135.974015,
+      "gpu_span_ms": 39730.031772,
+      "after_last_compute_ms": 141.524329,
+      "client_harness_overhead_ms": 1.2872449999995297
+    },
+    {
+      "arm": "gpu",
+      "repeat": 1,
+      "client_elapsed_ms": 40397.468847,
+      "response_span_ms": 40262.452001,
+      "before_first_compute_ms": 188.79139,
+      "gpu_span_ms": 39948.703066,
+      "after_last_compute_ms": 124.957545,
+      "client_harness_overhead_ms": 135.01684599999862
+    },
+    {
+      "arm": "control",
+      "repeat": 1,
+      "client_elapsed_ms": 37216.699811,
+      "response_span_ms": 37215.399575,
+      "before_first_compute_ms": 290.245365,
+      "gpu_span_ms": 36767.716023,
+      "after_last_compute_ms": 157.438187,
+      "client_harness_overhead_ms": 1.3002359999954933
+    }
+  ],
+  "means": {
+    "control": {
+      "client_elapsed_ms": 38268.703406,
+      "response_span_ms": 38267.407568,
+      "before_first_compute_ms": 197.1414725,
+      "gpu_span_ms": 37922.933887499996,
+      "after_last_compute_ms": 147.33220799999998,
+      "client_harness_overhead_ms": 1.2958379999981844
+    },
+    "gpu": {
+      "client_elapsed_ms": 40203.143104,
+      "response_span_ms": 40134.9910585,
+      "before_first_compute_ms": 162.3827025,
+      "gpu_span_ms": 39839.367419,
+      "after_last_compute_ms": 133.240937,
+      "client_harness_overhead_ms": 68.15204549999908
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

@@ -45,7 +45,14 @@ def diagnostics(directory):
         for e in json.loads((directory / "late.json").read_text())["records"]
         if e["event"] == "membership_sealed"
     ]
-    waits = union([(e["base_ready_ns"], e["seal_ns"]) for e in seals])
+    transports = [e["transport"] for e in seals]
+    waits = union(
+        [
+            (t["base_ready_ns"], t["seal_ns"])
+            for t in transports
+            if t.get("base_ready_ns") is not None
+        ]
+    )
     exposed = 0
     for begin, end in waits:
         overlap = sum(max(0, min(end, b) - max(begin, a)) for a, b in intervals)
@@ -53,7 +60,9 @@ def diagnostics(directory):
     return dict(
         inter_compute_gap_ms=gap_ms,
         hold_without_compute_ms=exposed / 1e6,
-        seal_reasons=dict(Counter(e["seal_reason"] for e in seals)),
+        seal_reasons=dict(
+            Counter(t.get("seal_reason", "ordinary_or_fallback") for t in transports)
+        ),
     )
 
 

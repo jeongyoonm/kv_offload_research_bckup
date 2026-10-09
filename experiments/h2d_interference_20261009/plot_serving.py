@@ -26,7 +26,7 @@ def main():
     metrics = (
         ("throughput_rps", "Throughput (requests/s) ↑"),
         ("mean_ttft_ms", "Mean TTFT (ms) ↓"),
-        ("p95_ttft_ms", "p95 TTFT (ms) ↓"),
+        ("p95_ttft_ms", "Mean episode p95 TTFT (ms) ↓"),
     )
     fig, axes = plt.subplots(1, 3, figsize=(13, 4.8))
     for axis, (metric, label) in zip(axes, metrics):
@@ -58,7 +58,7 @@ def main():
         0.5,
         0.05,
         "Two matched 32-request episodes per workload/config; "
-        "concurrency 32; one output token. Dots show individual episodes.\n"
+        "concurrency 32; one output token. Bars: episode means; dots: episodes.\n"
         "Separate allocations; small validation, not a continuous 300-request "
         "study or a statistical equivalence test.",
         ha="center",

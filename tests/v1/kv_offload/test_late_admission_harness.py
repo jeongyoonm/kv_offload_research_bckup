@@ -221,6 +221,61 @@ def deadline_core(monkeypatch):
     return make
 
 
+@pytest.mark.parametrize(
+    "supported,base_at", [(True, None), (False, None), (True, 1_060_000_000)]
+)
+def test_frozen_shape_correction_controls_deadline_and_preserves_snapshot(
+    deadline_core, supported, base_at
+):
+    """A loaded calibration advances the deadline without changing admission gates."""
+    import numpy as np
+
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    core, clock = deadline_core(lead_us=50_000)
+    clock.base_at = base_at
+    core.scheduler._late_seal_prediction_bias_us = 90_000
+    x = np.zeros(28)
+    context = 15552 if supported else 8192
+    x[:9] = [832, 1, 0, context, 832, 832, context, context, 896]
+    calibration = BatchShapeCalibration(
+        dict(
+            schema=3,
+            features=["intercept"],
+            coefficients=[30],
+            support=dict(requests=[1, 32], context=[15552, 58368], suffix=[832, 3072]),
+            geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+            bias_bounds_ms=[-500, 500],
+            provenance={},
+        )
+    )
+    core.deferral_timing.seal_estimator.latency_surface = SimpleNamespace(
+        requires_forecast=False,
+        predict_with_features=lambda data: (120_000_000, x),
+        duration_calibration=calibration,
+        target_schema="cuda_span_max.v1",
+    )
+    expected = max(1_040_000_000 if supported else clock.now, base_at or 0)
+    clock.ready_at = {"early": expected - 1, "late": expected + 1}
+    acknowledged = stage_rpc(
+        core, 9, [_request("base")], [_request("early"), _request("late")]
+    )
+    transport = core.scheduler._late_transport
+    assert transport["seal_ns"] == expected
+    assert transport["seal_reason"] == "compute_seal_deadline"
+    assert transport["prediction"]["applied_prediction_bias_ns"] == (
+        30_000_000 if supported else 90_000_000
+    )
+    assert transport["prediction"]["shape_calibration_fallback"] is not supported
+    assert set(acknowledged) & core.scheduler._late_kv_snapshot == {"early"}
+    assert transport["statuses"][:8] == [1] * 8
+    clock.now += 1
+    core._refresh_early_load_readiness()
+    assert "late" in core.scheduler.finished_recving_kv_req_ids
+    assert "late" not in core.scheduler._late_kv_snapshot
+    assert not core.batch_queue[-1][0].poll()
+
+
 @pytest.mark.parametrize("lead_us", [0, 5000, 10_000, 20_000])
 def test_compute_deadline_seals_while_a_is_held_and_clips_sleep(deadline_core, lead_us):
     """A deadline is an enforced seal, rather than a transition to more polling."""

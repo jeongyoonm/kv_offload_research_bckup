@@ -1,0 +1,34 @@
+[
+  {
+    "cell": "r0_control",
+    "warnings": []
+  },
+  {
+    "cell": "r0_gpu",
+    "warnings": []
+  },
+  {
+    "cell": "r1_control",
+    "warnings": []
+  },
+  {
+    "cell": "r1_gpu",
+    "warnings": []
+  },
+  {
+    "cell": "r2_control",
+    "warnings": []
+  },
+  {
+    "cell": "r2_gpu",
+    "warnings": []
+  },
+  {
+    "cell": "r3_control",
+    "warnings": []
+  },
+  {
+    "cell": "r3_gpu",
+    "warnings": []
+  }
+]

@@ -1,0 +1,43 @@
+{
+  "source_commit": "03b84ce",
+  "checks": [
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_offload/test_late_admission_harness.py -q",
+      "passed": 206,
+      "skipped": 8
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_connector/unit/offloading_connector/test_scheduler.py -k \"reset_cache or aligned_boundary_store_flushes\" -q",
+      "passed": 5,
+      "scope": "Also selected worker and harness files in the invocation; global -k selected these five scheduler checks."
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_connector/unit/offloading_connector/test_worker.py tests/v1/kv_offload/cpu/test_gpu_worker.py -k \"store or handle_preemptions\" -q",
+      "passed": 17,
+      "scope": "Includes four real-GPU byte/order checks on GPU 0; duplicates of initial focused checks are not added to this count."
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_offload/test_early_readiness.py -q -k \"prediction_bias or prediction_to_readiness or load_only_percentage\"",
+      "passed": 15
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_connector/unit/offloading_connector/test_worker.py -k \"store_reuse_gpu_fence\" -q",
+      "passed": 3,
+      "scope": "Rerun after mock typing fix; included in the 17 checks above."
+    }
+  ],
+  "negative_control": [
+    {
+      "overwrite": "forward",
+      "missing_fence_detected": true,
+      "error": "Tensor-likes are not equal!\n\nMismatched elements: 131072 / 131072 (100.0%)\nGreatest absolute difference: 73 at index (0,)\nGreatest relative difference: 4.294117450714111 at index (0,)"
+    },
+    {
+      "overwrite": "load",
+      "missing_fence_detected": true,
+      "error": "Tensor-likes are not equal!\n\nMismatched elements: 131072 / 131072 (100.0%)\nGreatest absolute difference: 73 at index (0,)\nGreatest relative difference: 4.294117450714111 at index (0,)"
+    }
+  ],
+  "preflight": "passed",
+  "precommit": "All applicable hooks including mypy passed, no applicable hooks bypassed."
+}

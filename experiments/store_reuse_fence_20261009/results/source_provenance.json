@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+  "branch": "experiment/store-reuse-gpu-fence-20261009",
+  "commit": "03b84ce183cebf8ba7e2ff65b224fa19cd7a6c0e"
+}

@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+  "branch": "experiment/cpu-recycled-block-order-20261009",
+  "commit": "77856382ca35fcc841d7fc10b25b286a33229890"
+}

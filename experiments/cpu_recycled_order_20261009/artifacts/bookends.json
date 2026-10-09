@@ -1,0 +1,35 @@
+{
+  "episodes": [
+    {
+      "arm": "gpu",
+      "repeat": 0,
+      "client_elapsed_ms": 38134.266416000006,
+      "response_span_ms": 37998.163776,
+      "before_first_compute_ms": 310.517113,
+      "gpu_span_ms": 37614.932237,
+      "after_last_compute_ms": 72.714426,
+      "client_harness_overhead_ms": 136.1026400000046
+    },
+    {
+      "arm": "gpu",
+      "repeat": 1,
+      "client_elapsed_ms": 37491.088255,
+      "response_span_ms": 37489.777046,
+      "before_first_compute_ms": 196.858696,
+      "gpu_span_ms": 37161.589881,
+      "after_last_compute_ms": 131.328469,
+      "client_harness_overhead_ms": 1.3112089999995078
+    }
+  ],
+  "means": {
+    "gpu": {
+      "client_elapsed_ms": 37812.677335500004,
+      "response_span_ms": 37743.970411,
+      "before_first_compute_ms": 253.6879045,
+      "gpu_span_ms": 37388.261059,
+      "after_last_compute_ms": 102.02144750000001,
+      "client_harness_overhead_ms": 68.70692450000206
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

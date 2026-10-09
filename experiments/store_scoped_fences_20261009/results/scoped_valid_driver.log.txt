@@ -1,0 +1,13 @@
+{"event": "comparison_started", "time": 1791525744.0867364, "expected_cells": 8}
+{"event": "server_ready", "time": 1791526099.6562772}
+{"event": "live_cell", "time": 1791526182.644475, "label": "control", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 6.916569501581571}
+{"event": "live_cell", "time": 1791526263.3239348, "label": "gpu", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 7.294503296452716}
+{"event": "live_cell", "time": 1791526441.6018908, "label": "control", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 7.855491821219026}
+{"event": "live_cell", "time": 1791526619.2765315, "label": "gpu", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 7.913305228736023}
+{"event": "live_cell", "time": 1791526797.0712783, "label": "gpu", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 7.759500713093305}
+{"event": "live_cell", "time": 1791526975.0004046, "label": "control", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 7.848988493809643}
+{"event": "live_cell", "time": 1791527153.1273048, "label": "control", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 7.837729890097411}
+{"event": "live_cell", "time": 1791527330.8375885, "label": "gpu", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 7.762930348430666}
+{"event": "live_cell", "time": 1791527509.047582, "label": "gpu", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 7.834831213792933}
+{"event": "live_cell", "time": 1791527687.1631243, "label": "control", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 7.688559638557998}
+{"event": "comparison_complete", "time": 1791527687.2379303, "cells": 8}

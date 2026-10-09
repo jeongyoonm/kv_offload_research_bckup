@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+  "branch": "experiment/store-reuse-scoped-fences-20261009",
+  "commit": "1f526ff574c35e0699ce51a58022c39afcfb1d59"
+}

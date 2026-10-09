@@ -805,3 +805,64 @@ def test_deferred_store_keeps_its_source_producer_until_submission(safe):
     assert not worker._unsubmitted_store_producers
     assert not worker._unsubmitted_store_jobs
     assert worker.build_connector_worker_meta() is None
+
+
+@pytest.mark.parametrize(
+    "fallback", ["none", "load_only", "unsafe", "reset", "missing_producer"]
+)
+@pytest.mark.parametrize("critical", [False, True])
+def test_noncritical_store_waits_for_forward_but_critical_store_does_not(
+    fallback, critical
+):
+    """Critical reuse remains fenced; only known producers move past forward."""
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    backend = worker.worker
+    assert backend is not None
+    backend.get_store_producer.return_value = object()
+    previous = _store_metadata(10)
+    previous.store_jobs.update(_store_metadata(11).store_jobs)
+    previous.experiment_options = {"store_specific_producer": True}
+    previous.store_producer_safe = True
+    worker.prepare_store_kv(previous)
+    if fallback == "missing_producer":
+        worker._unsubmitted_store_producers.pop(11)
+    current = _empty_metadata()
+    current.experiment_options = {
+        "store_specific_producer": True,
+        "store_noncritical_after_forward": True,
+        "store_reuse_gpu_fence": True,
+    }
+    current.store_producer_safe = fallback != "unsafe"
+    current.computed_request_ids = [] if fallback == "load_only" else ["next"]
+    current.force_flush_on_host = fallback == "reset"
+    current.jobs_to_flush = {10} if critical else None
+    worker.handle_preemptions(current)
+    worker.start_kv_transfers(current)
+    submitted = [
+        call.args[0] for call in backend.submit_store_after_producer.call_args_list
+    ]
+    submitted += [call.args[0] for call in backend.submit_store.call_args_list]
+    if fallback == "none":
+        expected = [10] if critical else []
+    elif fallback == "missing_producer":
+        expected = [10, 11] if critical else [11]
+    else:
+        expected = [10, 11]
+    assert sorted(submitted) == expected
+    if fallback == "none":
+        assert [job[0] for job in worker._unsubmitted_store_jobs] == (
+            [11] if critical else [10, 11]
+        )
+        if critical:
+            backend.fence_store_reuse.assert_called_once_with({10})
+    worker.prepare_store_kv(current)
+    submitted = [
+        call.args[0] for call in backend.submit_store_after_producer.call_args_list
+    ]
+    submitted += [call.args[0] for call in backend.submit_store.call_args_list]
+    assert sorted(submitted) == [10, 11]
+    assert not worker._unsubmitted_store_jobs
+    assert not worker._unsubmitted_store_producers
+    assert worker.build_connector_worker_meta() is None

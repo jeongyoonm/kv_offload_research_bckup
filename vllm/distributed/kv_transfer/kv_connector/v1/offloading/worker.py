@@ -68,6 +68,7 @@ class OffloadingConnectorWorker:
             tuple[int, GPULoadStoreSpec, LoadStoreSpec]
         ] = []
         self._unsubmitted_store_producers: dict[int, Any] = {}
+        self._defer_noncritical_stores = False
         self._connector_worker_meta = OffloadingWorkerMetadata()
 
     def _init_worker(self, kv_caches: CanonicalKVCaches) -> None:
@@ -217,6 +218,15 @@ class OffloadingConnectorWorker:
 
     def handle_preemptions(self, kv_connector_metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
+        self._defer_noncritical_stores = bool(
+            kv_connector_metadata.experiment_options.get(
+                "store_noncritical_after_forward"
+            )
+            and kv_connector_metadata.experiment_options.get("store_specific_producer")
+            and kv_connector_metadata.store_producer_safe
+            and kv_connector_metadata.computed_request_ids
+            and not kv_connector_metadata.force_flush_on_host
+        )
         if not (
             kv_connector_metadata.experiment_options.get("store_specific_producer")
             and kv_connector_metadata.store_producer_safe
@@ -241,22 +251,15 @@ class OffloadingConnectorWorker:
                         job_id, entry.req_id, kv_connector_metadata
                     )
 
-        # Submit deferred stores from previous step (and jobs_to_flush above).
-        if queue_stages.active and self._unsubmitted_store_jobs:
-            queue_stages.emit(
-                "deferred_store_submission_begin",
-                scope="handle_preemptions",
-                jobs=[job[0] for job in self._unsubmitted_store_jobs],
+        selected = None
+        if self._defer_noncritical_stores:
+            selected = set(kv_connector_metadata.jobs_to_flush or ())
+            selected.update(
+                job_id
+                for job_id, _, _ in self._unsubmitted_store_jobs
+                if job_id not in self._unsubmitted_store_producers
             )
-        for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
-            assert isinstance(src_spec, GPULoadStoreSpec)
-            success = self._submit_deferred_store(job_id, src_spec, dst_spec)
-            assert success
-        if queue_stages.active and self._unsubmitted_store_jobs:
-            queue_stages.emit(
-                "deferred_store_submission_end", scope="handle_preemptions"
-            )
-        self._unsubmitted_store_jobs.clear()
+        self._submit_pending_stores(selected, "handle_preemptions")
 
         if kv_connector_metadata.jobs_to_flush:
             gpu_fence = (
@@ -284,20 +287,8 @@ class OffloadingConnectorWorker:
         configure = getattr(self.worker, "configure_experiment", None)
         if configure is not None:
             configure(metadata.experiment_options)
-        if queue_stages.active and self._unsubmitted_store_jobs:
-            queue_stages.emit(
-                "deferred_store_submission_begin",
-                scope="start_kv_transfers",
-                jobs=[job[0] for job in self._unsubmitted_store_jobs],
-            )
-        for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
-            success = self._submit_deferred_store(job_id, src_spec, dst_spec)
-            assert success
-        if queue_stages.active and self._unsubmitted_store_jobs:
-            queue_stages.emit(
-                "deferred_store_submission_end", scope="start_kv_transfers"
-            )
-        self._unsubmitted_store_jobs.clear()
+        if not self._defer_noncritical_stores:
+            self._submit_pending_stores(None, "start_kv_transfers")
 
         if self._grouped_load_completion and metadata.load_jobs:
             self._load_completion_groups.append(
@@ -319,6 +310,8 @@ class OffloadingConnectorWorker:
         assert self.worker is not None
         if metadata.experiment_options.get("store_specific_producer"):
             self.worker.record_store_producers(metadata.computed_request_ids)
+        if self._defer_noncritical_stores:
+            self._submit_pending_stores(None, "after_forward")
         for job_id, entry in metadata.store_jobs.items():
             if not self._is_store_writer:
                 # Gate before queueing: no _unsubmitted_store_jobs entry.
@@ -332,6 +325,24 @@ class OffloadingConnectorWorker:
                 (job_id, entry.src_spec, entry.dst_spec)
             )
             self._capture_store_producer(job_id, entry.req_id, metadata)
+
+    def _submit_pending_stores(self, selected: set[int] | None, scope: str) -> None:
+        jobs: list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]] = []
+        remaining: list[tuple[int, GPULoadStoreSpec, LoadStoreSpec]] = []
+        for job in self._unsubmitted_store_jobs:
+            (jobs if selected is None or job[0] in selected else remaining).append(job)
+        if queue_stages.active and jobs:
+            queue_stages.emit(
+                "deferred_store_submission_begin",
+                scope=scope,
+                jobs=[job[0] for job in jobs],
+            )
+        for job_id, src_spec, dst_spec in jobs:
+            success = self._submit_deferred_store(job_id, src_spec, dst_spec)
+            assert success
+        if queue_stages.active and jobs:
+            queue_stages.emit("deferred_store_submission_end", scope=scope)
+        self._unsubmitted_store_jobs = remaining
 
     def _capture_store_producer(self, job_id, req_id, metadata):
         assert self.worker is not None

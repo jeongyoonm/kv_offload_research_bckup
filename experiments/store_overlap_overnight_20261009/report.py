@@ -204,6 +204,40 @@ def main():
         reference_rows[name] = current[name]["rows"]
         lines.append("")
     resident_comparisons = []
+    worker_comparisons = []
+    if all(name in current for name in ("sg2", "sg3")):
+        controls = {r["workload"]: r for r in current["sg2"]["rows"]}
+        lines.extend(
+            [
+                "## Background stores on matched CPU cohorts",
+                "",
+                "Only native D2H submission differs between these CPU runs.",
+                "Values pool identical request counts and seeds across allocations.",
+                "",
+                "| Prompt | Sync/async req/s | Rate % | Mean TTFT % | p95 % |",
+                "| --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for row in current["sg3"]["rows"]:
+            base = controls[row["workload"]]
+            assert row["measured_requests"] == base["measured_requests"]
+            gain = 100 * (row["throughput_rps"] / base["throughput_rps"] - 1)
+            mean = 100 * (1 - row["mean_ttft_ms"] / base["mean_ttft_ms"])
+            tail = 100 * (1 - row["p95_ttft_ms"] / base["p95_ttft_ms"])
+            lines.append(
+                f"| {row['workload']} | {base['throughput_rps']:.3f}/"
+                f"{row['throughput_rps']:.3f} | {gain:+.2f} | "
+                f"{mean:+.2f} | {tail:+.2f} |"
+            )
+            worker_comparisons.append(
+                dict(
+                    workload=row["workload"],
+                    throughput_change_percent=gain,
+                    mean_ttft_reduction_percent=mean,
+                    p95_ttft_reduction_percent=tail,
+                )
+            )
+        lines.append("")
     if all(name in current for name in ("sg2", "sg3", "sg4")):
         references = {r["workload"]: r for r in current["sg4"]["rows"]}
         lines.extend(
@@ -278,6 +312,7 @@ def main():
         continuous=continuous,
         resident=reference_rows,
         resident_comparisons=resident_comparisons,
+        resident_worker_comparisons=worker_comparisons,
         native_lead=(
             dict(
                 means=lead["means"],

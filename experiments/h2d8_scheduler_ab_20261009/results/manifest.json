@@ -13,5 +13,6 @@
   "raw_records.tar.gz": "b5c8a96fa7f46543c4e6c1814a3104ac529af4f41a2eb4c238ac539c2d5ee127",
   "report_preflight_v2.log": "7277b700b98f1365ef78be131c6884cbeb2f21a7223fdfd0b14d04d9fdc65dae",
   "source_provenance.json": "3c506d391b533d1cbb1a2a67b1e15db3d4e5a5d5f08e5e7537a03583da3960db",
-  "summary.json": "60e637b76ee6d50ee6b3ed34d9416852a38059cc17c9dcbb7d54336801ee18ac"
+  "summary.json": "60e637b76ee6d50ee6b3ed34d9416852a38059cc17c9dcbb7d54336801ee18ac",
+  "gap_audit.json": "604257c22ce4a5e5a63c6d56183032a1b5b6d42e53cd7bdb8d693a1fe15e91e0"
 }

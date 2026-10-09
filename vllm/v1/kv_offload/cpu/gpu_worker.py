@@ -412,6 +412,7 @@ class SingleDirectionOffloadingHandler:
         self._async_h2d_submission = async_h2d_submission
         self._async_h2d_chunk_bytes = async_h2d_chunk_bytes
         self._coalesce_load_descriptors = False
+        self._geometry_generation: int | None = None
         self._load_packet_alignment = False
         if self._async_h2d_submission:
             if self.gpu_to_cpu:
@@ -776,6 +777,26 @@ class SingleDirectionOffloadingHandler:
         # Writer rotation may skip non-writer blocks, leaving op_idx below
         # the sized upper bound
         assert op_idx <= num_copy_ops
+        if queue_stages.active and self._geometry_generation != queue_stages.generation:
+            self._geometry_generation = queue_stages.generation
+            queue_stages.emit(
+                "copy_descriptor_geometry",
+                job_id=job_id,
+                direction="store" if self.gpu_to_cpu else "load",
+                group_sizes=list(group_sizes),
+                src_block_ids_head=list(map(int, src_blocks[:16])),
+                dst_block_ids_head=list(map(int, dst_blocks[:16])),
+                refs=[
+                    dict(
+                        group=group,
+                        page_bytes=ref.page_size_bytes,
+                        src_row_bytes=self.src_tensors[ref.tensor_idx].stride(0),
+                        dst_row_bytes=self.dst_tensors[ref.tensor_idx].stride(0),
+                    )
+                    for group, refs in enumerate(self.layer_refs_per_group)
+                    for ref in refs
+                ],
+            )
         original_descriptors = op_idx
         if self.gpu_to_cpu and getattr(self, "_coalesce_store_descriptors", False):
             op_idx = _coalesce_descriptors(all_src, all_dst, all_sizes, op_idx)

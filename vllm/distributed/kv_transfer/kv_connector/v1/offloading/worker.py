@@ -215,6 +215,11 @@ class OffloadingConnectorWorker:
 
     def handle_preemptions(self, kv_connector_metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
+        if queue_stages.active and kv_connector_metadata.store_allocation_audit:
+            queue_stages.emit(
+                "store_allocation_audit",
+                allocations=kv_connector_metadata.store_allocation_audit,
+            )
 
         # Pop jobs_to_flush from store_jobs into _unsubmitted_store_jobs
         # so the existing submission loop below submits them before wait().

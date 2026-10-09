@@ -58,3 +58,35 @@ Use a fresh output path. Launch under an independent timeout and retain process
 ownership. GPU occupancy is checked before loading; normal/error paths shut down
 the owned executor. Preserve rejected cells and tracebacks rather than silently
 including them in summaries. No automatic startup selection is implemented yet.
+
+## Recorded stages and analysis
+
+The five-repeat screen fixes confirmation nominees before its independent
+eight-repeat allocation: 128/2 (control), 8/2 (joint completion nominee), and
+16/2 (readiness compromise). Analyze each completed allocation with `analyze.py`,
+and use `select.py` on the screen only. `plot.py` exports joint completion,
+forward enqueue and first-load readiness panels. Use the isolated plotting
+environment under `/mnt/localnvme/glm53_predictor_overnight_20261006/eval-venv`.
+
+The bounded Nsight diagnostic uses `run.py --trace --profiles 60k --shapes short
+--configs 128:2 8:2 16:2 --jobs 1 --repeats 1`. Start Nsight with CUDA and NVTX
+tracing, no CPU sampling, and `--capture-range=cudaProfilerApi
+--capture-range-end=stop`. Set the profiler's `TMPDIR` under the artifact root
+before launch and enable `VLLM_KV_READINESS_GPU_TRACE=1` for native copy ranges.
+Export to SQLite and run `trace_report.py` on the diagnostic directory.
+The one-load profiled cells have a different load count and profiler overhead;
+exclude them from selection. Copy API overlap with long compute launch gaps
+does not identify the specific internal lock. Recorded kernel time includes
+NCCL waiting kernels and does not measure useful compute utilization.
+
+`serving.py --chunk-mib N --depth 2 --output FRESH_PATH` runs the latest
+preparation and scheduling prototype with its frozen predictor, deadline,
+readiness exits, load-only target, and efficient waiting unchanged. Each setting
+has a separate allocation, three excluded warmups, and two matched 32-request
+episodes on each of 16K cached, 60K cached and heterogeneous workloads.
+Cached-token accounting, no GPU prefix-cache hits/preemptions, one output token,
+frozen predictor state and all-rank compact/pinned preparation are required.
+Run `report.py` on the artifact root after all serving stages, then
+`plot_serving.py` using the plotting environment. These small reset/primed
+episodes have allocation/order confounds and do not replace a continuous
+300-request evaluation or establish model accuracy.

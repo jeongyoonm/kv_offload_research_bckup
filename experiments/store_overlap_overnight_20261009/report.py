@@ -130,6 +130,29 @@ def main():
                 f"{means['inter_compute_gap_ms']:.1f} | {means['mean_ttft_ms']:.1f} |"
             )
             continuous.append(dict(root=name, means=means, gain=gain, changes=changes))
+    independent = None
+    if current["si1"]["status"] == "complete":
+        independent = read_run("si1")
+        lines.extend(
+            [
+                "",
+                "## Guarded independent load readiness",
+                "",
+                "Two matched continuous 300-request episodes per arm: 600 requests",
+                "each. Both arms retain the same tensor-major physical optimization.",
+                "",
+                "| Mode | Req/s | Gaps ms | Mean TTFT ms | p95 TTFT ms |",
+                "| --- | ---: | ---: | ---: | ---: |",
+            ]
+        )
+        for arm, means in independent["means"].items():
+            lines.append(
+                f"| {arm} | {means['throughput_rps']:.3f} | "
+                f"{means['inter_compute_gap_ms']:.1f} | "
+                f"{means['mean_ttft_ms']:.1f} | {means['p95_ttft_ms']:.1f} |"
+            )
+        gain = independent["paired_changes_percent"]["gpu"]["throughput_rps"]
+        lines.extend(["", f"Mean paired throughput change: {gain:+.2f}%."])
     lines.extend(["", "## Resident-cache references", ""])
     reference_rows = {}
     for name in ("sg1", "sg2", "sg3", "sg4"):
@@ -179,7 +202,18 @@ def main():
     )
     args.output.write_text("\n".join(lines) + "\n")
     tables.update(
-        paired=paired, native=native, continuous=continuous, resident=reference_rows
+        paired=paired,
+        native=native,
+        continuous=continuous,
+        resident=reference_rows,
+        independent=(
+            dict(
+                means=independent["means"],
+                paired_changes_percent=independent["paired_changes_percent"],
+            )
+            if independent
+            else None
+        ),
     )
     args.output.with_suffix(".json").write_text(json.dumps(tables, indent=2) + "\n")
     print(json.dumps(dict(report=str(args.output), complete_runs=len(paired))))

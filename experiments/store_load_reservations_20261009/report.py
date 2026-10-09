@@ -15,6 +15,7 @@ def main():
     report.PAIRS.update(
         store_reuse_fence_enqueue_begin="store_reuse_fence_enqueue_end",
         load_reuse_gate_begin="load_reuse_gate_end",
+        load_reuse_dependencies_begin="load_reuse_dependencies_end",
         store_descriptors_begin="store_descriptors_end",
         store_stream_dependencies_begin="store_stream_dependencies_end",
         store_copy_enqueue_begin="store_copy_enqueue_end",

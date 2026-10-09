@@ -1058,6 +1058,10 @@ class CPUOffloadingWorker(OffloadingWorker):
             return super().submit_load_with_store_fence(
                 job_id, src_spec, dst_spec, store_job_ids
             )
+        from vllm.v1.kv_offload import queue_stages
+
+        if queue_stages.active:
+            queue_stages.emit("load_reuse_dependencies_begin", job_id=job_id)
         gate = getattr(self, "_load_reuse_gate", None)
         if gate is None:
             gate = current_platform.Stream()
@@ -1067,6 +1071,8 @@ class CPUOffloadingWorker(OffloadingWorker):
             event = self._store_handler._transfer_events.get(store_job_id)
             if event is not None:
                 gate.wait_event(event)
+        if queue_stages.active:
+            queue_stages.emit("load_reuse_dependencies_end", job_id=job_id)
         # Native H2D records its ready event on the calling stream. A private
         # gate preserves copy-before-overwrite without fencing unrelated compute.
         with current_platform.stream(gate):

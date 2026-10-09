@@ -1,0 +1,752 @@
+{
+  "consistent": true,
+  "records": [
+    {
+      "root": "/mnt/localnvme/jeongyoon/sf1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+        "branch": "experiment/store-reuse-scoped-fences-20261009",
+        "commit": "1f526ff574c35e0699ce51a58022c39afcfb1d59"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/se2",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+        "branch": "experiment/store-specific-producer-events-20261009",
+        "commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sa1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+        "branch": "experiment/store-reuse-allocator-preference-20261009",
+        "commit": "a9ed417b28607447f407f0a079e455ba5b0bfe98"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sc1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+        "branch": "experiment/store-descriptor-coalescing-20261009",
+        "commit": "8d999c11282a5b08322a245063813f8663295e05"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sr1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+        "branch": "experiment/store-reuse-load-reservations-20261009",
+        "commit": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sp1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+        "branch": "experiment/store-critical-submission-20261009",
+        "commit": "9b5308951978a265e5a3bc96c6a6b77e2c859148"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/so1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
+        "branch": "experiment/kv-allocation-order-coalescing-20261009",
+        "commit": "052ae875b5a1812036a9e85359924c6020dd4d3c"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sn0",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 4,
+      "measured_requests": 300,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+        "branch": "experiment/store-native-async-submission-20261009",
+        "commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/snf",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": true,
+      "native_d2h_verified_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "measured_cells": 4,
+      "measured_requests": 300,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+        "branch": "experiment/store-native-async-submission-20261009",
+        "commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sn8",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": true,
+      "native_d2h_verified_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "measured_cells": 4,
+      "measured_requests": 300,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+        "branch": "experiment/store-native-async-submission-20261009",
+        "commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/st0",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 2,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+        "branch": "experiment/cpu-private-tensor-layout-20261009",
+        "commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/st1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private_tensor",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 2,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+        "branch": "experiment/cpu-private-tensor-layout-20261009",
+        "commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/stm",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private_tensor",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 2,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+        "branch": "experiment/cpu-private-tensor-layout-20261009",
+        "commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/stc",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private_tensor",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 2,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+        "branch": "experiment/cpu-recycled-block-order-20261009",
+        "commit": "77856382ca35fcc841d7fc10b25b286a33229890"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/si1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private_tensor",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 4,
+      "measured_requests": 1200,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+        "branch": "experiment/load-independent-ready-stream-20261009",
+        "commit": "f2d7584a7c2e9cf764ca6588df18675b10daea3c"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sv1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 8,
+      "measured_requests": 600,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_store_client_controls_20261009",
+        "branch": "experiment/store-preencoded-client-controls-20261009",
+        "commit": "52020ebf65623ecf20502c75fddfe8a890a60fdc"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/snl",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": true,
+      "native_d2h_verified_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "measured_cells": 4,
+      "measured_requests": 1200,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "recorded launch plan"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+        "branch": "experiment/native-d2h-deadline-lead-calibration-20261009",
+        "commit": "05c3ac25c8777a06dd173524e1e5fcb2e98b0733"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg1",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": null,
+      "cpu_layout": null,
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 18,
+      "measured_requests": 920,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": null,
+      "predictor_state_sha": null,
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+        "branch": "experiment/gpu-prefix-ceiling-controls-20261009",
+        "commit": "2cc38df60ff754216ed2153c96648436b14a5127"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg2",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 14,
+      "measured_requests": 620,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "immutable driver startup assertion and reviewed frozen file; digest was not recorded in the original resident launch plan",
+        "driver_commit": "16549324b4a7f6e6cd89365c55724aa4f524f96a"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+        "branch": "experiment/gpu-prefix-ceiling-controls-20261009",
+        "commit": "16549324b4a7f6e6cd89365c55724aa4f524f96a"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg3",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": 2130300354560,
+      "cpu_layout": "private",
+      "native_d2h": true,
+      "native_d2h_verified_ranks": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "measured_cells": 14,
+      "measured_requests": 620,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": {
+        "sha256": "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572",
+        "evidence": "immutable driver startup assertion and reviewed frozen file; digest was not recorded in the original resident launch plan",
+        "driver_commit": "81833459891a76b5a3079f4a5120acd8ca48a7df"
+      },
+      "predictor_state_sha": "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde",
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
+        "branch": "experiment/gpu-prefix-ceiling-native-controls-20261009",
+        "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df"
+      }
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg4",
+      "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+      "launch": {
+        "--tensor-parallel-size": "8",
+        "--kv-cache-dtype": "fp8_e4m3",
+        "--kv-cache-memory-bytes": "103079215104",
+        "--max-model-len": "65536",
+        "--max-num-batched-tokens": "61440",
+        "--max-num-seqs": "64",
+        "--block-size": "64"
+      },
+      "cpu_bytes": null,
+      "cpu_layout": null,
+      "native_d2h": false,
+      "native_d2h_verified_ranks": [],
+      "measured_cells": 14,
+      "measured_requests": 620,
+      "accepted": true,
+      "stopped": true,
+      "reported_gpu_tokens": [
+        "2,160,960"
+      ],
+      "checkpoint_provenance": null,
+      "predictor_state_sha": null,
+      "source": {
+        "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+        "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
+        "commit": "c17a114232e06e47f279ee049ae06de626f3c899"
+      }
+    }
+  ],
+  "definitions": "Acceptance is cache, request, launch and telemetry validation, not whole-model accuracy. Predictor file hashes identify the frozen source checkpoint; state hashes identify its parsed runtime state after the reviewed H2D-context update."
+}

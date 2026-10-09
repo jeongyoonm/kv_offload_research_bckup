@@ -1,0 +1,12 @@
+{
+  "launch_and_cache_audit": "final_acceptance_audit.json",
+  "isolation_exceptions": [
+    {
+      "root": "sc1",
+      "repeat": 2,
+      "reason": "GPU tests overlapped one serving pair. Retained in complete raw results; use the other three pairs for clean sorting-only evidence.",
+      "clean_three_pair_throughput_gain_percent": 0.3502312695874199
+    }
+  ],
+  "scope": "Acceptance checks do not establish whole-model accuracy or statistical significance. The original sparse selector remains unchanged. Serving and GPU tests were serialized after this documented exception."
+}

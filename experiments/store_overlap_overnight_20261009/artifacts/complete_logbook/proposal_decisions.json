@@ -1,0 +1,104 @@
+{
+  "selected": {
+    "allocator_preference": {
+      "roots": [
+        "sa1",
+        "sv1"
+      ],
+      "reason": "Eliminates observed pending-source reuse; retain safe waiting under pressure. Throughput effects are small and change sign in the controlled retest."
+    },
+    "native_full_store_submission": {
+      "roots": [
+        "sn0",
+        "snf",
+        "sn8"
+      ],
+      "reason": "Removes main-worker CUDA submission, reduces exposed pre-forward work and gaps, and improves the four-repeat mean serving rate. Full versus chunked throughput is not distinguished statistically.",
+      "additional_evidence": [
+        "sg2",
+        "sg3"
+      ],
+      "matched_resident_gains_percent": {
+        "familiar60k": 0.6166734530940188,
+        "short16k": 3.5584322802261203
+      }
+    }
+  },
+  "not_selected": {
+    "private_tensor_layout": {
+      "roots": [
+        "st0",
+        "st1"
+      ],
+      "reason": "Layout alone is neutral."
+    },
+    "private_tensor_physical_merging": {
+      "roots": [
+        "stm"
+      ],
+      "reason": "Descriptors merge successfully, but one repeat loses 12.9% throughput with large load-only gaps."
+    },
+    "recycled_cpu_order": {
+      "roots": [
+        "stc"
+      ],
+      "reason": "Both repeats remain slower than block-major."
+    },
+    "independent_load_readiness": {
+      "roots": [
+        "si1"
+      ],
+      "reason": "All loads use the intended guarded path, but both matched repeats regress; mean -4.85%."
+    },
+    "specific_producer_events": {
+      "roots": [
+        "se2"
+      ],
+      "reason": "Did not establish reliable serving benefit; first repeat has a large regression."
+    },
+    "gpu_block_ascending": {
+      "roots": [
+        "so1"
+      ],
+      "reason": "No live merging under block-major CPU storage and highly variable performance."
+    },
+    "preserved_descriptor_order": {
+      "roots": [
+        "store_overlap_overnight_20261009/cpu_layout_loads.json"
+      ],
+      "reason": "Actual-layout probe loses the sorted-order bandwidth benefit without reducing descriptors. Full serving run deliberately omitted."
+    },
+    "setup_lead_25_ms": {
+      "roots": [
+        "snl"
+      ],
+      "reason": "Recovery 95.28% to 98.65% and rounds 41.5 to 40.5, but mean paired throughput -0.49% and gaps 255.4 to 292.7 ms. Keep 100 ms in selected configuration."
+    }
+  },
+  "secondary_evidence": {
+    "scoped_fences": [
+      "sf1"
+    ],
+    "future_reservations": [
+      "sr1"
+    ],
+    "critical_store_order": [
+      "sp1"
+    ],
+    "descriptor_sorting": [
+      "sc1"
+    ],
+    "driver_caps": [
+      "store_overlap_overnight_20261009/contention_cap0.json",
+      "store_overlap_overnight_20261009/contention_cap256.json",
+      "store_overlap_overnight_20261009/contention_cap512.json"
+    ]
+  },
+  "pending": [],
+  "definitions": "Selection uses demonstrated mechanism, safety checks and matched serving results. Do not rank proposals by absolute rates from different cohorts or arrival harnesses; do not interpret small repeat counts as statistical confidence.",
+  "completed_references": [
+    "sg2",
+    "sg3",
+    "sg4"
+  ]
+}

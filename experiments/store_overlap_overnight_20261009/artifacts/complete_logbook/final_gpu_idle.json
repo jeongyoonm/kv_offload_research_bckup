@@ -1,0 +1,10 @@
+{
+  "time_utc": "2026-10-09T15:29:24.586122+00:00",
+  "command": [
+    "nvidia-smi",
+    "--query-compute-apps=pid",
+    "--format=csv,noheader,nounits"
+  ],
+  "compute_apps": "",
+  "idle": true
+}

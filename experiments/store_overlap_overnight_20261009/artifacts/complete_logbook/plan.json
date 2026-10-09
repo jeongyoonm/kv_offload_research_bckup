@@ -1,0 +1,697 @@
+{
+  "start_utc": "2026-10-09 05:47:40",
+  "deadline_utc": "2026-10-09 15:47:40",
+  "model": "GLM 5.3 NVFP4",
+  "parallelism": "TP8",
+  "data_root": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009",
+  "baseline": "6aeab52",
+  "proposals": [
+    {
+      "branch": "experiment/store-reuse-scoped-fences-20261009",
+      "commit": "1f526ff",
+      "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sf1",
+      "hypothesis": "Fences for future H2D destinations need not block unrelated compute",
+      "implementation_head": "26c4cb717cbee6337523cf3c5f5d0e7a4feac02a",
+      "current_head": "26c4cb717cbee6337523cf3c5f5d0e7a4feac02a",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sf1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+          "timed_source_commit": "1f526ff574c35e0699ce51a58022c39afcfb1d59",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true,
+      "status": "serving allocations recorded"
+    },
+    {
+      "branch": "experiment/store-reuse-load-reservations-20261009",
+      "commit": "b48977e",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sr1",
+      "hypothesis": "Include future suffix reservations in per-request load gates",
+      "implementation_head": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2",
+      "current_head": "bbf91deb64a66504868e2242625335ed6c202f9c",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sr1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+          "timed_source_commit": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/store-reuse-allocator-preference-20261009",
+      "commit": "a9ed417",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sa1",
+      "hypothesis": "Prefer free blocks not read by pending stores",
+      "implementation_head": "a9ed417b28607447f407f0a079e455ba5b0bfe98",
+      "current_head": "82ae385c7b30f51b3192202c378fa99612584f3d",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sa1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+          "timed_source_commit": "a9ed417b28607447f407f0a079e455ba5b0bfe98",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/store-critical-submission-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sp1",
+      "hypothesis": "Prioritize reuse-critical unsubmitted stores when CPU destinations are disjoint",
+      "commit": "9b53089",
+      "implementation_head": "9b5308951978a265e5a3bc96c6a6b77e2c859148",
+      "current_head": "53a075f614856016af4fada3d00565b12bed4a2e",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sp1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+          "timed_source_commit": "9b5308951978a265e5a3bc96c6a6b77e2c859148",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/store-descriptor-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sc1",
+      "hypothesis": "Merge physically contiguous D2H address pairs to reduce descriptor submission work",
+      "implementation_head": "8d999c11282a5b08322a245063813f8663295e05",
+      "current_head": "f5dba92155eb94f2ee7a61de147487aa117d203f",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sc1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+          "timed_source_commit": "8d999c11282a5b08322a245063813f8663295e05",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/store-driver-chunk-sweep-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_chunks_20261009",
+      "artifacts": "short roots selected per cap",
+      "hypothesis": "Existing CUDA descriptor caps may reduce bulk driver submission stalls",
+      "commit": "d514e5c",
+      "implementation_head": "d514e5c5f6a58d287ca91eda5cdf529b74a79842",
+      "current_head": "d514e5c5f6a58d287ca91eda5cdf529b74a79842",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/store-specific-producer-events-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/se2",
+      "hypothesis": "Wait on the recorded source producer, avoiding newer unrelated compute on the current stream",
+      "implementation_head": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+      "failed_startup_artifacts": "/mnt/localnvme/jeongyoon/se1",
+      "current_head": "ac00caf7c714748582e3269fa70a6353b0dfeee5",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/se1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+          "timed_source_commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+          "status": "incomplete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/se2",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+          "timed_source_commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true,
+      "status": "serving allocations recorded"
+    },
+    {
+      "branch": "experiment/store-noncritical-after-forward-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_after_forward_20261009",
+      "commit": "48f716c",
+      "artifacts": "/mnt/localnvme/jeongyoon/sw1",
+      "hypothesis": "Submit known-producer noncritical stores after forward to hide driver work",
+      "current_head": "48f716c8560192334f75ddf38ccaf0dec1d57c2c",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/gpu-prefix-ceiling-controls-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+      "hypothesis": "Validate cache-resident GPU-only ceiling with capacity-fitting matched controls",
+      "status": "serving allocations recorded",
+      "current_head": "c825cd5447c0ad87dc1dbe9fc0c348eaae8e30c8",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sg1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+          "timed_source_commit": "2cc38df60ff754216ed2153c96648436b14a5127",
+          "status": "complete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/sg2",
+          "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+          "timed_source_commit": "16549324b4a7f6e6cd89365c55724aa4f524f96a",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/load-store-descriptor-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_load_store_coalescing_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sl1",
+      "hypothesis": "Bound H2D descriptor merging by the unchanged native chunk size",
+      "current_head": "09b1091a362036570275a1b71229602cbe209770",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/store-preencoded-client-controls-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_client_controls_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/sv1",
+      "hypothesis": "Reduce client encoding and initial arrival variation in a matched allocator retest",
+      "current_head": "6536d16726710ae9ef8060f860814b5c6849f565",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sv1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_client_controls_20261009",
+          "timed_source_commit": "52020ebf65623ecf20502c75fddfe8a890a60fdc",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/store-submission-contention-probe-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_contention_probe_20261009",
+      "artifacts": "per-mode/probe roots in the requested storage",
+      "hypothesis": "Measure same-context H2D/D2H driver submission on disjoint buffers",
+      "current_head": "9fec5d9d6fd3f253eb2722d8fd57832f69f789c5",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/store-native-async-submission-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+      "artifacts": "per-mode/probe roots in the requested storage",
+      "hypothesis": "Move store driver calls to a separate native I/O worker; distinguish full-store and 8 MiB copies",
+      "current_head": "130630e191661d2e1096cdf4ccb6b87e351509f2",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sn0",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+          "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+          "status": "complete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/sn8",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+          "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+          "status": "complete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/snf",
+          "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+          "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/kv-allocation-order-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
+      "artifacts": "/mnt/localnvme/jeongyoon/so1",
+      "hypothesis": "Assign selected GPU blocks in physical order to enable address-pair merging",
+      "current_head": "2e3eb2ff0e2c2d33f2b536a62748aa413914c809",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/so1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
+          "timed_source_commit": "052ae875b5a1812036a9e85359924c6020dd4d3c",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "branch": "experiment/kv-packet-aligned-coalescing-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_kv_packet_coalescing_20261009",
+      "commit": "388902d",
+      "hypothesis": "Align coalesced descriptors to cumulative native packet boundaries to avoid underfilled copies",
+      "artifacts": "/mnt/localnvme/jeongyoon/sk1",
+      "status": "CPU mapping checks and six real GPU cases passed; serving comparison pending",
+      "current_head": "ddc170238fd450a48f840525975b0d9ab1a14bbf",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/store-merged-serving-validation-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_merged_validation_20261009",
+      "commit": "1b46fec",
+      "hypothesis": "Verify accumulated physical-layout improvements with continuous 300-request episodes and no intermediate prime/reset",
+      "artifacts": "/mnt/localnvme/jeongyoon/sm1",
+      "status": "configuration preflight passed; conditional on individual serving gains",
+      "current_head": "1b46fecdcb11d1dadf66b7ab6e5b6775f647f8d4",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "branch": "experiment/cpu-private-tensor-layout-20261009",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+      "hypothesis": "Private block-major CPU row stride prevents all physical merges; transpose physical layer storage within existing rank mappings",
+      "artifacts": [
+        "/mnt/localnvme/jeongyoon/st0",
+        "/mnt/localnvme/jeongyoon/st1",
+        "/mnt/localnvme/jeongyoon/stm"
+      ],
+      "verification": "48 CPU mapping/regression checks passed; GLM 99-page real-GPU roundtrip gate precedes serving",
+      "workload": "two continuous 300-request episodes per mode, working set 75 prefixes, four unique suffixes per prefix",
+      "current_head": "cbfdb998395264934e5f019c27e9c6daada6e212",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/st0",
+          "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+          "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+          "status": "complete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/st1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+          "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+          "status": "complete",
+          "stopped": true
+        },
+        {
+          "root": "/mnt/localnvme/jeongyoon/stm",
+          "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+          "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+      "artifacts": "si1",
+      "hypothesis": "Avoid unrelated compute dependencies only when authoritative load destinations are independent",
+      "branch": "experiment/load-independent-ready-stream-20261009",
+      "commit": "b2b14676bc5f16f91b226178e9d10c47951ba0e5",
+      "current_head": "e34702f4dee78188d75bbb4a5de308e30f29c469",
+      "safety_audit": "f2d7584 adds bounded earlier-dispatch zero/COW completion tracking; 32 CPU subset checks passed before serving launch.",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/si1",
+          "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+          "timed_source_commit": "f2d7584a7c2e9cf764ca6588df18675b10daea3c",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_tensor_ceiling_20261009",
+      "artifacts": "sg3",
+      "hypothesis": "Match CPU resident controls with verified physical layout optimization",
+      "branch": "experiment/gpu-prefix-ceiling-tensor-controls-20261009",
+      "commit": "c545d9a760d5263c74de554c4a243063aaac72b0",
+      "current_head": "c545d9a760d5263c74de554c4a243063aaac72b0",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_descriptor_order_20261009",
+      "artifacts": "cpu_layout_loads.json, sdo1 conditional",
+      "hypothesis": "Avoid sorting descriptors when no physical merges exist",
+      "branch": "experiment/descriptor-order-preservation-20261009",
+      "commit": "2a65915af75121d96d91e06fd263c52390895411",
+      "current_head": "30721e442351ac75872e53e657e32d9d89398ad0",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+      "artifacts": "stc",
+      "hypothesis": "Keep selected recycled CPU rows aligned with ascending GPU assignment",
+      "branch": "experiment/cpu-recycled-block-order-20261009",
+      "commit": "c5b54afeae36a02bdafa0b9f5a0913fec854e190",
+      "current_head": "1ec7336127148f108f876819906d9d5d1fd0cee8",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/stc",
+          "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+          "timed_source_commit": "77856382ca35fcc841d7fc10b25b286a33229890",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "status": "serving allocations recorded",
+      "tracked_worktree_clean": true
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_independent_ceiling_20261009",
+      "artifacts": "sg3 conditional",
+      "hypothesis": "Match resident CPU controls with the verified guarded independent load path",
+      "branch": "experiment/gpu-prefix-ceiling-independent-controls-20261009",
+      "commit": "5783f0d6c377ad54d8234c409af4cdd4952267e0",
+      "current_head": "544cd19ea97528fd38862f43ce51c13f06bfdecb",
+      "allocations": [],
+      "tracked_worktree_clean": true,
+      "serving_status": "not run independently; see verification and proposal decisions"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+      "artifacts": "sg4",
+      "hypothesis": "Explicitly match and audit process-local THP policy for GPU-only resident controls",
+      "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
+      "commit": "c17a114232e06e47f279ee049ae06de626f3c899",
+      "current_head": "495ce6b9bdf17418b295114e6cc6c406640e667b",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sg4",
+          "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+          "timed_source_commit": "c17a114232e06e47f279ee049ae06de626f3c899",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true,
+      "status": "serving allocations recorded"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
+      "artifacts": "sg3 conditional",
+      "hypothesis": "Use the verified native D2H candidate in matched CPU resident controls if it remains the best serving design",
+      "branch": "experiment/gpu-prefix-ceiling-native-controls-20261009",
+      "commit": "81833459891a76b5a3079f4a5120acd8ca48a7df",
+      "current_head": "7b9e4b07479e79bb13180ea5998b2e6d8f62eee7",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/sg3",
+          "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
+          "timed_source_commit": "81833459891a76b5a3079f4a5120acd8ca48a7df",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true,
+      "status": "serving allocations recorded"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+      "artifacts": "snl conditional",
+      "hypothesis": "Recalibrate the conservative setup lead after measured native D2H setup delay reduction",
+      "branch": "experiment/native-d2h-deadline-lead-calibration-20261009",
+      "commit": "acc2fd2fd0a0996b2ee705aae29bb241ab869d72",
+      "current_head": "b10294927a4652a50db07b3aa2db33d68ef065fc",
+      "allocations": [
+        {
+          "root": "/mnt/localnvme/jeongyoon/snl",
+          "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+          "timed_source_commit": "05c3ac25c8777a06dd173524e1e5fcb2e98b0733",
+          "status": "complete",
+          "stopped": true
+        }
+      ],
+      "tracked_worktree_clean": true,
+      "status": "serving allocations recorded"
+    }
+  ],
+  "constraints": [
+    "Keep model, weights, original sparse selector and FP8 KV unchanged",
+    "96 GiB GPU KV pool per GPU, 2130300354560-byte aggregate private CPU pool",
+    "H2D 8 MiB chunks, depth 2; frozen estimator and 90 ms subtraction/100 ms setup lead",
+    "Feature flags default disabled; reset and retirement remain actual completion waits",
+    "GPU-only ceiling conditional on successful fix and sufficient remaining time; validate actual cache hits and resident capacity"
+  ],
+  "initial_verification": {
+    "scoped_tests": 22,
+    "allocator_targeted": 4,
+    "allocator_regression": 205,
+    "reservation_tests": 18,
+    "priority_backend": 2,
+    "priority_connector": 5,
+    "reservation_regression": 220,
+    "producer_regression": 211,
+    "producer_real_gpu": 7,
+    "producer_negative_controls": 2,
+    "coalescing_real_gpu": 9,
+    "after_forward_cpu": 16,
+    "native_async_wait_cpu": 4,
+    "native_async_cpu_regression": 219,
+    "preencoded_merged_cpu": 10,
+    "ascending_allocation_cpu": 21,
+    "native_d2h_real_gpu": 3,
+    "bounded_load_real_gpu": 10,
+    "packet_alignment_real_gpu": 6
+  },
+  "startup_issue": "First scoped launch rejected before measurement: long TMPDIR exceeded AF_UNIX socket limit; relaunched at short root sf1; same root stays under user storage path",
+  "short_roots": {
+    "scoped": "/mnt/localnvme/jeongyoon/sf1",
+    "reservations": "/mnt/localnvme/jeongyoon/sr1",
+    "allocator": "/mnt/localnvme/jeongyoon/sa1",
+    "priority": "/mnt/localnvme/jeongyoon/sp1"
+  },
+  "scoped_result": {
+    "complete": true,
+    "paired_tps_percent": 0.12814469169839526,
+    "mean_tps_control": 7.80769246092102,
+    "mean_tps_scoped": 7.817641876013232,
+    "mean_gap_ms_control": 145.71620025,
+    "mean_gap_ms_scoped": 217.246425,
+    "conclusion": "Narrow fences change the placement of waiting but do not establish throughput improvement; retain negative GPU-gap result and test suffix reservations/source dependencies."
+  },
+  "queued_runs": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/reviewed_queue_1.json",
+  "producer_partial_observation": "r1_gpu: first 473.4 ms load-only seal stall preceded first changed store dependency by14.0 ms. Keep this negative throughput repeat; it cannot establish a causal producer regression.",
+  "allocator_result": {
+    "complete": true,
+    "paired_tps_percent": 0.4011610017039091,
+    "mean_tps_control": 7.795244098182477,
+    "mean_tps_preference": 7.8265848159439955,
+    "all_rank_fence_calls_control": 224,
+    "all_rank_fence_calls_candidate": 0,
+    "allocated_pending_source_blocks_control": 7536,
+    "allocated_pending_source_blocks_candidate": 0,
+    "conclusion": "Avoidable allocation-order dependencies removed in all measured ranks; modest descriptive serving gain; retest under shared preencoded client control."
+  },
+  "coalescing_result": {
+    "complete": true,
+    "all_pairs_tps_percent": 0.9583619994089076,
+    "clean_three_pairs_tps_percent": 0.3502312695874199,
+    "potentially_contaminated_pair": 2,
+    "descriptor_ratio": 1,
+    "conclusion": "No physical descriptor merges; preserve quality audit; test ascending assignment."
+  },
+  "producer_result": {
+    "complete": true,
+    "paired_tps_percent": -3.34406,
+    "conclusion": "Source-specific producer waits work but did not improve serving; retain negative repeat and retest arrival control if time remains."
+  },
+  "next_gpu_gate": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/idle_gate/summary.json",
+  "queued_runs_2": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/reviewed_queue_2.json",
+  "verification_gate": "/mnt/localnvme/jeongyoon/store_overlap_overnight_20261009/idle_gate/summary.json",
+  "last_progress_snapshot_utc": "2026-10-09T15:28:41.857224+00:00",
+  "all_serving_allocations": [
+    {
+      "root": "/mnt/localnvme/jeongyoon/sa1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_allocator_20261009",
+      "timed_source_commit": "a9ed417b28607447f407f0a079e455ba5b0bfe98",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sc1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_coalescing_20261009",
+      "timed_source_commit": "8d999c11282a5b08322a245063813f8663295e05",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/se1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+      "timed_source_commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+      "status": "incomplete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/se2",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_producers_20261009",
+      "timed_source_commit": "b42f5fdbedade97d422ef0c1bac5caa64833d32b",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sf1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+      "timed_source_commit": "1f526ff574c35e0699ce51a58022c39afcfb1d59",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+      "timed_source_commit": "2cc38df60ff754216ed2153c96648436b14a5127",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg2",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_ceiling_20261009",
+      "timed_source_commit": "16549324b4a7f6e6cd89365c55724aa4f524f96a",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg3",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_native_ceiling_20261009",
+      "timed_source_commit": "81833459891a76b5a3079f4a5120acd8ca48a7df",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sg4",
+      "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+      "timed_source_commit": "c17a114232e06e47f279ee049ae06de626f3c899",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/si1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_load_independent_ready_20261009",
+      "timed_source_commit": "f2d7584a7c2e9cf764ca6588df18675b10daea3c",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sn0",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+      "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sn8",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+      "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/snf",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+      "timed_source_commit": "4f32a00d4381af7ba9e04eb114e4267fa115dca8",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/snl",
+      "source": "/mnt/localnvme/jeongyoon/vllm_native_lead_calibration_20261009",
+      "timed_source_commit": "05c3ac25c8777a06dd173524e1e5fcb2e98b0733",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/so1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_kv_order_coalescing_20261009",
+      "timed_source_commit": "052ae875b5a1812036a9e85359924c6020dd4d3c",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sp1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_priority_20261009",
+      "timed_source_commit": "9b5308951978a265e5a3bc96c6a6b77e2c859148",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sr1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+      "timed_source_commit": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/st0",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+      "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/st1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+      "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/stc",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_block_order_20261009",
+      "timed_source_commit": "77856382ca35fcc841d7fc10b25b286a33229890",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/stm",
+      "source": "/mnt/localnvme/jeongyoon/vllm_cpu_tensor_layout_20261009",
+      "timed_source_commit": "06be8deef111c4c026faaf83c8e4f57b5d37246a",
+      "status": "complete",
+      "stopped": true
+    },
+    {
+      "root": "/mnt/localnvme/jeongyoon/sv1",
+      "source": "/mnt/localnvme/jeongyoon/vllm_store_client_controls_20261009",
+      "timed_source_commit": "52020ebf65623ecf20502c75fddfe8a890a60fdc",
+      "status": "complete",
+      "stopped": true
+    }
+  ],
+  "selected_design": {
+    "worker": "native full D2H plus allocator avoidance",
+    "scheduler_setup_lead_ms": 100,
+    "deadline_lead_decision": "25 ms improves admissions but regresses mean paired throughput; not selected"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "branch": "experiment/store-overlap-overnight-report-20261009",
+  "workspace": "/mnt/localnvme/jeongyoon/vllm_store_report_20261009",
+  "verified_manifest": "/mnt/localnvme/jeongyoon/vllm_store_report_20261009/experiments/store_overlap_overnight_20261009/artifacts/complete_logbook/manifest.json",
+  "selected_worker_branch": "experiment/store-native-async-submission-20261009",
+  "selected_worker_workspace": "/mnt/localnvme/jeongyoon/vllm_store_native_async_20261009",
+  "features": "Native D2H submission plus allocator avoidance; unchanged 100 ms setup lead; all runtime additions opt-in."
+}

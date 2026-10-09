@@ -1,0 +1,1428 @@
+{
+  "sf1": {
+    "label": "Scoped reuse fences",
+    "root": "/mnt/localnvme/jeongyoon/sf1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1944.6166824218817,
+    "means": {
+      "control": {
+        "throughput_rps": 7.80769246092102,
+        "mean_ttft_ms": 3521.3098602966666,
+        "p95_ttft_ms": 4574.821247225,
+        "compute_rounds": 12.25,
+        "compute_envelope_ms": 9114.2833045,
+        "inter_compute_gap_ms": 145.71620024999999,
+        "hold_without_compute_ms": 8.8982165,
+        "pre_forward": 61.5923195,
+        "forward_to_gpu_start": 77.20824075,
+        "deferred_store_submission_begin_exposed_ms": 43.826177,
+        "store_copy_enqueue_begin_full_ms": 222.2148965,
+        "store_copy_enqueue_begin_exposed_ms": 38.845887499999996,
+        "recovered_opportunity_percent": 92.12328767123287
+      },
+      "gpu": {
+        "throughput_rps": 7.817641876013232,
+        "mean_ttft_ms": 3521.20117832,
+        "p95_ttft_ms": 4765.9185904999995,
+        "compute_rounds": 12.5,
+        "compute_envelope_ms": 9094.0912715,
+        "inter_compute_gap_ms": 217.24642500000002,
+        "hold_without_compute_ms": 32.727805000000004,
+        "pre_forward": 67.9260755,
+        "forward_to_gpu_start": 21.243894,
+        "deferred_store_submission_begin_exposed_ms": 36.985822999999996,
+        "store_copy_enqueue_begin_full_ms": 208.81066975,
+        "store_copy_enqueue_begin_exposed_ms": 33.1287465,
+        "recovered_opportunity_percent": 92.6829268292683
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": 0.12814469169839526,
+        "mean_ttft_ms": 0.000131051732132903,
+        "p95_ttft_ms": 4.170138106776444,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.7359616537418345
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -1.1401186380501804
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": -0.9543521238369101
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 1.9024574447128684
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "se2": {
+    "label": "Specific producer events",
+    "root": "/mnt/localnvme/jeongyoon/se2",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1851.4545418159105,
+    "means": {
+      "control": {
+        "throughput_rps": 7.817280613609116,
+        "mean_ttft_ms": 3520.0810884,
+        "p95_ttft_ms": 4786.00014065,
+        "compute_rounds": 12,
+        "compute_envelope_ms": 9104.8672965,
+        "inter_compute_gap_ms": 144.7710145,
+        "hold_without_compute_ms": 6.9117595000000005,
+        "pre_forward": 88.47684799999999,
+        "forward_to_gpu_start": 47.7945895,
+        "deferred_store_submission_begin_exposed_ms": 56.851371,
+        "store_copy_enqueue_begin_full_ms": 264.78076575,
+        "store_copy_enqueue_begin_exposed_ms": 52.39944750000001,
+        "recovered_opportunity_percent": 93.47079037800687
+      },
+      "gpu": {
+        "throughput_rps": 7.568482974003576,
+        "mean_ttft_ms": 3614.48503888,
+        "p95_ttft_ms": 4763.4434695,
+        "compute_rounds": 12,
+        "compute_envelope_ms": 9086.346789,
+        "inter_compute_gap_ms": 528.3051345,
+        "hold_without_compute_ms": 399.705463,
+        "pre_forward": 101.3788,
+        "forward_to_gpu_start": 12.49143675,
+        "deferred_store_submission_begin_exposed_ms": 93.8925985,
+        "store_copy_enqueue_begin_full_ms": 291.13034775,
+        "store_copy_enqueue_begin_exposed_ms": 88.04782825,
+        "recovered_opportunity_percent": 91.11111111111111
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": -3.3440608459254673,
+        "mean_ttft_ms": 2.528173720239346,
+        "p95_ttft_ms": -0.4473651913780574,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.013866868503886742
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -12.320843222370126
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.06413476678777119
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": -0.5329696195727873
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sa1": {
+    "label": "Allocator avoidance",
+    "root": "/mnt/localnvme/jeongyoon/sa1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1857.3287889077328,
+    "means": {
+      "control": {
+        "throughput_rps": 7.795244098182477,
+        "mean_ttft_ms": 3519.089564566667,
+        "p95_ttft_ms": 4659.304653325,
+        "compute_rounds": 12.5,
+        "compute_envelope_ms": 9110.90504275,
+        "inter_compute_gap_ms": 222.1462675,
+        "hold_without_compute_ms": 0.00998625,
+        "pre_forward": 98.16987625,
+        "forward_to_gpu_start": 58.248315500000004,
+        "deferred_store_submission_begin_exposed_ms": 73.62300675,
+        "store_copy_enqueue_begin_full_ms": 266.0337515,
+        "store_copy_enqueue_begin_exposed_ms": 66.91468175,
+        "recovered_opportunity_percent": 91.72413793103448
+      },
+      "gpu": {
+        "throughput_rps": 7.8265848159439955,
+        "mean_ttft_ms": 3517.0814111033333,
+        "p95_ttft_ms": 4642.7617099,
+        "compute_rounds": 12,
+        "compute_envelope_ms": 9092.19573675,
+        "inter_compute_gap_ms": 161.523208,
+        "hold_without_compute_ms": 0.53496625,
+        "pre_forward": 82.777704,
+        "forward_to_gpu_start": 5.80737825,
+        "deferred_store_submission_begin_exposed_ms": 50.20532075,
+        "store_copy_enqueue_begin_full_ms": 258.18743275,
+        "store_copy_enqueue_begin_exposed_ms": 46.438477750000004,
+        "recovered_opportunity_percent": 92.6829268292683
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": 0.4011610017039091,
+        "mean_ttft_ms": -0.058569772594851965,
+        "p95_ttft_ms": -0.4049133281087025,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.3045080116200749
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.8426886871275352
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.48481628811005706
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": -0.025410836624295552
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sc1": {
+    "label": "Store descriptor sorting",
+    "root": "/mnt/localnvme/jeongyoon/sc1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1954.7150844680145,
+    "means": {
+      "control": {
+        "throughput_rps": 7.752414444478132,
+        "mean_ttft_ms": 3569.5955683533334,
+        "p95_ttft_ms": 4903.1305811249995,
+        "compute_rounds": 12.75,
+        "compute_envelope_ms": 9103.9805125,
+        "inter_compute_gap_ms": 197.8246175,
+        "hold_without_compute_ms": 93.65580625000001,
+        "pre_forward": 104.10504424999999,
+        "forward_to_gpu_start": 67.95887275,
+        "deferred_store_submission_begin_exposed_ms": 74.47436875,
+        "store_copy_enqueue_begin_full_ms": 260.68952225,
+        "store_copy_enqueue_begin_exposed_ms": 66.96294275,
+        "recovered_opportunity_percent": 91.98606271777004
+      },
+      "gpu": {
+        "throughput_rps": 7.826592194191303,
+        "mean_ttft_ms": 3503.452458036667,
+        "p95_ttft_ms": 4783.518147774999,
+        "compute_rounds": 11.75,
+        "compute_envelope_ms": 9077.862121,
+        "inter_compute_gap_ms": 117.014299,
+        "hold_without_compute_ms": 45.75781775,
+        "pre_forward": 49.8429475,
+        "forward_to_gpu_start": 64.2883125,
+        "deferred_store_submission_begin_exposed_ms": 20.75586225,
+        "store_copy_enqueue_begin_full_ms": 215.86834,
+        "store_copy_enqueue_begin_exposed_ms": 18.591819,
+        "recovered_opportunity_percent": 92.12328767123287
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": 0.9583619994089076,
+        "mean_ttft_ms": -1.8484309337162608,
+        "p95_ttft_ms": -2.410969996034784,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 2.08380807494839
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -1.5701386105842596
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 2.804955593819325
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.5706824719712289
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sr1": {
+    "label": "Future load reservations",
+    "root": "/mnt/localnvme/jeongyoon/sr1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1964.1722295880318,
+    "means": {
+      "control": {
+        "throughput_rps": 7.734202611645189,
+        "mean_ttft_ms": 3544.71670418,
+        "p95_ttft_ms": 4689.0086868749995,
+        "compute_rounds": 12.5,
+        "compute_envelope_ms": 9143.822718,
+        "inter_compute_gap_ms": 158.365976,
+        "hold_without_compute_ms": 39.33399825,
+        "pre_forward": 96.55957725,
+        "forward_to_gpu_start": 48.295351000000004,
+        "deferred_store_submission_begin_exposed_ms": 79.3985895,
+        "store_copy_enqueue_begin_full_ms": 258.72737525,
+        "store_copy_enqueue_begin_exposed_ms": 68.33144375,
+        "recovered_opportunity_percent": 91.0958904109589
+      },
+      "gpu": {
+        "throughput_rps": 7.796456249348134,
+        "mean_ttft_ms": 3516.15191994,
+        "p95_ttft_ms": 4604.690294675,
+        "compute_rounds": 12.5,
+        "compute_envelope_ms": 9122.739183,
+        "inter_compute_gap_ms": 137.64774599999998,
+        "hold_without_compute_ms": 1.29649825,
+        "pre_forward": 74.86743875,
+        "forward_to_gpu_start": 26.852415,
+        "deferred_store_submission_begin_exposed_ms": 50.044732499999995,
+        "store_copy_enqueue_begin_full_ms": 243.328265,
+        "store_copy_enqueue_begin_exposed_ms": 45.18787825,
+        "recovered_opportunity_percent": 91.72413793103448
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": 0.8179868082571318,
+        "mean_ttft_ms": -0.8005483063150187,
+        "p95_ttft_ms": -1.5452965586242429,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": -0.6985343884002515
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 3.101314513350606
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.8241558414693984
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.08468540823456383
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sp1": {
+    "label": "Critical stores first",
+    "root": "/mnt/localnvme/jeongyoon/sp1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1962.875704695005,
+    "means": {
+      "control": {
+        "throughput_rps": 7.718122042841651,
+        "mean_ttft_ms": 3581.33131448,
+        "p95_ttft_ms": 4841.5511784,
+        "compute_rounds": 12.25,
+        "compute_envelope_ms": 9151.952144750001,
+        "inter_compute_gap_ms": 189.723551,
+        "hold_without_compute_ms": 59.02599425,
+        "pre_forward": 92.86776825,
+        "forward_to_gpu_start": 62.31703,
+        "deferred_store_submission_begin_exposed_ms": 70.71207975,
+        "store_copy_enqueue_begin_full_ms": 239.25010625,
+        "store_copy_enqueue_begin_exposed_ms": 63.870763,
+        "recovered_opportunity_percent": 92.73356401384083
+      },
+      "gpu": {
+        "throughput_rps": 7.8251022633148395,
+        "mean_ttft_ms": 3519.924601816667,
+        "p95_ttft_ms": 4694.347145799999,
+        "compute_rounds": 12.25,
+        "compute_envelope_ms": 9136.37957675,
+        "inter_compute_gap_ms": 91.319577,
+        "hold_without_compute_ms": 0.75734975,
+        "pre_forward": 43.573488250000004,
+        "forward_to_gpu_start": 39.765137249999995,
+        "deferred_store_submission_begin_exposed_ms": 24.246341,
+        "store_copy_enqueue_begin_full_ms": 230.9541395,
+        "store_copy_enqueue_begin_exposed_ms": 21.496975250000002,
+        "recovered_opportunity_percent": 92.46575342465754
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": 1.3922950575582016,
+        "mean_ttft_ms": -1.709299484762683,
+        "p95_ttft_ms": -3.060002093799885,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.01054901103954009
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -0.3767660718227317
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 2.9224887921337483
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 3.0630731353759932
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "so1": {
+    "label": "Ascending GPU assignment",
+    "root": "/mnt/localnvme/jeongyoon/so1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1898.6599205262028,
+    "means": {
+      "control": {
+        "throughput_rps": 7.52336582316509,
+        "mean_ttft_ms": 3653.05733626,
+        "p95_ttft_ms": 4710.17283725,
+        "compute_rounds": 11.25,
+        "compute_envelope_ms": 9023.548796250001,
+        "inter_compute_gap_ms": 575.66985125,
+        "hold_without_compute_ms": 415.09491675,
+        "pre_forward": 133.65426424999998,
+        "forward_to_gpu_start": 5.3023215,
+        "deferred_store_submission_begin_exposed_ms": 105.68371450000001,
+        "store_copy_enqueue_begin_full_ms": 252.91885475,
+        "store_copy_enqueue_begin_exposed_ms": 96.744959,
+        "recovered_opportunity_percent": 92.16417910447761
+      },
+      "gpu": {
+        "throughput_rps": 7.268047469000816,
+        "mean_ttft_ms": 3784.6256756133334,
+        "p95_ttft_ms": 4924.8194739,
+        "compute_rounds": 11,
+        "compute_envelope_ms": 9010.201646,
+        "inter_compute_gap_ms": 1011.003072,
+        "hold_without_compute_ms": 741.3428867499999,
+        "pre_forward": 158.39733025,
+        "forward_to_gpu_start": 5.4237727499999995,
+        "deferred_store_submission_begin_exposed_ms": 109.966767,
+        "store_copy_enqueue_begin_full_ms": 221.537079,
+        "store_copy_enqueue_begin_exposed_ms": 101.16391625,
+        "recovered_opportunity_percent": 92.3076923076923
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": -3.4073273806967674,
+        "mean_ttft_ms": 3.62089252109683,
+        "p95_ttft_ms": 4.424204234497786,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": -12.036162553766516
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -12.073184670961112
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.8730476062912551
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 11.577359103370256
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sn0": {
+    "label": "Synchronous store control",
+    "root": "/mnt/localnvme/jeongyoon/sn0",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 4,
+    "allocation_seconds": 1062.2089193398133,
+    "means": {
+      "control": {
+        "throughput_rps": 7.792027513677176,
+        "mean_ttft_ms": 3542.734079056667,
+        "p95_ttft_ms": 4860.30987915,
+        "compute_rounds": 12.25,
+        "compute_envelope_ms": 9141.55591575,
+        "inter_compute_gap_ms": 152.11984725,
+        "hold_without_compute_ms": 17.80946775,
+        "pre_forward": 108.26540975,
+        "forward_to_gpu_start": 5.78977125,
+        "deferred_store_submission_begin_exposed_ms": 71.94940125,
+        "store_copy_enqueue_begin_full_ms": 272.4240015,
+        "store_copy_enqueue_begin_exposed_ms": 66.4196405,
+        "recovered_opportunity_percent": 92.83276450511946
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300
+    }
+  },
+  "snf": {
+    "label": "Native store, full submission",
+    "root": "/mnt/localnvme/jeongyoon/snf",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 4,
+    "allocation_seconds": 1143.8668668689206,
+    "means": {
+      "gpu": {
+        "throughput_rps": 7.872861352255427,
+        "mean_ttft_ms": 3505.9144059299997,
+        "p95_ttft_ms": 4732.56070035,
+        "compute_rounds": 12.75,
+        "compute_envelope_ms": 9203.07075975,
+        "inter_compute_gap_ms": 34.041253,
+        "hold_without_compute_ms": 0.11645125,
+        "pre_forward": 10.8022585,
+        "forward_to_gpu_start": 8.10100975,
+        "deferred_store_submission_begin_exposed_ms": 2.5780882499999995,
+        "store_copy_enqueue_begin_full_ms": 0.0,
+        "store_copy_enqueue_begin_exposed_ms": 0.0,
+        "recovered_opportunity_percent": 91.49659863945578
+      }
+    },
+    "paired_changes_percent": {
+      "gpu": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "gpu": 300
+    }
+  },
+  "sn8": {
+    "label": "Native store, 8 MiB chunks",
+    "root": "/mnt/localnvme/jeongyoon/sn8",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 4,
+    "allocation_seconds": 1135.786312626209,
+    "means": {
+      "gpu": {
+        "throughput_rps": 7.876936862349634,
+        "mean_ttft_ms": 3500.439151506667,
+        "p95_ttft_ms": 4675.1033108500005,
+        "compute_rounds": 12.5,
+        "compute_envelope_ms": 9157.241903999999,
+        "inter_compute_gap_ms": 71.0876485,
+        "hold_without_compute_ms": 0.4462855,
+        "pre_forward": 10.00335675,
+        "forward_to_gpu_start": 8.303976500000001,
+        "deferred_store_submission_begin_exposed_ms": 0.48400425,
+        "store_copy_enqueue_begin_full_ms": 0.0,
+        "store_copy_enqueue_begin_exposed_ms": 0.0,
+        "recovered_opportunity_percent": 90.44368600682594
+      }
+    },
+    "paired_changes_percent": {
+      "gpu": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "gpu": 300
+    }
+  },
+  "st0": {
+    "label": "Continuous block-major control",
+    "root": "/mnt/localnvme/jeongyoon/st0",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 2,
+    "allocation_seconds": 837.9314745534211,
+    "means": {
+      "control": {
+        "throughput_rps": 8.174716908282864,
+        "mean_ttft_ms": 3758.9970354133334,
+        "p95_ttft_ms": 4674.717659175,
+        "compute_rounds": 40.5,
+        "compute_envelope_ms": 36041.6482495,
+        "inter_compute_gap_ms": 248.94814100000002,
+        "hold_without_compute_ms": 0.0080005,
+        "pre_forward": 224.5159745,
+        "forward_to_gpu_start": 18.0253775,
+        "deferred_store_submission_begin_exposed_ms": 137.1017215,
+        "store_copy_enqueue_begin_full_ms": 1105.17213,
+        "store_copy_enqueue_begin_exposed_ms": 129.0423035,
+        "recovered_opportunity_percent": 95.60067681895093
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 600
+    }
+  },
+  "st1": {
+    "label": "Continuous tensor-major only",
+    "root": "/mnt/localnvme/jeongyoon/st1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 2,
+    "allocation_seconds": 931.3526302543469,
+    "means": {
+      "control": {
+        "throughput_rps": 8.174884313692548,
+        "mean_ttft_ms": 3754.843364088333,
+        "p95_ttft_ms": 4539.072332650001,
+        "compute_rounds": 40.5,
+        "compute_envelope_ms": 36075.5599595,
+        "inter_compute_gap_ms": 251.1542855,
+        "hold_without_compute_ms": 12.8796165,
+        "pre_forward": 181.32664499999998,
+        "forward_to_gpu_start": 20.356617999999997,
+        "deferred_store_submission_begin_exposed_ms": 117.805909,
+        "store_copy_enqueue_begin_full_ms": 1015.4375785,
+        "store_copy_enqueue_begin_exposed_ms": 110.139891,
+        "recovered_opportunity_percent": 96.12794612794613
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 600
+    }
+  },
+  "stm": {
+    "label": "Continuous tensor-major plus merging",
+    "root": "/mnt/localnvme/jeongyoon/stm",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 2,
+    "allocation_seconds": 940.9802256696858,
+    "means": {
+      "gpu": {
+        "throughput_rps": 7.664509161404735,
+        "mean_ttft_ms": 4021.2000662849996,
+        "p95_ttft_ms": 4352.096760825,
+        "compute_rounds": 35.5,
+        "compute_envelope_ms": 35481.945525,
+        "inter_compute_gap_ms": 3428.6356625,
+        "hold_without_compute_ms": 2254.718385,
+        "pre_forward": 34.342512,
+        "forward_to_gpu_start": 903.8020095,
+        "deferred_store_submission_begin_exposed_ms": 24.419212,
+        "store_copy_enqueue_begin_full_ms": 20.283562,
+        "store_copy_enqueue_begin_exposed_ms": 4.97451,
+        "recovered_opportunity_percent": 97.52066115702479
+      }
+    },
+    "paired_changes_percent": {
+      "gpu": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "gpu": 600
+    }
+  },
+  "stc": {
+    "label": "Continuous sorted recycled CPU rows",
+    "root": "/mnt/localnvme/jeongyoon/stc",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 2,
+    "allocation_seconds": 940.8427276909351,
+    "means": {
+      "gpu": {
+        "throughput_rps": 7.934420997767537,
+        "mean_ttft_ms": 3866.9654664733334,
+        "p95_ttft_ms": 4972.191829175,
+        "compute_rounds": 43,
+        "compute_envelope_ms": 36092.287995,
+        "inter_compute_gap_ms": 1295.973064,
+        "hold_without_compute_ms": 747.1513855000001,
+        "pre_forward": 95.73631850000001,
+        "forward_to_gpu_start": 1056.0751235,
+        "deferred_store_submission_begin_exposed_ms": 26.160555499999997,
+        "store_copy_enqueue_begin_full_ms": 34.891982999999996,
+        "store_copy_enqueue_begin_exposed_ms": 4.986608,
+        "recovered_opportunity_percent": 94.20289855072464
+      }
+    },
+    "paired_changes_percent": {
+      "gpu": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "gpu": 600
+    }
+  },
+  "si1": {
+    "label": "Independent load ready stream",
+    "root": "/mnt/localnvme/jeongyoon/si1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 4,
+    "allocation_seconds": 1513.21484322194,
+    "means": {
+      "control": {
+        "throughput_rps": 7.845232616784091,
+        "mean_ttft_ms": 3912.1647939,
+        "p95_ttft_ms": 4683.008484525,
+        "compute_rounds": 43.5,
+        "compute_envelope_ms": 36244.5583165,
+        "inter_compute_gap_ms": 1678.375571,
+        "hold_without_compute_ms": 745.6418639999999,
+        "pre_forward": 52.93515,
+        "forward_to_gpu_start": 1483.931088,
+        "deferred_store_submission_begin_exposed_ms": 9.29509,
+        "store_copy_enqueue_begin_full_ms": 44.953486,
+        "store_copy_enqueue_begin_exposed_ms": 1.9739565,
+        "recovered_opportunity_percent": 89.83050847457628
+      },
+      "gpu": {
+        "throughput_rps": 7.462277476219835,
+        "mean_ttft_ms": 4112.640059541667,
+        "p95_ttft_ms": 4916.958298924999,
+        "compute_rounds": 36.5,
+        "compute_envelope_ms": 35710.683516000005,
+        "inter_compute_gap_ms": 4128.683903,
+        "hold_without_compute_ms": 2115.9792115,
+        "pre_forward": 245.8918925,
+        "forward_to_gpu_start": 2442.3134099999997,
+        "deferred_store_submission_begin_exposed_ms": 52.980902500000006,
+        "store_copy_enqueue_begin_full_ms": 40.8561105,
+        "store_copy_enqueue_begin_exposed_ms": 11.3819215,
+        "recovered_opportunity_percent": 73.66255144032922
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": -4.846524775367744,
+        "mean_ttft_ms": 5.16338449107161,
+        "p95_ttft_ms": 4.804324803288318,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": -1.7198967762310224
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -7.873683987595204
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 600,
+      "gpu": 600
+    }
+  },
+  "sv1": {
+    "label": "Preencoded allocator control",
+    "root": "/mnt/localnvme/jeongyoon/sv1",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 8,
+    "allocation_seconds": 1955.10166362999,
+    "means": {
+      "control": {
+        "throughput_rps": 7.801882305589508,
+        "mean_ttft_ms": 3544.63829043,
+        "p95_ttft_ms": 4519.366284725,
+        "compute_rounds": 12,
+        "compute_envelope_ms": 9074.246268249999,
+        "inter_compute_gap_ms": 167.829593,
+        "hold_without_compute_ms": 17.05415625,
+        "pre_forward": 77.45012125000001,
+        "forward_to_gpu_start": 66.88251875,
+        "deferred_store_submission_begin_exposed_ms": 54.715588000000004,
+        "store_copy_enqueue_begin_full_ms": 245.100381,
+        "store_copy_enqueue_begin_exposed_ms": 49.441438500000004,
+        "recovered_opportunity_percent": 93.37979094076655
+      },
+      "gpu": {
+        "throughput_rps": 7.784267283361085,
+        "mean_ttft_ms": 3572.2767585033334,
+        "p95_ttft_ms": 4841.731598925,
+        "compute_rounds": 11.75,
+        "compute_envelope_ms": 9038.3389825,
+        "inter_compute_gap_ms": 90.622902,
+        "hold_without_compute_ms": 27.906353,
+        "pre_forward": 40.44276125,
+        "forward_to_gpu_start": 5.1816595,
+        "deferred_store_submission_begin_exposed_ms": 23.181535999999998,
+        "store_copy_enqueue_begin_full_ms": 202.79937,
+        "store_copy_enqueue_begin_exposed_ms": 21.0739805,
+        "recovered_opportunity_percent": 93.75
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": -0.22615097356225577,
+        "mean_ttft_ms": 0.7794250358763799,
+        "p95_ttft_ms": 7.064017480015328,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": -0.887956314514704
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 1.232782572215818
+          },
+          {
+            "repeat": 2,
+            "throughput_change_percent": 0.14248302161206094
+          },
+          {
+            "repeat": 3,
+            "throughput_change_percent": -1.3718368475853282
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 300,
+      "gpu": 300
+    }
+  },
+  "sdo1": {
+    "label": "Preserved descriptor order",
+    "root": "/mnt/localnvme/jeongyoon/sdo1",
+    "status": "not_started"
+  },
+  "snl": {
+    "label": "Native D2H setup lead recalibration",
+    "root": "/mnt/localnvme/jeongyoon/snl",
+    "status": "complete",
+    "stopped": true,
+    "measured_cells": 4,
+    "allocation_seconds": 1395.5446629412472,
+    "means": {
+      "control": {
+        "throughput_rps": 8.178121616934963,
+        "mean_ttft_ms": 3753.9109347333333,
+        "p95_ttft_ms": 4694.316854575,
+        "compute_rounds": 41.5,
+        "compute_envelope_ms": 36167.293565,
+        "inter_compute_gap_ms": 255.3799425,
+        "hold_without_compute_ms": 0.0536935,
+        "pre_forward": 16.099085,
+        "forward_to_gpu_start": 23.089662500000003,
+        "deferred_store_submission_begin_exposed_ms": 0.0,
+        "store_copy_enqueue_begin_full_ms": 0.0,
+        "store_copy_enqueue_begin_exposed_ms": 0.0,
+        "recovered_opportunity_percent": 95.27824620573355
+      },
+      "gpu": {
+        "throughput_rps": 8.13838017123798,
+        "mean_ttft_ms": 3769.4385185266665,
+        "p95_ttft_ms": 4594.099789899999,
+        "compute_rounds": 40.5,
+        "compute_envelope_ms": 36163.507731,
+        "inter_compute_gap_ms": 292.7460325,
+        "hold_without_compute_ms": 4.352911,
+        "pre_forward": 84.7195665,
+        "forward_to_gpu_start": 15.285715,
+        "deferred_store_submission_begin_exposed_ms": 15.4857605,
+        "store_copy_enqueue_begin_full_ms": 0.0,
+        "store_copy_enqueue_begin_exposed_ms": 0.0,
+        "recovered_opportunity_percent": 98.65319865319866
+      }
+    },
+    "paired_changes_percent": {
+      "control": {
+        "throughput_rps": 0.0,
+        "mean_ttft_ms": 0.0,
+        "p95_ttft_ms": 0.0,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.0
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": 0.0
+          }
+        ]
+      },
+      "gpu": {
+        "throughput_rps": -0.48603349064313406,
+        "mean_ttft_ms": 0.4129274262847593,
+        "p95_ttft_ms": -2.1619880965842997,
+        "per_repeat": [
+          {
+            "repeat": 0,
+            "throughput_change_percent": 0.15709606702793977
+          },
+          {
+            "repeat": 1,
+            "throughput_change_percent": -1.1250333795818745
+          }
+        ]
+      }
+    },
+    "all_episodes_accepted": true,
+    "requests_by_arm": {
+      "control": 600,
+      "gpu": 600
+    }
+  },
+  "sg1": {
+    "label": "GPU/CPU resident reference",
+    "rows": [
+      {
+        "workload": "familiar60k",
+        "label": "gpu_only",
+        "requests_per_episode": 32,
+        "episodes": 10,
+        "measured_requests": 320,
+        "throughput_rps": 7.673695072764915,
+        "aggregate_throughput_rps": 7.670593471880813,
+        "mean_ttft_ms": 3076.7858662,
+        "p50_ttft_ms": 2732.3151085,
+        "p95_ttft_ms": 4150.328330949999,
+        "restored_prefix_tokens": 18677760,
+        "cpu_load_bytes_server_wide": 0,
+        "gpu_prefix_hit_tokens": 18677760.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      },
+      {
+        "workload": "short16k",
+        "label": "gpu_only",
+        "requests_per_episode": 75,
+        "episodes": 4,
+        "measured_requests": 300,
+        "throughput_rps": 25.79659115279869,
+        "aggregate_throughput_rps": 25.796501903228677,
+        "mean_ttft_ms": 1091.5754400266667,
+        "p50_ttft_ms": 1212.1570084999998,
+        "p95_ttft_ms": 1284.9665616500001,
+        "restored_prefix_tokens": 4665600,
+        "cpu_load_bytes_server_wide": 0,
+        "gpu_prefix_hit_tokens": 4665600.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      },
+      {
+        "workload": "familiar60k",
+        "label": "gpu_capacity_limited",
+        "requests_per_episode": 75,
+        "episodes": 4,
+        "measured_requests": 300,
+        "throughput_rps": 0.4944988633164792,
+        "aggregate_throughput_rps": 0.4944988627423928,
+        "mean_ttft_ms": 51335.18259264,
+        "p50_ttft_ms": 64636.337400000004,
+        "p95_ttft_ms": 64645.7809138,
+        "restored_prefix_tokens": 0,
+        "cpu_load_bytes_server_wide": 0,
+        "gpu_prefix_hit_tokens": 0.0,
+        "full_residency_required": false,
+        "restored_expected_fraction": null
+      }
+    ],
+    "definitions": "Warm priming is excluded; all cells pass cache-hit accounting, one-output-token and no-preemption checks. GPU-only resident cells require every expected prefix token in GPU cache, with zero CPU offload loads. CPU cells reset GPU cache after priming and verify CPU restoration. Full-resident references fit the unchanged GPU KV pool. Capacity-limited 75-request 60K episodes explicitly permit prefix misses and are not an all-hits ceiling. Throughput is the mean of episode rates; aggregate throughput is also given. Tail TTFT here is pooled across measured requests. CPU and GPU cache modes use independent allocations. GPU-only uses ordinary worker preparation without the connector-dependent observer or scheduler holds, so this is a measured resident reference, not a mathematical upper bound."
+  },
+  "sg2": {
+    "label": "GPU/CPU resident reference",
+    "rows": [
+      {
+        "workload": "familiar60k",
+        "label": "cpu_only",
+        "requests_per_episode": 32,
+        "episodes": 10,
+        "measured_requests": 320,
+        "throughput_rps": 7.2955726722464,
+        "aggregate_throughput_rps": 7.2904315389372165,
+        "mean_ttft_ms": 3002.174184459375,
+        "p50_ttft_ms": 3056.5523745,
+        "p95_ttft_ms": 4382.46536405,
+        "restored_prefix_tokens": 18677760,
+        "cpu_load_bytes_server_wide": 7127433216000.0,
+        "gpu_prefix_hit_tokens": 0.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      },
+      {
+        "workload": "short16k",
+        "label": "cpu_only",
+        "requests_per_episode": 75,
+        "episodes": 4,
+        "measured_requests": 300,
+        "throughput_rps": 25.150769059099012,
+        "aggregate_throughput_rps": 25.12060805227611,
+        "mean_ttft_ms": 1088.75164855,
+        "p50_ttft_ms": 1119.2477294999999,
+        "p95_ttft_ms": 1428.4099869500003,
+        "restored_prefix_tokens": 4665600,
+        "cpu_load_bytes_server_wide": 1780392960000.0,
+        "gpu_prefix_hit_tokens": 0.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      }
+    ],
+    "definitions": "Warm priming is excluded; all cells pass cache-hit accounting, one-output-token and no-preemption checks. GPU-only resident cells require every expected prefix token in GPU cache, with zero CPU offload loads. CPU cells reset GPU cache after priming and verify CPU restoration. Full-resident references fit the unchanged GPU KV pool. Capacity-limited 75-request 60K episodes explicitly permit prefix misses and are not an all-hits ceiling. Throughput is the mean of episode rates; aggregate throughput is also given. Tail TTFT here is pooled across measured requests. CPU and GPU cache modes use independent allocations. GPU-only uses ordinary worker preparation without the connector-dependent observer or scheduler holds, so this is a measured resident reference, not a mathematical upper bound."
+  },
+  "sg3": {
+    "label": "GPU/CPU resident reference",
+    "rows": [
+      {
+        "workload": "familiar60k",
+        "label": "cpu_only",
+        "requests_per_episode": 32,
+        "episodes": 10,
+        "measured_requests": 320,
+        "throughput_rps": 7.340562532167326,
+        "aggregate_throughput_rps": 7.338053079825206,
+        "mean_ttft_ms": 2926.631126259375,
+        "p50_ttft_ms": 3389.735103,
+        "p95_ttft_ms": 4403.3540742,
+        "restored_prefix_tokens": 18677760,
+        "cpu_load_bytes_server_wide": 7127433216000.0,
+        "gpu_prefix_hit_tokens": 0.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      },
+      {
+        "workload": "short16k",
+        "label": "cpu_only",
+        "requests_per_episode": 75,
+        "episodes": 4,
+        "measured_requests": 300,
+        "throughput_rps": 26.045742144023112,
+        "aggregate_throughput_rps": 26.035340684563593,
+        "mean_ttft_ms": 1052.7075499666666,
+        "p50_ttft_ms": 1105.3946179999998,
+        "p95_ttft_ms": 1376.24385545,
+        "restored_prefix_tokens": 4665600,
+        "cpu_load_bytes_server_wide": 1780392960000.0,
+        "gpu_prefix_hit_tokens": 0.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      }
+    ],
+    "definitions": "Warm priming is excluded; all cells pass cache-hit accounting, one-output-token and no-preemption checks. GPU-only resident cells require every expected prefix token in GPU cache, with zero CPU offload loads. CPU cells reset GPU cache after priming and verify CPU restoration. Full-resident references fit the unchanged GPU KV pool. Capacity-limited 75-request 60K episodes explicitly permit prefix misses and are not an all-hits ceiling. Throughput is the mean of episode rates; aggregate throughput is also given. Tail TTFT here is pooled across measured requests. CPU and GPU cache modes use independent allocations. GPU-only uses ordinary worker preparation without the connector-dependent observer or scheduler holds, so this is a measured resident reference, not a mathematical upper bound."
+  },
+  "sg4": {
+    "label": "GPU/CPU resident reference",
+    "rows": [
+      {
+        "workload": "familiar60k",
+        "label": "gpu_only",
+        "requests_per_episode": 32,
+        "episodes": 10,
+        "measured_requests": 320,
+        "throughput_rps": 7.719772312982991,
+        "aggregate_throughput_rps": 7.7189394026162566,
+        "mean_ttft_ms": 3066.06191360625,
+        "p50_ttft_ms": 2799.8224215,
+        "p95_ttft_ms": 4120.6862497,
+        "restored_prefix_tokens": 18677760,
+        "cpu_load_bytes_server_wide": 0,
+        "gpu_prefix_hit_tokens": 18677760.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      },
+      {
+        "workload": "short16k",
+        "label": "gpu_only",
+        "requests_per_episode": 75,
+        "episodes": 4,
+        "measured_requests": 300,
+        "throughput_rps": 25.7700621402628,
+        "aggregate_throughput_rps": 25.753085499793524,
+        "mean_ttft_ms": 1090.94293711,
+        "p50_ttft_ms": 1215.6415405,
+        "p95_ttft_ms": 1255.79421015,
+        "restored_prefix_tokens": 4665600,
+        "cpu_load_bytes_server_wide": 0,
+        "gpu_prefix_hit_tokens": 4665600.0,
+        "full_residency_required": true,
+        "restored_expected_fraction": 1.0
+      }
+    ],
+    "definitions": "Warm priming is excluded; all cells pass cache-hit accounting, one-output-token and no-preemption checks. GPU-only resident cells require every expected prefix token in GPU cache, with zero CPU offload loads. CPU cells reset GPU cache after priming and verify CPU restoration. Full-resident references fit the unchanged GPU KV pool. Capacity-limited 75-request 60K episodes explicitly permit prefix misses and are not an all-hits ceiling. Throughput is the mean of episode rates; aggregate throughput is also given. Tail TTFT here is pooled across measured requests. CPU and GPU cache modes use independent allocations. GPU-only uses ordinary worker preparation without the connector-dependent observer or scheduler holds, so this is a measured resident reference, not a mathematical upper bound."
+  }
+}

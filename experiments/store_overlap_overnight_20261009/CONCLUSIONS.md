@@ -72,3 +72,16 @@ See `REPORT.md` and its JSON companion in the data directory for all tables,
 including matched resident controls and any deadline-lead experiment that
 completed inside the overnight allocation. See `plan.json` for branches,
 timed source commits and verification provenance.
+
+## Final follow-up
+
+Reducing setup lead from 100 to 25 ms improved admission recovery from
+95.28% to 98.65% and consolidated one compute round on average, but mean
+paired throughput regressed 0.49% and GPU gaps increased. Keep 100 ms for
+the selected worker. This two-repeat study does not identify a universal
+best lead. See `DEADLINE_LEAD_FINDINGS.md` in the data directory.
+
+All 21 completed allocations passed launch/cache acceptance, covering
+13,280 measured requests. One earlier sorting repeat overlapped GPU tests;
+its quality exception and clean three-pair result remain explicit. All
+owned servers stopped and the final GPU process query was empty.

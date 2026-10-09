@@ -1,0 +1,81 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/se1",
+  "archive_sha256": "82df834ceab151d102a9a0063ed593f417a8c91dc365ddd38f5414e4e8ad99ae",
+  "archive_bytes": 8757691,
+  "members": [
+    {
+      "path": "libseal_execution_observer.so",
+      "bytes": 50176,
+      "sha256": "1d0f17a827b7e3cc1e24017f5d2ff9b9448b873f86b59d7d7e0ea1881ce38831",
+      "link_to": null
+    },
+    {
+      "path": "loaded_predictor.json",
+      "bytes": 78014223,
+      "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+      "link_to": null
+    },
+    {
+      "path": "ownership.json",
+      "bytes": 28,
+      "sha256": "a05e9c754fb40f3b09366b5590357dafa6159dc269e76dc57f1e53bada9f30bd",
+      "link_to": null
+    },
+    {
+      "path": "plan.json",
+      "bytes": 7587,
+      "sha256": "005314cb3eea362d909476c686d78dd36cc60ffa655d2a5206863ed5a166800c",
+      "link_to": null
+    },
+    {
+      "path": "process_log.jsonl",
+      "bytes": 199,
+      "sha256": "d395b8c6c96fe186342e12ed1d1aff0d179cc5c63b13178f2e3ecf0a39adeee4",
+      "link_to": null
+    },
+    {
+      "path": "server/command.json",
+      "bytes": 1597,
+      "sha256": "45971b81a2a58ff8e48f536093a77d571f3e42038dcd12f13783cabc418f9985",
+      "link_to": null
+    },
+    {
+      "path": "server/connector_config.json",
+      "bytes": 395,
+      "sha256": "280a2ee9a52286ccb224b504699c22e5fad991b354ae025d87bc758a6941f5e0",
+      "link_to": null
+    },
+    {
+      "path": "server/environment.json",
+      "bytes": 1129,
+      "sha256": "83f156cbbe7d90343aeda285f398243336916c84c5295cb6e4a909722d5c5844",
+      "link_to": null
+    },
+    {
+      "path": "server/process.json",
+      "bytes": 54,
+      "sha256": "83d5a662db4aeb66143f0a73a9f99ccaa095cca716b0742fd1db80aa229dc76c",
+      "link_to": null
+    },
+    {
+      "path": "server/server.log",
+      "bytes": 10563,
+      "sha256": "30620a0e9c17bb9828f8ea0b0720f3d22eb613483b621fc339b4adb693a5d375",
+      "link_to": null
+    },
+    {
+      "path": "source_provenance.json",
+      "bytes": 195,
+      "sha256": "dd7772b292475c12d2ea5fdb7a48757ee096b9e75bf306a88f59ba7dd8d6c871",
+      "link_to": null
+    },
+    {
+      "path": "summary.json",
+      "bytes": 92,
+      "sha256": "eaa3e16a09db52a12aeb70b35afa7eb2f8f7e6bb34a17038add3b1fcad6055af",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

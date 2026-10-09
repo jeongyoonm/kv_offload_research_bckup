@@ -1,0 +1,71 @@
+{
+  "time": 1791550948.83578,
+  "findings": [
+    {
+      "mechanism": "GPU source block reuse",
+      "evidence_roots": [
+        "sa1",
+        "sv1"
+      ],
+      "result": "Allocator avoidance removed observed pending-store block allocations (7536 to 0) and reuse fences (224 to 0). Free-block availability was sufficient; this was allocation order rather than unavoidable capacity pressure.",
+      "limitation": "Mechanism reproduced; throughput changed +0.40% in the original harness and -0.23% in the preencoded retest. Capacity-constrained reuse retains safe waiting."
+    },
+    {
+      "mechanism": "Main-worker CUDA store submission",
+      "evidence_roots": [
+        "sn0",
+        "snf",
+        "sn8"
+      ],
+      "result": "Native D2H moved CUDA submission into a separate worker. In full mode, exposed pre-forward intervals fell 108.3 to 10.8 ms/75 requests and inter-compute gaps fell 152.1 to 34.0 ms. Unclipped host preparation from worker entry to forward averaged 43.7 to 22.0 ms per batch. Mean same-seed serving gain was 1.04%.",
+      "limitation": "Independent allocations, four same-seed repeats per mode. Compute envelope and batching changed; no statistical significance claim."
+    },
+    {
+      "mechanism": "Physical descriptor geometry",
+      "evidence_roots": [
+        "so1",
+        "store_overlap_overnight_20261009/cpu_layout_loads.json",
+        "st0",
+        "st1",
+        "stm",
+        "stc"
+      ],
+      "result": "Block-major CPU rows do not merge. Aligned tensor-major rows reduce one 2.784 GB prefix load from 90288 to 430 descriptors, with about 52.5 ms GPU transfer envelope versus 61 ms raw. Reversed assignments prevent merging.",
+      "limitation": "Continuous serving: tensor layout alone is neutral, merged mode has one 12.9% regression despite persistent descriptor reductions, and sorted recycled rows remain slower than block-major in both repeats. Copy microbenchmarks do not establish serving benefit."
+    },
+    {
+      "mechanism": "Preserving raw descriptor order",
+      "evidence_roots": [
+        "store_overlap_overnight_20261009/cpu_layout_loads.json"
+      ],
+      "result": "Did not help: preserved block-major loads were about 61 ms on GPU; sorted descriptors without merging were about 54.5 to 56.2 ms.",
+      "limitation": "An ordered microbenchmark; no hardware-specific causal claim. Proposal not promoted."
+    },
+    {
+      "mechanism": "Earlier-dispatch destination writes",
+      "evidence_roots": [
+        "store_overlap_overnight_20261009/independent_prior_write_cpu_tests.log"
+      ],
+      "result": "Independent load readiness now tracks pending zero/COW footprints across dispatches. Conflicts, missing context, reactivation and bounded-history overflow retain the ordinary stream path.",
+      "limitation": "32 filtered CPU checks passed before serving. All 600 loads/rank used independent readiness, but matched throughput regressed by 4.85% on average; not selected."
+    },
+    {
+      "mechanism": "Scheduler setup lead after faster worker",
+      "evidence_roots": [
+        "snl"
+      ],
+      "result": "25 ms versus 100 ms recovered 98.65% versus 95.28% of opportunities and used 40.5 versus 41.5 compute rounds. Mean paired throughput changed -0.49% and gaps rose 255.4 to 292.7 ms. Keep the 100 ms lead.",
+      "limitation": "Two matched continuous repeats; improved admission alone did not establish better serving. No general optimal lead claim."
+    },
+    {
+      "mechanism": "GPU resident cache reference",
+      "evidence_roots": [
+        "sg2",
+        "sg3",
+        "sg4"
+      ],
+      "result": "CPU synchronous/native/GPU resident rates were 7.296/7.341/7.720 req/s for long prompts and 25.151/26.046/25.770 for short prompts. Every CPU request restored its exact prefix; every GPU request hit its complete prefix, with zero offloading loads.",
+      "limitation": "Capacity-fitting cohorts; ordinary GPU scheduling differs from connector-dependent CPU scheduling. Not a mathematical upper bound; 75 long prefixes exceed the fixed cache budget."
+    }
+  ]
+}

@@ -103,6 +103,7 @@ def cell_audit(directory, result):
     assert len(opportunities & activated) == result["recovered_compute_opportunities"]
     eligible = {e["step"]: e for e in records if e["event"] == "seal_eligibility"}
     window, prepared = set(), set()
+    prepared_ready_lead = {}
     for seal in seals:
         t = seal["transport"]
         p = t.get("prediction")
@@ -121,7 +122,9 @@ def cell_audit(directory, result):
             status = t["statuses"][8 * (slot + 1) : 8 * (slot + 2)]
             if len(status) == 8 and all(s == 1 for s in status):
                 prepared.add(rid)
+                prepared_ready_lead.setdefault(rid, (end - ready[rid]) / 1e6)
     missed = opportunities - activated
+    strict_leads = [prepared_ready_lead[rid] for rid in prepared & missed]
     first = min(max(r[3] for r in e["execution_ranks"]) for e in computes.values())
     end = max(max(r[3] + r[6] for r in e["execution_ranks"]) for e in computes.values())
     client_start = min(r["start_ns"] for r in result["responses"])
@@ -139,6 +142,10 @@ def cell_audit(directory, result):
         nonadjacent_prediction_count=len(rows) - len(adjacent),
         deadline_window_misses=len(window & missed),
         prepared_deadline_window_misses=len(prepared & missed),
+        prepared_ready_by_actual_lead={
+            str(lead): sum(t >= lead for t in strict_leads)
+            for lead in (0, 25, 50, 75, 100)
+        },
         all_missed_compute_opportunities=len(missed),
         seal_reasons=dict(
             Counter(e["transport"].get("seal_reason", "ordinary") for e in seals)

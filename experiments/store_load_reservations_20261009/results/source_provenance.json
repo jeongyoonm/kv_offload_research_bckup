@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_store_reservations_20261009",
+  "branch": "experiment/store-reuse-load-reservations-20261009",
+  "commit": "b48977eb06cbf4c4317f5fb305d6eb6aabcae7a2"
+}

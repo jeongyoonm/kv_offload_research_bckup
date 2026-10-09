@@ -53,6 +53,20 @@ def main():
     idle_probes.idle()
     descriptor = idle_probes.BASE / "vllm_descriptor_order_20261009"
     idle_probes.run(
+        "descriptor_order_real_gpu_tests",
+        descriptor,
+        [
+            str(descriptor / ".venv/bin/python"),
+            "-m",
+            "pytest",
+            "tests/v1/kv_offload/cpu/test_gpu_worker.py",
+            "-q",
+            "-k",
+            "descriptor_preserve_order_glm_geometry",
+        ],
+        expected_passes=2,
+    )
+    idle_probes.run(
         "actual_cpu_layout_load_matrix",
         descriptor,
         [
@@ -79,7 +93,7 @@ def main():
             dict(
                 complete=True,
                 stopped=True,
-                tests=4,
+                tests=6,
                 load_matrix_cases=12,
                 time=time.time(),
             )
@@ -87,7 +101,7 @@ def main():
         + "\n"
     )
     temporary.replace(gate / "summary.json")
-    idle_probes.log("tensor_gate_complete", tests=4, load_matrix_cases=12)
+    idle_probes.log("tensor_gate_complete", tests=6, load_matrix_cases=12)
 
 
 if __name__ == "__main__":

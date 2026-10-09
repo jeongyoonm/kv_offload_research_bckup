@@ -817,6 +817,95 @@ def test_store_descriptor_coalescing_preserves_exact_byte_mapping(reverse_destin
     assert sum(sizes[:count]) == 37
 
 
+@pytest.mark.parametrize("limit", [5, 10, 16, 32])
+@pytest.mark.parametrize("reverse_destination", [False, True])
+def test_load_coalescing_preserves_byte_mapping_and_chunk_bound(
+    limit, reverse_destination
+):
+    """Repartition merged ranges without expanding ownership or the chunk limit."""
+    src = np.array([120, 100, 110, 200], dtype=np.int64)
+    dst = np.array([320, 300, 310, 500], dtype=np.int64)
+    if reverse_destination:
+        dst[:3] = [300, 320, 310]
+    sizes = np.array([10, 10, 10, 7], dtype=np.int64)
+
+    def mapping(count):
+        return {
+            int(d + i): int(s + i)
+            for s, d, n in zip(src[:count], dst[:count], sizes[:count])
+            for i in range(int(n))
+        }
+
+    expected = mapping(4)
+    count = gpu_worker._coalesce_bounded_descriptors(src, dst, sizes, 4, limit)
+    assert mapping(count) == expected
+    assert count <= 4 and sizes[:count].sum() == 37
+    if limit >= 10:
+        assert sizes[:count].max() <= limit
+        assert count == (4 if reverse_destination else (30 + limit - 1) // limit + 1)
+    else:
+        assert count == 4
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA copy test")
+@torch.inference_mode()
+@pytest.mark.parametrize("dst_ids", [[3, 0, 1, 2], [0, 3, 2, 1]])
+def test_coalesced_async_load_preserves_rows_and_waits_for_gpu_writes(
+    default_vllm_config, dst_ids, monkeypatch
+):
+    """Bounded merging must retain destination-write ordering and real retirement."""
+    page_size = 65536
+    gpu_tensor = torch.zeros((8, page_size), dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[
+                CanonicalKVCacheTensor(tensor=gpu_tensor, page_size_bytes=page_size)
+            ],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=8,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=2 * page_size,
+    )
+    worker.configure_experiment(
+        {"copy_pipeline_depth": 2, "load_descriptor_coalescing": True}
+    )
+    cpu = worker._store_handler.dst_tensors[0]
+    for row in range(8):
+        cpu[row].fill_(row)
+    original = gpu_worker._coalesce_bounded_descriptors
+    counts = []
+
+    def coalesce(*args):
+        count = original(*args)
+        counts.append(count)
+        return count
+
+    monkeypatch.setattr(gpu_worker, "_coalesce_bounded_descriptors", coalesce)
+    src_ids = [3, 0, 1, 2]
+    try:
+        torch.cuda._sleep(100_000_000)
+        gpu_tensor.fill_(127)
+        assert worker.submit_load(
+            1, CPULoadStoreSpec(src_ids), GPULoadStoreSpec(dst_ids, (4,), (0,))
+        )
+        worker.wait({1})
+        torch.accelerator.synchronize()
+        for src_id, dst_id in zip(src_ids, dst_ids):
+            torch.testing.assert_close(
+                gpu_tensor[dst_id].cpu(),
+                torch.full((page_size,), src_id, dtype=torch.int8),
+            )
+        assert counts == [2 if dst_ids == src_ids else 4]
+        assert [result.job_id for result in worker.get_finished()] == [1]
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()
+
+
 @pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA copy test")
 @torch.inference_mode()
 @pytest.mark.parametrize("dst_ids", [[3, 0, 1, 2], [0, 3, 2, 1]])

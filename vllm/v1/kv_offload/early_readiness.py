@@ -73,6 +73,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "copy_pipeline_depth": 1,
     "store_reuse_gpu_fence": False,
     "store_descriptor_coalescing": False,
+    "load_descriptor_coalescing": False,
     "deferral_policy": "disabled",
     "deferral_hold_ms": 120,
     "deferral_target_gain": 2,

@@ -290,6 +290,25 @@ def _coalesce_descriptors(src, dst, sizes, count):
     return merged_count
 
 
+def _coalesce_bounded_descriptors(src, dst, sizes, count, max_bytes):
+    """Merge physical ranges, then split them within the native chunk limit."""
+    if not count or max_bytes <= 0 or np.any(sizes[:count] > max_bytes):
+        return count
+    merged = _coalesce_descriptors(src, dst, sizes, count)
+    if merged == count:
+        return count
+    lengths = sizes[:merged].copy()
+    parts = (lengths + max_bytes - 1) // max_bytes
+    expanded = int(parts.sum())
+    assert expanded <= count
+    first = np.cumsum(parts) - parts
+    offsets = (np.arange(expanded) - np.repeat(first, parts)) * max_bytes
+    src[:expanded] = np.repeat(src[:merged].copy(), parts) + offsets
+    dst[:expanded] = np.repeat(dst[:merged].copy(), parts) + offsets
+    sizes[:expanded] = np.minimum(max_bytes, np.repeat(lengths, parts) - offsets)
+    return expanded
+
+
 class SingleDirectionOffloadingHandler:
     """
     Handles transfers for a single direction, either CPU->GPU or GPU->CPU.
@@ -363,6 +382,8 @@ class SingleDirectionOffloadingHandler:
         self._coalesce_store_descriptors = False
         self.layer_refs_per_group = layer_refs_per_group
         self._async_h2d_submission = async_h2d_submission
+        self._async_h2d_chunk_bytes = async_h2d_chunk_bytes
+        self._coalesce_load_descriptors = False
         if self._async_h2d_submission:
             if self.gpu_to_cpu:
                 raise ValueError("async_h2d_submission only supports CPU-to-GPU")
@@ -729,6 +750,19 @@ class SingleDirectionOffloadingHandler:
         original_descriptors = op_idx
         if self.gpu_to_cpu and getattr(self, "_coalesce_store_descriptors", False):
             op_idx = _coalesce_descriptors(all_src, all_dst, all_sizes, op_idx)
+        elif self._async_h2d_submission and self._coalesce_load_descriptors:
+            op_idx = _coalesce_bounded_descriptors(
+                all_src, all_dst, all_sizes, op_idx, self._async_h2d_chunk_bytes
+            )
+            if queue_stages.active:
+                queue_stages.emit(
+                    "load_descriptors_coalesced",
+                    job_id=job_id,
+                    num_bytes=num_transfer_bytes,
+                    original_descriptors=original_descriptors,
+                    num_descriptors=op_idx,
+                    max_descriptor_bytes=int(all_sizes[:op_idx].max()) if op_idx else 0,
+                )
         src = src[:op_idx]
         dst = dst[:op_idx]
         sizes = sizes[:op_idx]
@@ -1079,6 +1113,9 @@ class CPUOffloadingWorker(OffloadingWorker):
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
         self._store_handler._coalesce_store_descriptors = bool(
             options.get("store_descriptor_coalescing", False)
+        )
+        self._load_handler._coalesce_load_descriptors = bool(
+            options.get("load_descriptor_coalescing", False)
         )
         depth = int(options.get("copy_pipeline_depth", 1))
         if depth == getattr(self, "_copy_pipeline_depth", 1):

@@ -266,37 +266,46 @@ def _new_descriptor_buffers(
     )
 
 
-def _coalesce_descriptors(src, dst, sizes, count):
+def _coalesce_descriptors(src, dst, sizes, count, *, preserve_order=False):
     """Merge contiguous pointer pairs; copies within a CUDA batch are unordered."""
     if count < 2:
         return count
     order = np.argsort(src[:count], kind="stable")
-    src[:count], dst[:count], sizes[:count] = (
+    sorted_src, sorted_dst, sorted_sizes = (
         src[:count][order],
         dst[:count][order],
         sizes[:count][order],
     )
-    joins = (src[: count - 1] + sizes[: count - 1] == src[1:count]) & (
-        dst[: count - 1] + sizes[: count - 1] == dst[1:count]
+    joins = (sorted_src[:-1] + sorted_sizes[:-1] == sorted_src[1:]) & (
+        sorted_dst[:-1] + sorted_sizes[:-1] == sorted_dst[1:]
     )
+    if not preserve_order:
+        src[:count], dst[:count], sizes[:count] = sorted_src, sorted_dst, sorted_sizes
     if not joins.any():
         return count
     starts = np.concatenate(([0], np.flatnonzero(~joins) + 1))
-    merged_sizes = np.add.reduceat(sizes[:count], starts)
+    merged_sizes = np.add.reduceat(sorted_sizes, starts)
     merged_count = len(starts)
-    src[:merged_count] = src[starts]
-    dst[:merged_count] = dst[starts]
-    sizes[:merged_count] = merged_sizes
+    groups = (
+        np.argsort(np.minimum.reduceat(order, starts), kind="stable")
+        if preserve_order
+        else np.arange(merged_count)
+    )
+    src[:merged_count] = sorted_src[starts[groups]]
+    dst[:merged_count] = sorted_dst[starts[groups]]
+    sizes[:merged_count] = merged_sizes[groups]
     return merged_count
 
 
 def _coalesce_bounded_descriptors(
-    src, dst, sizes, count, max_bytes, *, packet_aligned=False
+    src, dst, sizes, count, max_bytes, *, packet_aligned=False, preserve_order=False
 ):
     """Merge physical ranges, then split them within the native chunk limit."""
     if not count or max_bytes <= 0 or np.any(sizes[:count] > max_bytes):
         return count
-    merged = _coalesce_descriptors(src, dst, sizes, count)
+    merged = _coalesce_descriptors(
+        src, dst, sizes, count, preserve_order=preserve_order
+    )
     if merged == count:
         return count
     lengths = sizes[:merged].copy()
@@ -412,6 +421,7 @@ class SingleDirectionOffloadingHandler:
         self._async_h2d_submission = async_h2d_submission
         self._async_h2d_chunk_bytes = async_h2d_chunk_bytes
         self._coalesce_load_descriptors = False
+        self._preserve_descriptor_order = False
         self._geometry_generation: int | None = None
         self._load_packet_alignment = False
         if self._async_h2d_submission:
@@ -799,7 +809,13 @@ class SingleDirectionOffloadingHandler:
             )
         original_descriptors = op_idx
         if self.gpu_to_cpu and getattr(self, "_coalesce_store_descriptors", False):
-            op_idx = _coalesce_descriptors(all_src, all_dst, all_sizes, op_idx)
+            op_idx = _coalesce_descriptors(
+                all_src,
+                all_dst,
+                all_sizes,
+                op_idx,
+                preserve_order=getattr(self, "_preserve_descriptor_order", False),
+            )
         elif self._async_h2d_submission and self._coalesce_load_descriptors:
             op_idx = _coalesce_bounded_descriptors(
                 all_src,
@@ -808,6 +824,7 @@ class SingleDirectionOffloadingHandler:
                 op_idx,
                 self._async_h2d_chunk_bytes,
                 packet_aligned=getattr(self, "_load_packet_alignment", False),
+                preserve_order=getattr(self, "_preserve_descriptor_order", False),
             )
         if self._async_h2d_submission and queue_stages.active:
             queue_stages.emit(
@@ -1171,6 +1188,10 @@ class CPUOffloadingWorker(OffloadingWorker):
         return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
 
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
+        for handler in (self._store_handler, self._load_handler):
+            handler._preserve_descriptor_order = bool(
+                options.get("descriptor_preserve_order", False)
+            )
         self._store_handler._coalesce_store_descriptors = bool(
             options.get("store_descriptor_coalescing", False)
         )

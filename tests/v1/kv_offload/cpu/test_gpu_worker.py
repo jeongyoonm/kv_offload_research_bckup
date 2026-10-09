@@ -38,6 +38,29 @@ NUM_MAPPINGS = [3]
 NUM_MAPPINGS_PER_GROUP = [2]
 
 
+def test_coalescing_without_joins_preserves_native_copy_order():
+    """Unsuccessful merging must not replace GPU-local copy order with CPU order."""
+    src = np.array([100, 0, 200], dtype=np.int64)
+    dst = np.array([0, 20, 40], dtype=np.int64)
+    sizes = np.full(3, 20, dtype=np.int64)
+    before = tuple(array.copy() for array in (src, dst, sizes))
+    count = gpu_worker._coalesce_descriptors(src, dst, sizes, 3, preserve_order=True)
+    assert count == 3
+    for array, original in zip((src, dst, sizes), before):
+        np.testing.assert_array_equal(array, original)
+
+
+def test_coalescing_preserves_first_original_position_of_each_copy_group():
+    src = np.array([100, 0, 40, 20], dtype=np.int64)
+    dst = src + 1000
+    sizes = np.full(4, 20, dtype=np.int64)
+    count = gpu_worker._coalesce_descriptors(src, dst, sizes, 4, preserve_order=True)
+    assert count == 2
+    np.testing.assert_array_equal(src[:count], [100, 0])
+    np.testing.assert_array_equal(dst[:count], [1100, 1000])
+    np.testing.assert_array_equal(sizes[:count], [20, 60])
+
+
 @pytest.mark.parametrize("fragmented", [False, True])
 @torch.inference_mode()
 def test_private_tensor_glm_geometry_store_load_bytes(default_vllm_config, fragmented):

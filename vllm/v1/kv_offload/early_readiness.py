@@ -75,6 +75,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "store_descriptor_coalescing": False,
     "load_descriptor_coalescing": False,
     "load_descriptor_packet_alignment": False,
+    "descriptor_preserve_order": False,
     "store_reuse_allocator_preference": False,
     "store_reuse_allocator_audit": False,
     "ascending_gpu_block_assignment": False,

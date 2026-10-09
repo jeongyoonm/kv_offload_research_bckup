@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_gpu_thp_ceiling_20261009",
+  "branch": "experiment/gpu-prefix-ceiling-thp-matched-20261009",
+  "commit": "c17a114232e06e47f279ee049ae06de626f3c899"
+}

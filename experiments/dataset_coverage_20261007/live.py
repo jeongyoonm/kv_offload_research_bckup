@@ -66,28 +66,45 @@ def stream(tokens, name):
 
 
 def cell(
-    label, state, workload, seed, repeat, requests_count=75, *, require_preparation=True
+    label,
+    state,
+    workload,
+    seed,
+    repeat,
+    requests_count=75,
+    *,
+    require_preparation=True,
+    prefix_working_set=None,
 ):
     directory = run.ROOT / "live" / workload / f"r{repeat}_{label}"
     if (directory / "result.json").exists():
         return json.loads((directory / "result.json").read_text())
     directory.mkdir(parents=True, exist_ok=True)
     run.reset(True)
-    homogeneous = workload in ("familiar60k", "short16k")
+    homogeneous = workload in ("familiar60k", "short16k", "mid32k")
+    if prefix_working_set is not None:
+        assert homogeneous and 0 < prefix_working_set <= requests_count
     context, suffix = {
         "familiar60k": (58368, 3072),
         "short16k": (15552, 832),
+        "mid32k": (30720, 2048),
         "heterogeneous": (24576, 8192),
     }[workload]
     requests, primes, expected = [], [], []
+    shared_prefixes = {}
     for i in range(requests_count):
         c = context if homogeneous or i % 2 else 4096
         s = suffix if homogeneous or i % 3 else 2048
         prefix, tail = run.prompt(c, s, seed * 100000 + i)
+        if prefix_working_set is not None:
+            slot = i % prefix_working_set
+            if slot not in shared_prefixes:
+                shared_prefixes[slot] = prefix
+            prefix = shared_prefixes[slot]
         hit = homogeneous or i % 2 == 0
         expected.append(c if hit else 0)
         requests.append(prefix + tail)
-        if hit:
+        if hit and (prefix_working_set is None or i < prefix_working_set):
             primes.append(prefix + [31700] * 64)
     with concurrent.futures.ThreadPoolExecutor(max_workers=32) as pool:
         run.configure()
@@ -217,6 +234,7 @@ def cell(
         repeat=repeat,
         concurrency=32,
         requests=requests_count,
+        prefix_working_set=prefix_working_set,
         seconds=elapsed,
         throughput_rps=requests_count / elapsed,
         mean_ttft_ms=statistics.mean(ttft),

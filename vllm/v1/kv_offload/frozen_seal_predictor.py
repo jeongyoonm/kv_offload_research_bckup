@@ -179,6 +179,13 @@ class FrozenSealPredictor:
             FEATURE_NAMES + FORECAST_NAMES + SPARSE_NAMES + ENVELOPE_NAMES
         )
         checkpoint = self._state["checkpoint"]
+        self.duration_calibration = None
+        if "duration_calibration" in checkpoint:
+            from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+            self.duration_calibration = BatchShapeCalibration(
+                checkpoint["duration_calibration"]
+            )
         if self.excludes_elapsed and checkpoint.get("excluded_feature_indices") != [21]:
             raise ValueError("offset predictor must exclude elapsed execution time")
         self.neural = NeuralCandidate(checkpoint.get("neural", checkpoint))

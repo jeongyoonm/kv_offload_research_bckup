@@ -25,6 +25,60 @@ def transfer_surface_state():
     )
 
 
+def shape_correction_state():
+    from vllm.v1.kv_offload.seal_calibration import FEATURES
+
+    return dict(
+        schema=1,
+        features=FEATURES,
+        coefficients=[10, 0, 0, 0, 100],
+        support=dict(requests=[1, 32], context=[15552, 58368], suffix=[832, 3072]),
+        bias_bounds_ms=[-500, 500],
+        provenance={},
+    )
+
+
+def test_shape_correction_changes_with_prediction_and_ignores_forecast_age():
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    correction = BatchShapeCalibration(shape_correction_state())
+    x = np.zeros(28)
+    x[:9] = [3328, 4, 0, 62208, 832, 832, 15552, 15552, 3584]
+    assert correction.bias_ns(200_000_000, x, 90_000_000) == (30_000_000, False)
+    x[21] = 1000
+    assert correction.bias_ns(400_000_000, x, 90_000_000) == (50_000_000, False)
+
+
+@pytest.mark.parametrize("context,suffix", [(8192, 832), (61440, 3072), (32768, 8192)])
+def test_shape_correction_uses_original_bias_outside_calibrated_support(
+    context, suffix
+):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    correction = BatchShapeCalibration(shape_correction_state())
+    x = np.zeros(28)
+    x[:9] = [suffix * 4, 4, 0, context * 4, suffix, suffix, context, context, 0]
+    assert correction.bias_ns(200_000_000, x, 90_000_000) == (90_000_000, True)
+    assert correction.bias_ns(200_000_000, None, 90_000_000) == (90_000_000, True)
+
+
+@pytest.mark.parametrize("mutation", ["nonfinite", "width", "support", "bounds"])
+def test_shape_correction_rejects_corrupt_artifacts_before_publication(mutation):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    if mutation == "nonfinite":
+        state["coefficients"][0] = float("nan")
+    elif mutation == "width":
+        state["coefficients"].pop()
+    elif mutation == "support":
+        state["support"]["requests"] = [0, 32]
+    else:
+        state["bias_bounds_ms"] = [500, -500]
+    with pytest.raises(ValueError, match="shape calibration"):
+        BatchShapeCalibration(state)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
     """Even an elapsed-sensitive component cannot move an offset deadline."""

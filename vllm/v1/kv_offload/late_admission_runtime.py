@@ -875,9 +875,18 @@ def stage_rpc(core, step, base, candidates):
                                     // 100
                                 )
                                 raw_duration_ns = predicted
-                                predicted = max(
-                                    1, predicted - prediction_bias_us * 1000
+                                applied_bias_ns = prediction_bias_us * 1000
+                                shape_calibration = getattr(
+                                    model, "duration_calibration", None
                                 )
+                                calibration_fallback = None
+                                if shape_calibration is not None:
+                                    applied_bias_ns, calibration_fallback = (
+                                        shape_calibration.bias_ns(
+                                            predicted, point_features, applied_bias_ns
+                                        )
+                                    )
+                                predicted = max(1, predicted - applied_bias_ns)
                                 reserve_ns = timing.seal_estimator.preparation_reserve(
                                     core.scheduler._late_seal_prediction_reserve_us
                                     * 1000
@@ -891,6 +900,10 @@ def stage_rpc(core, step, base, candidates):
                                     predicted_duration_ns=predicted,
                                     raw_scaled_duration_ns=raw_duration_ns,
                                     prediction_bias_us=prediction_bias_us,
+                                    applied_prediction_bias_ns=applied_bias_ns,
+                                    shape_calibration_enabled=shape_calibration
+                                    is not None,
+                                    shape_calibration_fallback=calibration_fallback,
                                     deadline_ns=predicted_deadline_ns,
                                     features=timing.seal_estimator.features(
                                         data

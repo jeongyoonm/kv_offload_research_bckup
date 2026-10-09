@@ -1,0 +1,15 @@
+{"event": "comparison_started", "time": 1791508245.4845235, "expected_cells": 24}
+{"event": "server_ready", "time": 1791508499.6645927}
+{"event": "live_cell", "time": 1791508527.0445917, "label": "C", "workload": "short16k", "repeat": "warmup", "accepted": true, "throughput_rps": 21.089344381381814}
+{"event": "comparison_failed", "time": 1791508527.0658011, "error": "AssertionError()"}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d8_scheduler_ab_20261009/run.py", line 217, in <module>
+    main()
+  File "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d8_scheduler_ab_20261009/run.py", line 177, in main
+    cell(policy, workload, 8090, "warmup", 32)
+  File "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d8_scheduler_ab_20261009/run.py", line 154, in cell
+    assert not result["worker_preparation_coverage"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError

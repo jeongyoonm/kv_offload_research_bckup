@@ -86,6 +86,7 @@ def main():
     native = BASE / "vllm_store_native_async_20261009"
     coalescing = BASE / "vllm_kv_order_coalescing_20261009"
     probe = BASE / "vllm_store_contention_probe_20261009"
+    packet = BASE / "vllm_kv_packet_coalescing_20261009"
     run(
         "native_async_real_gpu_tests",
         native,
@@ -113,6 +114,20 @@ def main():
             "coalesced_async_load or load_coalescing_preserves",
         ],
         expected_passes=10,
+    )
+    run(
+        "packet_alignment_real_gpu_tests",
+        packet,
+        [
+            str(packet / ".venv/bin/python"),
+            "-m",
+            "pytest",
+            "tests/v1/kv_offload/cpu/test_gpu_worker.py",
+            "-q",
+            "-k",
+            "coalesced_async_load",
+        ],
+        expected_passes=6,
     )
     for cap in (0, 256, 512):
         command = [
@@ -181,6 +196,7 @@ def main():
         time=time.time(),
         native_gpu_tests=3,
         bounded_coalescing_tests=10,
+        packet_alignment_gpu_tests=6,
     )
     (ARTIFACTS / "idle_probes_summary.json").write_text(
         json.dumps(result, indent=2) + "\n"

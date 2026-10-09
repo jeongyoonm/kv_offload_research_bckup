@@ -1,0 +1,5857 @@
+{
+  "episodes": [
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 0,
+      "generations": [
+        10
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52407928125,
+              "median": 0.48948749999999996,
+              "min": 0.470738,
+              "max": 0.760472
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.021242281249999998,
+              "median": 0.013948499999999999,
+              "min": 0.009293,
+              "max": 0.060696
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5241434375,
+              "median": 0.4911945,
+              "min": 0.470727,
+              "max": 0.784823
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02222290625,
+              "median": 0.0135645,
+              "min": 0.008631,
+              "max": 0.060714
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52743184375,
+              "median": 0.4922865,
+              "min": 0.472593,
+              "max": 0.815159
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02654496875,
+              "median": 0.0184075,
+              "min": 0.009031,
+              "max": 0.099779
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53209865625,
+              "median": 0.500083,
+              "min": 0.481527,
+              "max": 0.765807
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02376946875,
+              "median": 0.015697,
+              "min": 0.009812,
+              "max": 0.056444
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5412264999999999,
+              "median": 0.511286,
+              "min": 0.492594,
+              "max": 0.868362
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.029668375,
+              "median": 0.0141715,
+              "min": 0.008832,
+              "max": 0.196544
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5373203125,
+              "median": 0.5022945,
+              "min": 0.475704,
+              "max": 0.909847
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.022614,
+              "median": 0.01431,
+              "min": 0.009092,
+              "max": 0.070137
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55151740625,
+              "median": 0.522921,
+              "min": 0.493862,
+              "max": 0.826696
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0252363125,
+              "median": 0.0139975,
+              "min": 0.009861,
+              "max": 0.082075
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53201253125,
+              "median": 0.5007174999999999,
+              "min": 0.478524,
+              "max": 0.870786
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02375159375,
+              "median": 0.0146035,
+              "min": 0.008957,
+              "max": 0.068692
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 1,
+      "generations": [
+        14
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.533444,
+              "median": 0.49675949999999996,
+              "min": 0.471445,
+              "max": 0.868246
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02608771875,
+              "median": 0.0199275,
+              "min": 0.009519,
+              "max": 0.097448
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54074925,
+              "median": 0.504391,
+              "min": 0.468814,
+              "max": 0.837792
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02538475,
+              "median": 0.016171,
+              "min": 0.0093,
+              "max": 0.067238
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54122784375,
+              "median": 0.497131,
+              "min": 0.475737,
+              "max": 0.896712
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02404890625,
+              "median": 0.017965500000000002,
+              "min": 0.00881,
+              "max": 0.054613
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54118034375,
+              "median": 0.5095609999999999,
+              "min": 0.480606,
+              "max": 0.820747
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0421263125,
+              "median": 0.018485,
+              "min": 0.009029,
+              "max": 0.573534
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5568625,
+              "median": 0.5215795000000001,
+              "min": 0.500376,
+              "max": 0.87537
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0249435625,
+              "median": 0.013567,
+              "min": 0.00896,
+              "max": 0.089734
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5470618125,
+              "median": 0.5077355,
+              "min": 0.477872,
+              "max": 0.937798
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02534,
+              "median": 0.0186075,
+              "min": 0.009402,
+              "max": 0.088037
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55470490625,
+              "median": 0.50986,
+              "min": 0.485308,
+              "max": 0.871152
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02357384375,
+              "median": 0.014166000000000002,
+              "min": 0.009355,
+              "max": 0.055921
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.56432503125,
+              "median": 0.505332,
+              "min": 0.476857,
+              "max": 0.90264
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.023691375,
+              "median": 0.014311,
+              "min": 0.009176,
+              "max": 0.063516
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 2,
+      "generations": [
+        18
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52820278125,
+              "median": 0.489342,
+              "min": 0.464042,
+              "max": 0.838379
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02159571875,
+              "median": 0.0129325,
+              "min": 0.007859,
+              "max": 0.076064
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.562766,
+            "store_async_enqueue": 0.048657
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5313100625,
+              "median": 0.49577099999999996,
+              "min": 0.476477,
+              "max": 0.814137
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02126146875,
+              "median": 0.012718,
+              "min": 0.008814,
+              "max": 0.064732
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.552347,
+            "store_async_enqueue": 0.042983
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5391687187499999,
+              "median": 0.495433,
+              "min": 0.472397,
+              "max": 0.783761
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.020281281249999998,
+              "median": 0.0130025,
+              "min": 0.008277,
+              "max": 0.063244
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.665655,
+            "store_async_enqueue": 0.042689
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.549675875,
+              "median": 0.5078065,
+              "min": 0.483179,
+              "max": 0.889509
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02120059375,
+              "median": 0.0136455,
+              "min": 0.008379,
+              "max": 0.072959
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.559201,
+            "store_async_enqueue": 0.048589
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55104290625,
+              "median": 0.5149035,
+              "min": 0.493176,
+              "max": 0.859137
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02035178125,
+              "median": 0.013240499999999999,
+              "min": 0.008241,
+              "max": 0.065271
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.667238,
+            "store_async_enqueue": 0.045967
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5315091875,
+              "median": 0.500264,
+              "min": 0.47238,
+              "max": 0.844617
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02163,
+              "median": 0.012428999999999999,
+              "min": 0.007861,
+              "max": 0.064499
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.533468,
+            "store_async_enqueue": 0.044078
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5492634375,
+              "median": 0.508658,
+              "min": 0.48785,
+              "max": 0.917607
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.021861843750000002,
+              "median": 0.01499,
+              "min": 0.007928,
+              "max": 0.061296
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.565265,
+            "store_async_enqueue": 0.047955
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53125840625,
+              "median": 0.500786,
+              "min": 0.478495,
+              "max": 0.768308
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0251738125,
+              "median": 0.015739,
+              "min": 0.008935,
+              "max": 0.08459
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.534583,
+            "store_async_enqueue": 0.08459
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 3,
+      "generations": [
+        22
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5440440625,
+              "median": 0.48920600000000003,
+              "min": 0.469886,
+              "max": 0.840838
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0255908125,
+              "median": 0.013503,
+              "min": 0.008539,
+              "max": 0.107101
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.526154,
+            "store_async_enqueue": 0.07037
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54005325,
+              "median": 0.49421400000000004,
+              "min": 0.471641,
+              "max": 0.84958
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02834884375,
+              "median": 0.017369000000000002,
+              "min": 0.008079,
+              "max": 0.121409
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.500373,
+            "store_async_enqueue": 0.057485
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5455129375,
+              "median": 0.493819,
+              "min": 0.469226,
+              "max": 0.843334
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.028342625,
+              "median": 0.013062,
+              "min": 0.008731,
+              "max": 0.115448
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.514347,
+            "store_async_enqueue": 0.064344
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.56181215625,
+              "median": 0.5036970000000001,
+              "min": 0.480817,
+              "max": 0.885472
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02887934375,
+              "median": 0.0148325,
+              "min": 0.008439,
+              "max": 0.190779
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.514462,
+            "store_async_enqueue": 0.063068
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.57238790625,
+              "median": 0.5188275,
+              "min": 0.498163,
+              "max": 0.85253
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.03025815625,
+              "median": 0.014943000000000001,
+              "min": 0.008446,
+              "max": 0.182945
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.538088,
+            "store_async_enqueue": 0.07148
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54489003125,
+              "median": 0.497287,
+              "min": 0.476805,
+              "max": 0.869484
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02535409375,
+              "median": 0.0131305,
+              "min": 0.00886,
+              "max": 0.092811
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.537825,
+            "store_async_enqueue": 0.092811
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5704399375,
+              "median": 0.512448,
+              "min": 0.486232,
+              "max": 0.856261
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02340471875,
+              "median": 0.013871000000000001,
+              "min": 0.008697,
+              "max": 0.073177
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.523145,
+            "store_async_enqueue": 0.069267
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55989040625,
+              "median": 0.532557,
+              "min": 0.477233,
+              "max": 0.847029
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0246819375,
+              "median": 0.012829,
+              "min": 0.009203,
+              "max": 0.080359
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.533418,
+            "store_async_enqueue": 0.080359
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 4,
+      "generations": [
+        26
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5358473125,
+              "median": 0.48880599999999996,
+              "min": 0.46606,
+              "max": 0.805191
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.025465625,
+              "median": 0.0141265,
+              "min": 0.009266,
+              "max": 0.065747
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53825471875,
+              "median": 0.489714,
+              "min": 0.469116,
+              "max": 0.791004
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02205084375,
+              "median": 0.0146845,
+              "min": 0.008688,
+              "max": 0.061966
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.533238375,
+              "median": 0.493706,
+              "min": 0.470795,
+              "max": 0.766141
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.025466937499999998,
+              "median": 0.014743,
+              "min": 0.008463,
+              "max": 0.09047
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5434071875,
+              "median": 0.5048790000000001,
+              "min": 0.480473,
+              "max": 0.830366
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02117090625,
+              "median": 0.014772,
+              "min": 0.009387,
+              "max": 0.055497
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.571110875,
+              "median": 0.5152829999999999,
+              "min": 0.496853,
+              "max": 0.856767
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0257766875,
+              "median": 0.014247,
+              "min": 0.00975,
+              "max": 0.152675
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.543499375,
+              "median": 0.49979,
+              "min": 0.481495,
+              "max": 0.818817
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02372,
+              "median": 0.013892999999999999,
+              "min": 0.008573,
+              "max": 0.085673
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5598913125,
+              "median": 0.5082945000000001,
+              "min": 0.487232,
+              "max": 0.818204
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02558328125,
+              "median": 0.017453000000000003,
+              "min": 0.009143,
+              "max": 0.075644
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55929634375,
+              "median": 0.5092165,
+              "min": 0.482341,
+              "max": 0.88079
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0227558125,
+              "median": 0.0144925,
+              "min": 0.009494,
+              "max": 0.055656
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 5,
+      "generations": [
+        30
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53938409375,
+              "median": 0.4937595,
+              "min": 0.464342,
+              "max": 0.784558
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02195696875,
+              "median": 0.013638,
+              "min": 0.008701,
+              "max": 0.066598
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53480471875,
+              "median": 0.49733700000000003,
+              "min": 0.468944,
+              "max": 0.81595
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02281496875,
+              "median": 0.0134615,
+              "min": 0.008827,
+              "max": 0.074951
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.541281125,
+              "median": 0.4966515,
+              "min": 0.47712,
+              "max": 0.794559
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.023764,
+              "median": 0.0151695,
+              "min": 0.009059,
+              "max": 0.10356
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55154509375,
+              "median": 0.4982325,
+              "min": 0.479155,
+              "max": 0.814745
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02133153125,
+              "median": 0.014512500000000001,
+              "min": 0.009093,
+              "max": 0.065216
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.56397240625,
+              "median": 0.5288245,
+              "min": 0.493038,
+              "max": 0.896652
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02658878125,
+              "median": 0.016034,
+              "min": 0.009256,
+              "max": 0.126518
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.56282715625,
+              "median": 0.5065390000000001,
+              "min": 0.478258,
+              "max": 0.849301
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02437440625,
+              "median": 0.014587,
+              "min": 0.00885,
+              "max": 0.067716
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55787528125,
+              "median": 0.5081015,
+              "min": 0.490065,
+              "max": 0.816816
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02644815625,
+              "median": 0.017756,
+              "min": 0.009868,
+              "max": 0.065682
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.58343840625,
+              "median": 0.5084625,
+              "min": 0.484304,
+              "max": 0.919705
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.03106528125,
+              "median": 0.022088999999999998,
+              "min": 0.010853,
+              "max": 0.106332
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 6,
+      "generations": [
+        34
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.56970840625,
+              "median": 0.5135725,
+              "min": 0.465192,
+              "max": 1.195558
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.03025178125,
+              "median": 0.022760500000000003,
+              "min": 0.008554,
+              "max": 0.122862
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5585546875,
+              "median": 0.491663,
+              "min": 0.473707,
+              "max": 1.228777
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02692084375,
+              "median": 0.0149,
+              "min": 0.008653,
+              "max": 0.140095
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.556053375,
+              "median": 0.498004,
+              "min": 0.473198,
+              "max": 0.99697
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02809228125,
+              "median": 0.013502,
+              "min": 0.008377,
+              "max": 0.088966
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.555464625,
+              "median": 0.502178,
+              "min": 0.479234,
+              "max": 0.890133
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.022785312500000002,
+              "median": 0.0142055,
+              "min": 0.008679,
+              "max": 0.09288
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5617846875,
+              "median": 0.5210859999999999,
+              "min": 0.493106,
+              "max": 0.931128
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0285759375,
+              "median": 0.015091,
+              "min": 0.009421,
+              "max": 0.126737
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.54508096875,
+              "median": 0.5162804999999999,
+              "min": 0.475291,
+              "max": 0.954738
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.028476124999999998,
+              "median": 0.018765499999999997,
+              "min": 0.008534,
+              "max": 0.137623
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55900171875,
+              "median": 0.5056309999999999,
+              "min": 0.485519,
+              "max": 1.007051
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02476503125,
+              "median": 0.013714500000000001,
+              "min": 0.009409,
+              "max": 0.103487
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53958625,
+              "median": 0.5053435,
+              "min": 0.479491,
+              "max": 0.807579
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02391434375,
+              "median": 0.0145945,
+              "min": 0.008981,
+              "max": 0.075216
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 7,
+      "generations": [
+        38
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5214808125,
+              "median": 0.4853995,
+              "min": 0.4681,
+              "max": 0.843852
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02107353125,
+              "median": 0.0143135,
+              "min": 0.00895,
+              "max": 0.055675
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53899184375,
+              "median": 0.4938265,
+              "min": 0.469155,
+              "max": 0.84485
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02390978125,
+              "median": 0.015075,
+              "min": 0.009665,
+              "max": 0.058244
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5328617812499999,
+              "median": 0.4959945,
+              "min": 0.468106,
+              "max": 0.822273
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0220335,
+              "median": 0.014364499999999999,
+              "min": 0.009278,
+              "max": 0.061332
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53137421875,
+              "median": 0.497831,
+              "min": 0.483607,
+              "max": 0.791038
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02208709375,
+              "median": 0.015449000000000001,
+              "min": 0.00997,
+              "max": 0.053581
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5405101875,
+              "median": 0.511261,
+              "min": 0.490689,
+              "max": 0.81092
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0217225,
+              "median": 0.013721,
+              "min": 0.009869,
+              "max": 0.054049
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.51922278125,
+              "median": 0.49390999999999996,
+              "min": 0.475179,
+              "max": 0.769347
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02688646875,
+              "median": 0.0189655,
+              "min": 0.00896,
+              "max": 0.120674
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53418253125,
+              "median": 0.5044755,
+              "min": 0.483336,
+              "max": 0.817116
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02508478125,
+              "median": 0.0189265,
+              "min": 0.010374,
+              "max": 0.059143
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53322725,
+              "median": 0.5019925000000001,
+              "min": 0.481644,
+              "max": 0.797655
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02534903125,
+              "median": 0.0191365,
+              "min": 0.009383,
+              "max": 0.089088
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 8,
+      "generations": [
+        42
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5251373125,
+              "median": 0.4856955,
+              "min": 0.467528,
+              "max": 0.854603
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02436025,
+              "median": 0.013493,
+              "min": 0.008841,
+              "max": 0.084631
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52096065625,
+              "median": 0.491475,
+              "min": 0.471436,
+              "max": 0.803579
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0246253125,
+              "median": 0.014962,
+              "min": 0.008308,
+              "max": 0.081552
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.520030875,
+              "median": 0.4888055,
+              "min": 0.46954,
+              "max": 0.745495
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.022597125,
+              "median": 0.016118,
+              "min": 0.008588,
+              "max": 0.062699
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52327859375,
+              "median": 0.4950605,
+              "min": 0.481948,
+              "max": 0.732234
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02455078125,
+              "median": 0.017953,
+              "min": 0.009114,
+              "max": 0.055625
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.57941128125,
+              "median": 0.541533,
+              "min": 0.488018,
+              "max": 0.79284
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02568765625,
+              "median": 0.0182115,
+              "min": 0.008315,
+              "max": 0.058878
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52944709375,
+              "median": 0.49963650000000004,
+              "min": 0.477395,
+              "max": 0.781074
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02316409375,
+              "median": 0.0155655,
+              "min": 0.008643,
+              "max": 0.062732
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53390534375,
+              "median": 0.5097395,
+              "min": 0.483785,
+              "max": 0.747978
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02599821875,
+              "median": 0.021249499999999998,
+              "min": 0.009117,
+              "max": 0.060181
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5705500625,
+              "median": 0.512197,
+              "min": 0.484369,
+              "max": 0.800334
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.026992375,
+              "median": 0.0235075,
+              "min": 0.008997,
+              "max": 0.062389
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.0,
+            "store_async_enqueue": 0.0
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "familiar60k",
+      "repeat": 9,
+      "generations": [
+        46
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52286725,
+              "median": 0.4929815,
+              "min": 0.46499,
+              "max": 0.829259
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0242626875,
+              "median": 0.016580499999999998,
+              "min": 0.008593,
+              "max": 0.070411
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.535496,
+            "store_async_enqueue": 0.070411
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.52315478125,
+              "median": 0.49828700000000004,
+              "min": 0.476389,
+              "max": 0.819997
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02479228125,
+              "median": 0.016182000000000002,
+              "min": 0.010113,
+              "max": 0.081943
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.520773,
+            "store_async_enqueue": 0.081943
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.53036765625,
+              "median": 0.4973665,
+              "min": 0.475795,
+              "max": 0.847144
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0259780625,
+              "median": 0.0195505,
+              "min": 0.009517,
+              "max": 0.073865
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.535931,
+            "store_async_enqueue": 0.073865
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5252244687500001,
+              "median": 0.4976075,
+              "min": 0.475364,
+              "max": 0.826099
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0247925625,
+              "median": 0.015049,
+              "min": 0.009551,
+              "max": 0.07118
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.54534,
+            "store_async_enqueue": 0.07118
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.55189275,
+              "median": 0.515115,
+              "min": 0.494443,
+              "max": 0.897806
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.02697946875,
+              "median": 0.0157305,
+              "min": 0.009171,
+              "max": 0.085279
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.545985,
+            "store_async_enqueue": 0.085279
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.538368625,
+              "median": 0.4986345,
+              "min": 0.477544,
+              "max": 0.90831
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.0334445,
+              "median": 0.019438,
+              "min": 0.009661,
+              "max": 0.274105
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.52881,
+            "store_async_enqueue": 0.274105
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5477051875,
+              "median": 0.5080169999999999,
+              "min": 0.485223,
+              "max": 0.797902
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.026801625,
+              "median": 0.0207045,
+              "min": 0.009738,
+              "max": 0.086206
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.54211,
+            "store_async_enqueue": 0.086206
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 32,
+              "mean": 0.5267810625,
+              "median": 0.5010075,
+              "min": 0.481985,
+              "max": 0.814668
+            },
+            "store_async_enqueue": {
+              "count": 32,
+              "mean": 0.03051753125,
+              "median": 0.019731,
+              "min": 0.009632,
+              "max": 0.104825
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 0.535749,
+            "store_async_enqueue": 0.089348
+          },
+          "descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "original_descriptors": {
+            "count": 32,
+            "mean": 4752,
+            "median": 4752.0,
+            "min": 4752,
+            "max": 4752
+          },
+          "descriptor_ratio": {
+            "count": 32,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "short16k",
+      "repeat": 0,
+      "generations": [
+        50
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4789762,
+              "median": 0.472556,
+              "min": 0.457728,
+              "max": 0.558058
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.018421026666666666,
+              "median": 0.011569,
+              "min": 0.008209,
+              "max": 0.069195
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.965338,
+            "store_async_enqueue": 0.378064
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.47987728,
+              "median": 0.47476,
+              "min": 0.454915,
+              "max": 0.55656
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.018446226666666666,
+              "median": 0.012309,
+              "min": 0.008756,
+              "max": 0.054409
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.9781,
+            "store_async_enqueue": 0.373995
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.47895218666666667,
+              "median": 0.473134,
+              "min": 0.456013,
+              "max": 0.550827
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.0217108,
+              "median": 0.012423,
+              "min": 0.008702,
+              "max": 0.151444
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.558189,
+            "store_async_enqueue": 0.346053
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48822068,
+              "median": 0.482402,
+              "min": 0.463003,
+              "max": 0.550826
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017491493333333333,
+              "median": 0.012014,
+              "min": 0.007865,
+              "max": 0.062567
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 12.18192,
+            "store_async_enqueue": 0.38608
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5483120533333333,
+              "median": 0.500478,
+              "min": 0.483319,
+              "max": 0.70451
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.01835676,
+              "median": 0.012143,
+              "min": 0.007955,
+              "max": 0.061418
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 13.469086,
+            "store_async_enqueue": 0.339864
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48431465333333334,
+              "median": 0.479277,
+              "min": 0.464845,
+              "max": 0.553095
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017809813333333334,
+              "median": 0.011398,
+              "min": 0.008402,
+              "max": 0.059006
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.16408,
+            "store_async_enqueue": 0.329015
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4973457333333333,
+              "median": 0.492694,
+              "min": 0.474063,
+              "max": 0.559108
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.02099936,
+              "median": 0.012278,
+              "min": 0.008925,
+              "max": 0.101298
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 15.182401,
+            "store_async_enqueue": 0.461912
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5351265466666667,
+              "median": 0.492054,
+              "min": 0.470919,
+              "max": 0.70875
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.02250988,
+              "median": 0.012983,
+              "min": 0.008004,
+              "max": 0.106824
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 14.42926,
+            "store_async_enqueue": 0.409481
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "short16k",
+      "repeat": 1,
+      "generations": [
+        54
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.47868496,
+              "median": 0.472456,
+              "min": 0.45282,
+              "max": 0.540583
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.020632546666666668,
+              "median": 0.012126,
+              "min": 0.008554,
+              "max": 0.096164
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.642435,
+            "store_async_enqueue": 0.406739
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48401394666666664,
+              "median": 0.476803,
+              "min": 0.457824,
+              "max": 0.551239
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.021680146666666667,
+              "median": 0.013043,
+              "min": 0.008519,
+              "max": 0.118503
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 12.152922,
+            "store_async_enqueue": 0.466624
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4832051333333333,
+              "median": 0.47647,
+              "min": 0.459818,
+              "max": 0.543599
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.020987946666666667,
+              "median": 0.014613,
+              "min": 0.008302,
+              "max": 0.073617
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 9.409321,
+            "store_async_enqueue": 0.350709
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48891678666666666,
+              "median": 0.484806,
+              "min": 0.461842,
+              "max": 0.551217
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.01896984,
+              "median": 0.011629,
+              "min": 0.009025,
+              "max": 0.06065
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.365431,
+            "store_async_enqueue": 0.332744
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.56273496,
+              "median": 0.520815,
+              "min": 0.480731,
+              "max": 0.713898
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.02501648,
+              "median": 0.017397,
+              "min": 0.008771,
+              "max": 0.159073
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 8.628664,
+            "store_async_enqueue": 0.276134
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48824955999999997,
+              "median": 0.48207,
+              "min": 0.465367,
+              "max": 0.561441
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.02179476,
+              "median": 0.011563,
+              "min": 0.008838,
+              "max": 0.176951
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.409087,
+            "store_async_enqueue": 0.422276
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5043257866666666,
+              "median": 0.493386,
+              "min": 0.47368,
+              "max": 0.61256
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.022934213333333335,
+              "median": 0.014063,
+              "min": 0.008467,
+              "max": 0.145271
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 9.628018,
+            "store_async_enqueue": 0.2607
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5137209333333334,
+              "median": 0.488901,
+              "min": 0.46731,
+              "max": 0.715097
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.021474506666666667,
+              "median": 0.014039,
+              "min": 0.008468,
+              "max": 0.087501
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 13.286039,
+            "store_async_enqueue": 0.416372
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "short16k",
+      "repeat": 2,
+      "generations": [
+        58
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.47723434666666664,
+              "median": 0.470138,
+              "min": 0.454726,
+              "max": 0.566179
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017411973333333334,
+              "median": 0.012148,
+              "min": 0.008454,
+              "max": 0.054557
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.355351,
+            "store_async_enqueue": 0.321768
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4805734133333333,
+              "median": 0.473274,
+              "min": 0.456293,
+              "max": 0.600041
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017938373333333334,
+              "median": 0.011,
+              "min": 0.008007,
+              "max": 0.137838
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.394871,
+            "store_async_enqueue": 0.301069
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.47987438666666665,
+              "median": 0.474004,
+              "min": 0.457352,
+              "max": 0.561133
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.016929386666666667,
+              "median": 0.011542,
+              "min": 0.008443,
+              "max": 0.056879
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.543826,
+            "store_async_enqueue": 0.311849
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4851801866666667,
+              "median": 0.480527,
+              "min": 0.460915,
+              "max": 0.548151
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.0182658,
+              "median": 0.011787,
+              "min": 0.008348,
+              "max": 0.105785
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.653313,
+            "store_async_enqueue": 0.306205
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5023616266666667,
+              "median": 0.496723,
+              "min": 0.480933,
+              "max": 0.586013
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017491773333333332,
+              "median": 0.011938,
+              "min": 0.007946,
+              "max": 0.064159
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 12.011508,
+            "store_async_enqueue": 0.308989
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48368552,
+              "median": 0.478341,
+              "min": 0.464532,
+              "max": 0.559585
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.01630768,
+              "median": 0.011171,
+              "min": 0.008086,
+              "max": 0.050949
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.588801,
+            "store_async_enqueue": 0.29496
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.4928040933333333,
+              "median": 0.48752,
+              "min": 0.472255,
+              "max": 0.551585
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017063253333333334,
+              "median": 0.011713,
+              "min": 0.008357,
+              "max": 0.059188
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.774687,
+            "store_async_enqueue": 0.3178
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5017516666666667,
+              "median": 0.482029,
+              "min": 0.466478,
+              "max": 0.715929
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.017689466666666667,
+              "median": 0.011106,
+              "min": 0.008211,
+              "max": 0.060954
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.664611,
+            "store_async_enqueue": 0.318188
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    },
+    {
+      "arm": "cpu_only",
+      "workload": "short16k",
+      "repeat": 3,
+      "generations": [
+        62
+      ],
+      "ranks": {
+        "0": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48107673333333334,
+              "median": 0.475313,
+              "min": 0.458121,
+              "max": 0.57044
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.03704564,
+              "median": 0.014505,
+              "min": 0.008899,
+              "max": 1.035162
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.234666,
+            "store_async_enqueue": 1.396867
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "1": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.48459302666666665,
+              "median": 0.478558,
+              "min": 0.462764,
+              "max": 0.558656
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.037812853333333334,
+              "median": 0.016528,
+              "min": 0.008355,
+              "max": 1.001985
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.445026,
+            "store_async_enqueue": 1.427344
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "2": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.49592778666666665,
+              "median": 0.477053,
+              "min": 0.458528,
+              "max": 1.522125
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.024269333333333334,
+              "median": 0.018633,
+              "min": 0.008926,
+              "max": 0.148445
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.519194,
+            "store_async_enqueue": 0.590348
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "3": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.49242392,
+              "median": 0.486695,
+              "min": 0.458889,
+              "max": 0.56567
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.03500132,
+              "median": 0.014584,
+              "min": 0.008786,
+              "max": 0.879117
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 13.649364,
+            "store_async_enqueue": 1.414867
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "4": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5160715333333333,
+              "median": 0.499429,
+              "min": 0.482826,
+              "max": 1.363308
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.022651293333333333,
+              "median": 0.014341,
+              "min": 0.008204,
+              "max": 0.145936
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 12.786894,
+            "store_async_enqueue": 0.455242
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "5": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.49027144,
+              "median": 0.483829,
+              "min": 0.468573,
+              "max": 0.556211
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.03579598666666667,
+              "median": 0.015067,
+              "min": 0.008561,
+              "max": 0.865749
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 10.335551,
+            "store_async_enqueue": 1.29504
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "6": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.51422248,
+              "median": 0.492802,
+              "min": 0.476382,
+              "max": 1.674678
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.024714279999999998,
+              "median": 0.015366,
+              "min": 0.008711,
+              "max": 0.110946
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 13.62916,
+            "store_async_enqueue": 0.670447
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        },
+        "7": {
+          "durations_ms": {
+            "store_descriptors": {
+              "count": 75,
+              "mean": 0.5070750666666667,
+              "median": 0.484984,
+              "min": 0.46968,
+              "max": 1.603992
+            },
+            "store_async_enqueue": {
+              "count": 75,
+              "mean": 0.023067146666666666,
+              "median": 0.01359,
+              "min": 0.00887,
+              "max": 0.081275
+            }
+          },
+          "exposed_inter_compute_ms": {
+            "store_descriptors": 11.699783,
+            "store_async_enqueue": 0.467979
+          },
+          "descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "original_descriptors": {
+            "count": 75,
+            "mean": 1287,
+            "median": 1287,
+            "min": 1287,
+            "max": 1287
+          },
+          "descriptor_ratio": {
+            "count": 75,
+            "mean": 1.0,
+            "median": 1.0,
+            "min": 1.0,
+            "max": 1.0
+          },
+          "producer_states": {},
+          "allocation": {},
+          "allocation_totals": {},
+          "load_descriptors": {},
+          "load_ready_states": {},
+          "load_policy_reasons": {},
+          "independent_compute_states": {},
+          "copy_descriptor_geometry": []
+        }
+      }
+    }
+  ],
+  "definitions": "Durations include all store markers in each measured policy generation, including final drain. Exposed times intersect conservative all-rank inter-compute gaps. Nested markers overlap: do not sum them as an additive latency breakdown. Producer/stream readiness is a CPU-side snapshot at dependency submission. Allocation counters describe the selection from already-known pending stores only. In the independent load path, load_ready_states describes its private ready stream; independent_compute_states records the original compute stream."
+}

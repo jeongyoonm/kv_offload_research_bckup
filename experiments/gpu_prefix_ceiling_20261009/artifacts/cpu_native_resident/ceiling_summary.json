@@ -1,0 +1,141 @@
+{
+  "rows": [
+    {
+      "workload": "familiar60k",
+      "label": "cpu_only",
+      "requests_per_episode": 32,
+      "episodes": 10,
+      "measured_requests": 320,
+      "throughput_rps": 7.340562532167326,
+      "aggregate_throughput_rps": 7.338053079825206,
+      "mean_ttft_ms": 2926.631126259375,
+      "p50_ttft_ms": 3389.735103,
+      "p95_ttft_ms": 4403.3540742,
+      "restored_prefix_tokens": 18677760,
+      "cpu_load_bytes_server_wide": 7127433216000.0,
+      "gpu_prefix_hit_tokens": 0.0,
+      "full_residency_required": true,
+      "restored_expected_fraction": 1.0,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "seed": 9401,
+          "throughput_rps": 7.4113245034243445,
+          "mean_ttft_ms": 2831.73479671875,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 1,
+          "seed": 9402,
+          "throughput_rps": 7.486833984812749,
+          "mean_ttft_ms": 2844.58228621875,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 2,
+          "seed": 9403,
+          "throughput_rps": 7.126253041669356,
+          "mean_ttft_ms": 3009.88325659375,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 3,
+          "seed": 9404,
+          "throughput_rps": 7.135837881948127,
+          "mean_ttft_ms": 2982.06271159375,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 4,
+          "seed": 9405,
+          "throughput_rps": 7.453893246848469,
+          "mean_ttft_ms": 2853.90194415625,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 5,
+          "seed": 9406,
+          "throughput_rps": 7.433589070796147,
+          "mean_ttft_ms": 2864.433951875,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 6,
+          "seed": 9407,
+          "throughput_rps": 7.282178240877132,
+          "mean_ttft_ms": 2984.12529871875,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 7,
+          "seed": 9408,
+          "throughput_rps": 7.4734162561523405,
+          "mean_ttft_ms": 3042.11525425,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 8,
+          "seed": 9409,
+          "throughput_rps": 7.195203219559157,
+          "mean_ttft_ms": 2943.9830277812503,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 9,
+          "seed": 9410,
+          "throughput_rps": 7.407095875585434,
+          "mean_ttft_ms": 2909.4887346875,
+          "gpu_hit_target_fraction": null
+        }
+      ]
+    },
+    {
+      "workload": "short16k",
+      "label": "cpu_only",
+      "requests_per_episode": 75,
+      "episodes": 4,
+      "measured_requests": 300,
+      "throughput_rps": 26.045742144023112,
+      "aggregate_throughput_rps": 26.035340684563593,
+      "mean_ttft_ms": 1052.7075499666666,
+      "p50_ttft_ms": 1105.3946179999998,
+      "p95_ttft_ms": 1376.24385545,
+      "restored_prefix_tokens": 4665600,
+      "cpu_load_bytes_server_wide": 1780392960000.0,
+      "gpu_prefix_hit_tokens": 0.0,
+      "full_residency_required": true,
+      "restored_expected_fraction": 1.0,
+      "per_repeat": [
+        {
+          "repeat": 0,
+          "seed": 9401,
+          "throughput_rps": 26.347396753789518,
+          "mean_ttft_ms": 1049.00595224,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 1,
+          "seed": 9402,
+          "throughput_rps": 25.540495047948816,
+          "mean_ttft_ms": 1070.7466088266667,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 2,
+          "seed": 9403,
+          "throughput_rps": 25.54704713799948,
+          "mean_ttft_ms": 1054.2553333866667,
+          "gpu_hit_target_fraction": null
+        },
+        {
+          "repeat": 3,
+          "seed": 9404,
+          "throughput_rps": 26.748029636354634,
+          "mean_ttft_ms": 1036.8223054133334,
+          "gpu_hit_target_fraction": null
+        }
+      ]
+    }
+  ],
+  "definitions": "Warm priming is excluded; all cells pass cache-hit accounting, one-output-token and no-preemption checks. GPU-only resident cells require every expected prefix token in GPU cache, with zero CPU offload loads. CPU cells reset GPU cache after priming and verify CPU restoration. Full-resident references fit the unchanged GPU KV pool. Capacity-limited 75-request 60K episodes explicitly permit prefix misses and are not an all-hits ceiling. Throughput is the mean of episode rates; aggregate throughput is also given. Tail TTFT here is pooled across measured requests. CPU and GPU cache modes use independent allocations. GPU-only uses ordinary worker preparation without the connector-dependent observer or scheduler holds, so this is a measured resident reference, not a mathematical upper bound."
+}

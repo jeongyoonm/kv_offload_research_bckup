@@ -570,6 +570,24 @@ class OffloadingWorker(ABC):
         """Order subsequent GPU writes after stores; default to a host wait."""
         self.wait(job_ids)
 
+    def record_store_producers(self, req_ids: list[str]) -> None:
+        return
+
+    def clear_store_producers(self) -> None:
+        return
+
+    def get_store_producer(self, req_id: str) -> Any:
+        return None
+
+    def submit_store_after_producer(
+        self,
+        job_id: int,
+        src_spec: GPULoadStoreSpec,
+        dst_spec: LoadStoreSpec,
+        producer: Any,
+    ) -> bool:
+        return self.submit_store(job_id, src_spec, dst_spec)
+
     def shutdown(self) -> None:
         return
 

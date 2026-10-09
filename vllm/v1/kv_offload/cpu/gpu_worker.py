@@ -73,6 +73,7 @@ class Transfer:
     batch_src: torch.Tensor
     batch_dst: torch.Tensor
     batch_sizes: torch.Tensor
+    producer_event: torch.Event | None = None
 
 
 @dataclass
@@ -590,7 +591,11 @@ class SingleDirectionOffloadingHandler:
         return block_bases_src[writer_mask], block_bases_dst[writer_mask]
 
     def transfer_async(
-        self, job_id: int, src_spec: LoadStoreSpec, dst_spec: LoadStoreSpec
+        self,
+        job_id: int,
+        src_spec: LoadStoreSpec,
+        dst_spec: LoadStoreSpec,
+        producer_event: torch.Event | None = None,
     ) -> bool:
         from vllm.v1.kv_offload import queue_stages
 
@@ -777,7 +782,18 @@ class SingleDirectionOffloadingHandler:
         # the step being scheduled and cannot retract zeroing shipped in an
         # earlier step for a since-reallocated block; with async scheduling
         # nothing else orders that zeroing against this copy.
-        stream.wait_stream(current_platform.current_stream())
+        if producer_event is None:
+            stream.wait_stream(current_platform.current_stream())
+        else:
+            assert self.gpu_to_cpu
+            if trace_store:
+                queue_stages.emit(
+                    "store_specific_producer_dependency",
+                    job_id=job_id,
+                    producer_ready=producer_event.query(),
+                    current_stream_ready=current_platform.current_stream().query(),
+                )
+            stream.wait_event(producer_event)
         if self._transfers:
             last_transfer: Transfer = self._transfers[-1]
             last_event = last_transfer.end_event
@@ -819,6 +835,7 @@ class SingleDirectionOffloadingHandler:
                 batch_src=batch_src,
                 batch_dst=batch_dst,
                 batch_sizes=batch_sizes,
+                producer_event=producer_event,
             )
         )
 
@@ -961,6 +978,8 @@ class CPUOffloadingWorker(OffloadingWorker):
         # successful construction, the worker is the sole owner and releases
         # it after both transfer directions have stopped.
         self._mmap_region = mmap_region
+        self._specific_store_producers = False
+        self._store_producers: dict[str, torch.Event] = {}
         pin_memory = PIN_MEMORY
         logger.info("Allocating %d CPU tensors...", len(kv_caches.tensors))
         if mmap_region is not None and pin_memory:
@@ -1047,7 +1066,44 @@ class CPUOffloadingWorker(OffloadingWorker):
         """Async CPU -> GPU."""
         return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
 
+    def record_store_producers(self, req_ids: list[str]) -> None:
+        if not getattr(self, "_specific_store_producers", False) or not req_ids:
+            return
+        if not current_platform.is_cuda():
+            return
+        producers = getattr(self, "_store_producers", None)
+        if producers is None:
+            producers = {}
+            self._store_producers = producers
+        event = torch.Event()
+        event.record(current_platform.current_stream())
+        for req_id in req_ids:
+            producers.pop(req_id, None)
+            producers[req_id] = event
+        while len(producers) > 256:
+            del producers[next(iter(producers))]
+
+    def get_store_producer(self, req_id: str):
+        return getattr(self, "_store_producers", {}).get(req_id)
+
+    def clear_store_producers(self) -> None:
+        self._store_producers.clear()
+
+    def submit_store_after_producer(
+        self,
+        job_id: int,
+        src_spec: GPULoadStoreSpec,
+        dst_spec: LoadStoreSpec,
+        producer: torch.Event,
+    ) -> bool:
+        return self._store_handler.transfer_async(
+            job_id, src_spec, dst_spec, producer_event=producer
+        )
+
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
+        self._specific_store_producers = bool(options.get("store_specific_producer"))
+        if not self._specific_store_producers:
+            getattr(self, "_store_producers", {}).clear()
         depth = int(options.get("copy_pipeline_depth", 1))
         if depth == getattr(self, "_copy_pipeline_depth", 1):
             return

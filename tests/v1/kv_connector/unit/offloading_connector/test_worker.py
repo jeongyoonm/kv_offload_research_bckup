@@ -773,3 +773,35 @@ def test_register_kv_caches_uniform_type(backend):
     # opaque mapping rather than a certified, parallelism-agnostic one
     assert group_refs[0].mapping.parallelism_agnostic
     assert not group_refs[1].mapping.parallelism_agnostic
+
+
+@pytest.mark.parametrize("safe", [False, True])
+def test_deferred_store_keeps_its_source_producer_until_submission(safe):
+    """Capture the producer when queueing; unsafe geometry retains broad ordering."""
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    assert worker.worker is not None
+    producer = object()
+    worker.worker.get_store_producer.return_value = producer
+    metadata = _store_metadata(10)
+    metadata.experiment_options = {"store_specific_producer": True}
+    metadata.store_producer_safe = safe
+    metadata.computed_request_ids = ["req"]
+    worker.prepare_store_kv(metadata)
+    worker.worker.record_store_producers.assert_called_once_with(["req"])
+    next_meta = _empty_metadata()
+    next_meta.experiment_options = {"store_specific_producer": True}
+    next_meta.store_producer_safe = safe
+    worker.handle_preemptions(next_meta)
+    worker.start_kv_transfers(next_meta)
+    if safe:
+        args = worker.worker.submit_store_after_producer.call_args.args
+        assert args[0] == 10 and args[-1] is producer
+        worker.worker.submit_store.assert_not_called()
+    else:
+        worker.worker.submit_store.assert_called_once()
+        worker.worker.submit_store_after_producer.assert_not_called()
+    assert not worker._unsubmitted_store_producers
+    assert not worker._unsubmitted_store_jobs
+    assert worker.build_connector_worker_meta() is None

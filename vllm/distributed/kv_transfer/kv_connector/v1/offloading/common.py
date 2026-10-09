@@ -74,6 +74,8 @@ class OffloadingConnectorMetadata(KVConnectorMetadata):
     experiment_options: dict[str, int | bool] = field(default_factory=dict)
     optimistic_load_jobs: set[int] = field(default_factory=set)
     force_flush_on_host: bool = False
+    computed_request_ids: list[str] = field(default_factory=list)
+    store_producer_safe: bool = False
 
 
 @dataclass

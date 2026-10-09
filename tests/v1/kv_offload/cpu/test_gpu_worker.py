@@ -791,3 +791,47 @@ def test_invalid_copy_pipeline_depth_rejected(depth):
 
     with pytest.raises(ValueError):
         validate_experiment_options({"copy_pipeline_depth": depth})
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA producer event test")
+@torch.inference_mode()
+@pytest.mark.parametrize("producer_busy", [False, True])
+def test_store_waits_for_its_producer_but_not_newer_unrelated_compute(
+    default_vllm_config, producer_busy
+):
+    """A store must read produced bytes without inheriting later stream work."""
+    page = 128 * 1024
+    gpu = torch.full((2, page), 0x11, dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=gpu, page_size_bytes=page)],
+            group_data_refs=[[CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page)]],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+    )
+    worker.configure_experiment({"store_specific_producer": True})
+    spec = GPULoadStoreSpec([0], (1,), (0,))
+    try:
+        torch.accelerator.synchronize()
+        if producer_busy:
+            torch.cuda._sleep(100_000_000)
+        gpu[0].fill_(0x33)
+        worker.record_store_producers(["a"])
+        producer = worker.get_store_producer("a")
+        assert producer is not None
+        torch.cuda._sleep(200_000_000)
+        unrelated = torch.Event()
+        unrelated.record(current_platform.current_stream())
+        assert worker.submit_store_after_producer(
+            1, spec, CPULoadStoreSpec([0]), producer
+        )
+        worker.wait({1})
+        assert not unrelated.query(), "Store inherited later unrelated compute"
+        cpu = worker._store_handler.dst_tensors[0]
+        torch.testing.assert_close(cpu[0], torch.full((page,), 0x33, dtype=torch.int8))
+        assert [r.job_id for r in worker.get_finished()] == [1]
+        assert not worker.get_finished()
+    finally:
+        torch.accelerator.synchronize()
+        worker.shutdown()

@@ -1581,6 +1581,17 @@ class OffloadingConnectorScheduler:
             store_jobs=partial_store_jobs | normal_store_jobs,
             jobs_to_flush=self._current_batch_jobs_to_flush,
             force_flush_on_host=self._current_batch_force_flush_on_host,
+            computed_request_ids=[
+                rid for rid, n in scheduler_output.num_scheduled_tokens.items() if n > 0
+            ],
+            store_producer_safe=not (
+                self._current_batch_force_flush_on_host
+                or scheduler_output.new_block_ids_to_zero
+                or scheduler_output.kv_cache_block_copies
+                or scheduler_output.preempted_req_ids
+                or self._sliding_window_groups
+                or any(g.requires_cow_source for g in self.config.kv_group_configs)
+            ),
         )
 
         # All prepare_store calls for finished requests have been issued.

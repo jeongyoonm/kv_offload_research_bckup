@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 from collections import defaultdict
 from dataclasses import replace
+from typing import Any
 
 import torch
 
@@ -66,6 +67,7 @@ class OffloadingConnectorWorker:
         self._unsubmitted_store_jobs: list[
             tuple[int, GPULoadStoreSpec, LoadStoreSpec]
         ] = []
+        self._unsubmitted_store_producers: dict[int, Any] = {}
         self._connector_worker_meta = OffloadingWorkerMetadata()
 
     def _init_worker(self, kv_caches: CanonicalKVCaches) -> None:
@@ -215,6 +217,12 @@ class OffloadingConnectorWorker:
 
     def handle_preemptions(self, kv_connector_metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
+        if not (
+            kv_connector_metadata.experiment_options.get("store_specific_producer")
+            and kv_connector_metadata.store_producer_safe
+        ):
+            self._unsubmitted_store_producers.clear()
+            self.worker.clear_store_producers()
 
         # Pop jobs_to_flush from store_jobs into _unsubmitted_store_jobs
         # so the existing submission loop below submits them before wait().
@@ -229,6 +237,9 @@ class OffloadingConnectorWorker:
                     self._unsubmitted_store_jobs.append(
                         (job_id, entry.src_spec, entry.dst_spec)
                     )
+                    self._capture_store_producer(
+                        job_id, entry.req_id, kv_connector_metadata
+                    )
 
         # Submit deferred stores from previous step (and jobs_to_flush above).
         if queue_stages.active and self._unsubmitted_store_jobs:
@@ -239,7 +250,7 @@ class OffloadingConnectorWorker:
             )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
             assert isinstance(src_spec, GPULoadStoreSpec)
-            success = self.worker.submit_store(job_id, src_spec, dst_spec)
+            success = self._submit_deferred_store(job_id, src_spec, dst_spec)
             assert success
         if queue_stages.active and self._unsubmitted_store_jobs:
             queue_stages.emit(
@@ -280,7 +291,7 @@ class OffloadingConnectorWorker:
                 jobs=[job[0] for job in self._unsubmitted_store_jobs],
             )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
-            success = self.worker.submit_store(job_id, src_spec, dst_spec)
+            success = self._submit_deferred_store(job_id, src_spec, dst_spec)
             assert success
         if queue_stages.active and self._unsubmitted_store_jobs:
             queue_stages.emit(
@@ -305,6 +316,9 @@ class OffloadingConnectorWorker:
             assert success
 
     def prepare_store_kv(self, metadata: OffloadingConnectorMetadata):
+        assert self.worker is not None
+        if metadata.experiment_options.get("store_specific_producer"):
+            self.worker.record_store_producers(metadata.computed_request_ids)
         for job_id, entry in metadata.store_jobs.items():
             if not self._is_store_writer:
                 # Gate before queueing: no _unsubmitted_store_jobs entry.
@@ -317,6 +331,26 @@ class OffloadingConnectorWorker:
             self._unsubmitted_store_jobs.append(
                 (job_id, entry.src_spec, entry.dst_spec)
             )
+            self._capture_store_producer(job_id, entry.req_id, metadata)
+
+    def _capture_store_producer(self, job_id, req_id, metadata):
+        assert self.worker is not None
+        if (
+            metadata.experiment_options.get("store_specific_producer")
+            and metadata.store_producer_safe
+        ):
+            producer = self.worker.get_store_producer(req_id)
+            if producer is not None:
+                self._unsubmitted_store_producers[job_id] = producer
+
+    def _submit_deferred_store(self, job_id, src_spec, dst_spec):
+        assert self.worker is not None
+        producer = self._unsubmitted_store_producers.pop(job_id, None)
+        if producer is not None:
+            return self.worker.submit_store_after_producer(
+                job_id, src_spec, dst_spec, producer
+            )
+        return self.worker.submit_store(job_id, src_spec, dst_spec)
 
     def get_finished(self, finished_req_ids: set[str]) -> tuple[set[str], set[str]]:
         """

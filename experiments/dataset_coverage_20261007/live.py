@@ -65,6 +65,16 @@ def stream(tokens, name):
     )
 
 
+WORKLOAD_SHAPES = {
+    "familiar60k": (58368, 3072),
+    "short16k": (15552, 832),
+    "mid32k": (30720, 2048),
+    "short_long_suffix": (15552, 3072),
+    "long_short_suffix": (58368, 832),
+    "heterogeneous": (24576, 8192),
+}
+
+
 def cell(
     label,
     state,
@@ -81,15 +91,10 @@ def cell(
         return json.loads((directory / "result.json").read_text())
     directory.mkdir(parents=True, exist_ok=True)
     run.reset(True)
-    homogeneous = workload in ("familiar60k", "short16k", "mid32k")
+    homogeneous = workload in WORKLOAD_SHAPES and workload != "heterogeneous"
     if prefix_working_set is not None:
         assert homogeneous and 0 < prefix_working_set <= requests_count
-    context, suffix = {
-        "familiar60k": (58368, 3072),
-        "short16k": (15552, 832),
-        "mid32k": (30720, 2048),
-        "heterogeneous": (24576, 8192),
-    }[workload]
+    context, suffix = WORKLOAD_SHAPES[workload]
     requests, primes, expected = [], [], []
     shared_prefixes = {}
     for i in range(requests_count):

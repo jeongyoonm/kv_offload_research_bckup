@@ -20,6 +20,13 @@ SOURCE = Path(__file__).resolve().parents[2]
 module, collector = baseline.module, baseline.collector
 CURRENT_ARM = "control"
 LEADS = {"control": 100_000, "shape100": 100_000, "shape50": 50_000}
+PREFIX_WORKING_SETS = {
+    "short16k": 300,
+    "mid32k": 150,
+    "familiar60k": 75,
+    "short_long_suffix": 250,
+    "long_short_suffix": 75,
+}
 
 
 def options(active=False):
@@ -52,7 +59,8 @@ def main():
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
     assert 1 <= args.repeats <= 8 and 900 <= args.allocation_timeout <= 10800
-    assert set(args.workloads) <= {"short16k", "mid32k", "familiar60k", "heterogeneous"}
+    assert set(args.workloads) <= set(module.driver.live.WORKLOAD_SHAPES)
+    assert args.requests != 300 or set(args.workloads) <= set(PREFIX_WORKING_SETS)
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
     assert not (root / "plan.json").exists(), "Use a fresh output root"
@@ -113,7 +121,7 @@ def main():
             requests=args.requests,
             concurrency=32,
             output_tokens=1,
-            prefix_working_set=75 if args.requests == 300 else None,
+            prefix_working_sets=PREFIX_WORKING_SETS if args.requests == 300 else None,
             seeds=[args.seed_start + i for i in range(args.repeats)],
             checkpoint_sha256=digest,
             fit_sha256=hashlib.sha256(args.fit.read_bytes()).hexdigest(),
@@ -126,7 +134,9 @@ def main():
             "allocator avoidance, H2D8/depth2, preparation, readiness and load-only "
             "policy unchanged. Calibration fitted before these independent seeds. "
             "75-request episodes are reset/primed; 300-request episodes have one "
-            "initial reset and a 75-prefix working set with distinct suffixes.",
+            "initial reset and a workload-specific prefix working set with "
+            "distinct suffixes. Working sets exceed GPU token capacity while "
+            "prefixes plus new suffixes fit the CPU token budget.",
         ),
     )
     collector.save(
@@ -164,7 +174,7 @@ def main():
             repeat,
             requests_count=count,
             require_preparation=True,
-            prefix_working_set=75 if count == 300 else None,
+            prefix_working_set=PREFIX_WORKING_SETS[workload] if count == 300 else None,
         )
         assert result["accepted"], result
         return result

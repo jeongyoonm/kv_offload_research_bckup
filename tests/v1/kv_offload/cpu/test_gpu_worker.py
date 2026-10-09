@@ -309,11 +309,13 @@ def test_native_store_fifo_and_shutdown_preserve_overlapping_cpu_writes(
         torch.testing.assert_close(
             cpu[0], torch.full((page_size,), 0x33, dtype=torch.int8)
         )
+        torch.cuda._sleep(100_000_000)
+        tensor[1].fill_(0x55)
         spec = GPULoadStoreSpec([1], group_sizes=(1,), block_indices=(0,))
         assert worker.submit_store(3, spec, CPULoadStoreSpec([1]))
     finally:
         worker.shutdown()
-    torch.testing.assert_close(cpu[1], torch.full((page_size,), 0x33, dtype=torch.int8))
+    torch.testing.assert_close(cpu[1], torch.full((page_size,), 0x55, dtype=torch.int8))
     assert worker._store_handler._async_submitter_handle is None
 
 

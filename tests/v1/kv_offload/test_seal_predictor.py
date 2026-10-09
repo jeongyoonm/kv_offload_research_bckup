@@ -79,6 +79,45 @@ def test_shape_correction_rejects_corrupt_artifacts_before_publication(mutation)
         BatchShapeCalibration(state)
 
 
+@pytest.mark.parametrize(
+    "context,suffix,supported",
+    [
+        (15552, 832, True),
+        (58368, 3072, True),
+        (30720, 1664, True),
+        (15552, 3072, False),
+        (58368, 832, False),
+        (30720, 2048, False),
+    ],
+)
+def test_joint_guard_distinguishes_geometry_inside_marginal_bounds(
+    context, suffix, supported
+):
+    """Context/suffix combinations require support beyond separate ranges."""
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    old = BatchShapeCalibration(state)
+    state.update(schema=2, geometry_support=dict(suffix_per_context=[0.05, 0.057]))
+    guarded = BatchShapeCalibration(state)
+    x = np.zeros(28)
+    x[:9] = [suffix * 4, 4, 0, context * 4, suffix, suffix, context, context, 0]
+    assert old.bias_ns(200_000_000, x, 90_000_000) == (30_000_000, False)
+    assert guarded.bias_ns(200_000_000, x, 90_000_000) == (
+        (30_000_000, False) if supported else (90_000_000, True)
+    )
+
+
+@pytest.mark.parametrize("bounds", [[0, 0.1], [0.1, 0.05], [0.05], [0.05, np.nan]])
+def test_joint_guard_rejects_invalid_support_before_checkpoint_publication(bounds):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_correction_state()
+    state.update(schema=2, geometry_support=dict(suffix_per_context=bounds))
+    with pytest.raises(ValueError, match="geometry support"):
+        BatchShapeCalibration(state)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
     """Even an elapsed-sensitive component cannot move an offset deadline."""

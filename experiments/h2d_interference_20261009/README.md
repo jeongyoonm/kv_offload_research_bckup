@@ -86,6 +86,12 @@ has a separate allocation, three excluded warmups, and two matched 32-request
 episodes on each of 16K cached, 60K cached and heterogeneous workloads.
 Cached-token accounting, no GPU prefix-cache hits/preemptions, one output token,
 frozen predictor state and all-rank compact/pinned preparation are required.
+The existing snapshot is trained at 128 MiB. For 8/16 MiB, explicitly retarget
+only its `context.h2d_chunk_bytes` compatibility identity; preserve every learned
+weight and history, and leave the production compatibility check active.
+Record the original file hash, loaded state, and changed identity field. A CPU
+replay checks exact prediction equality on control request-shape events. This
+does not assume identical live prediction error under changed I/O interference.
 Run `report.py` on the artifact root after all serving stages, then
 `plot_serving.py` using the plotting environment. These small reset/primed
 episodes have allocation/order confounds and do not replace a continuous

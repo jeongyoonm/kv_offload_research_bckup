@@ -149,8 +149,63 @@ def cell_audit(directory, result):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("root", type=Path)
+    parser.add_argument("--partial", action="store_true")
     args = parser.parse_args()
     root = args.root
+    if args.partial:
+        rows = []
+        for path in sorted((root / "live").glob("*/*/result.json")):
+            result = json.loads(path.read_text())
+            if result["repeat"] == "warmup":
+                continue
+            assert result["accepted"] and result["frozen_unchanged"]
+            audit, _ = cell_audit(path.parent, result)
+            detail = diagnostics(path.parent)
+            rows.append(
+                dict(
+                    **{
+                        k: result[k]
+                        for k in (
+                            "workload",
+                            "label",
+                            "repeat",
+                            "seed",
+                            "throughput_rps",
+                            "mean_ttft_ms",
+                            "p95_ttft_ms",
+                            "compute_rounds",
+                            "recovered_compute_opportunities",
+                            "kv_ready_during_compute",
+                        )
+                    },
+                    inter_compute_gap_ms=detail["inter_compute_gap_ms"],
+                    **audit,
+                )
+            )
+        (root / "partial_audit.json").write_text(
+            json.dumps(dict(provisional=True, episodes=rows), indent=2) + "\n"
+        )
+        for row in rows:
+            print(
+                json.dumps(
+                    {
+                        k: row[k]
+                        for k in (
+                            "workload",
+                            "label",
+                            "repeat",
+                            "throughput_rps",
+                            "compute_rounds",
+                            "inter_compute_gap_ms",
+                            "corrected_prediction",
+                            "prepared_deadline_window_misses",
+                            "recovered_compute_opportunities",
+                            "kv_ready_during_compute",
+                        )
+                    }
+                )
+            )
+        return
     summary = json.loads((root / "summary.json").read_text())
     assert summary["complete"] and summary["stopped"]
     plan = json.loads((root / "plan.json").read_text())

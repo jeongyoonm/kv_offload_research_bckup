@@ -5,6 +5,7 @@
 import argparse
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import regex as re
@@ -21,6 +22,36 @@ EXPECTED_LAUNCH = {
     "--block-size": "64",
 }
 CHECKPOINT_FILE_SHA = "048c50302c0405ce2dcad233f064d13088f9bf1282c018837237d854f9bc2572"
+PREDICTOR_STATE_SHA = "7156a300996445131973d3c8288a08bd42136fe89f2f6e15bd5bac787c24dcde"
+
+
+def checkpoint_provenance(root, plan, provenance):
+    recorded = plan.get("checkpoint_file_sha256")
+    if recorded is not None:
+        assert recorded == CHECKPOINT_FILE_SHA, root
+        return dict(sha256=recorded, evidence="recorded launch plan")
+    # Resident-reference drivers assert the frozen file before server startup,
+    # but their original plan schema omitted the file digest.
+    assert plan.get("cache") == "cpu", root
+    driver = "experiments/gpu_prefix_ceiling_20261009/run.py"
+    source = subprocess.check_output(
+        ["git", "show", f"{provenance['commit']}:{driver}"],
+        cwd=provenance["source"],
+        text=True,
+    )
+    assert "hashlib.sha256(checkpoint.read_bytes()).hexdigest()" in source
+    assert '== freeze["models"]["matched_offset"]' in source
+    model_root = Path("/mnt/localnvme/glm53_offset_predictor_20261008")
+    checkpoint = model_root / "models/matched_offset.json"
+    freeze = json.loads((model_root / "freeze.json").read_text())
+    digest = hashlib.sha256(checkpoint.read_bytes()).hexdigest()
+    assert digest == freeze["models"]["matched_offset"] == CHECKPOINT_FILE_SHA
+    return dict(
+        sha256=digest,
+        evidence="immutable driver startup assertion and reviewed frozen file; "
+        "digest was not recorded in the original resident launch plan",
+        driver_commit=provenance["commit"],
+    )
 
 
 def audit(root):
@@ -44,12 +75,15 @@ def audit(root):
             assert row["expected_cached"] == row["observed_cached"], root
     predictor = root / "loaded_predictor.json"
     semantic_sha = None
+    provenance = json.loads((root / "source_provenance.json").read_text())
+    checkpoint = None
     if any("checkpoint_sha256" in r for r in results):
-        assert plan["checkpoint_file_sha256"] == CHECKPOINT_FILE_SHA, root
+        checkpoint = checkpoint_provenance(root, plan, provenance)
         state = json.loads(predictor.read_text())
         semantic_sha = hashlib.sha256(
             json.dumps(state, sort_keys=True).encode()
         ).hexdigest()
+        assert semantic_sha == PREDICTOR_STATE_SHA, root
         assert all(r["checkpoint_sha256"] == semantic_sha for r in results), root
         assert all(r["frozen_unchanged"] for r in results), root
         assert all(r["optimized_preparation_verified"] for r in results), root
@@ -78,9 +112,9 @@ def audit(root):
         accepted=True,
         stopped=True,
         reported_gpu_tokens=capacities,
-        checkpoint_file_sha=plan.get("checkpoint_file_sha256"),
+        checkpoint_provenance=checkpoint,
         predictor_state_sha=semantic_sha,
-        source=json.loads((root / "source_provenance.json").read_text()),
+        source=provenance,
     )
 
 

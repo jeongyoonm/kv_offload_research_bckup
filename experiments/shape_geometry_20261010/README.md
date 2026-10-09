@@ -11,7 +11,8 @@ do not establish support for arbitrary context/suffix combinations.
 
 First validate the unchanged frozen correction on 15552/3072 and
 58368/832. Compare the original fixed 90 ms correction/100 ms lead with
-the frozen shape correction/50 ms lead, using two paired 75-request
+the frozen shape correction at both 100 ms and 50 ms leads, using two
+paired 75-request
 episodes and new seeds 9601/2. These are development observations for
 any subsequent geometry refit; fresh serving seeds must validate that
 refit. No labels from these cells select the initial frozen checkpoint.
@@ -35,7 +36,7 @@ PYTHONPATH="$PWD" .venv/bin/python \
   --output /mnt/localnvme/jeongyoon/yc2 \
   --fit /mnt/localnvme/jeongyoon/shape_calibration_20261010/frozen_fit.json \
   --workloads short_long_suffix long_short_suffix \
-  --arms control shape50 --seed-start 9601
+  --arms control shape100 shape50 --seed-start 9601
 ```
 
 Retain all rejected cells and failed checks. Do not interpret the

@@ -72,6 +72,7 @@ WORKLOAD_SHAPES = {
     "short_long_suffix": (15552, 3072),
     "long_short_suffix": (58368, 832),
     "unseen48k": (49152, 1536),
+    "mixed_supported": (36960, 1952),
     "heterogeneous": (24576, 8192),
 }
 
@@ -92,22 +93,32 @@ def cell(
         return json.loads((directory / "result.json").read_text())
     directory.mkdir(parents=True, exist_ok=True)
     run.reset(True)
-    homogeneous = workload in WORKLOAD_SHAPES and workload != "heterogeneous"
+    homogeneous = workload in WORKLOAD_SHAPES and workload not in (
+        "heterogeneous",
+        "mixed_supported",
+    )
     if prefix_working_set is not None:
-        assert homogeneous and 0 < prefix_working_set <= requests_count
+        assert (
+            homogeneous or workload == "mixed_supported"
+        ) and 0 < prefix_working_set <= requests_count
+        if workload == "mixed_supported":
+            assert prefix_working_set % 4 == 0
     context, suffix = WORKLOAD_SHAPES[workload]
     requests, primes, expected = [], [], []
     shared_prefixes = {}
     for i in range(requests_count):
         c = context if homogeneous or i % 2 else 4096
         s = suffix if homogeneous or i % 3 else 2048
+        if workload == "mixed_supported":
+            c = (15552, 58368)[i % 2]
+            s = (832, 3072)[(i // 2) % 2]
         prefix, tail = run.prompt(c, s, seed * 100000 + i)
         if prefix_working_set is not None:
             slot = i % prefix_working_set
             if slot not in shared_prefixes:
                 shared_prefixes[slot] = prefix
             prefix = shared_prefixes[slot]
-        hit = homogeneous or i % 2 == 0
+        hit = homogeneous or workload == "mixed_supported" or i % 2 == 0
         expected.append(c if hit else 0)
         requests.append(prefix + tail)
         if hit and (prefix_working_set is None or i < prefix_working_set):

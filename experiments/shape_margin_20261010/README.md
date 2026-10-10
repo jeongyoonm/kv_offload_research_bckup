@@ -31,3 +31,11 @@ readiness/cancellation snapshots, safety cap, and ordered retirement.
 
 CPU margin auditing is permitted during serving. Runtime mechanism
 tests and new GPU allocations wait for the current allocation to stop.
+
+The next composition probe uses all four combinations of contexts
+15552/58368 and suffixes 832/3072, with full CPU-prefix hits. It is
+independent serving validation, not fitting data for the frozen model.
+A 100-prefix working set repeats shapes every four requests; its
+3,696,000 prefix tokens exceed GPU capacity and its conservative
+4,288,000 total CPU tokens fit the unchanged CPU budget. Existing
+exact CPU-hit, zero GPU-hit, no-preemption and preparation checks apply.

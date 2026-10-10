@@ -108,7 +108,7 @@ def base_predict(base, rows):
     )
 
 
-def fit(rows, seed):
+def fit(rows, seed, correction_config=None):
     groups = np.array([r["episode"] for r in rows])
     it, iv = next(
         GroupShuffleSplit(1, test_size=0.2, random_state=73).split(rows, groups=groups)
@@ -136,7 +136,11 @@ def fit(rows, seed):
     assert np.isfinite(oof).all()
     x = np.column_stack((study.full_features(rows), oof))
     correction, seconds = arch.fit(
-        arch.FIXED_CORRECTION, x, arch.target(rows) - oof, rows, seed
+        correction_config or arch.FIXED_CORRECTION,
+        x,
+        arch.target(rows) - oof,
+        rows,
+        seed,
     )
     names = (
         arch.surface.FEATURE_NAMES
@@ -226,7 +230,40 @@ def main():
     )
     with threadpool_limits(limits=1):
         started = time.monotonic()
-        envelope, audit = fit(forecasts, 73)
+        groups = np.array([r["episode"] for r in forecasts])
+        cv = []
+        for fold, (it, iv) in enumerate(GroupKFold(3).split(forecasts, groups=groups)):
+            path = args.output / f"cv_{fold}.json"
+            if path.exists():
+                cv.append(json.loads(path.read_text()))
+                continue
+            tr, va = [forecasts[i] for i in it], [forecasts[i] for i in iv]
+            assert not {r["episode"] for r in tr} & {r["episode"] for r in va}
+            read = lambda name, fold=fold: json.loads(
+                (args.study / f"cv_{fold}_{name}_checkpoint.json").read_text()
+            )
+            correction_config = json.loads(
+                (args.study / f"cv_{fold}_trees_tuned.json").read_text()
+            )["audit"]["correction"]
+            fitted, fold_audit = fit(tr, 73, correction_config)
+            fold_scores = {}
+            for blend, name in [
+                (False, "envelope_boost"),
+                (True, "envelope_sparse_mlp"),
+            ]:
+                surface = wrap(
+                    fitted, read("sparse_mlp"), read("trees_fixed"), tr, blend
+                )
+                fold_scores[name] = arch.metrics(
+                    arch.target(va), predict(surface, va), va
+                )
+            result = dict(fold=fold, scores=fold_scores, audit=fold_audit)
+            study.train.save(path, result)
+            cv.append(result)
+        correction_config = json.loads(
+            (args.study / "trees_tuned_fit_audit.json").read_text()
+        )["correction"]
+        envelope, audit = fit(forecasts, 73, correction_config)
         scores, exports = {}, {}
         for blend, name in [(False, "envelope_boost"), (True, "envelope_sparse_mlp")]:
             surface = wrap(envelope, neural, fallback, forecasts, blend)
@@ -246,6 +283,7 @@ def main():
                 exports=exports,
                 frozen_before_final=True,
                 audit=audit,
+                cv=cv,
                 seconds=time.monotonic() - started,
             ),
         )

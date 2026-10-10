@@ -90,10 +90,35 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--seal-snapshot-only", action="store_true")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     assert not (args.output / "selection.json").exists()
     rows = json.loads(gzip.decompress(args.data.read_bytes()))
+    snapshot_audit = {}
+    if args.seal_snapshot_only:
+        kept = []
+        for row in rows:
+            if not row["last"]:
+                continue
+            actual = runtime.setup_features(
+                row["final_shapes"], row["features"][7], np.zeros(28)
+            )
+            matches = actual is not None and np.array_equal(
+                actual[:7], np.asarray(row["features"][:7], np.float32)
+            )
+            if not matches:
+                snapshot_audit["geometry_mismatch"] = (
+                    snapshot_audit.get("geometry_mismatch", 0) + 1
+                )
+                continue
+            kept.append(dict(row, weight=1.0, first=True))
+        snapshot_audit["retained_batches"] = len(kept)
+        snapshot_audit["discarded_earlier_frames"] = sum(not r["last"] for r in rows)
+        rows = kept
+        (args.output / "snapshot_audit.json").write_text(
+            json.dumps(snapshot_audit, indent=2) + "\n"
+        )
     splits = {
         name: [r for r in rows if r["split"] == name]
         for name in ("train", "dev", "final")
@@ -114,6 +139,11 @@ def main():
         "boost120": dict(max_iter=120, max_leaf_nodes=15, min_samples_leaf=30),
         "boost80_small": dict(max_iter=80, max_leaf_nodes=7, min_samples_leaf=50),
     }
+    if args.seal_snapshot_only:
+        configs.update(
+            extra80_leaf5=dict(n_estimators=80, min_samples_leaf=5, max_depth=12),
+            extra80_leaf10=dict(n_estimators=80, min_samples_leaf=10, max_depth=12),
+        )
     with threadpool_limits(limits=4):
         for target in ("target_cpu_ms", "target_ready_ms"):
             for name, config in configs.items():
@@ -160,6 +190,8 @@ def main():
             dev=metrics(splits["dev"], quantile.predict(x["dev"]), "target_ready_ms")
         )
         selection = dict(
+            seal_snapshot_only=args.seal_snapshot_only,
+            snapshot_audit=snapshot_audit,
             mean=best,
             uncertainty="ready_q90",
             candidates=candidates,
@@ -173,7 +205,8 @@ def main():
             final[arm] = metrics(
                 splits["final"], model.predict(x["final"]), "target_ready_ms"
             )
-            state = export(model, key, "target_ready_ms", model.get_params())
+            model_id = key + ("_seal_snapshot" if args.seal_snapshot_only else "")
+            state = export(model, model_id, "target_ready_ms", model.get_params())
             indices = [3, 4, 10, 11]
             state["support"] = dict(
                 indices=indices,

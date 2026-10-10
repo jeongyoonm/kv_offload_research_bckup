@@ -55,14 +55,16 @@ class BatchShapeCalibration:
             "provenance",
         }
         schema = state.get("schema") if isinstance(state, dict) else None
-        if schema in (2, 3, 4):
+        if schema in (2, 3, 4, 5, 6):
             required.add("geometry_support")
-        if schema == 4:
+        if schema in (4, 6):
             required.add("deadline_margin")
+        if schema in (5, 6):
+            required.add("productive_load_policy")
         if (
             not isinstance(state, dict)
             or set(state) != required
-            or schema not in (1, 2, 3, 4)
+            or schema not in (1, 2, 3, 4, 5, 6)
             or (schema in (1, 2) and state["features"] != FEATURES)
             or not isinstance(state["features"], list)
             or not state["features"]
@@ -94,7 +96,7 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid shape calibration support")
         self.geometry_bounds = None
-        if schema in (2, 3, 4):
+        if schema in (2, 3, 4, 5, 6):
             geometry = state["geometry_support"]
             if not isinstance(geometry, dict) or set(geometry) != {
                 "suffix_per_context"
@@ -111,7 +113,7 @@ class BatchShapeCalibration:
                 raise ValueError("invalid shape calibration geometry support")
 
         self.deadline_margin = None
-        if schema == 4:
+        if schema in (4, 6):
             margin = state["deadline_margin"]
             required_margin = {
                 "finish_allowance_ms",
@@ -147,6 +149,13 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid calibrated deadline margin bounds")
             self.deadline_margin = margin
+        self.productive_load_policy = None
+        if schema in (5, 6):
+            from vllm.v1.kv_offload.productive_load_policy import ProductiveLoadPolicy
+
+            self.productive_load_policy = ProductiveLoadPolicy(
+                state["productive_load_policy"], self.support, self.geometry_bounds
+            )
 
     def bias_ns(self, raw_duration_ns, features, fallback_ns):
         if features is None:

@@ -256,6 +256,84 @@ def test_deadline_margin_rejects_corrupt_frozen_allowances(mutation):
         BatchShapeCalibration(state)
 
 
+def productive_correction_state():
+    from vllm.v1.kv_offload.productive_load_policy import DIRECT_FEATURES
+
+    state = shape_correction_state()
+    state.update(
+        schema=5,
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+        productive_load_policy=dict(
+            schema=1,
+            features=DIRECT_FEATURES,
+            coefficients=[80, 0, 1000, 0, 0, 10],
+            work_coefficients=[1000, 10],
+            minimum_efficiency=0.7,
+            minimum_ready_candidates=1,
+            provenance={},
+        ),
+    )
+    return state
+
+
+def test_productive_exit_uses_ready_work_shape_instead_of_fixed_request_fraction():
+    """Larger suffixes provide a productive batch with fewer ready requests."""
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    model = BatchShapeCalibration(productive_correction_state()).productive_load_policy
+    targets = []
+    for shape in ([832, 15552], [3072, 58368]):
+        cohort = [shape] * 16
+        targets.append(
+            next(n for n in range(1, 17) if model.ready([], cohort[:n], cohort)[0])
+        )
+    assert targets[1] < targets[0] < 8
+    assert model.ready([[3072, 58368]] * 8, [], [[3072, 58368]] * 8) == (False, None)
+
+
+@pytest.mark.parametrize(
+    "shapes", [None, [], [[8192, 15552]], [[832, 0]], [[832, 15552]] * 33]
+)
+def test_productive_exit_preserves_fixed_policy_for_unknown_or_unsupported_shapes(
+    shapes,
+):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    model = BatchShapeCalibration(productive_correction_state()).productive_load_policy
+    assert model.ready([], [[832, 15552]], shapes) == (False, None)
+
+
+def test_productive_exit_weights_mixed_uncached_work_without_future_inputs():
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    model = BatchShapeCalibration(productive_correction_state()).productive_load_policy
+    short, long = [832, 15552], [3072, 58368]
+    active = [short] * 8 + [long] * 8
+    short_score = model.ready([], [short] * 4, active)[1]
+    long_score = model.ready([], [long] * 4, active)[1]
+    assert long_score > short_score
+
+
+@pytest.mark.parametrize(
+    "mutation", ["nonfinite", "negative_work", "efficiency", "width"]
+)
+def test_productive_exit_rejects_invalid_frozen_models(mutation):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = productive_correction_state()
+    policy = state["productive_load_policy"]
+    if mutation == "nonfinite":
+        policy["coefficients"][0] = float("nan")
+    elif mutation == "negative_work":
+        policy["work_coefficients"][0] = -1
+    elif mutation == "efficiency":
+        policy["minimum_efficiency"] = 0
+    else:
+        policy["coefficients"].pop()
+    with pytest.raises(ValueError, match="productive load policy"):
+        BatchShapeCalibration(state)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
     """Even an elapsed-sensitive component cannot move an offset deadline."""

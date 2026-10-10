@@ -1868,6 +1868,87 @@ def test_prediction_to_readiness_uses_partial_target_without_compute():
     executor.finish()
 
 
+@pytest.mark.parametrize(
+    "condition",
+    ["idle", "base_ack", "partial_ack", "cancelled", "compute", "unsupported"],
+)
+def test_productive_load_only_exit_keeps_compute_ack_and_cancellation_gates(
+    deadline_core, condition
+):
+    """Ready productive work can start early only after every required ACK."""
+    import numpy as np
+
+    from vllm.v1.kv_offload.productive_load_policy import DIRECT_FEATURES
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    core, clock = deadline_core()
+    core.batch_queue[-1][1].total_num_scheduled_tokens = (
+        1024 if condition == "compute" else 0
+    )
+    core.scheduler._late_seal_load_only_ready_percent = 50
+    core.scheduler._late_base_request_shapes = []
+    context = 8192 if condition == "unsupported" else 58368
+    ids = [
+        "partial" if i == 0 and condition == "partial_ack" else f"c{i}"
+        for i in range(16)
+    ]
+    core.scheduler.requests = {
+        rid: SimpleNamespace(num_tokens=context + 3072, num_computed_tokens=context)
+        for rid in ids
+    }
+    clock.ready_at = {
+        rid: 1_011_000_000 if i < 3 else 1_051_000_000 for i, rid in enumerate(ids)
+    }
+    if condition == "base_ack":
+        clock.base_at = 1_031_000_000
+    if condition == "cancelled":
+        core.aborts_queue.put([ids[0]])
+    calibration = BatchShapeCalibration(
+        dict(
+            schema=5,
+            features=["intercept"],
+            coefficients=[0],
+            support=dict(requests=[1, 32], context=[15552, 58368], suffix=[832, 3072]),
+            geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+            bias_bounds_ms=[-500, 500],
+            provenance={},
+            productive_load_policy=dict(
+                schema=1,
+                features=DIRECT_FEATURES,
+                coefficients=[80, 0, 1000, 0, 0, 10],
+                work_coefficients=[1000, 10],
+                minimum_efficiency=0.7,
+                minimum_ready_candidates=1,
+                provenance={},
+            ),
+        )
+    )
+    x = np.zeros(28)
+    x[:9] = [832, 1, 0, 15552, 832, 832, 15552, 15552, 896]
+    core.deferral_timing.seal_estimator.latency_surface = SimpleNamespace(
+        requires_forecast=False,
+        predict_with_features=lambda data: (120_000_000, x),
+        duration_calibration=calibration,
+        target_schema="cuda_span_max.v1",
+    )
+    acknowledged = stage_rpc(
+        core, 9, [_request("base")], [_request(rid) for rid in ids]
+    )
+    transport = core.scheduler._late_transport
+    assert transport["statuses"][:8] == [1] * 8
+    if condition in ("idle", "base_ack"):
+        assert transport["seal_reason"] == "load_only_productive"
+        assert transport["partial_ready_count"] == 3
+        assert transport["seal_ns"] >= (clock.base_at or 1_011_000_000)
+        assert transport["seal_ns"] < 1_051_000_000
+        assert transport["load_only_productive_efficiency"] >= 0.7
+        assert set(acknowledged) & core.scheduler._late_kv_snapshot == set(ids[:3])
+    else:
+        assert transport["seal_reason"] == "candidate_target_ready"
+        assert transport["seal_ns"] >= 1_051_000_000
+    assert not core.batch_queue[-1][0].poll()
+
+
 @pytest.mark.parametrize("policy", ["event", "predictive"])
 @pytest.mark.parametrize("count", [1, 2, 9, 14, 16])
 def test_load_only_fraction_waits_for_half_the_published_cohort(

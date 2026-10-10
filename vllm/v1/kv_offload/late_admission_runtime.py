@@ -83,6 +83,22 @@ def compact_preparation_request(request):
     )
 
 
+def request_shapes_for(scheduler, request_ids):
+    """Read already-published residual shapes without allocation or promotion."""
+    shapes = []
+    for rid in request_ids:
+        request = scheduler.requests.get(rid)
+        if request is None:
+            return None
+        shapes.append(
+            [
+                request.num_tokens - request.num_computed_tokens,
+                request.num_computed_tokens,
+            ]
+        )
+    return shapes
+
+
 def prepare_candidates(scheduler, token_budget, base_reqs):
     """Stage bounded old in-flight loads after ordinary ready work is selected."""
     mode = getattr(scheduler, "_late_admission_mode", 0)
@@ -466,6 +482,9 @@ def stage_rpc(core, step, base, candidates):
     progress_signature = None
     progress_frame = None
     refinement = None
+    productive_ready = False
+    productive_efficiency = None
+    productive_shapes = None
     effective_seal_expiry_ns = None
     adaptive_poll_us = getattr(core.scheduler, "_late_seal_adaptive_poll_us", 1000)
     progress_polls = 0
@@ -730,8 +749,47 @@ def stage_rpc(core, step, base, candidates):
                             target = min(load_only_fraction_target, len(active))
                         elif load_only_target:
                             target = min(target, load_only_target)
+                        timing = getattr(core, "deferral_timing", None)
+                        model = getattr(
+                            getattr(timing, "seal_estimator", None),
+                            "latency_surface",
+                            None,
+                        )
+                        calibration = getattr(model, "duration_calibration", None)
+                        productivity = getattr(
+                            calibration, "productive_load_policy", None
+                        )
+                        if productivity is not None and not cancelled:
+                            base_shapes = getattr(
+                                core.scheduler, "_late_base_request_shapes", None
+                            )
+                            ready_shapes = request_shapes_for(
+                                core.scheduler,
+                                [
+                                    c.req_id
+                                    for c in candidates
+                                    if c.req_id in ready_acked and c.req_id in active
+                                ],
+                            )
+                            active_shapes = request_shapes_for(
+                                core.scheduler,
+                                [c.req_id for c in candidates if c.req_id in active],
+                            )
+                            productive_ready, productive_efficiency = (
+                                productivity.ready(
+                                    base_shapes, ready_shapes, active_shapes
+                                )
+                            )
+                            productive_shapes = dict(
+                                base=base_shapes,
+                                ready=ready_shapes,
+                                active=active_shapes,
+                            )
                     if ready_count >= target:
                         seal_reason = "candidate_target_ready"
+                        break
+                    if not has_compute and productive_ready:
+                        seal_reason = "load_only_productive"
                         break
                     if has_compute and compute_finished:
                         seal_reason = "predecessor_compute_finished"
@@ -1302,6 +1360,9 @@ def stage_rpc(core, step, base, candidates):
             load_only_pending_candidates=len(candidates),
             load_only_ready_percent=load_only_ready_percent,
             load_only_fraction_target=load_only_fraction_target,
+            load_only_productive_ready=productive_ready,
+            load_only_productive_efficiency=productive_efficiency,
+            load_only_productive_shapes=productive_shapes,
             has_compute=(
                 has_compute
                 if (policy == "event" or prediction_to_readiness) and candidates

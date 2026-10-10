@@ -167,6 +167,64 @@ def test_calibration_schema_rejects_elapsed_and_unknown_features():
             BatchShapeCalibration(state)
 
 
+def shape_floor_state():
+    state = shape_correction_state()
+    state.update(
+        schema=7,
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+        submission_floor=dict(
+            host_full_ms=dict(small_short=180),
+            offset_feature_index=26,
+            homogeneous_only=True,
+        ),
+    )
+    return state
+
+
+def test_submission_floor_subtracts_start_offset_without_learning_elapsed():
+    """An early device start leaves more host submission work on the critical path."""
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    model = BatchShapeCalibration(shape_floor_state())
+    x = np.zeros(28)
+    x[:9] = [832, 1, 0, 15552, 832, 832, 15552, 15552, 0]
+    assert model.bias_ns(200_000_000, x, 90_000_000) == (20_000_000, False)
+    x[21] = 100  # Forecast elapsed time does not alter the duration model.
+    assert model.bias_ns(200_000_000, x, 90_000_000) == (20_000_000, False)
+    x[26] = 80
+    assert model.bias_ns(200_000_000, x, 90_000_000) == (30_000_000, False)
+
+
+@pytest.mark.parametrize("change", ["mixed_suffix", "mixed_context", "missing", "nan"])
+def test_submission_floor_retains_correction_for_untrained_or_unknown_offset(change):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    model = BatchShapeCalibration(shape_floor_state())
+    x = np.zeros(28)
+    x[:9] = [1664, 2, 0, 31104, 832, 832, 15552, 15552, 0]
+    if change == "mixed_suffix":
+        x[5] = 1000
+    elif change == "mixed_context":
+        x[7] = 16000
+    elif change == "missing":
+        x = x[:26]
+    else:
+        x[26] = np.nan
+    assert model.submission_floor_ns(x) is None
+    assert model.bias_ns(200_000_000, x, 90_000_000) == (30_000_000, False)
+
+
+def test_submission_floor_preserves_legacy_correction_bounds():
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_floor_state()
+    state["submission_floor"]["host_full_ms"]["small_short"] = 1000
+    model = BatchShapeCalibration(state)
+    x = np.zeros(28)
+    x[:9] = [832, 1, 0, 15552, 832, 832, 15552, 15552, 0]
+    assert model.bias_ns(200_000_000, x, 90_000_000) == (-500_000_000, False)
+
+
 def shape_margin_state():
     state = shape_correction_state()
     state.update(

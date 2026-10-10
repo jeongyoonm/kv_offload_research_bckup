@@ -55,8 +55,10 @@ class BatchShapeCalibration:
             "provenance",
         }
         schema = state.get("schema") if isinstance(state, dict) else None
-        if schema in (2, 3, 4, 5, 6):
+        if schema in (2, 3, 4, 5, 6, 7):
             required.add("geometry_support")
+        if schema == 7:
+            required.add("submission_floor")
         if schema in (4, 6):
             required.add("deadline_margin")
         if schema in (5, 6):
@@ -64,7 +66,7 @@ class BatchShapeCalibration:
         if (
             not isinstance(state, dict)
             or set(state) != required
-            or schema not in (1, 2, 3, 4, 5, 6)
+            or schema not in (1, 2, 3, 4, 5, 6, 7)
             or (schema in (1, 2) and state["features"] != FEATURES)
             or not isinstance(state["features"], list)
             or not state["features"]
@@ -96,7 +98,7 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid shape calibration support")
         self.geometry_bounds = None
-        if schema in (2, 3, 4, 5, 6):
+        if schema in (2, 3, 4, 5, 6, 7):
             geometry = state["geometry_support"]
             if not isinstance(geometry, dict) or set(geometry) != {
                 "suffix_per_context"
@@ -112,6 +114,26 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid shape calibration geometry support")
 
+        self.submission_floor = None
+        if schema == 7:
+            floor = state["submission_floor"]
+            if (
+                not isinstance(floor, dict)
+                or set(floor)
+                != {"host_full_ms", "offset_feature_index", "homogeneous_only"}
+                or floor["offset_feature_index"] != 26
+                or floor["homogeneous_only"] is not True
+                or not isinstance(floor["host_full_ms"], dict)
+                or not floor["host_full_ms"]
+                or any(
+                    key not in ("small_short", "small_mid", "small_long")
+                    or not np.isfinite(value)
+                    or not 0 < value <= 5000
+                    for key, value in floor["host_full_ms"].items()
+                )
+            ):
+                raise ValueError("invalid calibrated submission floor")
+            self.submission_floor = floor
         self.deadline_margin = None
         if schema in (4, 6):
             margin = state["deadline_margin"]
@@ -183,7 +205,33 @@ class BatchShapeCalibration:
         bias = float(query @ self.coefficients)
         if not np.isfinite(bias):
             raise RuntimeError("nonfinite shape calibration result")
-        return int(np.clip(bias, *self.bounds) * 1e6), False
+        bias = float(np.clip(bias, *self.bounds))
+        floor_ns = self.submission_floor_ns(x)
+        if floor_ns is not None:
+            bias = float(
+                np.clip(min(bias, (raw_duration_ns - floor_ns) / 1e6), *self.bounds)
+            )
+        return int(bias * 1e6), False
+
+    def submission_floor_ns(self, features):
+        """Subtract the observed start offset from a frozen submission allowance."""
+        if self.submission_floor is None or features is None:
+            return None
+        x = np.asarray(features, dtype=float)
+        if (
+            x.ndim != 1
+            or len(x) <= 26
+            or not np.isfinite(x[[1, 4, 5, 6, 7, 26]]).all()
+            or not 1 <= x[1] <= 4
+            or x[4] != x[5]
+            or x[6] != x[7]
+            or x[26] < 0
+        ):
+            return None
+        host_ms = self.submission_floor["host_full_ms"].get(shape_bin(x[1], x[5]))
+        if host_ms is None:
+            return None
+        return max(0, int((host_ms - x[26]) * 1e6))
 
     def deadline_lead_ns(
         self, raw_duration_ns, features, base_shapes, candidate_shapes, fallback_ns

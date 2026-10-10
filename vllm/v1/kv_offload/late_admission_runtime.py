@@ -938,12 +938,19 @@ def stage_rpc(core, step, base, candidates):
                                     model, "duration_calibration", None
                                 )
                                 calibration_fallback = None
+                                submission_floor_ns = None
                                 if shape_calibration is not None:
                                     applied_bias_ns, calibration_fallback = (
                                         shape_calibration.bias_ns(
                                             predicted, point_features, applied_bias_ns
                                         )
                                     )
+                                    if not calibration_fallback:
+                                        submission_floor_ns = (
+                                            shape_calibration.submission_floor_ns(
+                                                point_features
+                                            )
+                                        )
                                 predicted = max(1, predicted - applied_bias_ns)
                                 margin_fallback = None
                                 margin_base = None
@@ -1004,6 +1011,7 @@ def stage_rpc(core, step, base, candidates):
                                     shape_calibration_enabled=shape_calibration
                                     is not None,
                                     shape_calibration_fallback=calibration_fallback,
+                                    shape_submission_floor_ns=submission_floor_ns,
                                     shape_deadline_margin_enabled=(
                                         shape_calibration is not None
                                         and shape_calibration.deadline_margin

@@ -1,0 +1,8 @@
+{
+  "strategy": "mean remaining B setup",
+  "checkpoint": "/mnt/localnvme/jeongyoon/setup_prediction_20261011/frozen_models/mean.json",
+  "sha256": "7a5015f786e6bdf03fa53ad2d5943d79a69a725617a27b293ab25c3e7fd87c36",
+  "default": "disabled",
+  "A_predictor": "unchanged",
+  "fallback_lead_ms": 50
+}

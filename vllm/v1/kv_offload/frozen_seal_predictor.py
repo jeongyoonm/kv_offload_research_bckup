@@ -195,6 +195,12 @@ class FrozenSealPredictor:
         )
         checkpoint = self._state["checkpoint"]
         self.duration_calibration = None
+        setup_state = state["provenance"].get("setup_predictor")
+        self.setup_predictor = None
+        if setup_state is not None:
+            from vllm.v1.kv_offload.setup_predictor import SetupPredictor
+
+            self.setup_predictor = SetupPredictor(setup_state)
         if "duration_calibration" in checkpoint:
             from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
 
@@ -243,7 +249,7 @@ class FrozenSealPredictor:
             )
         )
         if packed:
-            retain_checkpoint(self, state, {"checkpoint"}, packed=True)
+            retain_checkpoint(self, state, {"checkpoint", "provenance"}, packed=True)
 
     def state_dict(self):
         return restored_checkpoint(self)

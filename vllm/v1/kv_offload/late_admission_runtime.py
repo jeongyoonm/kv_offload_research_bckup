@@ -477,10 +477,12 @@ def stage_rpc(core, step, base, candidates):
     predicted_deadline_ns = None
     compute_seal_deadline_ns = None
     compute_seal_deadline_armed_ns = None
+    setup_prediction = None
     submission_trace = os.environ.get("VLLM_DEFERRAL_PREDICTOR_PROGRESS") == "1"
     progress_read_ns = 0
     progress_signature = None
     progress_frame = None
+    progress_load_features = None
     refinement = None
     productive_ready = False
     productive_efficiency = None
@@ -868,6 +870,11 @@ def stage_rpc(core, step, base, candidates):
                                 if valid_snapshot(execution, a_step, observed_ns):
                                     progress_signature = signature
                                     progress_frame = (primary, execution)
+                                    progress_load_features = (
+                                        timing.loads.forecast_features(
+                                            data, observed_ns
+                                        )
+                                    )
                                     if submission_trace:
                                         record(
                                             core.scheduler,
@@ -877,9 +884,7 @@ def stage_rpc(core, step, base, candidates):
                                             observed_ns=observed_ns,
                                             primary_snapshot=primary,
                                             execution_snapshot=execution,
-                                            forecast_load_features=timing.loads.forecast_features(
-                                                data, observed_ns
-                                            ),
+                                            forecast_load_features=progress_load_features,
                                         )
                     if timing and a_step and predicted_deadline_ns is None:
                         data = timing.steps.get(a_step)
@@ -1214,6 +1219,81 @@ def stage_rpc(core, step, base, candidates):
                                     False,
                                 ),
                             )
+                            setup_model = getattr(
+                                getattr(timing.seal_estimator, "latency_surface", None),
+                                "setup_predictor",
+                                None,
+                            )
+                            if (
+                                setup_model is not None
+                                and has_compute
+                                and (compute_deadline or compute_deadline_shadow)
+                                and effective_seal_expiry_ns is not None
+                            ):
+                                from vllm.v1.kv_offload.setup_predictor import (
+                                    setup_features,
+                                )
+
+                                begin_ns = time.monotonic_ns()
+                                inputs = prediction.get("predictor_input")
+                                if inputs is not None:
+                                    inputs = list(inputs)
+                                    if progress_load_features is not None:
+                                        inputs[11:21] = progress_load_features
+                                x = setup_features(
+                                    upcoming_shapes,
+                                    len(candidates),
+                                    inputs,
+                                    progress_frame[0] if progress_frame else None,
+                                )
+                                setup_ms = setup_model.predict_ms(
+                                    x,
+                                    native=getattr(
+                                        core.scheduler,
+                                        "_late_seal_native_predictor",
+                                        False,
+                                    ),
+                                )
+                                observed_ns = time.monotonic_ns()
+                                # Never revive a learned deadline that has expired.
+                                may_update = (
+                                    setup_prediction is None
+                                    or observed_ns < effective_seal_expiry_ns
+                                )
+                                if may_update:
+                                    allowance_ns = (
+                                        round(setup_ms * 1e6)
+                                        if setup_ms is not None
+                                        else compute_deadline_lead_us * 1000
+                                    )
+                                    compute_seal_deadline_ns = (
+                                        prediction["gpu_start_upper_ns"]
+                                        + prediction["predicted_duration_ns"]
+                                        - allowance_ns
+                                    )
+                                    effective_seal_expiry_ns = min(
+                                        compute_seal_deadline_ns,
+                                        base_ready_ns
+                                        + core.scheduler._late_seal_safety_us * 1000,
+                                    )
+                                setup_prediction = dict(
+                                    model_id=setup_model.model_id,
+                                    forecast_ns=begin_ns,
+                                    inputs=x.tolist() if x is not None else None,
+                                    predicted_setup_ms=setup_ms,
+                                    applied=setup_ms is not None and may_update,
+                                    fallback=setup_ms is None,
+                                    cost_ns=observed_ns - begin_ns,
+                                    deadline_ns=compute_seal_deadline_ns,
+                                    effective_expiry_ns=effective_seal_expiry_ns,
+                                    upcoming_shapes=upcoming_shapes,
+                                )
+                                record(
+                                    core.scheduler,
+                                    "setup_prediction",
+                                    step=step,
+                                    **setup_prediction,
+                                )
                             record(
                                 core.scheduler,
                                 "seal_preparation_prediction",
@@ -1393,6 +1473,7 @@ def stage_rpc(core, step, base, candidates):
             compute_seal_deadline_lead_us=compute_deadline_lead_us,
             compute_seal_deadline_ns=compute_seal_deadline_ns,
             compute_seal_deadline_armed_ns=compute_seal_deadline_armed_ns,
+            setup_prediction=setup_prediction,
             effective_seal_expiry_ns=effective_seal_expiry_ns,
             compute_seal_deadline_overshoot_ns=(
                 max(0, sealed_ns - effective_seal_expiry_ns)

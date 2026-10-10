@@ -25,6 +25,7 @@ SOURCE = Path(__file__).resolve().parents[2]
 
 
 def prepare(root, seconds):
+    assert len(str(root / "tmp")) <= 45, "Use a short path for Unix IPC sockets"
     baseline.CURRENT_POLICY = "D"
     policy = baseline.options(True)
     for key, value in EXPERIMENT_DEFAULTS.items():

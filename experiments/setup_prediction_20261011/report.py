@@ -49,7 +49,28 @@ def main():
         plan = json.loads((root / "plan.json").read_text())
         count = len(summary["results"])
         total += count * plan["requests"]
-        allocations.append(dict(root=str(root), plan=plan, audit=audit))
+        allocations.append(
+            dict(
+                root=str(root),
+                plan=plan,
+                audit=audit,
+                replicates=[
+                    {
+                        k: r[k]
+                        for k in (
+                            "workload",
+                            "label",
+                            "repeat",
+                            "seed",
+                            "throughput_rps",
+                            "mean_ttft_ms",
+                            "p95_ttft_ms",
+                        )
+                    }
+                    for r in summary["results"]
+                ],
+            )
+        )
         text += [
             root.name + f": {count} accepted {plan['requests']}-request cells",
             "Seeds: " + str(plan["seeds"]),
@@ -131,7 +152,13 @@ def plot(allocations, output):
         squeeze=False,
         constrained_layout=True,
     )
-    colors = ["#666666", "#D89028", "#2E779D"]
+    colors = dict(
+        fixed50="#666666",
+        fixed5="#D89028",
+        learned_mean="#2E779D",
+        learned_q90="#8C63AB",
+        shadow_mean50="#B77540",
+    )
     for row, allocation in enumerate(allocations):
         plan, audit = allocation["plan"], allocation["audit"]
         levels = {(r["workload"], r["arm"]): r for r in audit["levels"]}
@@ -150,16 +177,29 @@ def plot(allocations, output):
                     [levels[w, arm][metric] for w in plan["workloads"]],
                     width,
                     label=arm,
-                    color=colors[i],
+                    color=colors[arm],
                     alpha=0.85,
                 )
+                for j, workload in enumerate(plan["workloads"]):
+                    values = [
+                        r[metric]
+                        for r in allocation["replicates"]
+                        if r["workload"] == workload and r["label"] == arm
+                    ]
+                    ax.scatter(
+                        j + (i - 1) * width + np.linspace(-0.035, 0.035, len(values)),
+                        values,
+                        color="black",
+                        s=14,
+                        zorder=3,
+                    )
             ax.set_xticks(x, [LABELS[w] for w in plan["workloads"]])
             ax.set_ylabel(label)
             ax.set_title(Path(allocation["root"]).name)
             ax.grid(axis="y", alpha=0.2)
             ax.set_axisbelow(True)
             ax.legend(fontsize=8)
-    fig.suptitle("Frozen A predictor and workers; two300-request repeats per cell")
+    fig.suptitle("Frozen A predictor and workers; dots show two300-request repeats")
     fig.savefig(output / "serving_comparison.png", dpi=180)
     fig.savefig(output / "serving_comparison.pdf")
     plt.close(fig)

@@ -14,6 +14,8 @@ from experiments.current_chunk_retrain_20261010 import serving
 ROOT = Path("/mnt/localnvme/jeongyoon")
 CAMPAIGN = ROOT / "setup_prediction_20261011"
 A_STATE = ROOT / "current_chunk_retrain_20261010/envelope/envelope_boost.json"
+NEW_DIRECTORY = "seal_snapshot_models"
+NEW_ARM = "snapshot_mean"
 
 
 def main():
@@ -30,7 +32,7 @@ def main():
     paths, checksums = {}, {}
     for name, directory in (
         ("old_mean", "frozen_models"),
-        ("snapshot_mean", "seal_snapshot_models"),
+        (NEW_ARM, NEW_DIRECTORY),
     ):
         source = CAMPAIGN / directory / "mean.json"
         state = copy.deepcopy(base)
@@ -47,8 +49,9 @@ def main():
     (args.output / "snapshot_plan.json").write_text(
         json.dumps(
             dict(
-                purpose="Original prospective training versus matching physical "
-                "last-snapshot training; only frozen setup weights differ.",
+                purpose="Original setup training versus "
+                + NEW_DIRECTORY
+                + "; only frozen setup weights differ.",
                 setup_sha256=checksums,
                 A_sha256=hashlib.sha256(A_STATE.read_bytes()).hexdigest(),
                 A_weights_unchanged=True,

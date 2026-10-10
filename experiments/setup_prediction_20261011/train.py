@@ -91,6 +91,7 @@ def main():
     parser.add_argument("--data", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--seal-snapshot-only", action="store_true")
+    parser.add_argument("--model-id-suffix", default="")
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     assert not (args.output / "selection.json").exists()
@@ -205,7 +206,11 @@ def main():
             final[arm] = metrics(
                 splits["final"], model.predict(x["final"]), "target_ready_ms"
             )
-            model_id = key + ("_seal_snapshot" if args.seal_snapshot_only else "")
+            model_id = (
+                key
+                + ("_seal_snapshot" if args.seal_snapshot_only else "")
+                + args.model_id_suffix
+            )
             state = export(model, model_id, "target_ready_ms", model.get_params())
             indices = [3, 4, 10, 11]
             state["support"] = dict(

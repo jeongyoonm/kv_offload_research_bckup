@@ -393,7 +393,10 @@ def test_productive_exit_rejects_invalid_frozen_models(mutation):
 
 
 @pytest.mark.parametrize("fallback", [False, True])
-def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
+@pytest.mark.parametrize("packed", [False, True])
+def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
+    fallback, packed, monkeypatch
+):
     """Even an elapsed-sensitive component cannot move an offset deadline."""
     import copy
 
@@ -426,7 +429,15 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback)
             ),
         ),
     )
+    monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", str(int(packed)))
     model = FrozenSealPredictor(state)
+    assert model.state_dict() == state
+    exported = model.state_dict()
+    exported["checkpoint"]["weights"][0] = 0.0
+    assert model.state_dict() == state
+    if packed:
+        assert "checkpoint" not in model._state
+        assert "trees" not in model.neural.models[0].direct.tree._state
     data = dict(
         step=1,
         request_shapes=[[64, 64]],
@@ -595,7 +606,10 @@ def test_causal_surface_uses_current_receipts_and_validated_start_generation():
     assert model.predict(data) is None
 
 
-def test_composed_surface_restores_signed_residual_and_keeps_state_private():
+@pytest.mark.parametrize("packed", [False, True])
+def test_composed_surface_restores_signed_residual_and_keeps_state_private(
+    packed, monkeypatch
+):
     """An encoded negative correction survives JSON without changing its base."""
     import copy
     import json
@@ -622,6 +636,7 @@ def test_composed_surface_restores_signed_residual_and_keeps_state_private():
         target_schema=base["target_schema"],
         provenance={},
     )
+    monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", str(int(packed)))
     model = LatencySurface(json.loads(json.dumps(state)))
     data = dict(
         step=1,

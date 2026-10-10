@@ -5,10 +5,33 @@
 import copy
 import ctypes
 import functools
+import json
 import math
 import os
 
 import numpy as np
+
+
+def packed_checkpoint_enabled():
+    return os.environ.get("VLLM_SEAL_PACKED_CHECKPOINT") == "1"
+
+
+def retain_checkpoint(owner, state, weight_keys):
+    """Keep immutable weights outside Python's tracked container graph."""
+    if packed_checkpoint_enabled():
+        owner._packed_state = json.dumps(state, separators=(",", ":")).encode()
+        owner._state = copy.deepcopy(
+            {key: value for key, value in state.items() if key not in weight_keys}
+        )
+    else:
+        owner._packed_state = None
+        owner._state = copy.deepcopy(state)
+
+
+def restored_checkpoint(owner):
+    if owner._packed_state is not None:
+        return json.loads(owner._packed_state)
+    return copy.deepcopy(owner._state)
 
 
 @functools.lru_cache(maxsize=1)
@@ -189,7 +212,7 @@ class LatencySurface:
             self.requires_load_progress = True
             self.target_schema = state["target_schema"]
             self.residual_shift_ms = shift
-            self._state = copy.deepcopy(state)
+            retain_checkpoint(self, state, {"base", "residual"})
             return
         keys = {"schema", "feature_names", "trees", "provenance"}
         if isinstance(state, dict) and state.get("schema") == 2:
@@ -268,7 +291,7 @@ class LatencySurface:
                 self.feature[tree_index, node_index] = feature
                 self.threshold[tree_index, node_index] = threshold
                 self.value[tree_index, node_index] = value
-        self._state = copy.deepcopy(state)
+        retain_checkpoint(self, state, {"trees"})
         self.tree_indices = np.arange(len(trees))
         self.native = None
         native_path = os.environ.get("VLLM_DEFERRAL_FAST_FOREST")
@@ -286,7 +309,7 @@ class LatencySurface:
             )
 
     def state_dict(self):
-        return copy.deepcopy(self._state)
+        return restored_checkpoint(self)
 
     def input_features(self, data):
         if self.base is not None:

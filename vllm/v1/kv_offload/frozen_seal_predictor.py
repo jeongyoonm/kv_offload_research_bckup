@@ -12,6 +12,9 @@ from vllm.v1.kv_offload.latency_surface import (
     FORECAST_NAMES,
     SPARSE_NAMES,
     LatencySurface,
+    packed_checkpoint_enabled,
+    restored_checkpoint,
+    retain_checkpoint,
 )
 
 CORE_INDEX = [0, 1, 8, 23, 24, 25, 11, 12]
@@ -61,6 +64,8 @@ class Component:
             self.output = finite_array([state["y_scale"], state["y_mean"]])
         else:
             raise ValueError("unsupported predictor component")
+        if packed_checkpoint_enabled():
+            self.state = {"kind": state["kind"], "config": state.get("config")}
 
     def predict(self, x, native):
         if self.state["kind"] == "tree":
@@ -173,6 +178,7 @@ class FrozenSealPredictor:
         ):
             raise ValueError("incompatible frozen predictor snapshot")
         self._state = copy.deepcopy(state)
+        self._packed_state = None
         self.architecture = state["architecture"]
         self.excludes_elapsed = self.architecture == "guarded_sparse_mlp_offset"
         self.feature_names = (
@@ -218,9 +224,11 @@ class FrozenSealPredictor:
                 trees=[[[-1, -1, -2, 0.0, 1.0]]],
             )
         )
+        if packed_checkpoint_enabled():
+            retain_checkpoint(self, state, {"checkpoint"})
 
     def state_dict(self):
-        return copy.deepcopy(self._state)
+        return restored_checkpoint(self)
 
     def input_features(self, data):
         x = self.extractor.input_features(data)

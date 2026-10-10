@@ -1,0 +1,162 @@
+[
+  {
+    "name": "shape_calibration",
+    "branch": "experiment/shape-calibration-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_calibration_20261010",
+    "status": "completed75",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_calibration_20261010",
+    "head": "35a65d4335fc05a62e395c2193afb9ef45f6b275",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_calibration_20261010/artifacts/yc1/archive_manifest.json"
+    ],
+    "implementation_and_evidence_head": "35a65d4335fc05a62e395c2193afb9ef45f6b275",
+    "clean": false
+  },
+  {
+    "name": "crossed_geometry_audit",
+    "branch": "experiment/shape-geometry-calibration-20261010",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_geometry_20261010",
+    "status": "12 completed75-request cells demonstrate narrow-calibration extrapolation failure; archived",
+    "implementation_and_evidence_head": "a1afb31feebbd4577dcc34b3f81f5cde213aac62",
+    "clean": true,
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010/artifacts/yc2/archive_manifest.json",
+      "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "head": "a1afb31feebbd4577dcc34b3f81f5cde213aac62"
+  },
+  {
+    "name": "joint_guard",
+    "branch": "experiment/shape-joint-guard-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_joint_guard_20261010",
+    "status": "completed300 yc3; unsupported geometry safely falls back",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_joint_guard_20261010",
+    "head": "4e91e8ca94800d7b4595a27aec7976a6023df305",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_joint_guard_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "4e91e8ca94800d7b4595a27aec7976a6023df305",
+    "clean": true
+  },
+  {
+    "name": "broader_basis",
+    "branch": "experiment/shape-basis-calibration-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_basis_20261010",
+    "status": "completed300 yc3; archived and SHA verified; no uniform serving gain",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_basis_20261010",
+    "head": "c1599acd7a7572439a4aa01a51361f216421c735",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_basis_20261010/artifacts/yc3/archive_manifest.json",
+      "/mnt/localnvme/jeongyoon/vllm_shape_basis_20261010/artifacts/shape_basis_logbook/manifest.json"
+    ],
+    "implementation_and_evidence_head": "c1599acd7a7572439a4aa01a51361f216421c735",
+    "clean": true
+  },
+  {
+    "name": "deadline_margin",
+    "branch": "experiment/shape-deadline-margin-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_margin_20261010",
+    "status": "CPU verified; worker-only allowance superseded before serving",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_margin_20261010",
+    "head": "6774689d9a0f7a4a6c93382ca8c673141c106d01",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_margin_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "6774689d9a0f7a4a6c93382ca8c673141c106d01",
+    "clean": true
+  },
+  {
+    "name": "productive_load_only",
+    "branch": "experiment/shape-productive-load-only-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_productive_20261010",
+    "status": "CPU verified; yc4 completed32 cells; mechanism activates, no standalone serving gain",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_productive_20261010",
+    "head": "f57d5ca532efb7d65b46a5ad9e5dc35ddc4d6d50",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_productive_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "f57d5ca532efb7d65b46a5ad9e5dc35ddc4d6d50",
+    "clean": true
+  },
+  {
+    "name": "direct_shape",
+    "branch": "experiment/shape-direct-duration-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_direct_20261010",
+    "status": "frozen alternative; offline algebra/shadow audits only",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_direct_20261010",
+    "head": "0e6decc577bff21290ce0ce4739de28473bc90b3",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_direct_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "0e6decc577bff21290ce0ce4739de28473bc90b3",
+    "clean": true
+  },
+  {
+    "name": "submission_floor",
+    "branch": "experiment/shape-submission-floor-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_floor_20261010",
+    "status": "CPU verified; development and unseen shadow improvements only, not live",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_floor_20261010",
+    "head": "32cbbc87ab659b89e94f9330e5dc236fb5a82ec0",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_floor_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "32cbbc87ab659b89e94f9330e5dc236fb5a82ec0",
+    "clean": true
+  },
+  {
+    "name": "complete_deadline_margin",
+    "branch": "experiment/shape-complete-deadline-margin-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_complete_margin_20261010",
+    "status": "yc4 completed32-cell standalone study and yc5 combined study; not promoted",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_complete_margin_20261010",
+    "head": "c50802023c85ce1e2b11f33f989bf004f8088aac",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_complete_margin_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "c50802023c85ce1e2b11f33f989bf004f8088aac",
+    "clean": true
+  },
+  {
+    "name": "GC_timing_diagnosis",
+    "branch": "experiment/shape-gc-timing-diagnosis-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_gc_20261010",
+    "status": "yc4 completed/drained/SHA archived; GC tails confirmed, no collector-policy changes",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_gc_20261010",
+    "head": "7301ea82ebc64c1dc8ec020402cfb4b5ad977531",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_gc_20261010/artifacts/yc4/archive_manifest.json",
+      "/mnt/localnvme/jeongyoon/vllm_shape_gc_20261010/artifacts/gc_logbook/manifest.json"
+    ],
+    "implementation_and_evidence_head": "7301ea82ebc64c1dc8ec020402cfb4b5ad977531",
+    "clean": true
+  },
+  {
+    "name": "packed_checkpoint",
+    "branch": "experiment/shape-packed-checkpoint-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_packed_20261010",
+    "status": "CPU verified exact2412 frames; yc5 completed12 accepted cells; short throughput -6.52%, mid +6.33%; not uniform serving winner",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_packed_20261010",
+    "head": "5cfc192ac79789ab9e6838ffe11d93568bacb98c",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_packed_20261010/artifacts/final_logbook_7h/manifest.json"
+    ],
+    "implementation_and_evidence_head": "5cfc192ac79789ab9e6838ffe11d93568bacb98c",
+    "clean": true
+  },
+  {
+    "name": "margin_productive_interaction",
+    "branch": "experiment/shape-margin-productive-combined-20261010",
+    "data": "/mnt/localnvme/jeongyoon/shape_combined_20261010",
+    "status": "yc5 completed; short -2.65%, mid +6.07%; productive exit zero activations, not promoted",
+    "source": "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010",
+    "head": "debe3395f366779dc2bc5557fbcf2a6d99dcc856",
+    "verified_archives": [
+      "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010/artifacts/yc5/archive_manifest.json",
+      "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010/artifacts/combined_logbook/manifest.json"
+    ],
+    "implementation_and_evidence_head": "debe3395f366779dc2bc5557fbcf2a6d99dcc856",
+    "clean": true
+  }
+]

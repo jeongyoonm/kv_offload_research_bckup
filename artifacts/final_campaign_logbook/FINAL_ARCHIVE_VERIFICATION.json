@@ -1,0 +1,66 @@
+[
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_calibration_20261010/artifacts/yc1/archive_manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010/artifacts/yc2/archive_manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_joint_guard_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_basis_20261010/artifacts/yc3/archive_manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_basis_20261010/artifacts/shape_basis_logbook/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_margin_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_productive_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_direct_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_floor_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_complete_margin_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_gc_20261010/artifacts/yc4/archive_manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_gc_20261010/artifacts/gc_logbook/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_packed_20261010/artifacts/final_logbook_7h/manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010/artifacts/yc5/archive_manifest.json",
+    "archive_hash_verified": true
+  },
+  {
+    "manifest": "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010/artifacts/combined_logbook/manifest.json",
+    "archive_hash_verified": true
+  }
+]

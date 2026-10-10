@@ -1,0 +1,32 @@
+[
+  {
+    "source": "comparison.json",
+    "export": "comparison.json.gz",
+    "sha256": "25749fa4457793f4761cf471d77ccad50c10cd46ab65c94b2d6e7d1b1d5dc5ca",
+    "verified": true
+  },
+  {
+    "source": "loaded_predictor.json",
+    "export": "loaded_predictor.json.gz",
+    "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+    "verified": true
+  },
+  {
+    "source": "plan.json",
+    "export": "plan.json.gz",
+    "sha256": "bc9c65bea5b403fe4a150cf94ba10894ad36d4bc727633724349636b9b3cdc25",
+    "verified": true
+  },
+  {
+    "source": "source_provenance.json",
+    "export": "source_provenance.json.gz",
+    "sha256": "0e459bf5860589fd6b1d5637a7d481682f6708c9b8a50490ddd913f751bb27f7",
+    "verified": true
+  },
+  {
+    "source": "summary.json",
+    "export": "summary.json.gz",
+    "sha256": "e0884b2d6d9975f5e977cdc21c43247872bb980fddaf9cbc4f94e3d54848eb62",
+    "verified": true
+  }
+]

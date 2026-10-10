@@ -1,0 +1,249 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_calibration_20261010",
+  "archive_sha256": "17a17a1628ea39631d7da9324ec9e6b920571019cfdf4e2ec7a6bdd8338d290f",
+  "archive_bytes": 8793733,
+  "members": [
+    {
+      "path": "CAMPAIGN_STATUS.json",
+      "bytes": 10277,
+      "sha256": "fc3d229d0e93cb3803420b735d99c2e14d652e5ada065cda9f84e7e9b2ce9e44",
+      "link_to": null
+    },
+    {
+      "path": "DRAFT_REPORT.txt",
+      "bytes": 6196,
+      "sha256": "c76384cf76266dabe401f061bc1b51826386682b2a12b9f3427cda60ae6d3e6a",
+      "link_to": null
+    },
+    {
+      "path": "EXPLORATION_PLAN.txt",
+      "bytes": 2167,
+      "sha256": "e7ba100a6d4dafe2d3c44d10f0f2fd18cc97833bdedb5064c0865ad2e8fc3b83",
+      "link_to": null
+    },
+    {
+      "path": "FINAL_ARCHIVE_VERIFICATION.json",
+      "bytes": 2475,
+      "sha256": "8992383eab37480a62b0f0a41cd4744d0c4a7926659c9ffb153a2144a72c5060",
+      "link_to": null
+    },
+    {
+      "path": "FINAL_BRANCH_CATALOGUE.json",
+      "bytes": 7870,
+      "sha256": "3603c0d110ac3721dfae7949e0591aa8677b73e031710d96c89255f0a14f3e81",
+      "link_to": null
+    },
+    {
+      "path": "FINAL_REPORT.txt",
+      "bytes": 13506,
+      "sha256": "4d7681a80dc0ed37d0877d9b9c204d30751ca09e5dee09c82a66170c03356ce7",
+      "link_to": null
+    },
+    {
+      "path": "REPORT.txt",
+      "bytes": 3542,
+      "sha256": "07d48df5c03dc9530a23ea9b0647f04b1fcf3ccdb294ebe8ac80d38a6683d44b",
+      "link_to": null
+    },
+    {
+      "path": "calibration_microbenchmark.json",
+      "bytes": 421,
+      "sha256": "ade078caa2ad2d90ff231ce6144bfa6e270c9334f855e20df648402649c49920",
+      "link_to": null
+    },
+    {
+      "path": "cpu_gate.log",
+      "bytes": 854,
+      "sha256": "2acd5a30275ad88585b6d59ceb98673797d28e8d83321287fb86a6d1ca130a2c",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "final_campaign_archive.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "link_to": null
+    },
+    {
+      "path": "first_long50_gaps.json",
+      "bytes": 147902,
+      "sha256": "a8bd937fc66044232551e06e21ca57fc4bbf503677a22aafc1b3f557e1de5610",
+      "link_to": null
+    },
+    {
+      "path": "fit.log",
+      "bytes": 1851,
+      "sha256": "4d86e92f091f1317073c26161f81b1340d5a570d94f462f2665291d483d49124",
+      "link_to": null
+    },
+    {
+      "path": "frozen_fit.json",
+      "bytes": 1851,
+      "sha256": "4d86e92f091f1317073c26161f81b1340d5a570d94f462f2665291d483d49124",
+      "link_to": "fit.log"
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 7481,
+      "sha256": "a1883c6bf722220f269cac0172bf0f5cac174b069933330fa6ef688d558d435f",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit_retry.log",
+      "bytes": 4049,
+      "sha256": "34b0d9bec85ccc3d65a02688b72f006604e7d625b8a017170febe76eaab58ba6",
+      "link_to": null
+    },
+    {
+      "path": "ledger.jsonl",
+      "bytes": 5072,
+      "sha256": "07f70eac222cfc52b08d945ba4fc860904a9c0ab0ad7a0055405e98e6f6d7075",
+      "link_to": null
+    },
+    {
+      "path": "logbook_archive_driver.log",
+      "bytes": 465,
+      "sha256": "beb72e03ba4cdc06fb5f7f272d746b0f3c3ac2fd6c1883ccdf995936ad08cea3",
+      "link_to": null
+    },
+    {
+      "path": "mid_control_r1_gaps.json",
+      "bytes": 105833,
+      "sha256": "48a73fee23812495c558cfde0b0128fcddae422984d6d5b97a19f4accef18e30",
+      "link_to": null
+    },
+    {
+      "path": "ns1_rows.json",
+      "bytes": 72217,
+      "sha256": "969cfe5a67eb147c09dde8481561fd3859d2b2822af2049339875374aa8ab513",
+      "link_to": null
+    },
+    {
+      "path": "offline_screen.json",
+      "bytes": 5227,
+      "sha256": "6f149079004e496cb56f5d31e31aa39b8dcc77ee8418fdc6d14303dbd6817804",
+      "link_to": null
+    },
+    {
+      "path": "partial_commit.log",
+      "bytes": 3768,
+      "sha256": "459c97261f118a99f23a62345378ad9320669bd9fb0af243100f407b972dcc72",
+      "link_to": null
+    },
+    {
+      "path": "preflight.log",
+      "bytes": 506,
+      "sha256": "aba8d686cdd7f308f8dec5392f646b39aa4363a7011e92e2a3642963fb1d66e9",
+      "link_to": null
+    },
+    {
+      "path": "preflight_fixed/calibration.json",
+      "bytes": 877,
+      "sha256": "6f82f77e3a526317e5d30a49fe9b31278997a60d0e0f3839b3df81b8cb5284fe",
+      "link_to": null
+    },
+    {
+      "path": "preflight_fixed/loaded_predictor.json",
+      "bytes": 78014223,
+      "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+      "link_to": null
+    },
+    {
+      "path": "preflight_fixed/plan.json",
+      "bytes": 11286,
+      "sha256": "bc9c65bea5b403fe4a150cf94ba10894ad36d4bc727633724349636b9b3cdc25",
+      "link_to": null
+    },
+    {
+      "path": "preflight_fixed/source_provenance.json",
+      "bytes": 184,
+      "sha256": "39a9a525041edf1414b33c059f55bf9aae02d64147a7edbcc31b5c79bcbf0479",
+      "link_to": null
+    },
+    {
+      "path": "preflight_fixed.log",
+      "bytes": 54,
+      "sha256": "d8eb199f0cf9982f02b36807190fc1c1e4a080d0638c115f95bfb3bfa761c28c",
+      "link_to": null
+    },
+    {
+      "path": "prior_missed_ready_windows.json",
+      "bytes": 1077,
+      "sha256": "f3baa816e2dd98bd4e096ffe4069311110cc82bac3f4912c45850b22306e595c",
+      "link_to": null
+    },
+    {
+      "path": "prior_setup_audit.json",
+      "bytes": 27400,
+      "sha256": "01b35777f5cc3178879b8800ca7494ad437b15b330c7ad617221d964f7b79d02",
+      "link_to": null
+    },
+    {
+      "path": "report_commit.log",
+      "bytes": 3861,
+      "sha256": "6cb8ed5208bc09643b6c0edec9c7f2b5cc56e1401001d17d4a41efaff4584d68",
+      "link_to": null
+    },
+    {
+      "path": "results_commit.log",
+      "bytes": 5060,
+      "sha256": "33846f15d0eabc4dd9b8c7d54ea999c29e40e8a393ef30e7eb3c227e6c72de90",
+      "link_to": null
+    },
+    {
+      "path": "sc1_driver.log",
+      "bytes": 468,
+      "sha256": "842562857209300548856be7203b454157acb608405a75e0efe26e9397467ff9",
+      "link_to": null
+    },
+    {
+      "path": "scope_commit.log",
+      "bytes": 3779,
+      "sha256": "0d4698679f002e0102e97571bba1848eecaa97d8899605293d0ba2b227924d53",
+      "link_to": null
+    },
+    {
+      "path": "window_commit.log",
+      "bytes": 3765,
+      "sha256": "cd5e3b4f658222f158118922f0113c631272bd147f5d090dda2e95a3047b7414",
+      "link_to": null
+    },
+    {
+      "path": "yc1_archive.log",
+      "bytes": 174,
+      "sha256": "41e6733f1336048c9456281a8e2face304f106e0c08c163df271b50b87f951f6",
+      "link_to": null
+    },
+    {
+      "path": "yc1_comparison.log",
+      "bytes": 22389,
+      "sha256": "0a294420003c148f8bd9561ce5a1fe3ecc4c0c523898053492428d39cde46c02",
+      "link_to": null
+    },
+    {
+      "path": "yc1_driver.log",
+      "bytes": 4694,
+      "sha256": "0a704bcf7684d69988998165d06315d9ad94701ce5539697eb8cfcf2d1d2ab25",
+      "link_to": null
+    },
+    {
+      "path": "yc1_final_archive.log",
+      "bytes": 174,
+      "sha256": "81c3040bd8bc3c5287b49b0efa3195fae901160ac90395c809d819e05d3cd394",
+      "link_to": null
+    },
+    {
+      "path": "yc1_partial.log",
+      "bytes": 6277,
+      "sha256": "15913530bda8a820b8011f0518d06a55214c6553afce9dc60dc0378142e9f730",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

@@ -1,0 +1,81 @@
+Final: seven-hour GLM5.3 TP8 shape-calibration and sealing campaign
+Start2026-10-09 22:19:54UTC; stop/drain/archive target2026-10-10 05:19:54UTC.
+Model execution/weights/sparse selector unchanged; private CPU budget2130300354560 bytes; GPU96GiB/rank, H2D8MiB/depth2 and native D2H1GiB/depth2 unchanged. All mechanisms opt-in; parent checkout untouched.
+
+1. Broader calibration
+Original five-feature correction failed crossed geometry; replace with explicit suffix and prefix-index work plus raw tree estimate, full-rank seven-feature ridge residual, support guard. Freeze459 earlier rows, group by allocation/seed. SeedCV MAE14.25ms, leave-geometry macro16.60ms; these are offline validations.
+
+300-request comparison: control is fixed90ms correction/100ms lead; broader uses frozen shape correction/50ms lead. Comparison includes both changes, not calibration alone. Two reversed-order repeats, con32/output1.
+short16k: control28.166→broad29.608req/s (+5.12%); predictionMAE61.09→17.93ms.
+mid32k: control12.889→broad12.275req/s (-4.76%); predictionMAE53.94→12.43ms.
+familiar60k: control8.132→broad8.153req/s (+0.27%); predictionMAE31.81→12.29ms.
+unseen48k: control15.151→broad15.110req/s (-0.27%); predictionMAE28.34→13.78ms.
+
+2. Standalone policy ablation
+Same broader duration model across all four arms; fixed50ms lead reference, smaller shape margin, productive70/80 exits in load-only state. 32 accepted300-request cells; two reversed-order repeats.
+short16k: basis50=29.958req/s(+0.00%), margin75=28.406req/s(-5.18%), productive70=29.417req/s(-1.80%), productive80=30.077req/s(+0.40%)
+mid32k: basis50=13.171req/s(+0.00%), margin75=12.670req/s(-3.80%), productive70=12.960req/s(-1.60%), productive80=12.919req/s(-1.91%)
+familiar60k: basis50=8.135req/s(+0.00%), margin75=8.129req/s(-0.08%), productive70=8.127req/s(-0.10%), productive80=8.142req/s(+0.09%)
+mixed_supported: basis50=13.214req/s(+0.00%), margin75=12.889req/s(-2.47%), productive70=13.164req/s(-0.38%), productive80=13.104req/s(-0.84%)
+Standalone shape margin not promoted; productive exits work but serving improvement not established. Short bad margin cell consolidates rounds yet waits for eight-ready; max mid load-only gap seals350ms after A ends although three loads ready180ms after end. Submitted before end, so readiness wait cannot be explained solely by unsubmitted loads.
+Mixed held-out first cell: broadMAE13.10ms vs fixed90 correction59.31ms on same38 observed frames, zero fallback. This is an offline accuracy counterfactual, not served throughput against fixed correction.
+
+3. Fundamental CPU tail
+GC overlap: mid productive70 has280ms membership-finalization interval overlapping272ms collection,226ms GC in GPU gaps. Other gaps are mostly load-only waiting. Timing overlap supports intervention, not attribution of all GC to predictor.
+Packed immutable JSON checkpoint storage retains exact private snapshots and inference arrays. CPU303passed/9skipped. Exact2412 observed NumPy/native frames (yc3 uniform and held48K; yc4 uniform and mixed shapes containing crossed geometries). Tracked objects847697→149; isolated fullGC median52.658→0.010892ms, no collector-policy change. This is CPU evidence; matched serving outcomes are recorded below.
+
+4. Fresh-seed follow-up completed
+12 accepted300-request cells, basis50 vs packed50 vs independent frozen margin+productive70 combination; short16K/mid32K, seeds9901/9902 reverse order; no new fitting. All owned processes exited05:06:13UTC; rawyc5 SHA archived and verified.
+
+yc5 frozen-model follow-up: completed12 accepted300-request cells, two reversed-order repeats, GLM5.3 TP8/con32/output1.
+Reference already includes optimized worker, input preparation, broad correction and scheduler. All results arithmetic mean; mean episode p95, no CI.
+
+short16k basis50: throughput 29.9301req/s (+0.00%); meanTTFT 1025.59ms (+0.00% gain); p95TTFT 1260.24ms (+0.00% gain); rounds 39.5; gaps 119.56ms; MAE 17.41ms; recovered 92.39%.
+short16k packed50: throughput 27.9798req/s (-6.52%); meanTTFT 1100.74ms (-7.33% gain); p95TTFT 1223.11ms (+2.95% gain); rounds 35.0; gaps 926.13ms; MAE 14.66ms; recovered 93.98%.
+short16k combined70: throughput 29.1369req/s (-2.65%); meanTTFT 1051.12ms (-2.49% gain); p95TTFT 1415.47ms (-12.32% gain); rounds 41.5; gaps 275.85ms; MAE 18.29ms; recovered 91.02%.
+mid32k basis50: throughput 12.3621req/s (+0.00%); meanTTFT 2480.54ms (+0.00% gain); p95TTFT 2743.20ms (+0.00% gain); rounds 35.5; gaps 1907.24ms; MAE 11.90ms; recovered 96.72%.
+mid32k packed50: throughput 13.1440req/s (+6.33%); meanTTFT 2338.25ms (+5.74% gain); p95TTFT 2711.92ms (+1.14% gain); rounds 40.5; gaps 56.69ms; MAE 11.06ms; recovered 95.98%.
+mid32k combined70: throughput 13.1122req/s (+6.07%); meanTTFT 2341.30ms (+5.61% gain); p95TTFT 2849.77ms (-3.88% gain); rounds 41.0; gaps 182.15ms; MAE 9.77ms; recovered 96.28%.
+
+Interpretation: no uniform serving winner. Packing removes checkpoint GC burden with exact frame/state equality, yet changes serving cadence and can enter load-only waits. Short packing -6.52%, mid +6.33%; combined short -2.65%, mid +6.07%. Mid gains are dominated by slow reference repeat, so do not attribute all gain to intervention or generalize beyond two repeats.
+Slow mid reference repeat:3695.15ms intercompute gaps,3017.95ms holds without compute,30 rounds; worst gaps~385ms predominantly scheduler waits; predecessor has no compute and prediction/deadline are null, waiting for8of16 loads. Slow packed short repeat:1783.14ms gaps,1315.37ms holds without compute,30 rounds, worst~188ms. This remaining readiness/cadence regime cannot be fixed by compute-duration calibration alone.
+Productive-load exit had zero activations across all four combined cells. This comparison does not establish that rule benefit.
+Collector policy and model execution unchanged. Timing probe logs pauses>=10ms; GC overlap is observational.
+Recommendation: retain broad correction plus fixed50ms lead as cross-workload reference. Keep packing opt-in as verified CPU optimization; do not promote smaller adaptive margins or productive targets as serving defaults. Next research should explicitly control initial partial-load cadence and ready-work value, followed by matched repeats; no additional experiment started.
+
+5. Audited alternatives
+Joint guard safely falls back outside coupled geometries. Direct shape duration wins held48K shadow but is worse on familiar shapes; no live direct claim. Small homogeneous CPU-submission floor improves seedCV14.25→11.89ms with limited fresh shadow gains, CPU verified, not live. Worker-only setup margin superseded by complete scheduler+worker setup allowance before live trial.
+
+Limits: two repeats are measurements, not confidence intervals; p95 numbers are mean episode p95s. Native compute endpoints include output copy. No full numerical model-output equivalence, other model/parallelism/decode/multimodal/hardware claim. Archive members SHA verified; preserve failed logs and frozen sources.
+
+
+6. Final selection and fundamental remaining issue
+Retain broad shape correction with fixed50ms lead as the cross-workload reference; source vllm_shape_basis_20261010, frozen fit shape_basis_20261010/frozen_broad_fit.json. Packed storage is opt-in and exact at predictor frames/state ownership; do not enable by default based on these results. No serving change was made to original parent workspace.
+The fundamental remaining bottleneck is scheduling cadence during load-only periods. Compute duration prediction is absent then, so improving its MAE cannot resolve waits for the fixed ready-load target. A readiness/throughput-value model or controlled initial partial-load dispatch should be evaluated separately, with fixed seeds and enough repeats to distinguish cadence regime changes. The present productive policy had an observed activation in yc4, but no consistent serving benefit, and zero activations in yc5 combined cells. No untested mechanism is promoted.
+
+7. Controlled methodology and limits
+106 measured cells:30×75-request exploratory cells and76×300-request cells, total25050 measured requests, plus excluded warmups/cache priming. Each workload working set exceeds2.16096M GPU KV tokens while fitting5.58208M CPU KV tokens; all300 cells are con32/output1 with exact CPU hits, zero GPU prefix hits, no preemption and frozen predictor identity. Baseline means latest optimized worker+scheduler control, not vanilla vLLM. All policies share original sparse selector/model weights. Serving acceptance does not prove full numerical model accuracy.
+Broader fit uses459 earlier adjacent rows, allocation/seed grouped splits, no evaluation rows refitted. Original narrow model trained only coupled Q/C geometry and failed crossed geometry; seven-feature full-rank correction explicitly includes suffix tokens and prefix-index pairs. Generalization measured within GLM5.3TP8: contexts15.5–58.4K, suffix832–3072, batchN1–17, held48K and mixed batches. These are CPU-prefix cache workloads, not arbitrary hit-ratio or decode studies. Other models, parallelisms, hardware, concurrency levels and out-of-support workload shapes remain untested; fallback retains prior correction.
+Arithmetic mean throughput/TTFT changes in this report differ slightly from the analysis helper geometric throughput aggregation. Both source rows/definitions are preserved. Recovered-percent denominators are KV-ready opportunities during preceding compute; load-only periods have no preceding compute and are excluded. Counts/ratios are recorded in per-cell comparison artifacts; a higher recovered ratio alone does not imply better throughput.
+
+8. Reproducible artifacts
+yc1: raw /mnt/localnvme/jeongyoon/yc1; source/archive /mnt/localnvme/jeongyoon/vllm_shape_calibration_20261010/artifacts/yc1.
+yc2: raw /mnt/localnvme/jeongyoon/yc2; source/archive /mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010/artifacts/yc2.
+yc3: raw /mnt/localnvme/jeongyoon/yc3; source/archive /mnt/localnvme/jeongyoon/vllm_shape_basis_20261010/artifacts/yc3.
+yc4: raw /mnt/localnvme/jeongyoon/yc4; source/archive /mnt/localnvme/jeongyoon/vllm_shape_gc_20261010/artifacts/yc4.
+yc5: raw /mnt/localnvme/jeongyoon/yc5; source/archive /mnt/localnvme/jeongyoon/vllm_shape_combined_20261010/artifacts/yc5.
+Frozen fit, CPU gates, failures, precommit logs, exact-frame equality proof and GC audits retained in the corresponding data/logbook archives. Every regular archive member SHA checked; copied JSON exports gzip roundtrip verified. No additional GPU allocation remains active.
+
+Branch catalogue (implementation and evidence head before final campaign-logbook commit):
+shape_calibration: experiment/shape-calibration-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_calibration_20261010 | 35a65d4335fc05a62e395c2193afb9ef45f6b275 | completed75
+crossed_geometry_audit: experiment/shape-geometry-calibration-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_geometry_20261010 | a1afb31feebbd4577dcc34b3f81f5cde213aac62 | 12 completed75-request cells demonstrate narrow-calibration extrapolation failure; archived
+joint_guard: experiment/shape-joint-guard-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_joint_guard_20261010 | 4e91e8ca94800d7b4595a27aec7976a6023df305 | completed300 yc3; unsupported geometry safely falls back
+broader_basis: experiment/shape-basis-calibration-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_basis_20261010 | c1599acd7a7572439a4aa01a51361f216421c735 | completed300 yc3; archived and SHA verified; no uniform serving gain
+deadline_margin: experiment/shape-deadline-margin-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_margin_20261010 | 6774689d9a0f7a4a6c93382ca8c673141c106d01 | CPU verified; worker-only allowance superseded before serving
+productive_load_only: experiment/shape-productive-load-only-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_productive_20261010 | f57d5ca532efb7d65b46a5ad9e5dc35ddc4d6d50 | CPU verified; yc4 completed32 cells; mechanism activates, no standalone serving gain
+direct_shape: experiment/shape-direct-duration-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_direct_20261010 | 0e6decc577bff21290ce0ce4739de28473bc90b3 | frozen alternative; offline algebra/shadow audits only
+submission_floor: experiment/shape-submission-floor-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_floor_20261010 | 32cbbc87ab659b89e94f9330e5dc236fb5a82ec0 | CPU verified; development and unseen shadow improvements only, not live
+complete_deadline_margin: experiment/shape-complete-deadline-margin-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_complete_margin_20261010 | c50802023c85ce1e2b11f33f989bf004f8088aac | yc4 completed32-cell standalone study and yc5 combined study; not promoted
+GC_timing_diagnosis: experiment/shape-gc-timing-diagnosis-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_gc_20261010 | 7301ea82ebc64c1dc8ec020402cfb4b5ad977531 | yc4 completed/drained/SHA archived; GC tails confirmed, no collector-policy changes
+packed_checkpoint: experiment/shape-packed-checkpoint-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_packed_20261010 | 5cfc192ac79789ab9e6838ffe11d93568bacb98c | CPU verified exact2412 frames; yc5 completed12 accepted cells; short throughput -6.52%, mid +6.33%; not uniform serving winner
+margin_productive_interaction: experiment/shape-margin-productive-combined-20261010 | /mnt/localnvme/jeongyoon/vllm_shape_combined_20261010 | debe3395f366779dc2bc5557fbcf2a6d99dcc856 | yc5 completed; short -2.65%, mid +6.07%; productive exit zero activations, not promoted

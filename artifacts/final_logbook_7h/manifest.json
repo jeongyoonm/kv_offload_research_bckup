@@ -1,0 +1,123 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_direct_20261010",
+  "archive_sha256": "d33089114ce851dbbba5bbeb3415a2f1f5452b4b54f3d06b4ede7cbad835c752",
+  "archive_bytes": 44523,
+  "members": [
+    {
+      "path": "algebra_audit.json",
+      "bytes": 274,
+      "sha256": "32be4e4a8c784e3dee513e3b7f1373d9202b5a5905eebdb0314b81706f2c973b",
+      "link_to": null
+    },
+    {
+      "path": "algebra_audit.log",
+      "bytes": 262,
+      "sha256": "fedc1411b1243a411693f5320b4364053fb1ad316f707c3c20a013367827961f",
+      "link_to": null
+    },
+    {
+      "path": "audit_commit.log",
+      "bytes": 3574,
+      "sha256": "c443b2bbeed906c5825c78380b143de5fabec665609a7dfddbe02c28225b39af",
+      "link_to": null
+    },
+    {
+      "path": "audit_commit_retry.log",
+      "bytes": 3820,
+      "sha256": "f2c1c549fdf58cb79f1176e57565aa12367dae2693a2efa8a1fed4b74b7fa5bd",
+      "link_to": null
+    },
+    {
+      "path": "build.log",
+      "bytes": 148,
+      "sha256": "8d2f45d73af48421de9ee89b8a88e4d3578d7bd128580068fde31940bc0cd0f7",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "endpoints_commit.log",
+      "bytes": 3574,
+      "sha256": "c443b2bbeed906c5825c78380b143de5fabec665609a7dfddbe02c28225b39af",
+      "link_to": "audit_commit.log"
+    },
+    {
+      "path": "endpoints_commit_retry.log",
+      "bytes": 3837,
+      "sha256": "2a28bbfd16278cc7ac98978ee342eaeee04c8ec818f29f52666188b8afe6c7f1",
+      "link_to": null
+    },
+    {
+      "path": "frozen_direct_fit.json",
+      "bytes": 4731,
+      "sha256": "94cd07189b1c14d9b953770b9c74010dc8c8099a54c72d9edd9637ea04c0f4ab",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 3833,
+      "sha256": "e8f0175b5d15e02f1496522c3b3110790dcbf96a48939bfdb3ff61fa365a4516",
+      "link_to": null
+    },
+    {
+      "path": "shadow_commit.log",
+      "bytes": 4107,
+      "sha256": "669da50f9e42954019a5b2ee2ba742b592349bafc36ec700971400b158d7dd5c",
+      "link_to": null
+    },
+    {
+      "path": "shadow_commit_retry.log",
+      "bytes": 3832,
+      "sha256": "6de53a81b211140afc90b28e905f67446e712d7df016b299f68692cda454ad93",
+      "link_to": null
+    },
+    {
+      "path": "yc3_endpoint_audit.json",
+      "bytes": 217157,
+      "sha256": "ae500523f22ac3d93c5560175a4bbfe4ba7124f427ff6a38ce554a6e39f3e73f",
+      "link_to": null
+    },
+    {
+      "path": "yc3_endpoint_audit.log",
+      "bytes": 1081,
+      "sha256": "2000fffb693e91038498902b0328085fd0228675989043d828426d9f5b08df09",
+      "link_to": null
+    },
+    {
+      "path": "yc3_shadow.json",
+      "bytes": 6432,
+      "sha256": "ea5970529ffa4287cb464181c93ead0408a5fa5eb9c3d02c9da0bb280cc57bb6",
+      "link_to": null
+    },
+    {
+      "path": "yc3_shadow.log",
+      "bytes": 6432,
+      "sha256": "ea5970529ffa4287cb464181c93ead0408a5fa5eb9c3d02c9da0bb280cc57bb6",
+      "link_to": "yc3_shadow.json"
+    },
+    {
+      "path": "yc3_shadow_complete.json",
+      "bytes": 18310,
+      "sha256": "99c9168f59b7359fc4dab1cbc86bf9ba3bc739ec846eb8d506a3ce50f39b45fe",
+      "link_to": null
+    },
+    {
+      "path": "yc3_shadow_complete.log",
+      "bytes": 18310,
+      "sha256": "99c9168f59b7359fc4dab1cbc86bf9ba3bc739ec846eb8d506a3ce50f39b45fe",
+      "link_to": "yc3_shadow_complete.json"
+    },
+    {
+      "path": "yc3_shadow_complete_summary.json",
+      "bytes": 726,
+      "sha256": "7b9389a75a0dc9076d3112d5ef6c587542fd37c21b05eb7d8687be1acfb81e83",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

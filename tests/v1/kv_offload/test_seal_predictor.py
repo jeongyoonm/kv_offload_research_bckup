@@ -167,6 +167,95 @@ def test_calibration_schema_rejects_elapsed_and_unknown_features():
             BatchShapeCalibration(state)
 
 
+def shape_margin_state():
+    state = shape_correction_state()
+    state.update(
+        schema=4,
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+        deadline_margin=dict(
+            finish_allowance_ms=dict(small_short=30, large_short=0),
+            setup_allowance_ms=dict(
+                small_short=8,
+                medium_short=15,
+                large_short=12,
+                small_long=20,
+                medium_long=30,
+                large_long=40,
+            ),
+            finish_fallback_ms=40,
+            setup_fallback_ms=35,
+            extra_ms=2,
+            bounds_ms=[10, 100],
+        ),
+    )
+    return state
+
+
+def test_deadline_margin_separates_predecessor_error_from_successor_setup():
+    """Identical A shape can need different margins for already-known B shapes."""
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    calibration = BatchShapeCalibration(shape_margin_state())
+    x = np.zeros(28)
+    x[:9] = [9984, 12, 0, 186624, 832, 832, 15552, 15552, 9984]
+    short = [[832, 15552]]
+    long = [[3072, 58368]]
+    assert calibration.deadline_lead_ns(
+        200_000_000, x, short, short * 7, 50_000_000
+    ) == (17_000_000, False)
+    assert calibration.deadline_lead_ns(
+        200_000_000, x, long, long * 15, 50_000_000
+    ) == (42_000_000, False)
+    assert calibration.deadline_lead_ns(200_000_000, x, short * 12, [], 50_000_000) == (
+        14_000_000,
+        False,
+    )
+    x[0], x[1], x[3] = 1664, 2, 31104
+    assert calibration.deadline_lead_ns(200_000_000, x, short * 12, [], 50_000_000) == (
+        44_000_000,
+        False,
+    )
+
+
+@pytest.mark.parametrize(
+    "base,candidates",
+    [
+        (None, []),
+        ([], None),
+        ([], []),
+        ([[1, 15552]], []),
+        ([[832, 15552]], [[832, 15552]] * 32),
+    ],
+)
+def test_deadline_margin_falls_back_for_unknown_or_unsupported_successor(
+    base, candidates
+):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    calibration = BatchShapeCalibration(shape_margin_state())
+    x = np.zeros(28)
+    x[:9] = [832, 1, 0, 15552, 832, 832, 15552, 15552, 896]
+    assert calibration.deadline_lead_ns(
+        200_000_000, x, base, candidates, 50_000_000
+    ) == (50_000_000, True)
+
+
+@pytest.mark.parametrize("mutation", ["nan", "unknown_bin", "bounds"])
+def test_deadline_margin_rejects_corrupt_frozen_allowances(mutation):
+    from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
+
+    state = shape_margin_state()
+    margin = state["deadline_margin"]
+    if mutation == "nan":
+        margin["extra_ms"] = float("nan")
+    elif mutation == "unknown_bin":
+        margin["finish_allowance_ms"]["unseen"] = 1
+    else:
+        margin["bounds_ms"] = [100, 10]
+    with pytest.raises(ValueError, match="deadline margin"):
+        BatchShapeCalibration(state)
+
+
 @pytest.mark.parametrize("fallback", [False, True])
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(fallback):
     """Even an elapsed-sensitive component cannot move an offset deadline."""

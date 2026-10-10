@@ -887,6 +887,48 @@ def stage_rpc(core, step, base, candidates):
                                         )
                                     )
                                 predicted = max(1, predicted - applied_bias_ns)
+                                margin_fallback = None
+                                margin_base = None
+                                margin_candidates: list[list[int]] | None = None
+                                if (
+                                    shape_calibration is not None
+                                    and shape_calibration.deadline_margin is not None
+                                    and (compute_deadline or compute_deadline_shadow)
+                                ):
+                                    margin_base = getattr(
+                                        core.scheduler,
+                                        "_late_base_request_shapes",
+                                        None,
+                                    )
+                                    candidate_work: list[list[int]] = []
+                                    all_candidates_known = True
+                                    for candidate in candidates:
+                                        request = core.scheduler.requests.get(
+                                            candidate.req_id
+                                        )
+                                        if request is None:
+                                            all_candidates_known = False
+                                            break
+                                        candidate_work.append(
+                                            [
+                                                request.num_tokens
+                                                - request.num_computed_tokens,
+                                                request.num_computed_tokens,
+                                            ]
+                                        )
+                                    margin_candidates = (
+                                        candidate_work if all_candidates_known else None
+                                    )
+                                    lead_ns, margin_fallback = (
+                                        shape_calibration.deadline_lead_ns(
+                                            raw_duration_ns,
+                                            point_features,
+                                            margin_base,
+                                            margin_candidates,
+                                            compute_deadline_lead_us * 1000,
+                                        )
+                                    )
+                                    compute_deadline_lead_us = (lead_ns + 999) // 1000
                                 reserve_ns = timing.seal_estimator.preparation_reserve(
                                     core.scheduler._late_seal_prediction_reserve_us
                                     * 1000
@@ -904,6 +946,15 @@ def stage_rpc(core, step, base, candidates):
                                     shape_calibration_enabled=shape_calibration
                                     is not None,
                                     shape_calibration_fallback=calibration_fallback,
+                                    shape_deadline_margin_enabled=(
+                                        shape_calibration is not None
+                                        and shape_calibration.deadline_margin
+                                        is not None
+                                    ),
+                                    shape_deadline_margin_fallback=margin_fallback,
+                                    applied_compute_deadline_lead_us=compute_deadline_lead_us,
+                                    deadline_base_shapes=margin_base,
+                                    deadline_candidate_shapes=margin_candidates,
                                     deadline_ns=predicted_deadline_ns,
                                     features=timing.seal_estimator.features(
                                         data

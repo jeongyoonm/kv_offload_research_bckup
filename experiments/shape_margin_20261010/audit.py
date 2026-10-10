@@ -121,6 +121,16 @@ def main():
     result = dict(
         finish_errors_by_A_shape=finish,
         host_setup_by_B_shape=setup,
+        finish_rows=[
+            dict(
+                workload=r["workload"],
+                group=r["group"],
+                requests=r["requests"],
+                max_suffix=r["features"][5],
+                error_ms=float(error),
+            )
+            for r, error in zip(rows, errors)
+        ],
         setup_rows=setup_rows,
         definitions="Finish errors are grouped out-of-fold development predictions. "
         "Positive finish error can postpone the seal. Setup is maximum per-rank "

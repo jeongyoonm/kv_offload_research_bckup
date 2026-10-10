@@ -19,6 +19,12 @@ GEOMETRY_FEATURES = FEATURES + [
 ]
 
 
+def shape_bin(requests, suffix):
+    size = "small" if requests <= 4 else "medium" if requests <= 8 else "large"
+    length = "short" if suffix <= 1024 else "mid" if suffix <= 2048 else "long"
+    return f"{size}_{length}"
+
+
 def shape_query(raw_duration_ns, x, features):
     """Build the same causal shape basis for frozen fitting and inference."""
     values = dict(
@@ -49,12 +55,14 @@ class BatchShapeCalibration:
             "provenance",
         }
         schema = state.get("schema") if isinstance(state, dict) else None
-        if schema in (2, 3):
+        if schema in (2, 3, 4):
             required.add("geometry_support")
+        if schema == 4:
+            required.add("deadline_margin")
         if (
             not isinstance(state, dict)
             or set(state) != required
-            or schema not in (1, 2, 3)
+            or schema not in (1, 2, 3, 4)
             or (schema in (1, 2) and state["features"] != FEATURES)
             or not isinstance(state["features"], list)
             or not state["features"]
@@ -86,7 +94,7 @@ class BatchShapeCalibration:
             ):
                 raise ValueError("invalid shape calibration support")
         self.geometry_bounds = None
-        if schema in (2, 3):
+        if schema in (2, 3, 4):
             geometry = state["geometry_support"]
             if not isinstance(geometry, dict) or set(geometry) != {
                 "suffix_per_context"
@@ -101,6 +109,44 @@ class BatchShapeCalibration:
                 or not 0 < self.geometry_bounds[0] <= self.geometry_bounds[1] <= 1
             ):
                 raise ValueError("invalid shape calibration geometry support")
+
+        self.deadline_margin = None
+        if schema == 4:
+            margin = state["deadline_margin"]
+            required_margin = {
+                "finish_allowance_ms",
+                "setup_allowance_ms",
+                "finish_fallback_ms",
+                "setup_fallback_ms",
+                "extra_ms",
+                "bounds_ms",
+            }
+            if not isinstance(margin, dict) or set(margin) != required_margin:
+                raise ValueError("invalid calibrated deadline margin")
+            allowed_bins = {
+                f"{n}_{q}"
+                for n in ("small", "medium", "large")
+                for q in ("short", "mid", "long")
+            }
+            for key in ("finish_allowance_ms", "setup_allowance_ms"):
+                values = margin[key]
+                if not isinstance(values, dict) or set(values) - allowed_bins:
+                    raise ValueError("invalid calibrated deadline margin bins")
+                if any(
+                    not np.isfinite(v) or not 0 <= v <= 1000 for v in values.values()
+                ):
+                    raise ValueError("invalid calibrated deadline margin values")
+            for key in ("finish_fallback_ms", "setup_fallback_ms", "extra_ms"):
+                if not np.isfinite(margin[key]) or not 0 <= margin[key] <= 1000:
+                    raise ValueError("invalid calibrated deadline margin values")
+            bounds = np.asarray(margin["bounds_ms"], dtype=float)
+            if (
+                bounds.shape != (2,)
+                or not np.isfinite(bounds).all()
+                or not 0 <= bounds[0] <= bounds[1] <= 250
+            ):
+                raise ValueError("invalid calibrated deadline margin bounds")
+            self.deadline_margin = margin
 
     def bias_ns(self, raw_duration_ns, features, fallback_ns):
         if features is None:
@@ -129,3 +175,38 @@ class BatchShapeCalibration:
         if not np.isfinite(bias):
             raise RuntimeError("nonfinite shape calibration result")
         return int(np.clip(bias, *self.bounds) * 1e6), False
+
+    def deadline_lead_ns(
+        self, raw_duration_ns, features, base_shapes, candidate_shapes, fallback_ns
+    ):
+        """Freeze a bounded lead using A uncertainty and possible B setup shapes."""
+        margin = self.deadline_margin
+        if margin is None or self.bias_ns(raw_duration_ns, features, 0)[1]:
+            return fallback_ns, True
+        if base_shapes is None or candidate_shapes is None:
+            return fallback_ns, True
+        shapes = np.asarray(base_shapes + candidate_shapes, dtype=float)
+        if (
+            shapes.ndim != 2
+            or shapes.shape[1] != 2
+            or not 0 < len(shapes) <= min(32, self.support["requests"][1])
+            or not np.isfinite(shapes).all()
+        ):
+            return fallback_ns, True
+        for column, key in ((0, "suffix"), (1, "context")):
+            low, high = self.support[key]
+            if np.any(shapes[:, column] < low) or np.any(shapes[:, column] > high):
+                return fallback_ns, True
+        a_bin = shape_bin(features[1], features[5])
+        error = margin["finish_allowance_ms"].get(a_bin, margin["finish_fallback_ms"])
+        suffix = float(shapes[:, 0].max())
+        setup = max(
+            margin["setup_allowance_ms"].get(
+                shape_bin(n, suffix), margin["setup_fallback_ms"]
+            )
+            for n in range(max(1, len(base_shapes)), len(shapes) + 1)
+        )
+        lead_ms = float(
+            np.clip(error + setup + margin["extra_ms"], *margin["bounds_ms"])
+        )
+        return int(lead_ms * 1e6), False

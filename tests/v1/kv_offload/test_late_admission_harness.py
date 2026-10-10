@@ -222,10 +222,17 @@ def deadline_core(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "supported,base_at", [(True, None), (False, None), (True, 1_060_000_000)]
+    "supported,base_at,margin",
+    [
+        (True, None, False),
+        (False, None, False),
+        (True, 1_060_000_000, False),
+        (True, None, True),
+        (False, None, True),
+    ],
 )
 def test_frozen_shape_correction_controls_deadline_and_preserves_snapshot(
-    deadline_core, supported, base_at
+    deadline_core, supported, base_at, margin
 ):
     """A loaded calibration advances the deadline without changing admission gates."""
     import numpy as np
@@ -238,24 +245,41 @@ def test_frozen_shape_correction_controls_deadline_and_preserves_snapshot(
     x = np.zeros(28)
     context = 15552 if supported else 8192
     x[:9] = [832, 1, 0, context, 832, 832, context, context, 896]
-    calibration = BatchShapeCalibration(
-        dict(
-            schema=3,
-            features=["intercept"],
-            coefficients=[30],
-            support=dict(requests=[1, 32], context=[15552, 58368], suffix=[832, 3072]),
-            geometry_support=dict(suffix_per_context=[0.01, 0.25]),
-            bias_bounds_ms=[-500, 500],
-            provenance={},
-        )
+    state = dict(
+        schema=3,
+        features=["intercept"],
+        coefficients=[30],
+        support=dict(requests=[1, 32], context=[15552, 58368], suffix=[832, 3072]),
+        geometry_support=dict(suffix_per_context=[0.01, 0.25]),
+        bias_bounds_ms=[-500, 500],
+        provenance={},
     )
+    if margin:
+        state.update(
+            schema=4,
+            deadline_margin=dict(
+                finish_allowance_ms=dict(small_short=20),
+                setup_allowance_ms=dict(small_short=10),
+                finish_fallback_ms=40,
+                setup_fallback_ms=35,
+                extra_ms=2,
+                bounds_ms=[10, 100],
+            ),
+        )
+        core.scheduler._late_base_request_shapes = [[832, 15552]]
+        core.scheduler.requests = {
+            rid: SimpleNamespace(num_tokens=16384, num_computed_tokens=15552)
+            for rid in ("early", "late")
+        }
+    calibration = BatchShapeCalibration(state)
     core.deferral_timing.seal_estimator.latency_surface = SimpleNamespace(
         requires_forecast=False,
         predict_with_features=lambda data: (120_000_000, x),
         duration_calibration=calibration,
         target_schema="cuda_span_max.v1",
     )
-    expected = max(1_040_000_000 if supported else clock.now, base_at or 0)
+    lead = 32_000_000 if supported and margin else 50_000_000
+    expected = max(1_090_000_000 - lead if supported else clock.now, base_at or 0)
     clock.ready_at = {"early": expected - 1, "late": expected + 1}
     acknowledged = stage_rpc(
         core, 9, [_request("base")], [_request("early"), _request("late")]
@@ -267,6 +291,11 @@ def test_frozen_shape_correction_controls_deadline_and_preserves_snapshot(
         30_000_000 if supported else 90_000_000
     )
     assert transport["prediction"]["shape_calibration_fallback"] is not supported
+    assert transport["compute_seal_deadline_lead_us"] == lead // 1000
+    if margin:
+        assert (
+            transport["prediction"]["shape_deadline_margin_fallback"] is not supported
+        )
     assert set(acknowledged) & core.scheduler._late_kv_snapshot == {"early"}
     assert transport["statuses"][:8] == [1] * 8
     clock.base_at = None  # The preparation acknowledgment file is retired at seal.

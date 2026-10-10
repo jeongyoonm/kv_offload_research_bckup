@@ -14,6 +14,12 @@ LABELS = dict(
     familiar60k="60K",
     mixed_supported="Mixed",
 )
+TITLES = dict(
+    sp11a="Initial mean / q90 comparison",
+    sr11="Smaller constant control",
+    ss11="Inference shadow control",
+    sm11="Added mixed-batch training coverage",
+)
 
 
 def main():
@@ -202,7 +208,8 @@ def plot(allocations, output):
                     )
             ax.set_xticks(x, [LABELS[w] for w in plan["workloads"]])
             ax.set_ylabel(label)
-            ax.set_title(Path(allocation["root"]).name)
+            allocation_name = Path(allocation["root"]).name
+            ax.set_title(TITLES.get(allocation_name, allocation_name))
             ax.grid(axis="y", alpha=0.2)
             ax.set_axisbelow(True)
             ax.legend(fontsize=8)

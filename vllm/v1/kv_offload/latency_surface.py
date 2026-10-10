@@ -16,9 +16,9 @@ def packed_checkpoint_enabled():
     return os.environ.get("VLLM_SEAL_PACKED_CHECKPOINT") == "1"
 
 
-def retain_checkpoint(owner, state, weight_keys):
+def retain_checkpoint(owner, state, weight_keys, packed=None):
     """Keep immutable weights outside Python's tracked container graph."""
-    if packed_checkpoint_enabled():
+    if packed_checkpoint_enabled() if packed is None else packed:
         owner._packed_state = json.dumps(state, separators=(",", ":")).encode()
         owner._state = copy.deepcopy(
             {key: value for key, value in state.items() if key not in weight_keys}
@@ -154,7 +154,7 @@ class LatencySurface:
     feature_names: list[str]
     target_schema: str
 
-    def __init__(self, state):
+    def __init__(self, state, packed=None):
         self.base = None
         if isinstance(state, dict) and state.get("schema") == 3:
             keys = {
@@ -186,8 +186,8 @@ class LatencySurface:
                 )
             ):
                 raise ValueError("incompatible composed latency surface")
-            self.base = LatencySurface(state["base"])
-            self.residual = LatencySurface(state["residual"])
+            self.base = LatencySurface(state["base"], packed=packed)
+            self.residual = LatencySurface(state["residual"], packed=packed)
             if (
                 self.base.feature_names != FEATURE_NAMES
                 or self.residual.feature_names
@@ -212,7 +212,7 @@ class LatencySurface:
             self.requires_load_progress = True
             self.target_schema = state["target_schema"]
             self.residual_shift_ms = shift
-            retain_checkpoint(self, state, {"base", "residual"})
+            retain_checkpoint(self, state, {"base", "residual"}, packed=packed)
             return
         keys = {"schema", "feature_names", "trees", "provenance"}
         if isinstance(state, dict) and state.get("schema") == 2:
@@ -291,7 +291,7 @@ class LatencySurface:
                 self.feature[tree_index, node_index] = feature
                 self.threshold[tree_index, node_index] = threshold
                 self.value[tree_index, node_index] = value
-        retain_checkpoint(self, state, {"trees"})
+        retain_checkpoint(self, state, {"trees"}, packed=packed)
         self.tree_indices = np.arange(len(trees))
         self.native = None
         native_path = os.environ.get("VLLM_DEFERRAL_FAST_FOREST")

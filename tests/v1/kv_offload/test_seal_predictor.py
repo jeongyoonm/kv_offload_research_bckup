@@ -416,7 +416,7 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
         schema=4,
         architecture="guarded_sparse_mlp_offset",
         target_schema="critical_end_after_all_rank_start.v1",
-        provenance=dict(general_prefill=True),
+        provenance=dict(general_prefill=True, packed_checkpoint=packed),
         checkpoint=dict(
             models=[dict(direct=dict(kind="tree", state=s)) for s in [tree, alternate]],
             weights=[1.0, 0.0],
@@ -429,7 +429,7 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
             ),
         ),
     )
-    monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", str(int(packed)))
+    monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", "0")
     model = FrozenSealPredictor(state)
     assert model.state_dict() == state
     exported = model.state_dict()

@@ -26,6 +26,7 @@ LEADS = {
     "guard50": 50_000,
     "basis100": 100_000,
     "basis50": 50_000,
+    "packed50": 50_000,
     "margin75": 50_000,
     "margin90": 50_000,
     "productive70": 50_000,
@@ -118,6 +119,8 @@ def main():
             restored = copy.deepcopy(states[arm])
             restored["latency_surface"]["checkpoint"].pop("duration_calibration")
             assert restored == base
+        if arm == "packed50":
+            states[arm]["latency_surface"]["provenance"]["packed_checkpoint"] = True
         estimator = ComputeEstimator.from_state_dict(states[arm], base["context"])
         assert estimator.state_dict(base["context"]) == states[arm]
         policies[arm] = options(True)

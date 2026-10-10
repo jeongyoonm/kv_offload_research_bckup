@@ -31,10 +31,10 @@ def finite_array(value):
 
 
 class Component:
-    def __init__(self, state):
+    def __init__(self, state, packed=False):
         self.state = state
         if state["kind"] == "tree":
-            self.tree = LatencySurface(state["state"])
+            self.tree = LatencySurface(state["state"], packed=packed)
             self.shift = float(state.get("shift", 0))
             if not np.isfinite(self.shift):
                 raise ValueError("invalid tree residual shift")
@@ -64,7 +64,7 @@ class Component:
             self.output = finite_array([state["y_scale"], state["y_mean"]])
         else:
             raise ValueError("unsupported predictor component")
-        if packed_checkpoint_enabled():
+        if packed:
             self.state = {"kind": state["kind"], "config": state.get("config")}
 
     def predict(self, x, native):
@@ -84,16 +84,18 @@ class Component:
 
 
 class Architecture:
-    def __init__(self, state):
+    def __init__(self, state, packed=False):
         self.indices = state.get("input_indices")
         if self.indices is not None and any(
             type(i) is not int or not 0 <= i < 31 for i in self.indices
         ):
             raise ValueError("invalid predictor input projection")
-        self.direct = Component(state["direct"]) if state.get("direct") else None
-        self.base = Component(state["base"]) if state.get("base") else None
+        self.direct = (
+            Component(state["direct"], packed) if state.get("direct") else None
+        )
+        self.base = Component(state["base"], packed) if state.get("base") else None
         self.correction = (
-            Component(state["correction"]) if state.get("correction") else None
+            Component(state["correction"], packed) if state.get("correction") else None
         )
         if self.direct is None and self.base is None:
             raise ValueError("predictor has no base")
@@ -128,8 +130,8 @@ class Support:
 
 
 class NeuralCandidate:
-    def __init__(self, state):
-        self.models = [Architecture(s) for s in state["models"]]
+    def __init__(self, state, packed=False):
+        self.models = [Architecture(s, packed) for s in state["models"]]
         self.weights = finite_array(state["weights"])
         self.support = Support(state["support_guard"], 31)
         self.fallback = state["support_guard"]["fallback_model_index"]
@@ -179,6 +181,11 @@ class FrozenSealPredictor:
             raise ValueError("incompatible frozen predictor snapshot")
         self._state = copy.deepcopy(state)
         self._packed_state = None
+        packed = state["provenance"].get(
+            "packed_checkpoint", packed_checkpoint_enabled()
+        )
+        if type(packed) is not bool:
+            raise ValueError("invalid packed checkpoint option")
         self.architecture = state["architecture"]
         self.excludes_elapsed = self.architecture == "guarded_sparse_mlp_offset"
         self.feature_names = (
@@ -194,7 +201,7 @@ class FrozenSealPredictor:
             )
         if self.excludes_elapsed and checkpoint.get("excluded_feature_indices") != [21]:
             raise ValueError("offset predictor must exclude elapsed execution time")
-        self.neural = NeuralCandidate(checkpoint.get("neural", checkpoint))
+        self.neural = NeuralCandidate(checkpoint.get("neural", checkpoint), packed)
         if all(
             component["kind"] == "tree"
             for model in checkpoint.get("neural", checkpoint)["models"]
@@ -207,13 +214,13 @@ class FrozenSealPredictor:
                 raise ValueError("unsupported envelope blend weights")
             envelope = checkpoint["envelope"]
             self.support = Support(envelope["support"], 27)
-            self.fallback = Architecture(envelope["fallback"])
+            self.fallback = Architecture(envelope["fallback"], packed)
             base = envelope["envelope"]["base"]
             self.core = finite_array(base["core_coefficients"])
             self.host = finite_array(base["host_coefficients"])
             if self.core.shape != (9,) or self.host.shape != (9,):
                 raise ValueError("invalid envelope coefficients")
-            self.correction = Component(envelope["envelope"]["correction"])
+            self.correction = Component(envelope["envelope"]["correction"], packed)
         # Reuse the existing causal feature validator, independent of model fitting.
         self.extractor = LatencySurface(
             dict(
@@ -224,8 +231,8 @@ class FrozenSealPredictor:
                 trees=[[[-1, -1, -2, 0.0, 1.0]]],
             )
         )
-        if packed_checkpoint_enabled():
-            retain_checkpoint(self, state, {"checkpoint"})
+        if packed:
+            retain_checkpoint(self, state, {"checkpoint"}, packed=True)
 
     def state_dict(self):
         return restored_checkpoint(self)

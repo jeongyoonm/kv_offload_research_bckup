@@ -167,7 +167,7 @@ def weights(rows):
     values = np.zeros(len(rows))
     for phase in sorted({r["_phase"] for r in rows}):
         indices = [i for i, r in enumerate(rows) if r["_phase"] == phase]
-        w = train.original_weights([rows[i] for i in indices])
+        w = train.weights([rows[i] for i in indices])
         values[indices] = w / w.sum()
     return values * len(rows) / values.sum()
 
@@ -204,7 +204,8 @@ def main():
             target="critical_end_after_all_rank_start.v1",
             elapsed_mask=21,
             weights="Equal total live-current and controlled-current phase mass; "
-            "historical workload weighting within each phase",
+            "equal allocation mass within phase, historical workload weighting "
+            "within allocation. Preserves the initial live-only refit weights.",
             validation="Three-fold episode purging, train-only OOF base correction; "
             "development for selection, final checked after selection freeze",
             external_shape_calibration=False,

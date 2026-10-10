@@ -7,6 +7,7 @@ import copy
 import gzip
 import hashlib
 import json
+import sys
 import time
 from pathlib import Path
 
@@ -15,9 +16,14 @@ from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from threadpoolctl import threadpool_limits
 
 from experiments.current_chunk_retrain_20261010 import train
-from vllm.v1.kv_offload.frozen_seal_predictor import FrozenSealPredictor
 
 arch = train.arch
+sys.modules.setdefault("vllm.v1.kv_offload.latency_surface", arch.surface)
+runtime = arch.load_module(
+    "current_chunk_cpu_runtime",
+    train.SOURCE / "vllm/v1/kv_offload/frozen_seal_predictor.py",
+)
+FrozenSealPredictor = runtime.FrozenSealPredictor
 MLP = dict(kind="mlp", layers=[64, 64], input="log1p", solver="lbfgs", alpha=0.01)
 NAMES = ("trees_fixed", "trees_tuned", "tree_direct", "mlp_direct", "sparse_mlp")
 

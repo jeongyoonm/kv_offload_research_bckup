@@ -182,6 +182,16 @@ def main():
                     primary = point["primary_snapshot"]
                     loads = point["forecast_load_features"]
                 if point["event"] == "setup_prediction":
+                    if point.get("shadow"):
+                        lead_ns = (
+                            plan["policies"][episode["label"]][
+                                "late_seal_compute_deadline_lead_us"
+                            ]
+                            * 1000
+                        )
+                        assert not point["applied"]
+                        assert point["deadline_ns"] == predicted_end - lead_ns
+                        audit["shadow_fixed_deadline_verified"] += 1
                     model = by_model_id[point["model_id"]]
                     result = model.predict_ms(point["inputs"])
                     assert (result is None and point["predicted_setup_ms"] is None) or (

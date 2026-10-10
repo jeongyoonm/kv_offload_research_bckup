@@ -37,7 +37,7 @@ def main():
     parser.add_argument("--requests", type=int, choices=(75, 300), default=300)
     parser.add_argument("--seed-start", type=int, default=12101)
     parser.add_argument("--lead-us", type=int, default=50000)
-    parser.add_argument("--allocation-seconds", type=int, default=7200)
+    parser.add_argument("--allocation-seconds", type=int, default=10800)
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
     root = args.output

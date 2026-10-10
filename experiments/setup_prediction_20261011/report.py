@@ -161,6 +161,7 @@ def plot(allocations, output):
         shadow_mean50="#B77540",
         old_mean="#2E779D",
         snapshot_mean="#39835D",
+        mixed_mean="#39835D",
     )
     for row, allocation in enumerate(allocations):
         plan, audit = allocation["plan"], allocation["audit"]

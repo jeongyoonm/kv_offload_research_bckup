@@ -19,6 +19,11 @@ def main():
     parser.add_argument("audit", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--quantile", type=float, choices=(0.75, 0.9), required=True)
+    parser.add_argument(
+        "--setup-target",
+        choices=("entry_to_forward_ms", "seal_to_forward_cpu_ms"),
+        default="entry_to_forward_ms",
+    )
     args = parser.parse_args()
     assert not args.output.exists()
     original = json.loads(args.fit.read_text())
@@ -40,12 +45,12 @@ def main():
 
     margin = dict(
         finish_allowance_ms=allowances(finish_rows, "error_ms"),
-        setup_allowance_ms=allowances(setup_rows, "entry_to_forward_ms"),
+        setup_allowance_ms=allowances(setup_rows, args.setup_target),
         finish_fallback_ms=max(
             0.0, float(np.quantile([r["error_ms"] for r in finish_rows], args.quantile))
         ),
         setup_fallback_ms=float(
-            np.quantile([r["entry_to_forward_ms"] for r in setup_rows], args.quantile)
+            np.quantile([r[args.setup_target] for r in setup_rows], args.quantile)
         ),
         extra_ms=2,
         bounds_ms=[10, 100],
@@ -55,6 +60,7 @@ def main():
         margin_audit_sha256=hashlib.sha256(args.audit.read_bytes()).hexdigest(),
         duration_fit_sha256=hashlib.sha256(args.fit.read_bytes()).hexdigest(),
         margin_quantile=args.quantile,
+        margin_setup_target=args.setup_target,
         margin_minimum_bin_samples=20,
         margin_mode="Grouped finish errors plus observed successor host setup; "
         "no future membership, no online training.",

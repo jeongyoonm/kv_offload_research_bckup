@@ -28,6 +28,8 @@ LEADS = {
     "basis50": 50_000,
     "margin75": 50_000,
     "margin90": 50_000,
+    "productive70": 50_000,
+    "productive80": 50_000,
 }
 PREFIX_WORKING_SETS = {
     "short16k": 300,
@@ -163,7 +165,9 @@ def main():
             "original 90ms fallback and all weights/history retained. Native stores, "
             "allocator avoidance, H2D8/depth2, preparation, readiness and load-only "
             "policy unchanged. Optional frozen shape margins alter only deadline "
-            "lead. Calibration fitted before these independent seeds. "
+            "lead. Optional productive-work policy adds a load-only early exit "
+            "after all-rank base and selected candidate readiness. Calibration "
+            "fitted before these independent seeds. "
             "75-request episodes are reset/primed; 300-request episodes have one "
             "initial reset and a workload-specific prefix working set with "
             "distinct suffixes. Working sets exceed GPU token capacity while "

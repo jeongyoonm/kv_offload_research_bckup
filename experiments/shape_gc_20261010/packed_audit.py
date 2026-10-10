@@ -21,6 +21,7 @@ def main():
     parser.add_argument("root", type=Path)
     parser.add_argument("fit", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--extra-root", type=Path, action="append", default=[])
     args = parser.parse_args()
     assert not args.output.exists()
     environment = json.loads((args.root / "server/environment.json").read_text())
@@ -40,6 +41,15 @@ def main():
     frames = json.loads(
         gzip.decompress((args.root / "prediction_rows.json.gz").read_bytes())
     )
+    frame_counts = {str(args.root): len(frames)}
+    checkpoint = (args.root / "loaded_predictor.json").read_bytes()
+    for root in args.extra_root:
+        assert (root / "loaded_predictor.json").read_bytes() == checkpoint
+        extra = json.loads(
+            gzip.decompress((root / "prediction_rows.json.gz").read_bytes())
+        )
+        frame_counts[str(root)] = len(extra)
+        frames.extend(extra)
     maximum = {"numpy": 0.0, "native": 0.0}
     for frame in frames:
         x = np.array(frame["features"], dtype=float)
@@ -58,6 +68,7 @@ def main():
                 ].latency_surface.duration_calibration.bias_ns(raw, x, 90_000_000)
     result = dict(
         frames=len(frames),
+        frame_counts=frame_counts,
         max_absolute_difference_ms=maximum,
         checkpoint_sha256=hashlib.sha256(
             (args.root / "loaded_predictor.json").read_bytes()

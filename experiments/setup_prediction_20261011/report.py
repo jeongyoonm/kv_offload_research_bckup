@@ -159,12 +159,15 @@ def plot(allocations, output):
         learned_mean="#2E779D",
         learned_q90="#8C63AB",
         shadow_mean50="#B77540",
+        old_mean="#2E779D",
+        snapshot_mean="#39835D",
     )
     for row, allocation in enumerate(allocations):
         plan, audit = allocation["plan"], allocation["audit"]
         levels = {(r["workload"], r["arm"]): r for r in audit["levels"]}
         x = np.arange(len(plan["workloads"]))
         width = 0.24
+        center = (len(plan["arms"]) - 1) / 2
         for col, (metric, label) in enumerate(
             [
                 ("throughput_rps", "Throughput (requests/s)"),
@@ -174,7 +177,7 @@ def plot(allocations, output):
             ax = axes[row, col]
             for i, arm in enumerate(plan["arms"]):
                 ax.bar(
-                    x + (i - 1) * width,
+                    x + (i - center) * width,
                     [levels[w, arm][metric] for w in plan["workloads"]],
                     width,
                     label=arm,
@@ -188,7 +191,9 @@ def plot(allocations, output):
                         if r["workload"] == workload and r["label"] == arm
                     ]
                     ax.scatter(
-                        j + (i - 1) * width + np.linspace(-0.035, 0.035, len(values)),
+                        j
+                        + (i - center) * width
+                        + np.linspace(-0.035, 0.035, len(values)),
                         values,
                         color="black",
                         s=14,

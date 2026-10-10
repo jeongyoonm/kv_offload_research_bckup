@@ -4,6 +4,7 @@
 
 import argparse
 import gzip
+import hashlib
 import importlib.util
 import json
 from collections import Counter, defaultdict
@@ -63,6 +64,15 @@ def main():
         for name, file in (("learned_mean", "mean"), ("learned_q90", "uncertainty"))
     }
     by_model_id = {model.model_id: model for model in models.values()}
+    plan = json.loads((args.root / "plan.json").read_text())
+    for arm, source in plan["sources"].items():
+        checkpoint = Path(source["path"])
+        assert hashlib.sha256(checkpoint.read_bytes()).hexdigest() == source["sha256"]
+        state = json.loads(checkpoint.read_text())
+        setup = state["latency_surface"]["provenance"].get("setup_predictor")
+        if setup is not None and setup["model_id"] not in by_model_id:
+            model = runtime.SetupPredictor(setup)
+            models[arm] = by_model_id[model.model_id] = model
     batches, replay, live_forecasts, episodes, audit = [], [], [], [], Counter()
     for episode in summary["results"]:
         directory = (

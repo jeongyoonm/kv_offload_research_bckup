@@ -121,14 +121,16 @@ def matrix(rows):
     return x
 
 
-def fit(batches, forecasts, seed):
+def fit(batches, forecasts, seed, base_config=None, correction_config=None):
+    base_config = base_config or arch.FIXED_BASE
+    correction_config = correction_config or arch.FIXED_CORRECTION
     base, _ = arch.fit(
-        arch.FIXED_BASE, arch.features(batches), arch.target(batches), batches, seed
+        base_config, arch.features(batches), arch.target(batches), batches, seed
     )
-    oof, audit = arch.cross_fit(arch.FIXED_BASE, batches, forecasts, seed)
+    oof, audit = arch.cross_fit(base_config, batches, forecasts, seed)
     assert all(a["episode_overlap"] == 0 for a in audit)
     correction, _ = arch.fit(
-        arch.FIXED_CORRECTION,
+        correction_config,
         np.column_stack((matrix(forecasts), oof)),
         arch.target(forecasts) - oof,
         forecasts,

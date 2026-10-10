@@ -69,6 +69,20 @@ def main():
                 cpu_cached_prefix_tokens=event.get("cpu_cached_prefix_tokens"),
             )
             rows.append(row)
+    records = [
+        json.loads(path.read_text())
+        for path in sorted((root / "cells").rglob("measurement_audit.json"))
+    ]
+    (root / "measurement_audit.json").write_text(
+        json.dumps(
+            dict(
+                counts=dict(Counter(f"{r['split']}:{r['reason']}" for r in records)),
+                cells=records,
+            ),
+            indent=2,
+        )
+        + "\n"
+    )
     from experiments.native_scheduler_ab_20261010 import run as baseline
 
     sys.modules["run"] = baseline.collector

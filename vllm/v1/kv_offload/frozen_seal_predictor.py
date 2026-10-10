@@ -174,6 +174,8 @@ class FrozenSealPredictor:
                 "guarded_sparse_mlp",
                 "guarded_sparse_mlp_offset",
                 "envelope_sparse_mlp",
+                "envelope_sparse_mlp_offset",
+                "submission_envelope_offset",
             )
             or state["target_schema"] != self.target_schema
             or state["provenance"].get("general_prefill") is not True
@@ -187,7 +189,7 @@ class FrozenSealPredictor:
         if type(packed) is not bool:
             raise ValueError("invalid packed checkpoint option")
         self.architecture = state["architecture"]
-        self.excludes_elapsed = self.architecture == "guarded_sparse_mlp_offset"
+        self.excludes_elapsed = self.architecture.endswith("_offset")
         self.feature_names = (
             FEATURE_NAMES + FORECAST_NAMES + SPARSE_NAMES + ENVELOPE_NAMES
         )
@@ -209,8 +211,17 @@ class FrozenSealPredictor:
             if (component := model.get(key)) is not None
         ):
             self.backend = "native_forest"
-        if self.architecture == "envelope_sparse_mlp":
-            if checkpoint.get("weights") != [0.5, 0.5]:
+        if self.architecture in (
+            "envelope_sparse_mlp",
+            "envelope_sparse_mlp_offset",
+            "submission_envelope_offset",
+        ):
+            self.blend_weights = (
+                [0.0, 1.0]
+                if self.architecture == "submission_envelope_offset"
+                else [0.5, 0.5]
+            )
+            if checkpoint.get("weights") != self.blend_weights:
                 raise ValueError("unsupported envelope blend weights")
             envelope = checkpoint["envelope"]
             self.support = Support(envelope["support"], 27)
@@ -258,7 +269,11 @@ class FrozenSealPredictor:
             x = x.copy()
             x[21] = 0
         neural_x = np.r_[x[:23], np.zeros(5), x[23:26]]
-        neural = self.neural.predict(neural_x, native)
+        neural = (
+            0.0
+            if self.architecture == "submission_envelope_offset"
+            else self.neural.predict(neural_x, native)
+        )
         if self.architecture in ("guarded_sparse_mlp", "guarded_sparse_mlp_offset"):
             return neural
         if self.support.outside(x):
@@ -270,7 +285,7 @@ class FrozenSealPredictor:
             envelope = max(
                 1, envelope + self.correction.predict(np.r_[x, envelope], native)
             )
-        return (neural + envelope) / 2
+        return self.blend_weights[0] * neural + self.blend_weights[1] * envelope
 
     def predict_with_features(self, data):
         x = self.input_features(data)

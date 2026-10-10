@@ -407,14 +407,28 @@ def test_productive_exit_rejects_invalid_frozen_models(mutation):
 
 @pytest.mark.parametrize("fallback", [False, True])
 @pytest.mark.parametrize("packed", [False, True])
+@pytest.mark.parametrize(
+    "architecture",
+    [
+        "guarded_sparse_mlp_offset",
+        "envelope_sparse_mlp_offset",
+        "submission_envelope_offset",
+    ],
+)
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
-    fallback, packed, monkeypatch
+    fallback, packed, architecture, monkeypatch
 ):
     """Even an elapsed-sensitive component cannot move an offset deadline."""
     import copy
 
     from vllm.v1.kv_offload.frozen_seal_predictor import FrozenSealPredictor
-    from vllm.v1.kv_offload.latency_surface import FEATURE_NAMES, FORECAST_NAMES
+    from vllm.v1.kv_offload.latency_surface import (
+        BASE_PREDICTION_NAMES,
+        ENVELOPE_NAMES,
+        FEATURE_NAMES,
+        FORECAST_NAMES,
+        SPARSE_NAMES,
+    )
 
     tree = transfer_surface_state()
     tree.update(
@@ -427,7 +441,7 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
     alternate["trees"][0][1][4] = 200.0
     state = dict(
         schema=4,
-        architecture="guarded_sparse_mlp_offset",
+        architecture=architecture,
         target_schema="critical_end_after_all_rank_start.v1",
         provenance=dict(general_prefill=True, packed_checkpoint=packed),
         checkpoint=dict(
@@ -442,11 +456,40 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
             ),
         ),
     )
+    if architecture != "guarded_sparse_mlp_offset":
+        neural = copy.deepcopy(state["checkpoint"])
+        correction = copy.deepcopy(tree)
+        correction["feature_names"] += (
+            SPARSE_NAMES + ENVELOPE_NAMES + BASE_PREDICTION_NAMES
+        )
+        state["checkpoint"] = dict(
+            neural=neural,
+            excluded_feature_indices=[21],
+            weights=(
+                [0.0, 1.0]
+                if architecture == "submission_envelope_offset"
+                else [0.5, 0.5]
+            ),
+            envelope=dict(
+                support={
+                    k: v
+                    for k, v in neural["support_guard"].items()
+                    if k != "fallback_model_index"
+                },
+                fallback=dict(direct=dict(kind="tree", state=alternate)),
+                envelope=dict(
+                    base=dict(
+                        core_coefficients=[1.0] + [0.0] * 8, host_coefficients=[0.0] * 9
+                    ),
+                    correction=dict(kind="tree", state=correction, shift=1.0),
+                ),
+            ),
+        )
     monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", "0")
     model = FrozenSealPredictor(state)
     assert model.state_dict() == state
     exported = model.state_dict()
-    exported["checkpoint"]["weights"][0] = 0.0
+    exported["checkpoint"]["weights"][0] = 0.25
     assert model.state_dict() == state
     if packed:
         assert "checkpoint" not in model._state

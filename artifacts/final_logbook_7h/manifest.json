@@ -1,0 +1,57 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_complete_margin_20261010",
+  "archive_sha256": "154d9af209d9df132a21b04ca520c505ff4a62a0a6c0aae1cde5ed5dc2663f76",
+  "archive_bytes": 34430,
+  "members": [
+    {
+      "path": "build.log",
+      "bytes": 721,
+      "sha256": "bf1ac126f2b888f66ba331cfd82339038f16131e4577a3ce89425cb673b5db61",
+      "link_to": null
+    },
+    {
+      "path": "complete.log",
+      "bytes": 2075,
+      "sha256": "578936fbd29b0005c8c52afafc2f8a5cedc28faa0db9869a25588cf1f55f3172",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "development_complete_rows.json",
+      "bytes": 295314,
+      "sha256": "54ad78e01373d66643b0accf5eefede46072510c2eb1e5643de7dbcf348cff94",
+      "link_to": null
+    },
+    {
+      "path": "frozen_complete_margin75.json",
+      "bytes": 3452,
+      "sha256": "1e80d3d742270ba4468cfe3f1b521748b782dd85cd712851d5ca09df359ad5a9",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 3861,
+      "sha256": "4d109c58aa0af451e93d160a4c981bd0c0499abf8ba2433bc65f6a48aa9aead1",
+      "link_to": null
+    },
+    {
+      "path": "ledger.jsonl",
+      "bytes": 2066,
+      "sha256": "75a97a50f263eb48c27666e42762e588e805d01510a07bdf0bbd40e437584667",
+      "link_to": null
+    },
+    {
+      "path": "planned_yc4_revision3.json",
+      "bytes": 2210,
+      "sha256": "587e7a311cf0e1127e0ce67496b0549da64e5baa127ae56eb20e41300700b293",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

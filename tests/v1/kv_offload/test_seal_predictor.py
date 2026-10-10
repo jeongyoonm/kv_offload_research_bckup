@@ -249,11 +249,24 @@ def shape_margin_state():
     return state
 
 
-def test_deadline_margin_separates_predecessor_error_from_successor_setup():
+@pytest.mark.parametrize("combined", [False, True])
+def test_deadline_margin_separates_predecessor_error_from_successor_setup(combined):
     """Identical A shape can need different margins for already-known B shapes."""
     from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
 
-    calibration = BatchShapeCalibration(shape_margin_state())
+    state = shape_margin_state()
+    if combined:
+        state.update(
+            schema=6,
+            productive_load_policy=productive_correction_state()[
+                "productive_load_policy"
+            ],
+        )
+    calibration = BatchShapeCalibration(state)
+    if combined:
+        assert calibration.productive_load_policy.ready(
+            [], [[3072, 58368]] * 3, [[3072, 58368]] * 16
+        )[0]
     x = np.zeros(28)
     x[:9] = [9984, 12, 0, 186624, 832, 832, 15552, 15552, 9984]
     short = [[832, 15552]]

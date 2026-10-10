@@ -1,0 +1,53 @@
+{
+  "time_utc": "2026-10-10T03:32:07.374330+00:00",
+  "source": "/mnt/localnvme/jeongyoon/vllm_shape_combined_20261010",
+  "branch": "experiment/shape-margin-productive-combined-20261010",
+  "root": "/mnt/localnvme/jeongyoon/yc5",
+  "arms": [
+    "basis50",
+    "packed50",
+    "combined70"
+  ],
+  "workloads": [
+    "short16k",
+    "mid32k"
+  ],
+  "requests": 300,
+  "repeats": 2,
+  "seeds": [
+    9901,
+    9902
+  ],
+  "concurrency": 32,
+  "output_tokens": 1,
+  "measured_cells": 12,
+  "allocation_timeout": 2700,
+  "latest_launch_utc": "2026-10-10T04:20:00Z",
+  "files": {
+    "basis50": {
+      "path": "/mnt/localnvme/jeongyoon/shape_basis_20261010/frozen_broad_fit.json",
+      "sha256": "34d61efc6f97eb5ad89aaaf4ba6cc6e25b41804880501d0e90bc9892413bcfde"
+    },
+    "packed50": {
+      "path": "/mnt/localnvme/jeongyoon/shape_basis_20261010/frozen_broad_fit.json",
+      "sha256": "34d61efc6f97eb5ad89aaaf4ba6cc6e25b41804880501d0e90bc9892413bcfde"
+    },
+    "combined70": {
+      "path": "/mnt/localnvme/jeongyoon/shape_combined_20261010/frozen_combined70.json",
+      "sha256": "41f2777ff3459bfa47b759744abbc10ec72e02e1b49a13301249d8b65735c38b"
+    }
+  },
+  "gc_diagnostic": {
+    "timing_only": true,
+    "min_duration_ms": 10
+  },
+  "scope": "Independent fresh-seed matched follow-up: packed storage intervention and frozen margin+productive70 interaction separately against basis50. Weights/duration coefficients fixed; no new fit or combined packing-policy arm.",
+  "basis": "yc4 first-repeat GC overlaps up to272ms of membership finalization; load audit reveals eight-ready seal350ms after compute ends versus three loads ready180ms after end. Neither timing overlap nor readiness replay is a throughput counterfactual.",
+  "gates": [
+    "yc4 complete/stopped and owned workers drained",
+    "predictor and sealing CPU tests",
+    "exact JSON state roundtrip and all NumPy/native frame equality",
+    "isolated packed tracked-object and GC traversal measurements"
+  ],
+  "fallback": "After04:20 skip combined arm and retain original8-cell packing plan if it can safely complete. Preserve drain/archive reserve; never interrupt main allocation."
+}

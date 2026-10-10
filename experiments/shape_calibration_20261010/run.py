@@ -27,6 +27,7 @@ LEADS = {
     "basis100": 100_000,
     "basis50": 50_000,
     "packed50": 50_000,
+    "combined70": 50_000,
     "margin75": 50_000,
     "margin90": 50_000,
     "productive70": 50_000,

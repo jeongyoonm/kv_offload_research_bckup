@@ -45,7 +45,8 @@ def prepare(root, seconds):
     assert extra["async_h2d_chunk_bytes"] == 8 * 1024**2
     assert extra["async_d2h_chunk_bytes"] == 1024**3
     assert extra["async_h2d_submission"] and extra["async_d2h_submission"]
-    collector.ROOT = root
+    baseline.module.ROOT = baseline.module.driver.ROOT = collector.ROOT = root
+    assert collector.snapshots.__globals__["ROOT"] == root
     collector.BASE = "http://127.0.0.1:18461"
     collector.options = lambda active=False: copy.deepcopy(policy)
     collector.server_command = lambda: copy.deepcopy((command, config))

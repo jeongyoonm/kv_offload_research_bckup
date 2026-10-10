@@ -1256,7 +1256,8 @@ def stage_rpc(core, step, base, candidates):
                                 )
                                 observed_ns = time.monotonic_ns()
                                 # Never revive a learned deadline that has expired.
-                                may_update = (
+                                shadow = getattr(setup_model, "shadow_only", False)
+                                may_update = not shadow and (
                                     setup_prediction is None
                                     or observed_ns < effective_seal_expiry_ns
                                 )
@@ -1281,6 +1282,7 @@ def stage_rpc(core, step, base, candidates):
                                     forecast_ns=begin_ns,
                                     inputs=x.tolist() if x is not None else None,
                                     predicted_setup_ms=setup_ms,
+                                    shadow=shadow,
                                     applied=setup_ms is not None and may_update,
                                     fallback=setup_ms is None,
                                     cost_ns=observed_ns - begin_ns,

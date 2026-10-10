@@ -67,6 +67,9 @@ class SetupPredictor:
         if state["schema"] != 1 or state["feature_names"] != FEATURE_NAMES:
             raise ValueError("incompatible setup predictor")
         self.model_id = state["model_id"]
+        self.shadow_only = state.get("shadow_only", False)
+        if type(self.shadow_only) is not bool:
+            raise ValueError("invalid setup shadow mode")
         self.shift = float(state["shift_ms"])
         trees = state["trees"]
         if not 1 <= len(trees) <= 256 or not np.isfinite(self.shift):

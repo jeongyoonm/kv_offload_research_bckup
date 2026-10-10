@@ -322,8 +322,9 @@ def test_compute_deadline_seals_while_a_is_held_and_clips_sleep(deadline_core, l
 
 
 @pytest.mark.parametrize("setup_ms", [0, 20, 80, None])
+@pytest.mark.parametrize("shadow", [False, True])
 def test_learned_setup_deadline_uses_causal_proposal_and_falls_back(
-    deadline_core, setup_ms
+    deadline_core, setup_ms, shadow
 ):
     """Learned B readiness replaces the lead, preserving held A and safety gates."""
     import numpy as np
@@ -346,9 +347,12 @@ def test_learned_setup_deadline_uses_causal_proposal_and_falls_back(
         requires_forecast=False,
         predict_with_features=lambda data: (120_000_000, features),
         target_schema="critical_end_after_all_rank_start.v1",
-        setup_predictor=SimpleNamespace(model_id="test", predict_ms=predict),
+        setup_predictor=SimpleNamespace(
+            model_id="test", predict_ms=predict, shadow_only=shadow
+        ),
     )
-    deadline = 1_120_000_000 - round((setup_ms if setup_ms is not None else 5) * 1e6)
+    allowance = setup_ms if setup_ms is not None and not shadow else 5
+    deadline = 1_120_000_000 - round(allowance * 1e6)
     clock.ready_at = {
         "ready": deadline - 1,
         "late": deadline + 1,
@@ -363,6 +367,10 @@ def test_learned_setup_deadline_uses_causal_proposal_and_falls_back(
     assert transport["seal_ns"] == deadline
     assert transport["compute_seal_deadline_ns"] == deadline
     assert transport["setup_prediction"]["fallback"] == (setup_ms is None)
+    assert transport["setup_prediction"]["shadow"] is shadow
+    assert transport["setup_prediction"]["applied"] is (
+        setup_ms is not None and not shadow
+    )
     assert seen and seen[0][:5] == [1, 832, 15552, 832, 15552]
     assert seen[0][7] == 4
     assert seen[0][8:12] == [1, 1024, 1024, 8192]

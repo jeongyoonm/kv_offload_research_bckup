@@ -37,6 +37,9 @@ def main():
                 throughput_rps=episode["throughput_rps"],
                 initial_loads=initial[key]["first_compute_load_state"][0],
                 initial_load_tokens=initial[key]["first_compute_load_state"][1],
+                initial_snapshot_at_dispatch=initial[key][
+                    "initial_load_snapshot_at_dispatch"
+                ],
                 initial_compute_sizes=initial[key]["compute_sizes"][:12],
                 load_only_compute_seals=initial[key]["load_only_compute_seals"],
                 compute_rounds=episode["compute_rounds"],

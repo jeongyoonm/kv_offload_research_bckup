@@ -93,6 +93,12 @@ def main():
         records = json.loads((directory / "late.json").read_text())["records"]
         ordered = [computes[step] for step in sorted(computes)]
         preceding = {b["step"]: a["step"] for a, b in zip(ordered, ordered[1:])}
+        first_setup = min(
+            (r["time_ns"] for r in records if r["event"] == "setup_prediction"),
+            default=None,
+        )
+        if first_setup is not None:
+            assert first_setup >= ordered[0]["dispatch_ns"]
         episodes.append(
             dict(
                 workload=episode["workload"],
@@ -100,6 +106,9 @@ def main():
                 repeat=episode["repeat"],
                 throughput_rps=episode["throughput_rps"],
                 first_compute_load_state=ordered[0]["load_state"],
+                first_compute_dispatch_ns=ordered[0]["dispatch_ns"],
+                first_setup_forecast_ns=first_setup,
+                initial_load_snapshot_at_dispatch=True,
                 compute_sizes=[len(event["selected"]) for event in ordered],
                 seal_reasons=dict(
                     Counter(

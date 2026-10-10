@@ -62,7 +62,8 @@ def main():
         )
         for name, file in (("learned_mean", "mean"), ("learned_q90", "uncertainty"))
     }
-    batches, replay, live_forecasts, audit = [], [], [], Counter()
+    by_model_id = {model.model_id: model for model in models.values()}
+    batches, replay, live_forecasts, episodes, audit = [], [], [], [], Counter()
     for episode in summary["results"]:
         directory = (
             args.root
@@ -80,6 +81,30 @@ def main():
             if e["event"] == "step_completion" and e.get("selected")
         }
         records = json.loads((directory / "late.json").read_text())["records"]
+        ordered = [computes[step] for step in sorted(computes)]
+        episodes.append(
+            dict(
+                workload=episode["workload"],
+                arm=episode["label"],
+                repeat=episode["repeat"],
+                throughput_rps=episode["throughput_rps"],
+                first_compute_load_state=ordered[0]["load_state"],
+                compute_sizes=[len(event["selected"]) for event in ordered],
+                seal_reasons=dict(
+                    Counter(
+                        event["transport"].get("seal_reason", "ordinary")
+                        for event in records
+                        if event["event"] == "membership_sealed"
+                    )
+                ),
+                load_only_compute_seals=sum(
+                    event["transport"].get("has_compute") is False
+                    and event["step"] in computes
+                    for event in records
+                    if event["event"] == "membership_sealed"
+                ),
+            )
+        )
         by_step = defaultdict(list)
         for event in records:
             if "step" in event:
@@ -143,7 +168,7 @@ def main():
                     primary = point["primary_snapshot"]
                     loads = point["forecast_load_features"]
                 if point["event"] == "setup_prediction":
-                    model = models[episode["label"]]
+                    model = by_model_id[point["model_id"]]
                     result = model.predict_ms(point["inputs"])
                     assert (result is None and point["predicted_setup_ms"] is None) or (
                         abs(result - point["predicted_setup_ms"]) < 2e-6
@@ -263,6 +288,7 @@ def main():
         )
     payload = dict(
         levels=levels,
+        episodes=episodes,
         comparisons=comparison["comparisons"],
         audit=dict(audit),
         definitions="Setup removes ordered RPC waiting and adds residual GPU "

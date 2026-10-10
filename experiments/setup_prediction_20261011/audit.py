@@ -91,6 +91,36 @@ def main():
             if e["event"] == "step_completion" and e.get("selected")
         }
         records = json.loads((directory / "late.json").read_text())["records"]
+        raw_forecasts = {
+            r["step"]: r for r in records if r["event"] == "seal_prediction"
+        }
+        for point in records:
+            if point["event"] != "setup_prediction":
+                continue
+            model = by_model_id[point["model_id"]]
+            value = model.predict_ms(point["inputs"])
+            if value is None:
+                assert point["predicted_setup_ms"] is None
+            else:
+                assert abs(value - point["predicted_setup_ms"]) < 2e-6
+            audit["whole_trace_live_replay_exact"] += 1
+            audit["whole_trace_fallback"] += point["fallback"]
+            audit["whole_trace_applied"] += point["applied"]
+            if point.get("shadow"):
+                forecast = raw_forecasts[point["step"]]
+                lead_ns = (
+                    plan["policies"][episode["label"]][
+                        "late_seal_compute_deadline_lead_us"
+                    ]
+                    * 1000
+                )
+                assert not point["applied"]
+                assert point["deadline_ns"] == (
+                    forecast["gpu_start_upper_ns"]
+                    + forecast["predicted_duration_ns"]
+                    - lead_ns
+                )
+                audit["whole_trace_shadow_fixed_deadline_verified"] += 1
         ordered = [computes[step] for step in sorted(computes)]
         preceding = {b["step"]: a["step"] for a, b in zip(ordered, ordered[1:])}
         first_setup = min(

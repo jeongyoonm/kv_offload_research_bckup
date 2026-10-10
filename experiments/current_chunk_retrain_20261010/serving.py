@@ -38,6 +38,7 @@ def main():
     parser.add_argument("--seed-start", type=int, default=12101)
     parser.add_argument("--lead-us", type=int, default=50000)
     parser.add_argument("--arm-lead-us", action="append", default=[], metavar="NAME=US")
+    parser.add_argument("--setup-reference-leads", action="store_true")
     parser.add_argument("--allocation-seconds", type=int, default=10800)
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
@@ -98,7 +99,20 @@ def main():
             assert changed <= {"late_seal_compute_deadline_lead_us"}
     if args.arm_lead_us:
         reference = states[next(iter(paths))]
-        assert all(state == reference for state in states.values())
+        if args.setup_reference_leads:
+
+            def without_setup(state):
+                state = copy.deepcopy(state)
+                state["latency_surface"]["provenance"].pop("setup_predictor", None)
+                return state
+
+            reference = without_setup(reference)
+            assert all(without_setup(state) == reference for state in states.values())
+            assert all(bias == 0 for bias in biases.values())
+        else:
+            assert all(state == reference for state in states.values())
+    elif args.setup_reference_leads:
+        raise ValueError("Setup references require explicit per-arm leads")
     extra = config["kv_connector_extra_config"]
     assert extra["async_h2d_chunk_bytes"] == 8 * 1024**2
     assert extra["async_d2h_chunk_bytes"] == 1024**3
@@ -116,7 +130,13 @@ def main():
             model="GLM 5.3 NVFP4",
             parallelism="TP8",
             arms=list(paths),
-            experiment_kind="deadline_leads" if args.arm_lead_us else "predictors",
+            experiment_kind=(
+                "setup_references"
+                if args.setup_reference_leads
+                else "deadline_leads"
+                if args.arm_lead_us
+                else "predictors"
+            ),
             policies=policies,
             workloads=args.workloads,
             requests=args.requests,
@@ -136,7 +156,11 @@ def main():
                 for name, path in paths.items()
             },
             scope=(
-                "Identical frozen predictor and policies except deadline lead; "
+                "A weights identical; optional setup metadata and explicit fixed "
+                "reference leads differ. Worker and other seal policy fields "
+                "are identical. Fresh seeds; reversed order on odd repeats."
+                if args.setup_reference_leads
+                else "Identical frozen predictor and policies except deadline lead; "
                 "fresh serving seeds and reversed arm order on odd repeats."
                 if args.arm_lead_us
                 else "Frozen models, fresh serving seeds, reversed arm order on odd "

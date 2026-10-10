@@ -89,6 +89,18 @@ def main():
             ]
         )
         holdout = np.array([row.get("split") == "final" for row in pool["forecasts"]])
+        neural_fallback = np.array(
+            [
+                model.neural.support.outside(np.r_[v[:23], np.zeros(5), v[23:26]])
+                for v in x
+            ]
+        )
+        envelope_fallback = np.array(
+            [
+                model.support.outside(v) if hasattr(model, "support") else False
+                for v in x
+            ]
+        )
         results[name] = dict(
             path=path,
             sha256=hashlib.sha256(Path(path).read_bytes()).hexdigest(),
@@ -103,6 +115,10 @@ def main():
             timing_scope="Warm native predict_features_ms, feature vector built; "
             "GC disabled only during this isolated CPU timing, serving GC unchanged",
             final_samples=int(holdout.sum()),
+            neural_guard_fallback_frames=int(neural_fallback.sum()),
+            final_neural_guard_fallback_frames=int(neural_fallback[holdout].sum()),
+            envelope_guard_fallback_frames=int(envelope_fallback.sum()),
+            final_envelope_guard_fallback_frames=int(envelope_fallback[holdout].sum()),
             applied_target_bias_ms=biases.get(name, 0),
             final_mae_ms=float(
                 np.mean(

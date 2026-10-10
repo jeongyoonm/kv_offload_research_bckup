@@ -62,7 +62,7 @@ def main():
         )
         for name, file in (("learned_mean", "mean"), ("learned_q90", "uncertainty"))
     }
-    batches, replay, audit = [], [], Counter()
+    batches, replay, live_forecasts, audit = [], [], [], Counter()
     for episode in summary["results"]:
         directory = (
             args.root
@@ -151,6 +151,15 @@ def main():
                     audit["live_replay_exact"] += 1
                     audit["fallback"] += point["fallback"]
                     audit["applied"] += point["applied"]
+                    live_forecasts.append(
+                        dict(
+                            workload=episode["workload"],
+                            arm=episode["label"],
+                            cost_us=point["cost_ns"] / 1000,
+                            fallback=point["fallback"],
+                            applied=point["applied"],
+                        )
+                    )
                     continue
                 if point["event"] != "seal_preparation_prediction" or acked is None:
                     continue
@@ -186,6 +195,11 @@ def main():
             for r in replay
             if (r["workload"], r["arm"]) == (level["workload"], level["arm"])
         ]
+        live = [
+            r
+            for r in live_forecasts
+            if (r["workload"], r["arm"]) == (level["workload"], level["arm"])
+        ]
         forecast_metrics = {}
         for model in models:
             for position in ("first", "last"):
@@ -198,6 +212,21 @@ def main():
                     [r["shadow_predictions"][model] for r in subset],
                     [r["target_ready_ms"] for r in subset],
                 )
+        ordering = {}
+        for position in ("first", "last"):
+            subset = [
+                r["shadow_predictions"]
+                for r in frames
+                if r[position]
+                and all(v is not None for v in r["shadow_predictions"].values())
+            ]
+            deltas = [r["learned_q90"] - r["learned_mean"] for r in subset]
+            ordering[position] = dict(
+                delta_ms=distribution(deltas),
+                q90_below_mean_percent=100 * np.mean([v < 0 for v in deltas])
+                if deltas
+                else None,
+            )
         levels.append(
             dict(
                 **level,
@@ -206,6 +235,13 @@ def main():
                     [r["target_ready_ms"] for r in selected],
                 ),
                 shadow_accuracy=forecast_metrics,
+                quantile_ordering=ordering,
+                live_forecasts=dict(
+                    count=len(live),
+                    cost_us=distribution([r["cost_us"] for r in live]),
+                    fallback_count=sum(r["fallback"] for r in live),
+                    applied_count=sum(r["applied"] for r in live),
+                ),
                 setup={
                     k: distribution([r[k] for r in selected])
                     for k in (

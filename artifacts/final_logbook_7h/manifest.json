@@ -1,0 +1,81 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_packed_20261010",
+  "archive_sha256": "839b0b814204941b5843cba49358d6c6fda4fcb693de77664bbdacef45ac19d7",
+  "archive_bytes": 5174,
+  "members": [
+    {
+      "path": "IMPLEMENTATION_STATUS.json",
+      "bytes": 1466,
+      "sha256": "b721b85c5aa8967bd42d7ef523dc5b431ddc74510baf28fd8aa1e63f2fe3d61c",
+      "link_to": null
+    },
+    {
+      "path": "audit_commit.log",
+      "bytes": 3853,
+      "sha256": "c5baa3c58a3393d419e3c14ff1ae5c84fcb8cab46a5180d3c8c7799473b3430c",
+      "link_to": null
+    },
+    {
+      "path": "audit_precommit_attempt1.log",
+      "bytes": 4872,
+      "sha256": "820c89970dfd80b3a564a291ab6fa9d54cf8b7ea3fb151b89346aa6472bb0193",
+      "link_to": null
+    },
+    {
+      "path": "audit_precommit_attempt2.log",
+      "bytes": 3787,
+      "sha256": "9f3c3d9769f5d7e0923f932bfe72c2b491ab9f9ac422dfe5faccde6189d4fdd8",
+      "link_to": null
+    },
+    {
+      "path": "audit_precommit_attempt3.log",
+      "bytes": 3495,
+      "sha256": "f336bbe4ee88c50afa18dc42954a549bbffeb366c5bb144fa80e1435de3d4072",
+      "link_to": null
+    },
+    {
+      "path": "combined_workspace.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "commit.log",
+      "bytes": 3798,
+      "sha256": "ad4fd1260ed476eb3b7cfeaf1f79ef160e0ca94e56cbc0f3a829ccd59678dad0",
+      "link_to": null
+    },
+    {
+      "path": "paired_commit.log",
+      "bytes": 3798,
+      "sha256": "187c6ce8963ce83638cb0f69833399478e755d9655dae345e5a0df2640fb99be",
+      "link_to": null
+    },
+    {
+      "path": "paired_precommit_attempt1.log",
+      "bytes": 4231,
+      "sha256": "73c5fd363bb2f768ee5e8580e2019bba55e110779d3c074db117eced9dddf50a",
+      "link_to": null
+    },
+    {
+      "path": "paired_precommit_attempt2.log",
+      "bytes": 3495,
+      "sha256": "f336bbe4ee88c50afa18dc42954a549bbffeb366c5bb144fa80e1435de3d4072",
+      "link_to": "audit_precommit_attempt3.log"
+    },
+    {
+      "path": "planned_followup.json",
+      "bytes": 1449,
+      "sha256": "3e766b4f529abd8482292755bc81701202783cbe187304d73e3eecc99397ef5b",
+      "link_to": null
+    },
+    {
+      "path": "precommit_attempt1.log",
+      "bytes": 3495,
+      "sha256": "f336bbe4ee88c50afa18dc42954a549bbffeb366c5bb144fa80e1435de3d4072",
+      "link_to": "audit_precommit_attempt3.log"
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

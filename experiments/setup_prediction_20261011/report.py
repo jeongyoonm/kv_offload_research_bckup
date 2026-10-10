@@ -206,7 +206,7 @@ def plot(allocations, output):
             ax.grid(axis="y", alpha=0.2)
             ax.set_axisbelow(True)
             ax.legend(fontsize=8)
-    fig.suptitle("Frozen A predictor and workers; dots show two300-request repeats")
+    fig.suptitle("Frozen A predictor and workers; dots show two 300-request repeats")
     fig.savefig(output / "serving_comparison.png", dpi=180)
     fig.savefig(output / "serving_comparison.pdf")
     plt.close(fig)

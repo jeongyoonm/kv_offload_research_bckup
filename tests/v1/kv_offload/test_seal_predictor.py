@@ -407,6 +407,7 @@ def test_productive_exit_rejects_invalid_frozen_models(mutation):
 
 @pytest.mark.parametrize("fallback", [False, True])
 @pytest.mark.parametrize("packed", [False, True])
+@pytest.mark.parametrize("with_setup", [False, True])
 @pytest.mark.parametrize(
     "architecture",
     [
@@ -416,7 +417,7 @@ def test_productive_exit_rejects_invalid_frozen_models(mutation):
     ],
 )
 def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
-    fallback, packed, architecture, monkeypatch
+    fallback, packed, with_setup, architecture, monkeypatch
 ):
     """Even an elapsed-sensitive component cannot move an offset deadline."""
     import copy
@@ -485,9 +486,26 @@ def test_offset_predictor_ignores_elapsed_time_in_primary_and_fallback(
                 ),
             ),
         )
+    if with_setup:
+        from vllm.v1.kv_offload.setup_predictor import FEATURE_NAMES as SETUP_NAMES
+
+        state["provenance"]["setup_predictor"] = dict(
+            schema=1,
+            feature_names=SETUP_NAMES,
+            model_id="test_setup",
+            shift_ms=0,
+            trees=[[[-1, -1, -2, 0, 20]]],
+            support=dict(indices=[0], minimum=[0], maximum=[32]),
+        )
     monkeypatch.setenv("VLLM_SEAL_PACKED_CHECKPOINT", "0")
     model = FrozenSealPredictor(state)
     assert model.state_dict() == state
+    assert "setup_predictor" not in model._state["provenance"]
+    if with_setup:
+        assert model.setup_predictor.predict_ms([0] * 23) == 20
+        assert model.setup_predictor.predict_ms([33] + [0] * 22) is None
+    else:
+        assert model.setup_predictor is None
     exported = model.state_dict()
     exported["checkpoint"]["weights"][0] = 0.25
     assert model.state_dict() == state

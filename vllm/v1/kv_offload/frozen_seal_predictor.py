@@ -3,6 +3,7 @@
 """Frozen experimental MLP and submission-envelope inference without trainers."""
 
 import copy
+import json
 
 import numpy as np
 
@@ -197,10 +198,13 @@ class FrozenSealPredictor:
         self.duration_calibration = None
         setup_state = state["provenance"].get("setup_predictor")
         self.setup_predictor = None
+        self._setup_snapshot = None
         if setup_state is not None:
             from vllm.v1.kv_offload.setup_predictor import SetupPredictor
 
             self.setup_predictor = SetupPredictor(setup_state)
+            self._setup_snapshot = json.dumps(setup_state).encode()
+            del self._state["provenance"]["setup_predictor"]
         if "duration_calibration" in checkpoint:
             from vllm.v1.kv_offload.seal_calibration import BatchShapeCalibration
 
@@ -249,10 +253,14 @@ class FrozenSealPredictor:
             )
         )
         if packed:
-            retain_checkpoint(self, state, {"checkpoint", "provenance"}, packed=True)
+            retain_checkpoint(self, state, {"checkpoint"}, packed=True)
+            self._state["provenance"].pop("setup_predictor", None)
 
     def state_dict(self):
-        return restored_checkpoint(self)
+        state = restored_checkpoint(self)
+        if self._setup_snapshot is not None:
+            state["provenance"]["setup_predictor"] = json.loads(self._setup_snapshot)
+        return state
 
     def input_features(self, data):
         x = self.extractor.input_features(data)

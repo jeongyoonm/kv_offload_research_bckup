@@ -37,6 +37,7 @@ def main():
     parser.add_argument("--requests", type=int, choices=(75, 300), default=300)
     parser.add_argument("--seed-start", type=int, default=12101)
     parser.add_argument("--lead-us", type=int, default=50000)
+    parser.add_argument("--arm-lead-us", action="append", default=[], metavar="NAME=US")
     parser.add_argument("--allocation-seconds", type=int, default=10800)
     parser.add_argument("--preflight-only", action="store_true")
     args = parser.parse_args()
@@ -48,6 +49,12 @@ def main():
     assert len(paths) == len(args.arm)
     assert set(args.workloads) <= set(PREFIX_WORKING_SETS)
     biases = {name: 0 for name in paths}
+    leads = dict.fromkeys(paths, args.lead_us)
+    for item in args.arm_lead_us:
+        name, lead = item.split("=", 1)
+        assert name in paths
+        leads[name] = int(lead)
+        assert leads[name] >= 0
     for item in args.bias_us:
         name, bias = item.split("=", 1)
         assert name in paths
@@ -72,7 +79,7 @@ def main():
         states[name] = state
         policy = copy.deepcopy(active)
         policy.update(
-            late_seal_compute_deadline_lead_us=args.lead_us,
+            late_seal_compute_deadline_lead_us=leads[name],
             late_seal_prediction_bias_us=biases[name],
         )
         validate_experiment_options(policy)
@@ -83,7 +90,15 @@ def main():
         assert policy["store_reuse_gpu_fence"]
         assert policy["store_reuse_allocator_preference"]
         changed = {k for k in policy if policy[k] != policies[next(iter(paths))][k]}
-        assert changed <= {"late_seal_prediction_bias_us"}
+        assert changed <= {
+            "late_seal_prediction_bias_us",
+            "late_seal_compute_deadline_lead_us",
+        }
+        if args.arm_lead_us:
+            assert changed <= {"late_seal_compute_deadline_lead_us"}
+    if args.arm_lead_us:
+        reference = states[next(iter(paths))]
+        assert all(state == reference for state in states.values())
     extra = config["kv_connector_extra_config"]
     assert extra["async_h2d_chunk_bytes"] == 8 * 1024**2
     assert extra["async_d2h_chunk_bytes"] == 1024**3
@@ -101,6 +116,7 @@ def main():
             model="GLM 5.3 NVFP4",
             parallelism="TP8",
             arms=list(paths),
+            experiment_kind="deadline_leads" if args.arm_lead_us else "predictors",
             policies=policies,
             workloads=args.workloads,
             requests=args.requests,
@@ -119,10 +135,15 @@ def main():
                 )
                 for name, path in paths.items()
             },
-            scope="Frozen models, fresh serving seeds, reversed arm order on odd "
-            "repeats; identical hold, deadline lead, candidate and load-only policy. "
-            "Legacy predictor bias is an explicitly recorded target conversion; "
-            "refits predict critical duration directly with zero external correction.",
+            scope=(
+                "Identical frozen predictor and policies except deadline lead; "
+                "fresh serving seeds and reversed arm order on odd repeats."
+                if args.arm_lead_us
+                else "Frozen models, fresh serving seeds, reversed arm order on odd "
+                "repeats; identical hold, deadline lead, candidate and load-only "
+                "policy. Legacy bias is an explicitly recorded target conversion; "
+                "refits predict critical duration with zero external correction."
+            ),
         ),
     )
     collector.save(

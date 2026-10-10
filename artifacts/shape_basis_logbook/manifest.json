@@ -1,0 +1,267 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_basis_20261010",
+  "archive_sha256": "7514695734ca3c9c93d5d63dc697336aeb0b6cd48908d82043015aedf772af81",
+  "archive_bytes": 8989331,
+  "members": [
+    {
+      "path": "PROVISIONAL_REPORT.txt",
+      "bytes": 1668,
+      "sha256": "05942208b5f4d1acabebcb318707a1df45a0262ac17dbb4396ed0b0429aa717c",
+      "link_to": null
+    },
+    {
+      "path": "REPORT.txt",
+      "bytes": 7306,
+      "sha256": "b7e49bf0b402d75e30acc2330267f2946693b73bf4d4c09ebdfcc9a2ab7f93ef",
+      "link_to": null
+    },
+    {
+      "path": "cpu_gate.log",
+      "bytes": 5085,
+      "sha256": "f18a2e3b1588464c6c0ab561fa345205fc7adcfb13b2894418e3d53ecd902ebb",
+      "link_to": null
+    },
+    {
+      "path": "cpu_gate_fixture_retry.log",
+      "bytes": 600,
+      "sha256": "1bc5c0a49a126cd38d2f92e04611d815edcdb8f63fc6b4b993f5fb559ed69158",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "fixture_commit.log",
+      "bytes": 3769,
+      "sha256": "a2471540361bbb93df0c837226684b1ed752d5d85063b033fdf512e7f10013b9",
+      "link_to": null
+    },
+    {
+      "path": "freeze_commit.log",
+      "bytes": 4597,
+      "sha256": "3fcf93d8bfc8cda6e1bfc75f76bd97efaf8f95ef4b38bc5bac3d87c6837aa970",
+      "link_to": null
+    },
+    {
+      "path": "frozen_broad_fit.json",
+      "bytes": 36287,
+      "sha256": "34d61efc6f97eb5ad89aaaf4ba6cc6e25b41804880501d0e90bc9892413bcfde",
+      "link_to": null
+    },
+    {
+      "path": "frozen_broad_fit.log",
+      "bytes": 1007,
+      "sha256": "479faf34c4c810c6bdc0dbf0cd9832becc6a7ea755f2553407f0c12ca2070b3c",
+      "link_to": null
+    },
+    {
+      "path": "frozen_runtime_audit.json",
+      "bytes": 413,
+      "sha256": "7687f91383f2ba3205927100ef9617e839fb6f3679a683d073cc1c1f69ead60e",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 3920,
+      "sha256": "9f76014d9742046b0d1776a9860ba3861ca1319465912aa79710570d7aedd55b",
+      "link_to": null
+    },
+    {
+      "path": "ledger.jsonl",
+      "bytes": 2254,
+      "sha256": "9d6d5b5d470f75ba6abf423dcd39291be81808cd66ac4b09010f1fe8d260f288",
+      "link_to": null
+    },
+    {
+      "path": "logbook_archive.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "link_to": null
+    },
+    {
+      "path": "preflight300/calibrations.json",
+      "bytes": 4204,
+      "sha256": "c0fc2221b59c9a01dcd1ba517ec8816c385ba48cb867981e83b4fe06009ad665",
+      "link_to": null
+    },
+    {
+      "path": "preflight300/loaded_predictor.json",
+      "bytes": 78014223,
+      "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+      "link_to": null
+    },
+    {
+      "path": "preflight300/plan.json",
+      "bytes": 17996,
+      "sha256": "54bb750ea2f637f4d26b157d088e0f268403324ae9611929c2042a605341d002",
+      "link_to": null
+    },
+    {
+      "path": "preflight300/source_provenance.json",
+      "bytes": 184,
+      "sha256": "9c034d0db415d22cdbd6014b5f134462de62ff7fa09c430d13f4d88f19c439fb",
+      "link_to": null
+    },
+    {
+      "path": "preflight300.log",
+      "bytes": 54,
+      "sha256": "d8eb199f0cf9982f02b36807190fc1c1e4a080d0638c115f95bfb3bfa761c28c",
+      "link_to": null
+    },
+    {
+      "path": "provisional_ns1_yc1.json",
+      "bytes": 18422,
+      "sha256": "eb3421ade1e8181e427b4a1ff580bc17f2d8f89bc1c282b1ff80deb8db931d72",
+      "link_to": null
+    },
+    {
+      "path": "provisional_ns1_yc1.log",
+      "bytes": 685,
+      "sha256": "6c839e3e93f3f966cc0010dd3318691f888fedede10fbeec65b8c67ca1087b71",
+      "link_to": null
+    },
+    {
+      "path": "provisional_ns1_yc1_geometry_audit.json",
+      "bytes": 26474,
+      "sha256": "aa5798f2524d8bb2df3de58e82c2fb5679cd9a5aeef2de04c05d510550a5422e",
+      "link_to": null
+    },
+    {
+      "path": "provisional_ns1_yc1_geometry_audit.log",
+      "bytes": 685,
+      "sha256": "6c839e3e93f3f966cc0010dd3318691f888fedede10fbeec65b8c67ca1087b71",
+      "link_to": "provisional_ns1_yc1.log"
+    },
+    {
+      "path": "submission_floor_development_rows.json",
+      "bytes": 619990,
+      "sha256": "8a5f6d0c370ab6b8145cbd8809aa0e6e851875ba5ad95d69bd2e6ba7579b396c",
+      "link_to": null
+    },
+    {
+      "path": "submission_floor_live_rows.json",
+      "bytes": 627239,
+      "sha256": "b3a6c88eb2517c5fc60722d83f320a635771496ca01a508fdadee53ab29f0b36",
+      "link_to": null
+    },
+    {
+      "path": "unseen_capacity_check.json",
+      "bytes": 182,
+      "sha256": "496b15e0e3e52c7dc033ba2bede619fe2cff257d0375b49a2749ff7cf785ed4b",
+      "link_to": null
+    },
+    {
+      "path": "yc3_analysis.log",
+      "bytes": 40181,
+      "sha256": "f8631ba643b69a7920ecb8d0dfa4ff89fecea7a6029f3da1a3320d22ca87d4f9",
+      "link_to": null
+    },
+    {
+      "path": "yc3_archive.log",
+      "bytes": 174,
+      "sha256": "803cfb125e5ebb9d97ebedeb160144846312ae3c61d84f0675c34842a9cf1c98",
+      "link_to": null
+    },
+    {
+      "path": "yc3_basis_short_outliers.json",
+      "bytes": 5004,
+      "sha256": "994d4f77d83304af3608f20f64c9053549361b2d9a1a181019b4a5fb85c13e8c",
+      "link_to": null
+    },
+    {
+      "path": "yc3_driver.log",
+      "bytes": 8173,
+      "sha256": "298fa2f60183aa5aab7173be3f6fe3741a65e81db3548ec716225fbf643aab9e",
+      "link_to": null
+    },
+    {
+      "path": "yc3_final_table.json",
+      "bytes": 6156,
+      "sha256": "5be516c79930645052e7f3c0cd97139833d41edf6571ac2c131028104e47d575",
+      "link_to": null
+    },
+    {
+      "path": "yc3_first_pair_gaps.json",
+      "bytes": 231459,
+      "sha256": "6da4fc70774691bf0569998d4dd826e3b052179c5ffb9fecd2ce9abb85f7be21",
+      "link_to": null
+    },
+    {
+      "path": "yc3_long_paired_provisional.json",
+      "bytes": 1065,
+      "sha256": "202dacebf97b3a34d1daed99a3bfc2a2d51e830459b51b384a43e919e8b50a7b",
+      "link_to": null
+    },
+    {
+      "path": "yc3_long_warmup_audit.json",
+      "bytes": 27786,
+      "sha256": "168c351ef0fe592597c3bc03a14b5d4eb787617634e398d4a27d04c94249c8ad",
+      "link_to": null
+    },
+    {
+      "path": "yc3_mid_load_only_gaps.json",
+      "bytes": 6501,
+      "sha256": "c73fd307dc889579589fb9f190b7941559835d61ded11977641b6e4d35e01a4b",
+      "link_to": null
+    },
+    {
+      "path": "yc3_mid_paired_provisional.json",
+      "bytes": 1066,
+      "sha256": "059f851b9a27b3d2b219589516fe60ac6cea655ebf1cc353f536a9b59f18b9bb",
+      "link_to": null
+    },
+    {
+      "path": "yc3_partial.log",
+      "bytes": 9892,
+      "sha256": "6edfd23d8e06020556facfafc02d63ce065c324ad43aa61f44aa4697d3534033",
+      "link_to": null
+    },
+    {
+      "path": "yc3_post_seal_scheduler_audit.json",
+      "bytes": 2563,
+      "sha256": "04e80f939d3ea2924b14358d96e592f8fb4568c3adca4ccf2db6b1621ed6f4ce",
+      "link_to": null
+    },
+    {
+      "path": "yc3_short_load_only_bubbles.json",
+      "bytes": 306983,
+      "sha256": "f98a1c62f14c740f02e2594043aeec5e85dc7fa86e46796af4352f596dcfa49a",
+      "link_to": null
+    },
+    {
+      "path": "yc3_short_paired_provisional.json",
+      "bytes": 1063,
+      "sha256": "719349e3e09b85692ecbd9bd125303892afe3b1947a9ddbb929806e5eed3e31e",
+      "link_to": null
+    },
+    {
+      "path": "yc3_unseen_oldshape_gap_phases.json",
+      "bytes": 105605,
+      "sha256": "1ca75bfc0d837509757885e3ace3e0d5102bc6df5e74f54c1540d2f38a2330b8",
+      "link_to": null
+    },
+    {
+      "path": "yc3_unseen_oldshape_gaps.json",
+      "bytes": 80887,
+      "sha256": "f6133a869af7257c0c33cd9b58de6bfa22806368e78fdb93810a78a237e58500",
+      "link_to": null
+    },
+    {
+      "path": "yc3_unseen_warmup_audit.json",
+      "bytes": 30824,
+      "sha256": "dd78c4138e0ab3800944a4e8f45419918e58cd32b81afa038da9c9c3cc962a20",
+      "link_to": null
+    },
+    {
+      "path": "yc3_warmup_audit_1.json",
+      "bytes": 8409,
+      "sha256": "b5401885660b29e2bb518e03e435950264bd59bde7f023b9c776d30b62ad09e9",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

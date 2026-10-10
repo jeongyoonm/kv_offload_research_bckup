@@ -15,15 +15,11 @@ from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from threadpoolctl import threadpool_limits
 
 from experiments.current_chunk_retrain_20261010 import architectures as study
-from vllm.v1.kv_offload.frozen_seal_predictor import (
-    CORE_INDEX,
-    CORE_SCALE,
-    HOST_INDEX,
-    HOST_SCALE,
-    FrozenSealPredictor,
-)
 
 arch = study.arch
+CORE_INDEX, CORE_SCALE = study.runtime.CORE_INDEX, study.runtime.CORE_SCALE
+HOST_INDEX, HOST_SCALE = study.runtime.HOST_INDEX, study.runtime.HOST_SCALE
+FrozenSealPredictor = study.FrozenSealPredictor
 
 
 def matrices(x):

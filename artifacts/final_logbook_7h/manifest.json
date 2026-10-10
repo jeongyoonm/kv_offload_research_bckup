@@ -1,0 +1,123 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_productive_20261010",
+  "archive_sha256": "17baf0336fb1f36064abc3ba9e7783e79db5d9d237c8f792f32c20a221879a58",
+  "archive_bytes": 12677,
+  "members": [
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "frozen_policy_decisions.json",
+      "bytes": 15383,
+      "sha256": "67a03097e5728d4495e9ea6c008790b42a54bb21c8fb30e3a4d4427e658ee719",
+      "link_to": null
+    },
+    {
+      "path": "frozen_productive70.json",
+      "bytes": 5471,
+      "sha256": "844b11b0a309647e2a2e5fccdc7841801b70269e05f768fee4383fa50385e73f",
+      "link_to": null
+    },
+    {
+      "path": "frozen_productive70.log",
+      "bytes": 212,
+      "sha256": "c8c0e77dfea20f0078e3197bc7aca89251f335ccef14b122bd07c75e1cf18819",
+      "link_to": null
+    },
+    {
+      "path": "frozen_productive80.json",
+      "bytes": 5471,
+      "sha256": "677c36d569b46c1af36505cc097eecf28ec75485bd964edfe4c2b56f3aa60885",
+      "link_to": null
+    },
+    {
+      "path": "frozen_productive80.log",
+      "bytes": 212,
+      "sha256": "7c559112aa84895efa9c3320c719e7ffef74f94e116fdd4d080f6743bcf416c6",
+      "link_to": null
+    },
+    {
+      "path": "harness_commit.log",
+      "bytes": 3770,
+      "sha256": "380dd557a1eb1d49673fe50faf8f1004b160df7c4b1f222b47b9cf4d44b8351a",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 9977,
+      "sha256": "677cdedafecdac928eadac5529f763c2a591a3d640147b550baa9578e08edc51",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit_retry.log",
+      "bytes": 3991,
+      "sha256": "b2cca985b08ab6ceb38d2ce224b324006b890206f24db1f91fd65b690e2df598",
+      "link_to": null
+    },
+    {
+      "path": "inherited_agents_read.txt",
+      "bytes": 5750,
+      "sha256": "b8de25db9a1d170e41d4d6026e2c0ba37b8e23c4876dceeccbdff7b145457d95",
+      "link_to": null
+    },
+    {
+      "path": "ledger.jsonl",
+      "bytes": 4120,
+      "sha256": "6685e9a38238c83b9e17d4aaef64a84f253a57cb7f49686320dabb8e5b56f533",
+      "link_to": null
+    },
+    {
+      "path": "planned_yc4.json",
+      "bytes": 1850,
+      "sha256": "cc31e40d1e2dbbfb6966ffa7202f39c254764b24504afb393b332a60c8cf02ba",
+      "link_to": null
+    },
+    {
+      "path": "planned_yc4_revision2.json",
+      "bytes": 2189,
+      "sha256": "1bef9749bbaba5ce7917a0776b09a32f1ab84da2395f8d06f6240cd734c0b815",
+      "link_to": null
+    },
+    {
+      "path": "replay_commit.log",
+      "bytes": 3888,
+      "sha256": "85b5e27e419ff17fa591b82d40cdda19288753c46a6f39682bdb143f2458aa04",
+      "link_to": null
+    },
+    {
+      "path": "replay_commit_retry.log",
+      "bytes": 3853,
+      "sha256": "4b0e1f809952b8b17c1dab49a3b09c22e51f314e58a99b5851104b3964c3c3f6",
+      "link_to": null
+    },
+    {
+      "path": "yc3_replay70.json",
+      "bytes": 5474,
+      "sha256": "09a6036156e29a4e3b362d61db1b6224744f6fb6041c755d4065caf2008c8269",
+      "link_to": null
+    },
+    {
+      "path": "yc3_replay70.log",
+      "bytes": 801,
+      "sha256": "0f2bca4c50d76cae3b08ec6abe122e15d431cedbb29c85aa372beb9fe1fe6ccf",
+      "link_to": null
+    },
+    {
+      "path": "yc3_replay80.json",
+      "bytes": 5617,
+      "sha256": "7677d6aa2008582959c20b9a5d27b2c4a4d431827139a12960ff9f7d90ce0bc5",
+      "link_to": null
+    },
+    {
+      "path": "yc3_replay80.log",
+      "bytes": 892,
+      "sha256": "cb085adc8f3a4f7c4b3d43d6c66fa5d161aec099114298c03c6b04e1ab459544",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

@@ -1,0 +1,39 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/shape_joint_guard_20261010",
+  "archive_sha256": "054e12419c7e7ff12d04ca14f27a25e1c3ad52ed0328ba33bf676be9e5b15c23",
+  "archive_bytes": 4115,
+  "members": [
+    {
+      "path": "build.log",
+      "bytes": 68,
+      "sha256": "f70088ca20a04983d706ef2135726d375a8b3b0de1e49088017d0bd81a4e995b",
+      "link_to": null
+    },
+    {
+      "path": "dependency_manifest.json",
+      "bytes": 6985,
+      "sha256": "8b01337f96b736e2b550a59edd698f72b517885d8a862adff44fb4ef78bbec12",
+      "link_to": null
+    },
+    {
+      "path": "frozen_guard.json",
+      "bytes": 2627,
+      "sha256": "7f72c3761bc775b74fd229ca9c34d40ec9367043eea6dba236d3d7bd01b1ec7b",
+      "link_to": null
+    },
+    {
+      "path": "implementation_commit.log",
+      "bytes": 3932,
+      "sha256": "fa7fe03a7ace32526f2e4d707306c90fe0ea954a5975b5f3dce682ae216a9ea9",
+      "link_to": null
+    },
+    {
+      "path": "ledger.jsonl",
+      "bytes": 655,
+      "sha256": "8a8cf176cbb35fd7b84ce65fd50c98ccb2096ba7849f06fe006c43d7855726c1",
+      "link_to": null
+    }
+  ],
+  "verified": true,
+  "definition": "Every regular file is preserved with its content hash. Identical files use tar hard links, including repeated replay binaries. Environment credential fields are removed from archives. All members were reopened and checked, including hard-link targets."
+}

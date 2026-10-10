@@ -30,6 +30,7 @@ LEADS = {
     "margin90": 50_000,
     "productive70": 50_000,
     "productive80": 50_000,
+    "direct50": 50_000,
 }
 PREFIX_WORKING_SETS = {
     "short16k": 300,

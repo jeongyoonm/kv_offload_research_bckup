@@ -30,8 +30,14 @@ def main():
     args = parser.parse_args()
     assert not args.output.exists()
     gc.collect(2)
+    gc.freeze()  # Mirror EngineCore startup before the estimator is loaded.
     before = len(gc.get_objects())
     before_rss = rss_kib()
+    baseline_samples = []
+    for _ in range(3):
+        started = time.monotonic_ns()
+        gc.collect(2)
+        baseline_samples.append((time.monotonic_ns() - started) / 1e6)
     started = time.monotonic_ns()
     state = json.loads(args.state.read_text())
     estimator = ComputeEstimator.from_state_dict(state, state["context"])
@@ -52,6 +58,8 @@ def main():
     assert estimator.latency_surface is not None
     result = dict(
         freeze_diagnostic=args.freeze,
+        startup_heap_frozen=True,
+        baseline_gc_ms=baseline_samples,
         construction_ms=construction_ms,
         tracked_before=before,
         tracked_after_loading=loaded,

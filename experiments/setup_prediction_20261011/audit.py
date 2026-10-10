@@ -82,6 +82,7 @@ def main():
         }
         records = json.loads((directory / "late.json").read_text())["records"]
         ordered = [computes[step] for step in sorted(computes)]
+        preceding = {b["step"]: a["step"] for a, b in zip(ordered, ordered[1:])}
         episodes.append(
             dict(
                 workload=episode["workload"],
@@ -115,6 +116,9 @@ def main():
             if step not in computes or not forecasts or seal is None:
                 continue
             prediction = forecasts[0]
+            if preceding.get(step) != prediction["predecessor_step"]:
+                audit["nonadjacent_predecessor"] += 1
+                continue
             a = computes.get(prediction["predecessor_step"])
             if a is None:
                 continue

@@ -75,7 +75,7 @@ def main():
             root.name + f": {count} accepted {plan['requests']}-request cells",
             "Seeds: " + str(plan["seeds"]),
             "Workload  Arm             req/s   gain%  meanTTFT  p95TTFT  "
-            "rounds  recovery%  gaps_ms",
+            "rounds  recovery%  KV_in_compute%  gaps_ms",
         ]
         changes = {(r["workload"], r["arm"]): r for r in audit["comparisons"]}
         for r in audit["levels"]:
@@ -86,6 +86,7 @@ def main():
                 f"{change['throughput_rps_change_percent']:+6.2f} "
                 f"{r['mean_ttft_ms']:8.1f} {r['p95_ttft_ms']:8.1f} "
                 f"{r['compute_rounds']:6.1f} {r['recovered_percent']:9.2f} "
+                f"{100 * r['kv_ready_during_compute'] / plan['requests']:14.2f} "
                 f"{r['inter_compute_gap_ms']:8.1f}"
             )
         text += [

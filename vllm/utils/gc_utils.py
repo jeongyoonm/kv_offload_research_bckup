@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 import gc
 import json
+import math
 import time
 from collections import Counter
 from contextlib import suppress
@@ -24,6 +25,8 @@ class GCDebugConfig:
     def __init__(self, gc_debug_conf: str | None = None) -> None:
         self.enabled: bool = False
         self.top_objects: int = -1
+        self.timing_only: bool = False
+        self.minimum_ms: float = 0
 
         if not gc_debug_conf or gc_debug_conf == "0":
             pass
@@ -34,6 +37,14 @@ class GCDebugConfig:
                 json_conf = json.loads(gc_debug_conf)
                 self.enabled = True
                 self.top_objects = json_conf.get("top_objects", -1)
+                self.timing_only = json_conf.get("timing_only", False)
+                self.minimum_ms = float(json_conf.get("min_duration_ms", 0))
+                if (
+                    type(self.timing_only) is not bool
+                    or not math.isfinite(self.minimum_ms)
+                    or self.minimum_ms < 0
+                ):
+                    raise ValueError("invalid GC timing configuration")
             except Exception:
                 self.enabled = False
                 logger.error("Failed to parse VLLM_GC_DEBUG(%s)", envs.VLLM_GC_DEBUG)
@@ -69,12 +80,29 @@ class GCDebugger:
             # Before GC started, record GC start time
             # and top collected objects
             self.start_time_ns = time.monotonic_ns()
+            if self.config.timing_only:
+                return
             objects = gc.get_objects(generation)
             self.num_objects = len(objects)
             self.gc_top_collected_objects = _compute_top_gc_collected_objects(
                 objects, self.config.top_objects
             )
         elif phase == "stop":
+            if self.config.timing_only:
+                stop_ns = time.monotonic_ns()
+                duration_ms = (stop_ns - self.start_time_ns) / 1e6
+                if duration_ms >= self.config.minimum_ms:
+                    logger.info(
+                        "GC timing start_ns=%d end_ns=%d duration_ms=%.3f "
+                        "generation=%d collected=%d uncollectable=%d",
+                        self.start_time_ns,
+                        stop_ns,
+                        duration_ms,
+                        generation,
+                        info.get("collected", 0),
+                        info.get("uncollectable", 0),
+                    )
+                return
             # After GC finished, Record GC elapsed time and
             # optionally top collected objects
             elpased_ms = (time.monotonic_ns() - self.start_time_ns) / 1e6

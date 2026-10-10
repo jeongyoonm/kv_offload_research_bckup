@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 
 import numpy as np
-from sklearn.model_selection import GroupKFold
+from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 from threadpoolctl import threadpool_limits
 
 from experiments.current_chunk_retrain_20261010 import train
@@ -19,7 +19,7 @@ from vllm.v1.kv_offload.frozen_seal_predictor import FrozenSealPredictor
 
 arch = train.arch
 MLP = dict(kind="mlp", layers=[64, 64], input="log1p", solver="lbfgs", alpha=0.01)
-NAMES = ("trees_fixed", "mlp_direct", "sparse_mlp")
+NAMES = ("trees_fixed", "trees_tuned", "tree_direct", "mlp_direct", "sparse_mlp")
 
 
 def full_features(rows):
@@ -57,6 +57,48 @@ def predict(checkpoint, rows):
 def fit(name, batches, forecasts, seed, fallback=None):
     if name == "trees_fixed":
         return train.fit(batches, forecasts, seed)
+    if name == "trees_tuned":
+        groups = np.array([r["episode"] for r in forecasts])
+        it, iv = next(
+            GroupShuffleSplit(1, test_size=0.2, random_state=73).split(
+                forecasts, groups=groups
+            )
+        )
+        tr, va = [forecasts[i] for i in it], [forecasts[i] for i in iv]
+        banned = {r["episode"] for r in va}
+        tb = [r for r in batches if r["episode"] not in banned]
+        log = []
+        base_config, base = arch.select(
+            "base_tree",
+            arch.features(tb),
+            arch.target(tb),
+            tb,
+            arch.features(va),
+            arch.target(va),
+            va,
+            seed,
+            log,
+        )
+        oof, _ = arch.cross_fit(base_config, tb, tr, seed)
+        vp = arch.predict(base, arch.features(va))
+        correction_config, _ = arch.select(
+            "boost",
+            np.column_stack((train.matrix(tr), oof)),
+            arch.target(tr) - oof,
+            tr,
+            np.column_stack((train.matrix(va), vp)),
+            arch.target(va) - vp,
+            va,
+            seed,
+            log,
+            offset=vp,
+        )
+        checkpoint, folds = train.fit(
+            batches, forecasts, seed, base_config, correction_config
+        )
+        return checkpoint, dict(
+            base=base_config, correction=correction_config, tuning=log, folds=folds
+        )
     x = train.matrix(forecasts)
     names = arch.surface.FEATURE_NAMES + arch.surface.FORECAST_NAMES
     indices = None
@@ -64,7 +106,27 @@ def fit(name, batches, forecasts, seed, fallback=None):
         x = full_features(forecasts)[:, :26]
         names += arch.surface.SPARSE_NAMES
         indices = list(range(23)) + [28, 29, 30]
-    model, seconds = arch.fit(MLP, x, arch.target(forecasts), forecasts, seed)
+    tuning = []
+    config = MLP
+    if name == "tree_direct":
+        groups = np.array([r["episode"] for r in forecasts])
+        it, iv = next(
+            GroupShuffleSplit(1, test_size=0.2, random_state=73).split(
+                forecasts, groups=groups
+            )
+        )
+        config, _ = arch.select(
+            "boost",
+            x[it],
+            arch.target(forecasts)[it],
+            [forecasts[i] for i in it],
+            x[iv],
+            arch.target(forecasts)[iv],
+            [forecasts[i] for i in iv],
+            seed,
+            tuning,
+        )
+    model, seconds = arch.fit(config, x, arch.target(forecasts), forecasts, seed)
     exported = dict(direct=arch.export_component(model, names))
     if indices is not None:
         exported["input_indices"] = indices
@@ -77,7 +139,10 @@ def fit(name, batches, forecasts, seed, fallback=None):
     error = float(np.max(np.abs(expected - actual)))
     assert error < 2e-6, dict(name=name, export_error_ms=error)
     return checkpoint, dict(
-        seconds=seconds, export_error_ms=error, fit_info=model.fit_info
+        seconds=seconds,
+        export_error_ms=error,
+        fit_info=getattr(model, "fit_info", {}),
+        tuning=tuning,
     )
 
 
@@ -158,9 +223,18 @@ def main():
                 path = args.output / f"cv_{fold}_{name}.json"
                 if path.exists():
                     result = json.loads(path.read_text())
+                    if name == "trees_fixed":
+                        fallback = json.loads(
+                            (
+                                args.output / f"cv_{fold}_{name}_checkpoint.json"
+                            ).read_text()
+                        )
                 else:
                     started = time.monotonic()
                     checkpoint, audit = fit(name, tb, tr, 73, fallback)
+                    train.save(
+                        args.output / f"cv_{fold}_{name}_checkpoint.json", checkpoint
+                    )
                     if name == "trees_fixed":
                         fallback = checkpoint
                     score = arch.metrics(arch.target(va), predict(checkpoint, va), va)

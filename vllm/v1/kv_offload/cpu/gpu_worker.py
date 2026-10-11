@@ -1130,7 +1130,11 @@ class CPUOffloadingWorker(OffloadingWorker):
         self._copy_pipeline_depth = depth
 
     def get_finished(self) -> list[TransferResult]:
-        return self._store_handler.get_finished() + self._load_handler.get_finished()
+        stored = self._store_handler.get_finished()
+        if getattr(self, "_block_readiness", None) is not None:
+            for result in stored:
+                self._store_blocks.pop(result.job_id, None)
+        return stored + self._load_handler.get_finished()
 
     def wait(self, job_ids: set[int]) -> None:
         self._store_handler.wait(job_ids)

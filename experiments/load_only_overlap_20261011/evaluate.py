@@ -255,6 +255,7 @@ def main():
     parser.add_argument("--classes", type=Path)
     parser.add_argument("--requests", type=int, default=64)
     parser.add_argument("--repeats", type=int, default=1)
+    parser.add_argument("--warmup-requests", type=int, default=8)
     parser.add_argument("--concurrencies", type=int, nargs="+", default=[32])
     parser.add_argument("--arms", nargs="+", default=["worker", "full"])
     parser.add_argument("--ids", nargs="+")
@@ -267,6 +268,7 @@ def main():
     root.mkdir(parents=True, exist_ok=True)
     assert not (root / "plan.json").exists()
     assert len(str(root / "tmp")) <= 45
+    assert args.warmup_requests >= 0
     assert set(args.concurrencies) <= set(workloads.CONCURRENCIES)
     assert set(args.arms) <= {"worker", "full"}
     arms = ["baseline"] if args.server_kind == "baseline" else args.arms
@@ -308,6 +310,7 @@ def main():
             arms=arms,
             kind=args.server_kind,
             requests=args.requests,
+            warmup_requests=args.warmup_requests,
             concurrencies=args.concurrencies,
             policies=policies,
             expected_cells=expected,
@@ -349,6 +352,21 @@ def main():
                 time.sleep(2)
         else:
             raise TimeoutError("Startup timed out")
+        for spec in specs:
+            if args.warmup_requests and spec["family"] != "evolving":
+                for arm in arms:
+                    CURRENT_ARM = arm
+                    cell(
+                        root,
+                        spec,
+                        arm,
+                        args.seed_start - 1,
+                        "warmup",
+                        max(args.concurrencies),
+                        args.warmup_requests,
+                        state,
+                        args.server_kind,
+                    )
         for repeat in range(args.repeats):
             for spec in specs:
                 for concurrency in args.concurrencies:

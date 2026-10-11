@@ -197,7 +197,7 @@ def summarize(responses, windows, events, engine_events, *, expected=None, proto
                 e.get("transport", {}).get("seal_reason")
                 or e.get("transport", {}).get("path", "unknown")
                 for e in protocol
-                if e["event"] == "membership_sealed"
+                if e["event"] == "seal_eligibility"
             )
         ),
         compute_rounds=len(compute) if engine_events else None,

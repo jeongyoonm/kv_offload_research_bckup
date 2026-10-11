@@ -53,7 +53,7 @@ def worker_entries(root):
     return entries
 
 
-def timing_details(data, root, complete):
+def timing_details(data, root, closed):
     directory = Path(data["source_result"]).parent
     engine = [
         json.loads(line)
@@ -100,7 +100,7 @@ def timing_details(data, root, complete):
         if measured
     ]
     coverage = None
-    if complete and data["arm"] != "baseline":
+    if closed and data["arm"] != "baseline":
         indexed = worker_entries(root)
         coverage = {}
         for rank in range(8):
@@ -189,7 +189,7 @@ def read(base):
             if data["workload"]["family"] != "evolving":
                 assert data["realized_outcomes"] == {"cpu_hit": data["requests"]}, path
             data["source_result"] = str(path)
-            data["timing_details"] = timing_details(data, root, status.get("complete"))
+            data["timing_details"] = timing_details(data, root, status.get("stopped"))
             cells.append(data)
     return cells, provenance
 

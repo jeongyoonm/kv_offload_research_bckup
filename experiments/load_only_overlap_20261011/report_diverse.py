@@ -22,7 +22,7 @@ COLORS = dict(baseline="#444444", worker="#3976b8", full="#d87d25")
 METRICS = ("throughput_rps", "mean_ttft_ms", "p95_ttft_ms", "p99_ttft_ms")
 ROOTS = (
     "dc11bh",
-    "dc11oh",
+    "dc11oi",
     "dc11bx",
     "dc11ox",
     "dc11be",

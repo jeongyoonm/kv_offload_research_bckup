@@ -1148,6 +1148,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
                 self.kv_cache_config.num_blocks,
                 scheduler_output.kv_cache_block_copies,
             )
+        self.kv_connector.record_block_initialization(scheduler_output)
 
     def gather_batch_req_state(
         self, scheduler_output: SchedulerOutput, dummy_run: bool
@@ -1592,6 +1593,7 @@ class GPUModelRunner(LoRAModelRunnerMixin):
             )
         if not dummy_run:
             # Update the request states.
+            self.kv_connector.begin_block_readiness(scheduler_output)
             self.update_pp_decode_requests()
             self.finish_requests(scheduler_output)
             self.free_states(scheduler_output)
@@ -1868,6 +1870,9 @@ class GPUModelRunner(LoRAModelRunnerMixin):
                 else:
                     # Eager (NONE): call the raw model directly.
                     model_output = self.model(**model_inputs)
+
+        if not dummy_run:
+            self.kv_connector.record_compute_blocks(scheduler_output)
 
         if self.is_last_pp_rank:
             if self.use_aux_hidden_state_outputs:

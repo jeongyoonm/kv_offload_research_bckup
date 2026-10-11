@@ -71,6 +71,7 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "optimistic_min_ranks": 7,
     "optimistic_window_ms": 20,
     "early_submission": False,
+    "h2d_block_readiness": False,
     "background_prepare": False,
     "copy_pipeline_depth": 1,
     "store_reuse_gpu_fence": False,

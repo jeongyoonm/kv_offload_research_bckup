@@ -942,3 +942,61 @@ def test_invalid_copy_pipeline_depth_rejected(depth):
 
     with pytest.raises(ValueError):
         validate_experiment_options({"copy_pipeline_depth": depth})
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="native CUDA H2D")
+@pytest.mark.parametrize("dependency", ["independent", "reader", "zero", "store"])
+@torch.inference_mode()
+def test_block_readiness_overlaps_only_independent_destinations(
+    default_vllm_config, dependency
+):
+    """Unrelated compute overlaps; destination readers/zeroing/stores stay ordered."""
+    page = 1024 * 1024
+    tensor = torch.full((2, page), 17, dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page)],
+            group_data_refs=[[CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page)]],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8192,
+        async_d2h_submission=True,
+    )
+    worker.configure_block_readiness(True)
+    cpu = worker._load_handler.src_tensors[0]
+    cpu[1].fill_(90)
+    spec = GPULoadStoreSpec([1], group_sizes=(1,), block_indices=(0,))
+    end = torch.Event()
+    try:
+        torch.accelerator.synchronize()
+        # Populate the native worker before measuring completion order.
+        worker.submit_load(10, CPULoadStoreSpec([1]), spec)
+        worker.wait({10})
+        worker.get_finished()
+        tensor[1].fill_(17)
+        torch.accelerator.synchronize()
+        torch.cuda._sleep(300_000_000)
+        if dependency == "zero":
+            tensor[1].zero_()
+        if dependency == "store":
+            worker.submit_store(11, spec, CPULoadStoreSpec([0]))
+        else:
+            worker._block_readiness.record(
+                [0] if dependency == "independent" else [1], dependency
+            )
+        end.record()
+        worker.submit_load(12, CPULoadStoreSpec([1]), spec)
+        worker.wait({12})
+        if dependency == "independent":
+            assert not end.query()
+        else:
+            assert end.query()
+        end.synchronize()
+        assert torch.equal(tensor[1].cpu(), cpu[1])
+        if dependency == "store":
+            worker.wait({11})
+            assert torch.all(cpu[0] == 17)
+    finally:
+        worker.shutdown()

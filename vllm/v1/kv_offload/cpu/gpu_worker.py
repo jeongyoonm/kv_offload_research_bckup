@@ -6,7 +6,10 @@ import time
 from collections import deque
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import NamedTuple
+from typing import TYPE_CHECKING, NamedTuple
+
+if TYPE_CHECKING:
+    from vllm.v1.kv_offload.h2d_readiness import BlockReadiness
 
 import numpy as np
 import torch
@@ -593,7 +596,11 @@ class SingleDirectionOffloadingHandler:
         return block_bases_src[writer_mask], block_bases_dst[writer_mask]
 
     def transfer_async(
-        self, job_id: int, src_spec: LoadStoreSpec, dst_spec: LoadStoreSpec
+        self,
+        job_id: int,
+        src_spec: LoadStoreSpec,
+        dst_spec: LoadStoreSpec,
+        ready_stream=None,
     ) -> bool:
         from vllm.v1.kv_offload import queue_stages
 
@@ -748,14 +755,17 @@ class SingleDirectionOffloadingHandler:
                         )
                     if trace_store:
                         queue_stages.emit("store_async_enqueue_begin", job_id=job_id)
-                    ops.submit_async_batch_memcpy(
-                        self._async_submitter_handle,
-                        job_id,
-                        src,
-                        dst,
-                        sizes,
-                        src_access_any=not self.gpu_to_cpu,
-                    )
+                    with current_platform.stream(
+                        ready_stream or current_platform.current_stream()
+                    ):
+                        ops.submit_async_batch_memcpy(
+                            self._async_submitter_handle,
+                            job_id,
+                            src,
+                            dst,
+                            sizes,
+                            src_access_any=not self.gpu_to_cpu,
+                        )
                     if trace_store:
                         queue_stages.emit("store_async_enqueue_end", job_id=job_id)
                 except Exception:
@@ -953,6 +963,9 @@ class CPUOffloadingWorker(OffloadingWorker):
     submit_load API.
     """
 
+    _block_readiness: "BlockReadiness | None" = None
+    _store_blocks: dict[int, set[int]]
+
     def __init__(
         self,
         kv_caches: CanonicalKVCaches,
@@ -1059,13 +1072,52 @@ class CPUOffloadingWorker(OffloadingWorker):
         self, job_id: int, src_spec: GPULoadStoreSpec, dst_spec: LoadStoreSpec
     ) -> bool:
         """Async GPU -> CPU."""
-        return self._store_handler.transfer_async(job_id, src_spec, dst_spec)
+        success = self._store_handler.transfer_async(job_id, src_spec, dst_spec)
+        if getattr(self, "_block_readiness", None) is not None:
+            self._store_blocks[job_id] = set(map(int, src_spec.block_ids))
+        return success
 
     def submit_load(
         self, job_id: int, src_spec: LoadStoreSpec, dst_spec: GPULoadStoreSpec
     ) -> bool:
         """Async CPU -> GPU."""
-        return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
+        readiness = getattr(self, "_block_readiness", None)
+        if readiness is None:
+            return self._load_handler.transfer_async(job_id, src_spec, dst_spec)
+        destinations = set(map(int, dst_spec.block_ids))
+        pending = {transfer.job_id for transfer in self._store_handler._async_transfers}
+        pending.update(transfer.job_id for transfer in self._store_handler._transfers)
+        self._store_blocks = {
+            job: blocks for job, blocks in self._store_blocks.items() if job in pending
+        }
+        conflicts = {
+            job for job, blocks in self._store_blocks.items() if blocks & destinations
+        }
+        if conflicts:
+            self._store_handler.wait(conflicts)
+        stream = readiness.dependencies(destinations)
+        return self._load_handler.transfer_async(
+            job_id, src_spec, dst_spec, ready_stream=stream
+        )
+
+    def configure_block_readiness(self, enabled: bool) -> None:
+        if enabled == (getattr(self, "_block_readiness", None) is not None):
+            return
+        if enabled:
+            if (
+                not current_platform.is_cuda()
+                or not self._load_handler._async_submission
+            ):
+                raise ValueError("block readiness requires native CUDA H2D")
+            from vllm.v1.kv_offload.h2d_readiness import BlockReadiness
+
+            self._block_readiness = BlockReadiness(
+                self._load_handler.dst_tensors[0].shape[0]
+            )
+            self._store_blocks = {}
+        else:
+            self._block_readiness = None
+            self._store_blocks = {}
 
     def configure_experiment(self, options: dict[str, int | bool]) -> None:
         depth = int(options.get("copy_pipeline_depth", 1))

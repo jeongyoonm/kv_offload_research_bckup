@@ -3384,3 +3384,74 @@ def test_coalesced_startup_owns_rank_descriptors_and_closes_them():
         readiness.close()
     assert all(not path.exists() for path in descriptors)
     assert not Path(channel.path).exists()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "host,flag,status",
+    [
+        ("127.0.0.1", True, 200),
+        ("127.0.0.1", False, 404),
+        ("127.0.0.1", "true", 404),
+        ("203.0.113.1", True, 403),
+    ],
+)
+async def test_read_only_cohort_status_needs_explicit_opt_in_and_loopback(
+    host, flag, status
+):
+    from unittest.mock import AsyncMock
+
+    from fastapi import HTTPException
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        get_deferral_cohort,
+    )
+
+    rpc = AsyncMock(return_value={"requests": 0})
+    raw = SimpleNamespace(
+        client=SimpleNamespace(host=host),
+        app=SimpleNamespace(
+            state=SimpleNamespace(
+                vllm_config=SimpleNamespace(
+                    kv_transfer_config=SimpleNamespace(
+                        kv_connector_extra_config={"cohort_status_diagnostics": flag}
+                    )
+                ),
+                engine_client=SimpleNamespace(get_deferral_cohort_status=rpc),
+            )
+        ),
+    )
+    if status == 200:
+        assert await get_deferral_cohort(raw) == {"requests": 0}
+        rpc.assert_awaited_once_with()
+    else:
+        with pytest.raises(HTTPException) as error:
+            await get_deferral_cohort(raw)
+        assert error.value.status_code == status
+        rpc.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_read_only_cohort_opt_in_does_not_enable_policy_mutation():
+    from fastapi import HTTPException
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        KVLoadSchedulingRequest,
+        set_kv_load_scheduling,
+    )
+
+    raw = SimpleNamespace(
+        client=SimpleNamespace(host="127.0.0.1"),
+        app=SimpleNamespace(
+            state=SimpleNamespace(
+                vllm_config=SimpleNamespace(
+                    kv_transfer_config=SimpleNamespace(
+                        kv_connector_extra_config={"cohort_status_diagnostics": True}
+                    )
+                ),
+            )
+        ),
+    )
+    with pytest.raises(HTTPException) as error:
+        await set_kv_load_scheduling(KVLoadSchedulingRequest(), raw)
+    assert error.value.status_code == 404

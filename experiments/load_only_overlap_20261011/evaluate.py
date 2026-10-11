@@ -52,7 +52,11 @@ def launch(root, kind, port):
     command[command.index("--max-model-len") + 1] = "81920"
     if kind == "baseline":
         extra = config["kv_connector_extra_config"]
-        extra.update(async_h2d_submission=False, async_d2h_submission=False)
+        extra.update(
+            async_h2d_submission=False,
+            async_d2h_submission=False,
+            cohort_status_diagnostics=True,
+        )
         for name in list(extra):
             if name.startswith(("early_load_", "_early_load_")) or name in (
                 "schedule_delay_ms",
@@ -78,6 +82,7 @@ def launch(root, kind, port):
             if key.startswith(("VLLM_DEFERRAL_", "VLLM_PREDICTOR_", "VLLM_DATASET_")):
                 del env[key]
         env["VLLM_COOPERATIVE_RESPONSE_PROGRESS"] = "0"
+        env["VLLM_DEFERRAL_LOAD_AUDIT"] = "1"
     env["PATH"] = (
         str(SOURCE / ".venv/bin") + ":/usr/local/cuda-13.0/bin:" + env.get("PATH", "")
     )

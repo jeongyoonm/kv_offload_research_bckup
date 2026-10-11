@@ -174,6 +174,7 @@ def deadline_core(monkeypatch):
         clock.ready_at = {}
         clock.complete_at = None
         clock.base_at = None
+        clock.base_signalled = False
         scheduler.requests = {}
         output = core.batch_queue[-1][1]
         output.total_num_scheduled_tokens = 1024
@@ -212,9 +213,13 @@ def deadline_core(monkeypatch):
             scheduler.finished_recving_kv_req_ids.update(
                 req for req, at in clock.ready_at.items() if at <= clock.now
             )
-            if clock.base_at is not None and clock.now >= clock.base_at:
+            if (
+                clock.base_at is not None
+                and clock.now >= clock.base_at
+                and not clock.base_signalled
+            ):
                 signal_prepared(path[0], 9, 7, 1)
-                clock.base_at = None
+                clock.base_signalled = True
 
         core._refresh_early_load_readiness.side_effect = refresh
         return core, clock

@@ -38,7 +38,38 @@ def summarize(path):
     seals = [e["transport"] for e in records if e["event"] == "seal_eligibility"]
     holds = [t for t in seals if t.get("base_ready_ns") and t.get("seal_ns")]
     load_only = [t for t in holds if not t.get("has_compute", False)]
+    by_step = {e["step"]: e for e in computed}
+    prediction_errors, seal_slacks, seal_to_gpu, late_seals = [], [], [], 0
+    for event in records:
+        if event["event"] != "seal_eligibility":
+            continue
+        transport = event["transport"]
+        prediction = transport.get("prediction") or {}
+        predecessor = by_step.get(prediction.get("predecessor_step"))
+        upcoming = by_step.get(event.get("step"))
+        if predecessor and prediction.get("predicted_duration_ns"):
+            end = max(r[3] + r[6] for r in predecessor["execution_ranks"])
+            estimated = (
+                prediction["gpu_start_upper_ns"] + prediction["predicted_duration_ns"]
+            )
+            prediction_errors.append((estimated - end) / 1e6)
+            seal = transport["seal_ns"]
+            seal_slacks.append((end - seal) / 1e6)
+            late_seals += seal > end
+        if upcoming and transport.get("seal_ns"):
+            start = max(r[3] for r in upcoming["execution_ranks"])
+            seal_to_gpu.append((start - transport["seal_ns"]) / 1e6)
     return dict(
+        prediction_count=len(prediction_errors),
+        prediction_end_mae_ms=statistics.mean(map(abs, prediction_errors))
+        if prediction_errors
+        else None,
+        prediction_end_bias_ms=statistics.mean(prediction_errors)
+        if prediction_errors
+        else None,
+        prediction_seal_slack_ms=seal_slacks,
+        prediction_late_seals=late_seals,
+        seal_to_B_gpu_start_ms=seal_to_gpu,
         path=str(path.parent),
         arm=result["label"],
         workload=result["workload"],

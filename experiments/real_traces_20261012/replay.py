@@ -9,6 +9,7 @@ import gzip
 import hashlib
 import json
 import statistics
+import subprocess
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -24,6 +25,41 @@ from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 
 CAMPAIGN = Path("/mnt/localnvme/jeongyoon/real_traces_20261012")
 BASE = "http://127.0.0.1:18472"
+
+
+def flush_timeline(root):
+    """Require every worker; an unused baseline engine emits no timeline."""
+    directory = root / "server/load_timeline"
+    pids = set(
+        subprocess.check_output(
+            ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"],
+            text=True,
+        ).split()
+    )
+    assert len(pids) == 8, pids
+    trigger = directory / "flush.request"
+    trigger.touch()
+    stamp = trigger.stat().st_mtime_ns
+    deadline = time.monotonic() + 10
+    while time.monotonic() < deadline:
+        paths = list(directory.glob(f"*.{stamp}.jsonl"))
+        observed = {p.name.split(".")[0] for p in paths}
+        complete = {
+            pid
+            for pid in observed
+            if (directory / f"{pid}.flushed").exists()
+            and (directory / f"{pid}.flushed").read_text() == str(stamp)
+        }
+        if pids <= complete and observed <= complete:
+            time.sleep(0.2)
+            paths = list(directory.glob(f"*.{stamp}.jsonl"))
+            return [
+                json.loads(line)
+                for path in paths
+                for line in path.read_text().splitlines()
+            ]
+        time.sleep(0.05)
+    raise RuntimeError("transfer timeline omitted one or more TP ranks")
 
 
 def configure(root, arm):
@@ -280,7 +316,7 @@ def cell(root, arm, spec):
     run, state, policy = configure(root, arm)
     client.drain()
     run.reset(True)
-    client.flush_timeline(root)
+    flush_timeline(root)
     before = client.metrics()
     trace_before = set((root / "server/timing/late_admission").glob("*.json"))
     run.save(
@@ -311,7 +347,7 @@ def cell(root, arm, spec):
             ),
         )["seal_estimator"]["state"]
         frozen = exported == state
-    events = client.flush_timeline(root)
+    events = flush_timeline(root)
     after = client.metrics()
     result = summarize(responses, start, end, expected, offered_end, events)
     protocol_counts = Counter()

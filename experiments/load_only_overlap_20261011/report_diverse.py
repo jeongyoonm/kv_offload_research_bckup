@@ -335,6 +335,53 @@ def plots(rows, output):
         ax.set_title(f"{arm} vs {reference} (concurrency32)")
     fig.colorbar(image, ax=axes, label="Throughput gain (%)", shrink=0.8)
     savefig(fig, output, "homogeneous_gain_grid")
+    mixed = sorted({r["workload"] for r in rows if r["family"] != "homogeneous"})
+    if mixed:
+        fig, axes = plt.subplots(1, 3, figsize=(14, 4))
+        positions = np.arange(len(mixed))
+        width = 0.24
+        for ax, metric, label in zip(
+            axes,
+            ("throughput_rps", "mean_ttft_ms", "p95_ttft_ms"),
+            ("Requests / s", "Mean TTFT (ms)", "p95 TTFT (ms)"),
+        ):
+            for offset, arm in enumerate(ARMS):
+                data = [bykey.get((spec, 32, arm)) for spec in mixed]
+                means = np.array([d[metric] if d else np.nan for d in data])
+                ranges = np.array(
+                    [
+                        [
+                            d[metric] - d[metric + "_min"],
+                            d[metric + "_max"] - d[metric],
+                        ]
+                        if d
+                        else [0, 0]
+                        for d in data
+                    ]
+                ).T
+                ax.bar(
+                    positions + (offset - 1) * width,
+                    means,
+                    width,
+                    label=arm,
+                    color=COLORS[arm],
+                    yerr=ranges,
+                    capsize=2,
+                )
+            ax.set_xticks(
+                positions,
+                labels=[
+                    s.replace("heterogeneous_", "mix ").replace("_", " ") for s in mixed
+                ],
+                rotation=20,
+                ha="right",
+            )
+            ax.set_ylabel(label)
+            ax.grid(axis="y", alpha=0.2)
+        axes[0].legend(fontsize=8)
+        fig.suptitle("GLM5.3 TP8, concurrency 32: repeat means and observed ranges")
+        fig.tight_layout()
+        savefig(fig, output, "mixed_workload_ablation")
     evolving = sorted({r["workload"] for r in rows if r["family"] == "evolving"})
     if evolving:
         fig, axes = plt.subplots(

@@ -417,6 +417,9 @@ def main():
     cells, provenance = read(args.base)
     rows = aggregate(cells)
     pairs = matched(cells)
+    coverage_path = args.base / "load_only_overlap_20261011/coverage_plan.json"
+    coverage = json.loads(coverage_path.read_text()) if coverage_path.exists() else {}
+    expected = coverage.get("expected_cells", 243)
     with (args.output / "cells.csv").open("w") as stream:
         columns = sorted(set().union(*(r for r in rows)))
         writer = csv.DictWriter(stream, fieldnames=columns)
@@ -424,10 +427,12 @@ def main():
         writer.writerows(rows)
     result = dict(
         cells=len(cells),
-        expected_cells=243,
+        expected_cells=expected,
         full_illustrative_grid_and_mixed_cells=360,
         matched_arm_triplets=len(pairs) // 2,
-        complete=len(cells) == 243 and all(p["complete"] for p in provenance.values()),
+        complete=len(cells) == expected
+        and all(p["complete"] for p in provenance.values()),
+        coverage_plan=coverage,
         rows=rows,
         timing_details=[
             dict(

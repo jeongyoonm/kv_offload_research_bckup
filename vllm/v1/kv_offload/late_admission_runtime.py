@@ -1627,7 +1627,13 @@ def record(owner, event, **fields):
     rows = getattr(owner, "_late_admission_records", None)
     if rows is None:
         rows = owner._late_admission_records = []
-    if len(rows) >= 4096:
+    capacity = getattr(owner, "_late_record_capacity", None)
+    if capacity is None:
+        capacity = int(os.environ.get("VLLM_LATE_ADMISSION_RECORD_CAPACITY", "4096"))
+        if not 1 <= capacity <= 1_000_000:
+            raise ValueError("late admission record capacity must be in [1, 1000000]")
+        owner._late_record_capacity = capacity
+    if len(rows) >= capacity:
         raise RuntimeError("late admission record capacity exceeded")
     rows.append(dict(event=event, time_ns=time.monotonic_ns(), **fields))
 
@@ -1648,7 +1654,7 @@ def export_records(owner, role, rank=-1):
                 rank=rank,
                 generation=getattr(owner, "_late_generation", 0),
                 records=rows,
-                capacity=4096,
+                capacity=getattr(owner, "_late_record_capacity", 4096),
                 overflow=False,
                 markers=getattr(owner, "_late_record_enabled", False),
                 counts=getattr(owner, "_late_counts", {}),

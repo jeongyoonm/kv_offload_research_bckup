@@ -33,6 +33,39 @@ from vllm.v1.request import RequestStatus
 request_runner = offloading_request_runner
 
 
+def test_diagnostic_capacity_is_bounded_configurable_and_exported(
+    monkeypatch, tmp_path
+):
+    """Long diagnostic cells retain every event up to their explicit limit."""
+    import json
+
+    from vllm.v1.kv_offload.late_admission_runtime import export_records, record
+
+    monkeypatch.setenv("VLLM_LATE_ADMISSION_RECORD_CAPACITY", "3")
+    monkeypatch.setenv("VLLM_DEFERRAL_TIMING_DIR", str(tmp_path))
+    owner = SimpleNamespace(_late_record_enabled=True)
+    for index in range(3):
+        record(owner, "event", index=index)
+    with pytest.raises(RuntimeError, match="capacity exceeded"):
+        record(owner, "event", index=3)
+    export_records(owner, "engine")
+    data = json.loads(next((tmp_path / "late_admission").glob("*.json")).read_text())
+    assert data["capacity"] == 3
+    assert [row["index"] for row in data["records"]] == [0, 1, 2]
+    monkeypatch.setenv("VLLM_LATE_ADMISSION_RECORD_CAPACITY", "1000001")
+    with pytest.raises(ValueError, match="1000000"):
+        record(SimpleNamespace(_late_record_enabled=True), "event")
+
+
+def test_diagnostic_capacity_default_remains_4096(monkeypatch):
+    from vllm.v1.kv_offload.late_admission_runtime import record
+
+    monkeypatch.delenv("VLLM_LATE_ADMISSION_RECORD_CAPACITY", raising=False)
+    owner = SimpleNamespace(_late_record_enabled=True)
+    record(owner, "event")
+    assert owner._late_record_capacity == 4096
+
+
 class ControlledExecutor:
     execute_model: Any
 

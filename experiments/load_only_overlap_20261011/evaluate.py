@@ -273,10 +273,11 @@ def main():
     parser.add_argument("--idle-target", type=int, default=1)
     parser.add_argument("--seconds", type=int, default=10800)
     parser.add_argument("--preflight-only", action="store_true")
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     root = args.output
     root.mkdir(parents=True, exist_ok=True)
-    assert not (root / "plan.json").exists()
+    assert args.resume or not (root / "plan.json").exists()
     assert len(str(root / "tmp")) <= 45
     assert args.warmup_requests >= 0
     assert set(args.concurrencies) <= set(workloads.CONCURRENCIES)
@@ -313,6 +314,54 @@ def main():
     if args.server_kind == "baseline":
         run.configure = lambda *a, **k: dict(baseline=True)
     expected = len(specs) * len(arms) * len(args.concurrencies) * args.repeats
+    completed = {}
+    attempt = None
+    if args.resume:
+        assert args.repeats == 1 and not args.preflight_only
+        old_plan = json.loads((root / "plan.json").read_text())
+        for name, value in dict(
+            specs=specs,
+            arms=arms,
+            kind=args.server_kind,
+            requests=args.requests,
+            warmup_requests=args.warmup_requests,
+            concurrencies=args.concurrencies,
+            policies=policies,
+            expected_cells=expected,
+            repeats=args.repeats,
+            seeds=[args.seed_start],
+        ).items():
+            assert old_plan[name] == value, f"Resume changed {name}"
+        previous = json.loads((root / "summary.json").read_text())
+        assert previous["stopped"] and not previous["complete"]
+        for result in previous["results"]:
+            assert result["accepted"]
+            key = (
+                result["workload"]["id"],
+                result["repeat"],
+                result["concurrency"],
+                result["arm"],
+            )
+            completed[key] = result
+        attempt = root / "attempts" / f"trace_capacity_{time.time_ns()}"
+        attempt.mkdir(parents=True)
+        shutil.copy2(root / "plan.json", attempt / "plan.json")
+        (root / "summary.json").rename(attempt / "summary.json")
+        (root / "server").rename(attempt / "server")
+        old_traces = attempt / "server/timing/late_admission"
+        new_traces = root / "server/timing/late_admission"
+        new_traces.mkdir(parents=True)
+        for path in old_traces.glob("*.json"):
+            shutil.copy2(path, new_traces / path.name)
+        for spec in specs:
+            for concurrency in args.concurrencies:
+                for arm in arms:
+                    key = (spec["id"], 0, concurrency, arm)
+                    directory = root / "cells" / spec["id"] / f"r0_{arm}_n{concurrency}"
+                    if key not in completed and directory.exists():
+                        target = attempt / "partial_cells" / spec["id"] / directory.name
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        directory.rename(target)
     run.save(
         root / "plan.json",
         dict(
@@ -330,6 +379,8 @@ def main():
             commit=subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=SOURCE, text=True
             ).strip(),
+            resumed_attempt=str(attempt) if attempt else None,
+            preserved_completed_cells=len(completed),
             scope="Shared private cache initialization; "
             "baseline ordinary host H2D/D2H, "
             "no chunked async submission, early submission or late admission. "
@@ -346,7 +397,7 @@ def main():
         root / "libseal_execution_observer.so",
     )
     proc = timer = None
-    results = []
+    results = list(completed.values())
     started = time.monotonic()
     try:
         proc = launch(root, args.server_kind, 18468)
@@ -363,8 +414,26 @@ def main():
         else:
             raise TimeoutError("Startup timed out")
         for spec in specs:
+            if args.resume and all(
+                (spec["id"], repeat, concurrency, arm) in completed
+                for repeat in range(args.repeats)
+                for concurrency in args.concurrencies
+                for arm in arms
+            ):
+                continue
             if args.warmup_requests and spec["family"] != "evolving":
                 for arm in arms:
+                    if args.resume:
+                        directory = (
+                            root
+                            / "cells"
+                            / spec["id"]
+                            / f"rwarmup_{arm}_n{max(args.concurrencies)}"
+                        )
+                        if directory.exists():
+                            target = attempt / "warmups" / spec["id"] / directory.name
+                            target.parent.mkdir(parents=True, exist_ok=True)
+                            directory.rename(target)
                     CURRENT_ARM = arm
                     cell(
                         root,
@@ -381,6 +450,9 @@ def main():
             for spec in specs:
                 for concurrency in args.concurrencies:
                     for arm in arms if repeat % 2 == 0 else list(reversed(arms)):
+                        key = (spec["id"], repeat, concurrency, arm)
+                        if key in completed:
+                            continue
                         assert time.monotonic() - started < args.seconds - 120
                         CURRENT_ARM = arm
                         results.append(

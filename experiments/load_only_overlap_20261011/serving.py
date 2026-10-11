@@ -6,6 +6,7 @@ import argparse
 import copy
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import threading
@@ -46,6 +47,7 @@ def main():
     parser.add_argument("--initial-barrier", action="store_true")
     parser.add_argument("--block-arm", action="append", default=[])
     parser.add_argument("--worker-arm", action="append", default=[])
+    parser.add_argument("--dma-audit", action="store_true")
     parser.add_argument("--lead-us", type=int, default=50000)
     parser.add_argument("--arm-lead-us", action="append", default=[], metavar="NAME=US")
     parser.add_argument("--allocation-seconds", type=int, default=10800)
@@ -77,6 +79,13 @@ def main():
     baseline.CURRENT_POLICY = "D"
     active, inactive = baseline.options(True), baseline.options(False)
     command, config = baseline.server_command()
+    if args.dma_audit:
+        config.update(
+            kv_connector="AuditedOffloadingConnector",
+            kv_connector_module_path="experiments.load_only_overlap_20261011.dma_audit",
+        )
+        command[command.index("--kv-transfer-config") + 1] = json.dumps(config)
+        os.environ["CACHE_INIT_DMA_AUDIT_DIR"] = str(root / "dma_audit")
     command[command.index("--port") + 1] = "18462"
     states, policies = {}, {}
     context = None
@@ -154,6 +163,7 @@ def main():
             arms=list(paths),
             experiment_kind="load_only_policy",
             initial_barrier=args.initial_barrier,
+            dma_audit=args.dma_audit,
             policies=policies,
             workloads=args.workloads,
             requests=args.requests,

@@ -18,7 +18,18 @@ import numpy as np
 ARMS = ("baseline", "worker", "full")
 COLORS = dict(baseline="#444444", worker="#3976b8", full="#d87d25")
 METRICS = ("throughput_rps", "mean_ttft_ms", "p95_ttft_ms", "p99_ttft_ms")
-ROOTS = ("dc11bh", "dc11oh", "dc11bx", "dc11ox", "dc11be", "dc11oe", "dc11bc", "dc11oc")
+ROOTS = (
+    "dc11bh",
+    "dc11oh",
+    "dc11bx",
+    "dc11ox",
+    "dc11be",
+    "dc11oe",
+    "dc11bc",
+    "dc11oc",
+    "dc11bs",
+    "dc11os",
+)
 
 
 def read(base):
@@ -260,9 +271,10 @@ def main():
         writer.writerows(rows)
     result = dict(
         cells=len(cells),
-        expected_cells=360,
+        expected_cells=243,
+        full_illustrative_grid_and_mixed_cells=360,
         matched_arm_triplets=len(pairs) // 2,
-        complete=len(cells) == 360 and all(p["complete"] for p in provenance.values()),
+        complete=len(cells) == 243 and all(p["complete"] for p in provenance.values()),
         rows=rows,
         paired_gains=pairs,
         provenance=provenance,

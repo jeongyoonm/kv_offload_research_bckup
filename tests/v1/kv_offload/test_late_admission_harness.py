@@ -214,6 +214,7 @@ def deadline_core(monkeypatch):
             )
             if clock.base_at is not None and clock.now >= clock.base_at:
                 signal_prepared(path[0], 9, 7, 1)
+                clock.base_at = None
 
         core._refresh_early_load_readiness.side_effect = refresh
         return core, clock
@@ -2107,6 +2108,72 @@ def test_load_only_ack_order_selects_fallback_or_half_cohort_wait(
         assert transport["predecessor_ready"] is True
         assert "base_ready_ns" not in transport
         assert acknowledged == []
+
+
+@pytest.mark.parametrize("base_at", [None, 1_006_000_000])
+@pytest.mark.parametrize("rpc_at", [1_000_000_000, 1_003_000_000])
+@pytest.mark.parametrize("idle_target", [0, 1, 4, 8])
+def test_consistent_load_only_policy_ignores_empty_rpc_ack_order(
+    deadline_core, base_at, rpc_at, idle_target
+):
+    """Empty RPC readiness cannot switch between first-ready and cohort waiting."""
+    core, clock = deadline_core(lead_us=50_000)
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    core.batch_queue[-1][0].poll = lambda: clock.now >= rpc_at
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_consistent = True
+    scheduler._late_seal_load_only_idle_target = idle_target
+    scheduler._late_seal_load_only_ready_percent = 50
+    clock.base_at = base_at
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {
+        c.req_id: 1_011_000_000 + i * 2_000_000 for i, c in enumerate(candidates)
+    }
+    acked = stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    target = idle_target or 8
+    ready_at = clock.ready_at[candidates[target - 1].req_id]
+    assert 0 <= transport["seal_ns"] - ready_at < 2_000_000
+    assert transport["ready_target"] == target
+    assert transport["seal_reason"] == "candidate_target_ready"
+    assert transport["setup_prediction"] is None
+    assert set(acked) & scheduler._late_kv_snapshot == {
+        c.req_id for c in candidates[:target]
+    }
+    clock.now += 100_000_000
+    core._refresh_early_load_readiness()
+    assert scheduler._late_kv_snapshot == {c.req_id for c in candidates[:target]}
+
+
+@pytest.mark.parametrize("stop", ["base", "cancel", "partial", "compute"])
+def test_idle_target_preserves_base_work_and_candidate_safety(deadline_core, stop):
+    """Useful base work exits; cancellation/partial ack never counts as ready."""
+    core, clock = deadline_core()
+    scheduler = core.scheduler
+    scheduler._late_seal_load_only_consistent = True
+    scheduler._late_seal_load_only_idle_target = 1
+    scheduler._late_seal_load_only_ready_percent = 50
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0 if stop != "compute" else 1
+    first = "partial" if stop == "partial" else "first"
+    candidates = [_request(first), _request("second")]
+    clock.ready_at = {first: clock.now, "second": 1_011_000_000}
+    if stop == "base":
+        scheduler._late_base_request_shapes = [[128, 4096]]
+    if stop == "cancel":
+        core.aborts_queue.put([first])
+    acked = stage_rpc(core, 9, [_request("base")], candidates)
+    transport = scheduler._late_transport
+    if stop == "base":
+        assert transport["seal_reason"] == "load_only_base_work_ready"
+        assert transport["seal_ns"] == 1_001_000_000
+    elif stop in ("cancel", "partial"):
+        assert transport["seal_ns"] == 1_011_000_000
+        eligible = set(acked) & scheduler._late_kv_snapshot - scheduler._late_cancelled
+        assert eligible == {"second"}
+    else:
+        assert transport["ready_target"] == 2
+        assert transport["load_only_consistent"] is False
+        assert transport["seal_ns"] == 1_011_000_000
 
 
 def test_load_only_fraction_excludes_cancellation_without_shrinking_target(

@@ -453,7 +453,12 @@ def stage_rpc(core, step, base, candidates):
     if not queued:
         return []
     predecessor = queued[-1][0]
-    if predecessor.poll():
+    consistent_load_only = (
+        bool(candidates)
+        and getattr(core.scheduler, "_late_seal_load_only_consistent", False) is True
+        and not compute_progress(core, queued)[0]
+    )
+    if predecessor.poll() and not consistent_load_only:
         return []
     started = time.monotonic_ns()
     delay_us = getattr(core.scheduler, "_late_seal_delay_us", 0) if candidates else 0
@@ -465,6 +470,9 @@ def stage_rpc(core, step, base, candidates):
     partial_percent = getattr(core.scheduler, "_late_partial_ready_percent", 0)
     load_only_ready_percent = getattr(
         core.scheduler, "_late_seal_load_only_ready_percent", 0
+    )
+    load_only_idle_target = getattr(
+        core.scheduler, "_late_seal_load_only_idle_target", 0
     )
     load_only_fraction_target = (
         (len(candidates) * load_only_ready_percent + 99) // 100
@@ -751,6 +759,11 @@ def stage_rpc(core, step, base, candidates):
                             target = min(load_only_fraction_target, len(active))
                         elif load_only_target:
                             target = min(target, load_only_target)
+                        if consistent_load_only and load_only_idle_target:
+                            target = min(target, load_only_idle_target)
+                            if getattr(core.scheduler, "_late_base_request_shapes", []):
+                                seal_reason = "load_only_base_work_ready"
+                                break
                         timing = getattr(core, "deferral_timing", None)
                         model = getattr(
                             getattr(timing, "seal_estimator", None),
@@ -1398,7 +1411,7 @@ def stage_rpc(core, step, base, candidates):
                     if now_ns >= base_ready_ns + (delay_us + extension_us) * 1000:
                         seal_reason = "extension_deadline"
                         break
-            elif predecessor_ready:
+            elif predecessor_ready and not consistent_load_only:
                 record(core.scheduler, "predecessor_first_fallback", step=step)
                 core.scheduler._late_transport = dict(
                     start_ns=started,
@@ -1447,6 +1460,8 @@ def stage_rpc(core, step, base, candidates):
             ),
             load_only_pending_candidates=len(candidates),
             load_only_ready_percent=load_only_ready_percent,
+            load_only_consistent=consistent_load_only,
+            load_only_idle_target=load_only_idle_target,
             load_only_fraction_target=load_only_fraction_target,
             load_only_productive_ready=productive_ready,
             load_only_productive_efficiency=productive_efficiency,

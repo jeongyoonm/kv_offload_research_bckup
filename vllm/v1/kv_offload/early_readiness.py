@@ -35,6 +35,8 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "late_seal_target_candidates": 4,
     "late_seal_load_only_target_candidates": 0,
     "late_seal_load_only_ready_percent": 0,
+    "late_seal_load_only_consistent": False,
+    "late_seal_load_only_idle_target": 0,
     "late_seal_repeat_us": 25_000,
     "late_seal_condition_preparation": False,
     "late_seal_recent_preparation": False,
@@ -107,6 +109,7 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         ("late_seal_target_candidates", 16),
         ("late_seal_load_only_target_candidates", 16),
         ("late_seal_load_only_ready_percent", 100),
+        ("late_seal_load_only_idle_target", 16),
         ("late_seal_repeat_us", 100_000),
         ("late_candidate_slots", 16),
         ("late_partial_min_pending_candidates", 16),
@@ -187,6 +190,19 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         )
     ):
         raise ValueError("load-only percentage requires mode 4 and readiness seal")
+    if result["late_seal_load_only_consistent"] and (
+        result["late_admission_mode"] != 4
+        or not (
+            result["late_seal_policy"] == "event"
+            or result["late_seal_prediction_to_readiness"]
+        )
+    ):
+        raise ValueError("consistent load-only policy requires readiness seal")
+    if (
+        result["late_seal_load_only_idle_target"]
+        and not result["late_seal_load_only_consistent"]
+    ):
+        raise ValueError("idle load-only target requires consistent policy")
     deadline_options = (
         result["late_seal_compute_deadline"]
         or result["late_seal_compute_deadline_shadow"]

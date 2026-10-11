@@ -15,6 +15,8 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
+from experiments.load_only_overlap_20261011.analyze_serving import uncovered
+
 ARMS = ("baseline", "worker", "full")
 COLORS = dict(baseline="#444444", worker="#3976b8", full="#d87d25")
 METRICS = ("throughput_rps", "mean_ttft_ms", "p95_ttft_ms", "p99_ttft_ms")
@@ -30,6 +32,73 @@ ROOTS = (
     "dc11bs",
     "dc11os",
 )
+
+
+def timing_details(data):
+    directory = Path(data["source_result"]).parent
+    engine = [
+        json.loads(line)
+        for line in (directory / "engine.jsonl").read_text().splitlines()
+    ]
+    records = json.loads((directory / "protocol.json").read_text())
+    computed = {
+        e["step"]: e
+        for e in engine
+        if e["event"] == "step_completion" and e.get("selected") and e.get("valid")
+    }
+    intervals = sorted(
+        (
+            max(r[3] for r in e["execution_ranks"]),
+            max(r[3] + r[6] for r in e["execution_ranks"]),
+        )
+        for e in computed.values()
+    )
+    holds, errors, seal_slacks, seal_to_gpu = [], [], [], []
+    for event in records:
+        if event["event"] != "seal_eligibility":
+            continue
+        transport = event["transport"]
+        if transport.get("base_ready_ns") and transport.get("seal_ns"):
+            holds.append(transport)
+        prediction = transport.get("prediction") or {}
+        predecessor = computed.get(prediction.get("predecessor_step"))
+        upcoming = computed.get(event.get("step"))
+        if predecessor and prediction.get("predicted_duration_ns"):
+            end = max(r[3] + r[6] for r in predecessor["execution_ranks"])
+            estimated = (
+                prediction["gpu_start_upper_ns"] + prediction["predicted_duration_ns"]
+            )
+            errors.append((estimated - end) / 1e6)
+            seal_slacks.append((end - transport["seal_ns"]) / 1e6)
+        if upcoming and transport.get("seal_ns"):
+            start = max(r[3] for r in upcoming["execution_ranks"])
+            seal_to_gpu.append((start - transport["seal_ns"]) / 1e6)
+    load_only = [t for t in holds if not t.get("has_compute", False)]
+    leading = [
+        (min(x[0] for x in measured) - start) / 1e6
+        for start, end in data["windows"]
+        for measured in [[x for x in intervals if start <= x[0] <= end]]
+        if measured
+    ]
+    return dict(
+        prediction_count=len(errors),
+        prediction_end_mae_ms=statistics.mean(map(abs, errors)) if errors else None,
+        prediction_end_bias_ms=statistics.mean(errors) if errors else None,
+        prediction_late_seals=sum(x < 0 for x in seal_slacks),
+        prediction_seal_slack_ms=seal_slacks,
+        seal_to_B_gpu_start_ms=seal_to_gpu,
+        release_to_first_gpu_start_ms=leading,
+        load_only_seals=len(load_only),
+        load_only_hold_ms=sum(t.get("seal_hold_actual_ns", 0) for t in load_only) / 1e6,
+        all_exposed_hold_ms=sum(
+            uncovered(t["base_ready_ns"], t["seal_ns"], intervals) for t in holds
+        )
+        / 1e6,
+        load_only_exposed_hold_ms=sum(
+            uncovered(t["base_ready_ns"], t["seal_ns"], intervals) for t in load_only
+        )
+        / 1e6,
+    )
 
 
 def read(base):
@@ -66,6 +135,7 @@ def read(base):
             if data["workload"]["family"] != "evolving":
                 assert data["realized_outcomes"] == {"cpu_hit": data["requests"]}, path
             data["source_result"] = str(path)
+            data["timing_details"] = timing_details(data)
             cells.append(data)
     return cells, provenance
 
@@ -276,6 +346,17 @@ def main():
         matched_arm_triplets=len(pairs) // 2,
         complete=len(cells) == 243 and all(p["complete"] for p in provenance.values()),
         rows=rows,
+        timing_details=[
+            dict(
+                source=c["source_result"],
+                arm=c["arm"],
+                workload=c["workload"]["id"],
+                concurrency=c["concurrency"],
+                seed=c["seed"],
+                **c["timing_details"],
+            )
+            for c in cells
+        ],
         paired_gains=pairs,
         provenance=provenance,
         scope="64-request independent CPU-hit episodes; 300-request evolving streams. "

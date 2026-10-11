@@ -80,3 +80,9 @@ Coverage and reporting
 - Mixed-workload bars show repeat means and observed ranges, not confidence
   intervals. CPU submission and GPU execution envelopes overlap in time and
   must not be added as independent costs.
+- Opportunity counts use native all-rank readiness-notification timestamps,
+  with per-rank reconstruction when an ordinary callback wins the engine race.
+  Missing timestamps produce bounds and an unavailable point ratio; delayed
+  worker job-observation timestamps are never substituted.
+- Retrospective GPU-gap bounds preserve wider start-observation brackets.
+  This does not relax the live predictor's2ms observation-precision cutoff.

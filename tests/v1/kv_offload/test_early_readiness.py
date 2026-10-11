@@ -3500,3 +3500,33 @@ def test_opportunity_ratio_uses_native_time_and_rejects_partial_rank_coverage():
     result = summarize([owner, *notifications], protocol, compute, windows)
     assert result["total_late_admissions"] == 1
     assert result["late_admitted_during_compute_definite"] == 0
+
+
+def test_gpu_gap_bounds_preserve_wide_but_ordered_native_start_brackets():
+    from experiments.load_only_overlap_20261011.opportunities import execution_bounds
+
+    compute = [
+        dict(
+            step=step,
+            time_ns=now * 1_000_000,
+            execution_ranks=[
+                [
+                    step,
+                    (start - 1) * 1_000_000,
+                    start * 1_000_000,
+                    (start + 10) * 1_000_000,
+                    now * 1_000_000,
+                    1,
+                    50_000_000,
+                    (start + 50) * 1_000_000,
+                    (start + 60) * 1_000_000,
+                ]
+            ]
+            * 8,
+        )
+        for step, start, now in [(1, 100, 200), (2, 155, 250)]
+    ]
+    result = execution_bounds(compute, [(90_000_000, 300_000_000)])
+    assert result["start_bracket_above_predictor_2ms"] == 2
+    assert result["inter_compute_gap_lower_ms"] == 0
+    assert result["inter_compute_gap_upper_ms"] == 15

@@ -5,6 +5,48 @@
 from collections import defaultdict
 
 
+def execution_bounds(compute, windows):
+    intervals, widths = [], []
+    for event in compute:
+        ranks = event["execution_ranks"]
+        assert len(ranks) == 8
+        for r in ranks:
+            assert r and len(r) == 9 and r[0] == event["step"] and r[5] == 1
+            assert 0 < r[1] <= r[2] <= r[3] <= r[4] <= event["time_ns"]
+            assert r[6] > 0 and r[2] <= r[7] <= r[8] <= r[4]
+        widths.append(max(r[3] - r[2] for r in ranks))
+        intervals.append(
+            (
+                max(r[2] for r in ranks),
+                max(r[3] for r in ranks),
+                max(r[2] + r[6] for r in ranks),
+                max(r[3] + r[6] for r in ranks),
+            )
+        )
+    intervals.sort(key=lambda interval: interval[1])
+    lower = upper = 0
+    for start, end in windows:
+        measured = [i for i in intervals if start <= i[1] <= end]
+        for a, b in zip(measured, measured[1:]):
+            lower += max(0, b[0] - a[3])
+            upper += max(0, b[1] - a[2])
+    return dict(
+        native_execution_snapshots=len(compute),
+        start_bracket_above_predictor_2ms=sum(w > 2_000_000 for w in widths),
+        max_start_bracket_ms=max(widths) / 1e6 if widths else None,
+        inter_compute_gap_lower_ms=lower / 1e6 if intervals else None,
+        inter_compute_gap_upper_ms=upper / 1e6 if intervals else None,
+        gpu_envelope_lower_ms=sum(max(0, i[2] - i[1]) for i in intervals) / 1e6
+        if intervals
+        else None,
+        gpu_envelope_upper_ms=sum(max(0, i[3] - i[0]) for i in intervals) / 1e6
+        if intervals
+        else None,
+        scope="Retrospective bounds preserve wider native start brackets; "
+        "runtime predictor still rejects brackets above its unchanged2ms limit.",
+    )
+
+
 def summarize(events, protocol, compute, windows):
     owners = defaultdict(set)
     notifications = {}

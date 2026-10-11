@@ -18,6 +18,9 @@ import numpy as np
 
 from experiments.load_only_overlap_20261011.analyze_serving import uncovered
 from experiments.load_only_overlap_20261011.opportunities import (
+    execution_bounds,
+)
+from experiments.load_only_overlap_20261011.opportunities import (
     summarize as readiness_opportunities,
 )
 
@@ -119,6 +122,9 @@ def timing_details(data, root, complete):
                 prepared_entries=sum(bool(e.get("prepared")) for e in entries),
             )
     return dict(
+        execution_uncertainty=execution_bounds(
+            list(computed.values()), data["windows"]
+        ),
         readiness_opportunities=readiness_opportunities(
             [
                 json.loads(line)

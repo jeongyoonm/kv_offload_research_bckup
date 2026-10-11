@@ -2077,6 +2077,38 @@ def test_load_only_fraction_requires_all_base_acks(deadline_core):
     assert core.scheduler._late_transport["partial_ready_count"] == 8
 
 
+@pytest.mark.parametrize("base_first", [False, True])
+def test_load_only_ack_order_selects_fallback_or_half_cohort_wait(
+    deadline_core, base_first
+):
+    """The same load readiness takes different paths around empty RPC completion."""
+    core, clock = deadline_core(lead_us=50_000)
+    core.batch_queue[-1][1].total_num_scheduled_tokens = 0
+    core.batch_queue[-1][0].poll = lambda: clock.now >= 1_003_000_000
+    core.scheduler._late_seal_load_only_ready_percent = 50
+    core.scheduler._late_seal_safety_us = 2_000_000
+    clock.base_at = None if base_first else 1_006_000_000
+    candidates = [_request(f"candidate-{i}") for i in range(16)]
+    clock.ready_at = {c.req_id: 1_301_000_000 for c in candidates[:8]}
+    clock.ready_at[candidates[0].req_id] = clock.now
+
+    acknowledged = stage_rpc(core, 9, [_request("base")], candidates)
+    transport = core.scheduler._late_transport
+    if base_first:
+        assert transport["seal_ns"] == 1_301_000_000
+        assert transport["seal_reason"] == "candidate_target_ready"
+        assert transport["has_compute"] is False
+        assert transport["ready_target"] == 8
+        assert transport["predecessor_ready"] is True
+        assert transport["setup_prediction"] is None
+        assert acknowledged == [c.req_id for c in candidates]
+    else:
+        assert transport["seal_ns"] == 1_003_000_000
+        assert transport["predecessor_ready"] is True
+        assert "base_ready_ns" not in transport
+        assert acknowledged == []
+
+
 def test_load_only_fraction_excludes_cancellation_without_shrinking_target(
     deadline_core,
 ):

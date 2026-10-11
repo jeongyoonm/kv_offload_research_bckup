@@ -1758,8 +1758,6 @@ class EngineCore:
         )
 
     def get_deferral_cohort_status(self) -> dict[str, Any]:
-        if self.early_load_readiness is None:
-            raise RuntimeError("the early KV readiness experiment is not enabled")
         result = dict(
             paused=self.scheduler.pause_state != PauseState.UNPAUSED,
             requests=len(self.scheduler.deferral_live_request_ids()),

@@ -104,11 +104,16 @@ def timing_details(data, root, complete):
                 for entry in indexed.get((rank, step), [])
                 if any(a <= entry["time_ns"] <= b for a, b in data["windows"])
             ]
-            assert len(entries) == len(computed), (directory, rank, len(entries))
+            assert len(entries) <= len(computed), (directory, rank, len(entries))
+            observed_steps = {e["step"] for e in entries}
+            assert len(observed_steps) == len(entries), (directory, rank)
             coverage[rank] = dict(
+                total_compute_steps=len(computed),
                 compute_entries=len(entries),
+                unobserved_steps=sorted(set(computed) - observed_steps),
                 compact_entries=sum(bool(e.get("compact_tokens")) for e in entries),
                 pinned_entries=sum(bool(e.get("pinned_tokens")) for e in entries),
+                prepared_entries=sum(bool(e.get("prepared")) for e in entries),
             )
     return dict(
         worker_preparation_coverage=coverage,

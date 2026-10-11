@@ -3455,3 +3455,39 @@ async def test_read_only_cohort_opt_in_does_not_enable_policy_mutation():
     with pytest.raises(HTTPException) as error:
         await set_kv_load_scheduling(KVLoadSchedulingRequest(), raw)
     assert error.value.status_code == 404
+
+
+def test_opportunity_ratio_uses_native_time_and_rejects_partial_rank_coverage():
+    from experiments.load_only_overlap_20261011.opportunities import summarize
+
+    notifications = [
+        dict(
+            event="early_notification_received",
+            job_id=1,
+            rank=rank,
+            completion_ns=100,
+            status=1,
+        )
+        for rank in range(8)
+    ]
+    owner = dict(event="job_observed_done", job_id=1, request="request", time_ns=500)
+    transport = dict(has_compute=True)
+    protocol = [
+        dict(
+            event="membership_sealed",
+            activated={"request": 128},
+            transport=transport,
+        )
+    ]
+    compute = [dict(execution_ranks=[[1, 75, 78, 80, 250, 1, 120, 198, 200]] * 8)]
+    windows = [(50, 600)]
+    result = summarize([owner, *notifications], protocol, compute, windows)
+    assert result["ready_during_compute_definite"] == 1
+    assert result["late_admission_ratio_percent"] == 100
+    result = summarize([owner, *notifications[:-1]], protocol, compute, windows)
+    assert result["native_ready_coverage_complete"] is False
+    assert result["late_admission_ratio_percent"] is None
+    transport["has_compute"] = False
+    result = summarize([owner, *notifications], protocol, compute, windows)
+    assert result["total_late_admissions"] == 1
+    assert result["late_admitted_during_compute_definite"] == 0

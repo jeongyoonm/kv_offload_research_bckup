@@ -17,6 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from experiments.load_only_overlap_20261011.analyze_serving import uncovered
+from experiments.load_only_overlap_20261011.opportunities import (
+    summarize as readiness_opportunities,
+)
 
 ARMS = ("baseline", "worker", "full")
 COLORS = dict(baseline="#444444", worker="#3976b8", full="#d87d25")
@@ -116,6 +119,15 @@ def timing_details(data, root, complete):
                 prepared_entries=sum(bool(e.get("prepared")) for e in entries),
             )
     return dict(
+        readiness_opportunities=readiness_opportunities(
+            [
+                json.loads(line)
+                for line in (directory / "load_timeline.jsonl").read_text().splitlines()
+            ],
+            records,
+            list(computed.values()),
+            data["windows"],
+        ),
         worker_preparation_coverage=coverage,
         prediction_count=len(errors),
         prediction_end_mae_ms=statistics.mean(map(abs, errors)) if errors else None,
@@ -213,6 +225,24 @@ def aggregate(cells):
         )
         row["late_admissions_mean"] = statistics.mean(
             d["late_admissions"] for d in members
+        )
+        opportunities = [
+            d["timing_details"]["readiness_opportunities"] for d in members
+        ]
+        covered = [
+            o
+            for o in opportunities
+            if o.get("native_ready_coverage_complete")
+            and o.get("admission_predecessor_classification_complete")
+        ]
+        row["complete_readiness_coverage_cells"] = len(covered)
+        denominator = sum(o["ready_during_compute_definite"] for o in covered)
+        row["late_admission_ratio_percent"] = (
+            100
+            * sum(o["late_admitted_during_compute_definite"] for o in covered)
+            / denominator
+            if len(covered) == len(members) and denominator
+            else None
         )
         for metric in ("compute_rounds", "inter_compute_gaps_ms"):
             values = [d[metric] for d in members if d[metric] is not None]

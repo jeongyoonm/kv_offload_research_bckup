@@ -1034,3 +1034,19 @@ def test_block_readiness_tracks_all_cached_blocks_and_releases_finished(resumed)
     output.scheduled_cached_reqs.req_ids = []
     tracker.begin(output)
     assert set(tracker.requests) == {"new"}
+
+
+def test_block_readiness_retires_store_ownership_without_a_subsequent_load():
+    """Completed stores release physical-block ownership in GPU-only episodes."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    worker._block_readiness = MagicMock()
+    worker._store_blocks = {1: {17}, 2: {18}}
+    stored = MagicMock(job_id=1)
+    loaded = MagicMock(job_id=3)
+    worker._store_handler = MagicMock()
+    worker._store_handler.get_finished.return_value = [stored]
+    worker._load_handler = MagicMock()
+    worker._load_handler.get_finished.return_value = [loaded]
+
+    assert worker.get_finished() == [stored, loaded]
+    assert worker._store_blocks == {2: {18}}

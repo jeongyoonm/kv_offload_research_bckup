@@ -7,6 +7,7 @@ import csv
 import json
 import statistics
 from collections import defaultdict
+from functools import lru_cache
 from pathlib import Path
 
 import matplotlib
@@ -34,7 +35,19 @@ ROOTS = (
 )
 
 
-def timing_details(data):
+@lru_cache(maxsize=16)
+def worker_entries(root):
+    entries = defaultdict(list)
+    for path in (root / "server/timing/late_admission").glob("*-worker-*.json"):
+        exported = json.loads(path.read_text())
+        assert not exported.get("overflow"), path
+        for entry in exported["records"]:
+            if entry["event"] == "worker_entry":
+                entries[exported["rank"], entry["step"]].append(entry)
+    return entries
+
+
+def timing_details(data, root, complete):
     directory = Path(data["source_result"]).parent
     engine = [
         json.loads(line)
@@ -80,7 +93,25 @@ def timing_details(data):
         for measured in [[x for x in intervals if start <= x[0] <= end]]
         if measured
     ]
+    coverage = None
+    if complete and data["arm"] != "baseline":
+        indexed = worker_entries(root)
+        coverage = {}
+        for rank in range(8):
+            entries = [
+                entry
+                for step in computed
+                for entry in indexed.get((rank, step), [])
+                if any(a <= entry["time_ns"] <= b for a, b in data["windows"])
+            ]
+            assert len(entries) == len(computed), (directory, rank, len(entries))
+            coverage[rank] = dict(
+                compute_entries=len(entries),
+                compact_entries=sum(bool(e.get("compact_tokens")) for e in entries),
+                pinned_entries=sum(bool(e.get("pinned_tokens")) for e in entries),
+            )
     return dict(
+        worker_preparation_coverage=coverage,
         prediction_count=len(errors),
         prediction_end_mae_ms=statistics.mean(map(abs, errors)) if errors else None,
         prediction_end_bias_ms=statistics.mean(errors) if errors else None,
@@ -135,7 +166,7 @@ def read(base):
             if data["workload"]["family"] != "evolving":
                 assert data["realized_outcomes"] == {"cpu_hit": data["requests"]}, path
             data["source_result"] = str(path)
-            data["timing_details"] = timing_details(data)
+            data["timing_details"] = timing_details(data, root, status.get("complete"))
             cells.append(data)
     return cells, provenance
 

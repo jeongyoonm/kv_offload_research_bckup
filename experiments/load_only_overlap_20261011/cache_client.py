@@ -47,6 +47,21 @@ def flush_timeline(root):
     ]
 
 
+def drain():
+    """Complete delayed write-back outside request-latency measurement."""
+    deadline = time.monotonic() + 120
+    while time.monotonic() < deadline:
+        status = run.call("/experimental/deferral-cohort")
+        if (
+            not status["requests"]
+            and not status["queued_steps"]
+            and not status["connector_work_pending"]
+        ):
+            return status
+        time.sleep(0.05)
+    raise RuntimeError("request/connector work did not drain")
+
+
 def issue(requests, label, concurrency, *, initial_barrier=True):
     """Start with one engine-visible cohort, then allow normal replenishment."""
     if initial_barrier:

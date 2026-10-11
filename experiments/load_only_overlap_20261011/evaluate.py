@@ -120,6 +120,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         else workloads.build(data_path, spec, count, seed)
     )
     run = base.collector
+    client.drain()
     run.reset(True)
     run.configure(False)
     all_responses, windows, timeline, engine = [], [], [], []
@@ -140,6 +141,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
 
     if evolving:
         client.issue(data["warmup"], f"warm-{seed}", concurrency)
+        client.drain()
         # Flush observers at an episode boundary without resetting either cache.
         run.configure(True, state)
         client.flush_timeline(root)
@@ -151,6 +153,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         )
         all_responses = [(r, start) for r in responses]
         windows = [(start, end)]
+        client.drain()
         timeline = client.flush_timeline(root)
         engine = run.traces(offsets, directory) if kind != "baseline" else []
         trace_end(late_before)
@@ -164,6 +167,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             run.reset(True)
             run.configure(False)
             client.prime(cohort, f"prime-{seed}")
+            client.drain()
             run.reset(False)
             run.configure(True, state)
             client.flush_timeline(root)
@@ -173,6 +177,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             responses, start, end = client.issue(cohort, f"main-{seed}", concurrency)
             all_responses.extend((r, start) for r in responses)
             windows.append((start, end))
+            client.drain()
             timeline.extend(client.flush_timeline(root))
             part = directory / f"cohort{offset}"
             part.mkdir()

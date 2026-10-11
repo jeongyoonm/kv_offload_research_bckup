@@ -1758,10 +1758,14 @@ class EngineCore:
         )
 
     def get_deferral_cohort_status(self) -> dict[str, Any]:
+        connector = getattr(self.scheduler, "connector", None)
         result = dict(
             paused=self.scheduler.pause_state != PauseState.UNPAUSED,
             requests=len(self.scheduler.deferral_live_request_ids()),
             queued_steps=len(self.batch_queue or ()),
+            connector_work_pending=(
+                connector is not None and connector.has_pending_push_work()
+            ),
         )
         if os.environ.get("VLLM_PREDICTOR_DATASET_SHADOW") == "1":
             result["dataset_target_ready"] = sum(

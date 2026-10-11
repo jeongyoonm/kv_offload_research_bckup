@@ -80,6 +80,8 @@ def summarize(path):
         p95_ttft_ms=result["p95_ttft_ms"],
         rounds=result["compute_rounds"],
         admissions=result["late_admissions"],
+        kv_ready_during_compute=result["kv_ready_during_compute"],
+        recovered_compute_opportunities=result["recovered_compute_opportunities"],
         gpu_envelope_ms=sum(b - a for a, b in intervals) / 1e6,
         inter_compute_gaps_ms=sum(
             max(0, b[0] - a[1]) for a, b in zip(intervals, intervals[1:])

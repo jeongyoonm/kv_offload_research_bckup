@@ -298,7 +298,7 @@ def main():
         specs = [spec for spec in specs if spec["id"] in args.ids]
     assert specs
     run = base.collector
-    run.ROOT = root
+    base.module.ROOT = base.module.driver.ROOT = run.ROOT = root
     run.BASE = "http://127.0.0.1:18468"
     policies = {
         arm: validate_experiment_options({})

@@ -53,7 +53,7 @@ def worker_entries(root):
     return entries
 
 
-def timing_details(data, root, closed):
+def timing_details(data, root, closed, entries_index=None):
     directory = Path(data["source_result"]).parent
     engine = [
         json.loads(line)
@@ -101,7 +101,7 @@ def timing_details(data, root, closed):
     ]
     coverage = None
     if closed and data["arm"] != "baseline":
-        indexed = worker_entries(root)
+        indexed = entries_index if entries_index is not None else worker_entries(root)
         coverage = {}
         for rank in range(8):
             entries = [
@@ -169,6 +169,11 @@ def read(base):
             complete=status.get("complete", False),
             stopped=status.get("stopped", False),
         )
+        entries_index = (
+            worker_entries(root)
+            if status.get("stopped") and plan["kind"] == "optimized"
+            else None
+        )
         for path in sorted((root / "cells").glob("*/*/result.json")):
             data = json.loads(path.read_text())
             if data["repeat"] == "warmup":
@@ -189,7 +194,9 @@ def read(base):
             if data["workload"]["family"] != "evolving":
                 assert data["realized_outcomes"] == {"cpu_hit": data["requests"]}, path
             data["source_result"] = str(path)
-            data["timing_details"] = timing_details(data, root, status.get("stopped"))
+            data["timing_details"] = timing_details(
+                data, root, status.get("stopped"), entries_index
+            )
             cells.append(data)
     return cells, provenance
 

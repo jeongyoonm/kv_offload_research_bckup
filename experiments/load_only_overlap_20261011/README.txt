@@ -53,6 +53,8 @@ Broader workload measurements
 - CPU hit: any CPU load for that request; GPU hit: cached tokens>0 without
   CPU load; miss: neither. Requests with partial GPU+CPU hits count as CPU
   hits. Transfer bytes are reported per rank and across all eight ranks.
+  These are serving-path outcomes, not an arrival-time residency oracle;
+  requests sharing a pending promotion can reuse GPU blocks later.
 - Initial engine-visible cohort barrier excludes frontend arrival skew before
   the first schedule. Subsequent arrivals are ordinary closed-loop arrivals.
 - Shared compressed token datasets and hashes are recorded for matching arms.
@@ -61,3 +63,20 @@ Broader workload measurements
   larger candidate support is not silently enabled for this evaluation.
 - Heterogeneous classes are selected from measured transfer and compute demand,
   with explicit named class ordering for equal and transfer-skewed mixtures.
+
+Coverage and reporting
+- campaign.py preserves the active baseline evaluation and replaces only the
+  stopped queue controller after its completion. Every subsequent launch is
+  gated on the previous server stopping and every expected cell being accepted.
+- coverage_plan.json records budget decisions explicitly. The dense sweep
+  covers all seven concurrency points for three profiled classes; other shapes
+  initially cover1/32/64, with16 added only if measured wall time allows.
+- The64-request concurrency64 point is a single burst. It does not establish
+  a continuously replenished steady-state throughput plateau.
+- report_diverse checks matched payload hashes and budgets, observed transfers
+  against both per-rank totals and Prometheus counters, and all-rank stores.
+  Worker preparation trace coverage is separate from native execution timing;
+  absent preparation markers are never counted as prepared inputs.
+- Mixed-workload bars show repeat means and observed ranges, not confidence
+  intervals. CPU submission and GPU execution envelopes overlap in time and
+  must not be added as independent costs.

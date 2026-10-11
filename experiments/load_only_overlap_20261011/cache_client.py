@@ -95,7 +95,7 @@ def prime(requests, label):
                 future.result()
 
 
-def summarize(responses, windows, events, engine_events, *, expected=None):
+def summarize(responses, windows, events, engine_events, *, expected=None, protocol=()):
     ttfts = [
         (r["first_ns"] - max(r["start_ns"], start)) / 1e6 for r, start in responses
     ]
@@ -184,10 +184,21 @@ def summarize(responses, windows, events, engine_events, *, expected=None):
         store_rank_coverage=[len(ranks) for ranks in stores.values()],
         compute_batch_requests=[len(e["selected"]) for e in compute],
         compute_batch_tokens=[sum(e["selected"].values()) for e in compute],
-        late_admissions=sum(
-            len(e.get("admitted", []))
-            for e in engine_events
-            if e["event"] == "late_admission_sealed"
+        late_admissions=len(
+            {
+                req
+                for e in protocol
+                if e["event"] == "membership_sealed"
+                for req in e.get("activated", {})
+            }
+        ),
+        seal_reasons=dict(
+            Counter(
+                e.get("transport", {}).get("seal_reason")
+                or e.get("transport", {}).get("path", "unknown")
+                for e in protocol
+                if e["event"] == "membership_sealed"
+            )
         ),
         compute_rounds=len(compute) if engine_events else None,
         gpu_envelope_ms=sum(end - start for start, end in intervals) / 1e6

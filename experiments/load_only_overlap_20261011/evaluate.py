@@ -124,6 +124,20 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
     run.configure(False)
     all_responses, windows, timeline, engine = [], [], [], []
     metric_windows = []
+    protocol = []
+
+    def trace_begin():
+        return set((root / "server/timing/late_admission").glob("*.json"))
+
+    def trace_end(old):
+        if kind == "baseline":
+            return
+        for path in set((root / "server/timing/late_admission").glob("*.json")) - old:
+            exported = json.loads(path.read_text())
+            assert not exported.get("overflow"), path
+            if exported.get("role") == "engine":
+                protocol.extend(exported["records"])
+
     if evolving:
         client.issue(data["warmup"], f"warm-{seed}", concurrency)
         # Flush observers at an episode boundary without resetting either cache.
@@ -131,6 +145,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         client.flush_timeline(root)
         offsets = run.snapshots() if kind != "baseline" else {}
         before = client.metrics()
+        late_before = trace_begin()
         responses, start, end = client.issue(
             data["requests"], f"main-{seed}", concurrency
         )
@@ -138,6 +153,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         windows = [(start, end)]
         timeline = client.flush_timeline(root)
         engine = run.traces(offsets, directory) if kind != "baseline" else []
+        trace_end(late_before)
         after = client.metrics()
         metric_windows.append(dict(before=before, after=after))
         expected = None
@@ -153,6 +169,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             client.flush_timeline(root)
             offsets = run.snapshots() if kind != "baseline" else {}
             before = client.metrics()
+            late_before = trace_begin()
             responses, start, end = client.issue(cohort, f"main-{seed}", concurrency)
             all_responses.extend((r, start) for r in responses)
             windows.append((start, end))
@@ -161,13 +178,27 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             part.mkdir()
             if kind != "baseline":
                 engine.extend(run.traces(offsets, part))
+            trace_end(late_before)
             after = client.metrics()
             metric_windows.append(dict(before=before, after=after))
         expected = [r["context"] for r in data["requests"]]
     result = client.summarize(
-        all_responses, windows, timeline, engine, expected=expected
+        all_responses, windows, timeline, engine, expected=expected, protocol=protocol
     )
+    frozen = True
+    if kind != "baseline":
+        exported = run.call(
+            "/experimental/kv-load-scheduling",
+            dict(
+                early_load_completion=True,
+                experiment_options=run.options(True),
+                seal_estimator=dict(action="export"),
+            ),
+        )["seal_estimator"]["state"]
+        frozen = exported == state
+        result["accepted"] = result["accepted"] and frozen
     result.update(
+        frozen_predictor_unchanged=frozen if kind != "baseline" else None,
         arm=arm,
         workload=spec,
         seed=seed,
@@ -197,6 +228,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
     (directory / "engine.jsonl").write_text(
         "".join(json.dumps(e) + "\n" for e in engine)
     )
+    run.save(directory / "protocol.json", protocol)
     run.log(
         "cache_evaluation_cell",
         path=str(directory),

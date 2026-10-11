@@ -229,6 +229,17 @@ def aggregate(cells):
             d["measured_metric_deltas"].get("vllm:num_preemptions_total", 0)
             for d in members
         )
+        for label, metric in (
+            ("prompt", "vllm:request_prompt_tokens_sum"),
+            ("computed_prompt", "vllm:request_prefill_kv_computed_tokens_sum"),
+            ("cached_prompt", "vllm:prompt_tokens_cached_total"),
+        ):
+            values = [d["measured_metric_deltas"].get(metric) for d in members]
+            row[label + "_tokens_per_request"] = (
+                sum(values) / row["requests"]
+                if all(value is not None for value in values)
+                else None
+            )
         row["late_admissions_mean"] = statistics.mean(
             d["late_admissions"] for d in members
         )

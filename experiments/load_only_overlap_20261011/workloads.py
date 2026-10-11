@@ -24,18 +24,19 @@ def homogeneous_grid():
 
 
 def heterogeneous(classes):
-    assert set(classes) == {"transfer_heavy", "compute_heavy", "balanced"}
+    order = ("transfer_heavy", "compute_heavy", "balanced")
+    assert set(classes) == set(order)
     return [
         dict(
             id="heterogeneous_equal",
             family="heterogeneous",
-            shapes=list(classes.values()),
+            shapes=[classes[name] for name in order],
             weights=[1, 1, 1],
         ),
         dict(
             id="heterogeneous_transfer_skew",
             family="heterogeneous",
-            shapes=list(classes.values()),
+            shapes=[classes[name] for name in order],
             weights=[3, 1, 1],
         ),
     ]

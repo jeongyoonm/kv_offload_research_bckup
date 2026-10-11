@@ -2091,6 +2091,12 @@ class EngineCore:
             self.scheduler._late_seal_load_only_ready_percent = options[
                 "late_seal_load_only_ready_percent"
             ]
+            self.scheduler._late_seal_load_only_consistent = options[
+                "late_seal_load_only_consistent"
+            ]
+            self.scheduler._late_seal_load_only_idle_target = options[
+                "late_seal_load_only_idle_target"
+            ]
             self.scheduler._late_seal_repeat_us = options["late_seal_repeat_us"]
             self.scheduler._late_seal_condition_preparation = options[
                 "late_seal_condition_preparation"

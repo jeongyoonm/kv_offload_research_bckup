@@ -48,6 +48,8 @@ class SchedulerInterface(ABC):
     _late_seal_target_candidates: int
     _late_seal_load_only_target_candidates: int
     _late_seal_load_only_ready_percent: int
+    _late_seal_load_only_consistent: bool
+    _late_seal_load_only_idle_target: int
     _late_seal_repeat_us: int
     _late_seal_condition_preparation: bool
     _late_seal_recent_preparation: bool

@@ -3487,6 +3487,15 @@ def test_opportunity_ratio_uses_native_time_and_rejects_partial_rank_coverage():
     result = summarize([owner, *notifications[:-1]], protocol, compute, windows)
     assert result["native_ready_coverage_complete"] is False
     assert result["late_admission_ratio_percent"] is None
+    unknown_owner = dict(
+        event="job_observed_done", job_id=2, request="other", time_ns=500
+    )
+    result = summarize(
+        [owner, unknown_owner, *notifications], protocol, compute, windows
+    )
+    assert result["late_admission_ratio_percent"] is None
+    assert result["admission_ratio_lower_bound_percent"] == 50
+    assert result["admission_ratio_upper_bound_percent"] == 100
     transport["has_compute"] = False
     result = summarize([owner, *notifications], protocol, compute, windows)
     assert result["total_late_admissions"] == 1

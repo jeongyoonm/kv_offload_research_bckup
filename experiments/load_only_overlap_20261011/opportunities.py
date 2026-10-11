@@ -79,6 +79,15 @@ def summarize(events, protocol, compute, windows):
     definite = during(certain)
     potential = during(possible)
     recovered = compute_activated & definite
+    unknown = {
+        next(iter(requests))
+        for job, requests in owners.items()
+        if job not in notifications
+    } - definite
+    uncertain = unknown | (potential - definite)
+    possible_recovered = compute_activated & uncertain
+    largest_denominator = len(definite) + len(uncertain)
+    upper_denominator = len(definite) + len(possible_recovered)
     return dict(
         available=True,
         observed_load_jobs=len(owners),
@@ -93,7 +102,16 @@ def summarize(events, protocol, compute, windows):
         if definite and set(notifications) == set(owners) and classified == activated
         else None,
         missing_native_jobs=sorted(set(owners) - set(notifications)),
+        missing_native_unique_requests=len(unknown),
         admission_predecessor_classification_complete=classified == activated,
+        admission_ratio_lower_bound_percent=100 * len(recovered) / largest_denominator
+        if largest_denominator and classified == activated
+        else None,
+        admission_ratio_upper_bound_percent=100
+        * (len(recovered) + len(possible_recovered))
+        / upper_denominator
+        if upper_denominator and classified == activated
+        else None,
         total_late_admissions=len(activated),
         ready_during_compute_requests=sorted(definite),
         recovered_requests=sorted(recovered),
@@ -102,5 +120,7 @@ def summarize(events, protocol, compute, windows):
         "Definite/possible refer to native forward-start boundary uncertainty, "
         "not an exact GPU-copy completion oracle. Load-only admissions are "
         "outside this denominator. Ordinary ready-base scheduling is not counted "
-        "as late admission. No baseline ratio without native timing/readiness.",
+        "as late admission. Bounds allow missing notifications and start-boundary "
+        "ambiguity; they do not impute timestamps. No baseline ratio without "
+        "native timing/readiness.",
     )

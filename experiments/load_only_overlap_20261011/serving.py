@@ -39,7 +39,7 @@ def main():
         default=["short16k", "mid32k", "familiar60k", "unseen48k"],
     )
     parser.add_argument("--repeats", type=int, default=2)
-    parser.add_argument("--requests", type=int, choices=(75, 300), default=300)
+    parser.add_argument("--requests", type=int, choices=(32, 75, 300), default=300)
     parser.add_argument("--seed-start", type=int, default=12101)
     parser.add_argument(
         "--idle-arm", action="append", default=[], metavar="NAME=TARGET"

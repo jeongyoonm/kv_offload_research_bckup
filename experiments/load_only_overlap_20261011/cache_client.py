@@ -166,6 +166,24 @@ def summarize(responses, windows, events, engine_events, *, expected=None, proto
         h2d_bytes_all_ranks=sum(
             e["transfer_bytes"] for ranks in jobs.values() for e in ranks.values()
         ),
+        h2d_bytes_per_rank={
+            rank: sum(
+                e["transfer_bytes"]
+                for ranks in jobs.values()
+                for e in ranks.values()
+                if e.get("rank") == rank
+            )
+            for rank in range(8)
+        },
+        d2h_bytes_per_rank={
+            rank: sum(
+                e.get("transfer_bytes") or 0
+                for ranks in stores.values()
+                for e in ranks.values()
+                if e.get("rank") == rank
+            )
+            for rank in range(8)
+        },
         h2d_active_ms_all_ranks=sum(
             (e.get("transfer_time_seconds") or 0) * 1000
             for ranks in jobs.values()

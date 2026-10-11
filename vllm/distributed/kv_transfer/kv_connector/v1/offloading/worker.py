@@ -361,6 +361,7 @@ class OffloadingConnectorWorker:
                     request=req_id,
                     transfer_bytes=transfer_result.transfer_size,
                     transfer_time_seconds=transfer_result.transfer_time,
+                    rank=self.spec.config.parallel.rank,
                 )
             if timeline.enabled() and req_id is None:
                 timeline.emit(
@@ -368,6 +369,7 @@ class OffloadingConnectorWorker:
                     job_id=job_id,
                     transfer_bytes=transfer_result.transfer_size,
                     transfer_time_seconds=transfer_result.transfer_time,
+                    rank=self.spec.config.parallel.rank,
                 )
             if req_id is not None and self._grouped_load_completion:
                 self._completed_group_loads.add(job_id)

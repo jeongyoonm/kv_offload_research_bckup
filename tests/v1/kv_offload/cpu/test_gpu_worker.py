@@ -1000,3 +1000,37 @@ def test_block_readiness_overlaps_only_independent_destinations(
             assert torch.all(cpu[0] == 17)
     finally:
         worker.shutdown()
+
+
+@pytest.mark.parametrize("resumed", [False, True])
+def test_block_readiness_tracks_all_cached_blocks_and_releases_finished(resumed):
+    """KV readers include old cached blocks; resumed allocations replace old IDs."""
+    from types import SimpleNamespace
+
+    from vllm.v1.kv_offload.h2d_readiness import BlockReadiness
+
+    tracker = BlockReadiness.__new__(BlockReadiness)
+    tracker.requests = {"done": ([9],), "active": ([1, 2],)}
+    output = SimpleNamespace(
+        finished_req_ids={"done"},
+        preempted_req_ids=None,
+        scheduled_new_reqs=[SimpleNamespace(req_id="new", block_ids=([4, 5],))],
+        scheduled_cached_reqs=SimpleNamespace(
+            req_ids=["active"],
+            new_block_ids=[([3],)],
+            resumed_req_ids={"active"} if resumed else set(),
+        ),
+        num_scheduled_tokens={"new": 128, "active": 1},
+    )
+    tracker.begin(output)
+    assert "done" not in tracker.requests
+    seen = []
+    tracker.record = lambda blocks, kind: seen.append((set(blocks), kind))
+    tracker.record_compute(output)
+    expected = {3, 4, 5} if resumed else {1, 2, 3, 4, 5}
+    assert seen == [(expected, "compute")]
+    output.preempted_req_ids = {"active"}
+    output.scheduled_new_reqs = []
+    output.scheduled_cached_reqs.req_ids = []
+    tracker.begin(output)
+    assert set(tracker.requests) == {"new"}

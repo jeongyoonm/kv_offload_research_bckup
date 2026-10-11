@@ -15,7 +15,10 @@ from pathlib import Path
 from experiments.load_only_overlap_20261011 import live
 from experiments.native_scheduler_ab_20261010 import run as baseline
 from experiments.shape_calibration_20261010.run import PREFIX_WORKING_SETS
-from vllm.v1.kv_offload.early_readiness import validate_experiment_options
+from vllm.v1.kv_offload.early_readiness import (
+    EXPERIMENT_DEFAULTS,
+    validate_experiment_options,
+)
 from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
 
 SOURCE = Path(__file__).resolve().parents[2]
@@ -41,6 +44,8 @@ def main():
         "--idle-arm", action="append", default=[], metavar="NAME=TARGET"
     )
     parser.add_argument("--initial-barrier", action="store_true")
+    parser.add_argument("--block-arm", action="append", default=[])
+    parser.add_argument("--worker-arm", action="append", default=[])
     parser.add_argument("--lead-us", type=int, default=50000)
     parser.add_argument("--arm-lead-us", action="append", default=[], metavar="NAME=US")
     parser.add_argument("--allocation-seconds", type=int, default=10800)
@@ -97,6 +102,12 @@ def main():
                 late_seal_load_only_consistent=True,
                 late_seal_load_only_idle_target=idle_arms[name],
             )
+        if name in args.worker_arm:
+            for key, value in EXPERIMENT_DEFAULTS.items():
+                if key.startswith("late_"):
+                    policy[key] = value
+            policy.update(late_admission_markers=True, late_seal_freeze_estimator=True)
+        policy["h2d_block_readiness"] = name in args.block_arm
         policy = validate_experiment_options(policy)
         policies[name] = policy
     for policy in policies.values():
@@ -105,7 +116,15 @@ def main():
         assert policy["store_reuse_gpu_fence"]
         assert policy["store_reuse_allocator_preference"]
         changed = {k for k in policy if policy[k] != policies[next(iter(paths))][k]}
-        assert changed <= {
+        assert all(
+            key.startswith("late_")
+            for key in changed
+            - {
+                "h2d_block_readiness",
+            }
+        )
+        assert changed - {key for key in changed if key.startswith("late_")} <= {
+            "h2d_block_readiness",
             "late_seal_prediction_bias_us",
             "late_seal_compute_deadline_lead_us",
             "late_seal_load_only_consistent",
@@ -199,7 +218,7 @@ def main():
             repeat,
             requests_count=count,
             initial_barrier=args.initial_barrier,
-            require_preparation=True,
+            require_preparation=policies[name]["late_admission_mode"] == 4,
             prefix_working_set=PREFIX_WORKING_SETS[workload] if count == 300 else None,
         )
         assert result["accepted"] and result["frozen_unchanged"], result

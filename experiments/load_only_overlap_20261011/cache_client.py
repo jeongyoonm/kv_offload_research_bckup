@@ -109,6 +109,10 @@ def summarize(responses, windows, events, engine_events, *, expected=None):
         if event["event"] == "job_observed_done":
             jobs[event["job_id"]][event["pid"]] = event
             requests_loaded.add(event["request"])
+    stores = defaultdict(dict)
+    for event in events:
+        if event["event"] == "store_observed_done":
+            stores[event["job_id"]][event["pid"]] = event
     counts = Counter()
     for response, _ in responses:
         name = response["request"]
@@ -161,6 +165,29 @@ def summarize(responses, windows, events, engine_events, *, expected=None):
         load_jobs=len(jobs),
         h2d_bytes_all_ranks=sum(
             e["transfer_bytes"] for ranks in jobs.values() for e in ranks.values()
+        ),
+        h2d_active_ms_all_ranks=sum(
+            (e.get("transfer_time_seconds") or 0) * 1000
+            for ranks in jobs.values()
+            for e in ranks.values()
+        ),
+        h2d_job_slowest_rank_ms=[
+            max((e.get("transfer_time_seconds") or 0) * 1000 for e in ranks.values())
+            for ranks in jobs.values()
+        ],
+        d2h_bytes_all_ranks=sum(
+            (e.get("transfer_bytes") or 0)
+            for ranks in stores.values()
+            for e in ranks.values()
+        ),
+        store_jobs_observed_done=len(stores),
+        store_rank_coverage=[len(ranks) for ranks in stores.values()],
+        compute_batch_requests=[len(e["selected"]) for e in compute],
+        compute_batch_tokens=[sum(e["selected"].values()) for e in compute],
+        late_admissions=sum(
+            len(e.get("admitted", []))
+            for e in engine_events
+            if e["event"] == "late_admission_sealed"
         ),
         compute_rounds=len(compute) if engine_events else None,
         gpu_envelope_ms=sum(end - start for start, end in intervals) / 1e6

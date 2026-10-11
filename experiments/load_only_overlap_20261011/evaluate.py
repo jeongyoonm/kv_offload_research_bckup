@@ -123,7 +123,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
     run.reset(True)
     run.configure(False)
     all_responses, windows, timeline, engine = [], [], [], []
-    previous = client.metrics()
+    metric_windows = []
     if evolving:
         client.issue(data["warmup"], f"warm-{seed}", concurrency)
         # Flush observers at an episode boundary without resetting either cache.
@@ -139,6 +139,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         timeline = client.flush_timeline(root)
         engine = run.traces(offsets, directory) if kind != "baseline" else []
         after = client.metrics()
+        metric_windows.append(dict(before=before, after=after))
         expected = None
     else:
         # Independent prefixes; bound each primed cohort by actual CPU capacity.
@@ -151,6 +152,7 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             run.configure(True, state)
             client.flush_timeline(root)
             offsets = run.snapshots() if kind != "baseline" else {}
+            before = client.metrics()
             responses, start, end = client.issue(cohort, f"main-{seed}", concurrency)
             all_responses.extend((r, start) for r in responses)
             windows.append((start, end))
@@ -159,7 +161,8 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
             part.mkdir()
             if kind != "baseline":
                 engine.extend(run.traces(offsets, part))
-        before, after = previous, client.metrics()
+            after = client.metrics()
+            metric_windows.append(dict(before=before, after=after))
         expected = [r["context"] for r in data["requests"]]
     result = client.summarize(
         all_responses, windows, timeline, engine, expected=expected
@@ -171,8 +174,17 @@ def cell(root, spec, arm, seed, repeat, concurrency, count, state, kind):
         repeat=repeat,
         concurrency=concurrency,
         dataset_sha256=workloads.digest(data_path),
-        metrics_before=before,
-        metrics_after=after,
+        metric_windows=metric_windows,
+        measured_metric_deltas=dict(
+            (
+                key,
+                sum(
+                    pair["after"].get(key, 0) - pair["before"].get(key, 0)
+                    for pair in metric_windows
+                ),
+            )
+            for key in set().union(*(pair["after"] for pair in metric_windows))
+        ),
         windows=windows,
         cache_reset_between_measurement_cohorts=not evolving,
         cold_prime_time_excluded=not evolving,
@@ -251,7 +263,9 @@ def main():
         for arm in arms
     }
     state = json.loads(STATE_PATH.read_text())
-    run.options = lambda active=False: copy.deepcopy(policies[CURRENT_ARM])
+    run.options = lambda active=False: copy.deepcopy(
+        policies[CURRENT_ARM] if active else policy("worker", args.idle_target)
+    )
     if args.server_kind == "baseline":
         run.configure = lambda *a, **k: dict(baseline=True)
     expected = len(specs) * len(arms) * len(args.concurrencies) * args.repeats

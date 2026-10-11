@@ -360,6 +360,14 @@ class OffloadingConnectorWorker:
                     job_id=job_id,
                     request=req_id,
                     transfer_bytes=transfer_result.transfer_size,
+                    transfer_time_seconds=transfer_result.transfer_time,
+                )
+            if timeline.enabled() and req_id is None:
+                timeline.emit(
+                    "store_observed_done",
+                    job_id=job_id,
+                    transfer_bytes=transfer_result.transfer_size,
+                    transfer_time_seconds=transfer_result.transfer_time,
                 )
             if req_id is not None and self._grouped_load_completion:
                 self._completed_group_loads.add(job_id)

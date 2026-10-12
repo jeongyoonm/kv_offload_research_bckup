@@ -33,15 +33,20 @@ def main():
             temporary = ROOT / "progress.tmp"
             temporary.write_text(json.dumps(active, indent=2) + "\n")
             temporary.replace(ROOT / "progress.json")
-            raw = subprocess.check_output(
-                [
-                    "nvidia-smi",
-                    "--query-gpu=index,utilization.gpu,utilization.memory,memory.used",
-                    "--format=csv,noheader,nounits",
-                ],
-                text=True,
-                timeout=10,
-            )
+            gpu_error = None
+            try:
+                raw = subprocess.check_output(
+                    [
+                        "nvidia-smi",
+                        "--query-gpu=index,utilization.gpu,utilization.memory,memory.used",
+                        "--format=csv,noheader,nounits",
+                    ],
+                    text=True,
+                    timeout=10,
+                )
+            except (OSError, subprocess.SubprocessError) as error:
+                raw = ""
+                gpu_error = repr(error)
             gpu_output.write(
                 json.dumps(
                     dict(
@@ -49,6 +54,7 @@ def main():
                         episode=active.get("episode"),
                         arm=active.get("arm"),
                         phase=active.get("phase"),
+                        gpu_query_error=gpu_error,
                         gpus=[
                             [float(value.strip()) for value in line.split(",")]
                             for line in raw.splitlines()

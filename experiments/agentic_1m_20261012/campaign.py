@@ -289,6 +289,13 @@ def main():
         reserved = 0
         prior_durations = {}
         for spec in specs:
+            if spec.get("optional") and any(
+                not (baseline / "cells" / s["id"] / "result.json").exists()
+                for s in specs
+                if not s.get("optional")
+            ):
+                log("optional_deferred_for_primary", spec=spec)
+                continue
             prior_seconds, prior_concurrency = prior_durations.get(
                 spec["dataset"], (1200, 32)
             )

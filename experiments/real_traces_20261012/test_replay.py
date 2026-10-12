@@ -10,6 +10,7 @@ import aiohttp
 from aiohttp import web
 
 from experiments.real_traces_20261012 import replay
+from experiments.real_traces_20261012.prepare import MODEL, lcp, prompt_tokens
 
 
 def test_full_stream_output_is_required(monkeypatch):
@@ -129,3 +130,21 @@ def test_request_ids_are_not_confused_when_one_is_prefix():
     result = replay.summarize([response], 0, 10, 1, None, events)
     assert result["accepted"]
     assert result["realized_outcomes"] == {"gpu_hit": 1}
+
+
+def test_glm_chat_adapter_returns_ids_and_preserves_history_prefix():
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL, local_files_only=True)
+    history = [dict(role="user", content="Explain prefix caching. " * 256)]
+    first = prompt_tokens(tokenizer, history)
+    history.extend(
+        [
+            dict(role="assistant", content="Reuse previously computed KV blocks."),
+            dict(role="user", content="What about CPU cache?"),
+        ]
+    )
+    second = prompt_tokens(tokenizer, history)
+    assert len(first) > 512 and len(second) > len(first)
+    assert lcp(first, second) >= len(first) - 8
+    assert all(isinstance(t, int) for t in second)

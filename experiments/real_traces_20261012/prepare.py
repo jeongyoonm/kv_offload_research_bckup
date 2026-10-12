@@ -31,6 +31,18 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def prompt_tokens(tokenizer, history):
+    tokens = tokenizer.apply_chat_template(
+        history,
+        tokenize=True,
+        add_generation_prompt=True,
+        clear_thinking=False,
+        return_dict=False,
+    )
+    assert isinstance(tokens, list) and all(isinstance(t, int) for t in tokens)
+    return tokens
+
+
 def save(name, value):
     path = OUT / (name + ".json.gz")
     with gzip.open(path, "wt", compresslevel=3) as f:
@@ -129,9 +141,7 @@ def inferact(count):
             human, assistant = messages[2 * turn : 2 * turn + 2]
             assert human["from"] == "human" and assistant["from"] == "gpt"
             history.append(dict(role="user", content=human["value"]))
-            tokens = tokenizer.apply_chat_template(
-                history, tokenize=True, add_generation_prompt=True, clear_thinking=False
-            )
+            tokens = prompt_tokens(tokenizer, history)
             output = max(
                 1, len(tokenizer.encode(assistant["value"], add_special_tokens=False))
             )
@@ -198,12 +208,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--sessions", type=int, default=128)
     parser.add_argument("--moon-requests", type=int, default=1600)
+    parser.add_argument("--inferact-only", action="store_true")
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     result = {}
     for name in ["conversation", "toolagent", "synthetic"]:
-        result[name] = mooncake(name, args.moon_requests)
-        print(json.dumps(dict(prepared=name, **result[name])), flush=True)
+        if args.inferact_only:
+            path = OUT / ("mooncake_" + name + ".json.gz")
+            result[name] = dict(path=str(path), sha256=digest(path))
+        else:
+            result[name] = mooncake(name, args.moon_requests)
+            print(json.dumps(dict(prepared=name, **result[name])), flush=True)
     result["inferact"] = inferact(args.sessions)
     (OUT / "manifest.json").write_text(json.dumps(result, indent=2) + "\n")
 

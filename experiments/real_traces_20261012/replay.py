@@ -230,6 +230,15 @@ def distribution(values):
     )
 
 
+def token_sources(run):
+    result = {}
+    for line in run.textcall("/metrics").splitlines():
+        if line.startswith("vllm:prompt_tokens_by_source_total{"):
+            source = re.search(r'source="([^"]+)"', line).group(1)
+            result[source] = result.get(source, 0) + float(line.split()[-1])
+    return result
+
+
 def summarize(responses, start, end, expected, offered_end, events):
     valid = [r for r in responses if r["accepted"]]
     seconds = (end - start) / 1e9
@@ -318,6 +327,7 @@ def cell(root, arm, spec):
     run.reset(True)
     flush_timeline(root)
     before = client.metrics()
+    sources_before = token_sources(run)
     trace_before = set((root / "server/timing/late_admission").glob("*.json"))
     run.save(
         directory / "spec.json",
@@ -349,6 +359,7 @@ def cell(root, arm, spec):
         frozen = exported == state
     events = flush_timeline(root)
     after = client.metrics()
+    sources_after = token_sources(run)
     result = summarize(responses, start, end, expected, offered_end, events)
     protocol_counts = Counter()
     for path in (
@@ -366,6 +377,10 @@ def cell(root, arm, spec):
         protocol_counts=dict(protocol_counts),
         metric_deltas={
             k: after.get(k, 0) - before.get(k, 0) for k in set(before) | set(after)
+        },
+        token_source_deltas={
+            k: sources_after.get(k, 0) - sources_before.get(k, 0)
+            for k in set(sources_before) | set(sources_after)
         },
         gpu_cache_bytes_per_rank=96 * 1024**3,
         cpu_cache_bytes_server=2130300354560,

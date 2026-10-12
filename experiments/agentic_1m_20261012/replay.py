@@ -137,12 +137,22 @@ def cell(root, arm, spec):
     data = json.loads(path.read_text())
     assert data["max_model_len"] == LIMIT
     run, state, policy = prior.configure(root, arm)
+    diagnostic = spec.get("measurement") == "diagnostic"
+    if diagnostic:
+        assert arm == "full"
+        policy.update(late_admission_markers=True, zero_token_stage_markers=True)
+        run.configure(True, state)
     client.drain()
     run.reset(spec.get("reset_external", True))
     prior.flush_timeline(root)
     before = client.metrics()
     sources_before = prior.token_sources(run)
     trace_before = set((root / "server/timing/late_admission").glob("*.json"))
+    timing_offsets = (
+        {p: p.stat().st_size for p in (root / "server/timing").glob("engine-*.jsonl")}
+        if diagnostic
+        else {}
+    )
     save(
         directory / "spec.json",
         dict(
@@ -174,11 +184,21 @@ def cell(root, arm, spec):
     after = client.metrics()
     sources_after = prior.token_sources(run)
     counts = Counter()
+    records = []
     for p in set((root / "server/timing/late_admission").glob("*.json")) - trace_before:
         obj = json.loads(p.read_text())
         assert not obj.get("overflow"), p
         if obj.get("role") == "engine":
             counts.update(obj.get("counts", {}))
+            if diagnostic:
+                records.extend(obj.get("records", []))
+    if diagnostic:
+        save(directory / "prediction_records.json", records)
+        with (directory / "engine.jsonl").open("w") as output:
+            for path in (root / "server/timing").glob("engine-*.jsonl"):
+                with path.open() as source:
+                    source.seek(timing_offsets.get(path, 0))
+                    output.write(source.read())
     result = prior.summarize(responses, start, end, expected, None, events)
     delta = {k: after.get(k, 0) - before.get(k, 0) for k in set(before) | set(after)}
     checks = dict(

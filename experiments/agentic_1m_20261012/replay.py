@@ -71,7 +71,7 @@ async def issue(data, spec, directory):
     with (directory / "responses.jsonl").open("w") as sink:
         async with aiohttp.ClientSession(
             timeout=timeout,
-            connector=aiohttp.TCPConnector(limit=0),
+            connector=aiohttp.TCPConnector(limit=0, keepalive_timeout=1.0),
             read_bufsize=8 * 1024**2,
         ) as http:
 
@@ -230,6 +230,7 @@ def cell(root, arm, spec):
         cpu_cache_bytes_server=cache_settings()["cpu_bytes_to_use"],
         cpu_cache_backing=cache_settings()["cpu_cache_backing"],
         natural_cache_evolution=True,
+        client_transport=dict(keepalive_timeout_seconds=1.0, read_bufsize=8 * 1024**2),
         client_materialization_ms=prior.distribution(
             [r["client_materialization_ms"] for r in responses if r["accepted"]]
         ),

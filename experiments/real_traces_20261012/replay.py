@@ -42,7 +42,7 @@ def flush_timeline(root):
     trigger = directory / "flush.request"
     trigger.touch()
     stamp = trigger.stat().st_mtime_ns
-    deadline = time.monotonic() + 10
+    deadline = time.monotonic() + 120
     while time.monotonic() < deadline:
         paths = list(directory.glob(f"*.{stamp}.jsonl"))
         observed = {p.name.split(".")[0] for p in paths}

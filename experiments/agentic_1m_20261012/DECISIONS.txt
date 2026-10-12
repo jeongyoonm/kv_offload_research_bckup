@@ -80,3 +80,15 @@ content, token lengths, distribution and order within sessions stay fixed.
 Use r1 IDs as paced sensitivities in those cases, explicitly not repeated
 capacity runs; separate them in reports/plots. Never average paced and
 capacity measurements together. Primary r0 remains available for comparison.
+
+2026-10-12 07:37 UTC: Prioritize the requested two-trace concurrency sweep
+within the remaining time by pooling the exact frozen TraceLab provider
+windows into one mixed episode. All1118 Codex and762 Claude requests remain
+byte-identical, including output lengths; per-promptSHA256 checked during
+combination. Session interleaving is seeded;64 logical agents share each
+HTTP cap. This changes interleaving/intensity without resampling or modifying
+request content/distribution. Preserve the already-running Codex-only cell
+and reserve its optional prototype mirror. Main matrix now Inferact/mixed
+TraceLab at8/16/32, then provider-specific cells if mirrored time permits.
+Controller resume waits for any prior live cell to finish before configuring
+or resetting caches; completed cells are reused, never rerun silently.

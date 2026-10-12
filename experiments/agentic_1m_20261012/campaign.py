@@ -146,6 +146,21 @@ def stop_server(root):
 
 
 def run_cell(root, arm, spec):
+    for active in (root / "cells").glob("*"):
+        if (active / "responses.jsonl").exists():
+            while not (active / "result.json").exists():
+                if time.time() > MEASURE_CUTOFF or (root / "stopped.json").exists():
+                    raise RuntimeError(f"Prior cell did not finish: {active}")
+                time.sleep(2)
+    existing = root / "cells" / spec["id"]
+    if existing.exists():
+        while not (existing / "result.json").exists():
+            if time.time() > MEASURE_CUTOFF or (root / "stopped.json").exists():
+                raise RuntimeError(f"Existing cell did not finish: {existing}")
+            time.sleep(2)
+        result = json.loads((existing / "result.json").read_text())
+        assert result["accepted"], existing
+        return result
     path = ROOT / "specs" / (arm + "_" + spec["id"] + ".json")
     save(path, spec)
     timeout = min(10800, max(60, int(MEASURE_CUTOFF - time.time())))
@@ -174,6 +189,8 @@ def run_cell(root, arm, spec):
 
 
 def preflight(root, arm):
+    if (root / "preflight_complete.json").exists():
+        return
     probe_data()
     spec = dict(
         id="capability_cold",
@@ -235,6 +252,8 @@ def main():
                 "tracelab_claude_windows",
             )
         ]
+        if (ROOT / "primary_plan_mixed.json").exists():
+            specs = json.loads((ROOT / "primary_plan_mixed.json").read_text())
         save(ROOT / "primary_plan.json", specs)
         reserved = 0
         prior_durations = {}
@@ -256,7 +275,7 @@ def main():
             prior_durations[spec["dataset"]] = result["seconds"]
             results.append(dict(root=str(baseline), **result))
             selected.append(spec)
-            reserved += result["seconds"] * 1.2
+            reserved += result["seconds"] * 1.1
             save(ROOT / "selected_primary.json", selected)
             save(
                 ROOT / "progress.json",

@@ -17,7 +17,7 @@ from experiments.agentic_1m_20261012.replay import cell
 def prepare():
     name = "predictor_audit"
     if (DATA / (name + ".json")).exists():
-        return name
+        return name, prepare_prefixes(name)
     writer = Writer(name)
     rng = np.random.default_rng(20261015)
     sessions = []
@@ -36,7 +36,30 @@ def prepare():
             "then reset GPU only; not a trace performance cell or training data."
         ),
     )
-    return name
+    return name, prepare_prefixes(name)
+
+
+def prepare_prefixes(name):
+    """Populate only the prefix, leaving real uncached work for restoration."""
+    prefix_name = name + "_prefixes"
+    if (DATA / (prefix_name + ".json")).exists():
+        return prefix_name
+    data = json.loads((DATA / (name + ".json")).read_text())
+    blob = np.memmap(data["token_file"], dtype="<u4", mode="r")
+    writer = Writer(prefix_name)
+    sessions = []
+    for i, session in enumerate(data["sessions"]):
+        prefix = (65536, 98304, 131072, 196608)[i % 4]
+        offset = session["requests"][0]["offset"]
+        row = writer.row(blob[offset : offset + prefix], 16, session=i, index=0)
+        sessions.append(dict(session=i, requests=[row]))
+    finish(
+        prefix_name,
+        sessions,
+        writer,
+        adapter="Only the cached prefix of the disjoint predictor diagnostic.",
+    )
+    return prefix_name
 
 
 def analyze(directory):
@@ -101,15 +124,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, required=True)
     args = parser.parse_args()
-    name = prepare()
+    name, prefix_name = prepare()
     spec = dict(
         id="predictor_audit_prime",
-        dataset=name,
+        dataset=prefix_name,
         concurrency=8,
         measurement="diagnostic",
     )
     assert cell(args.root, "full", spec)["accepted"]
-    restore = dict(spec, id="predictor_audit_restore", reset_external=False)
+    restore = dict(
+        spec, id="predictor_audit_restore", dataset=name, reset_external=False
+    )
     assert cell(args.root, "full", restore)["accepted"]
     analyze(args.root / "cells" / restore["id"])
 

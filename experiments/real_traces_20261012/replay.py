@@ -258,12 +258,12 @@ def summarize(responses, start, end, expected, offered_end, events):
             jobs[e["job_id"]][e["pid"]] = e
         if e["event"] == "store_observed_done":
             stores[e["job_id"]][e["pid"]] = e
-    loaded = [e.get("request", "") for ranks in jobs.values() for e in ranks.values()]
+    loaded = {e.get("request", "") for ranks in jobs.values() for e in ranks.values()}
     outcomes = Counter()
     for r in valid:
         # vLLM wraps the provided ID with a completion prefix and unique suffix.
-        pattern = r"(?:^|-)" + re.escape(r["request"]) + r"(?:$|-)"
-        cpu = any(re.search(pattern, name) for name in loaded)
+        pattern = re.compile(r"(?:^|-)" + re.escape(r["request"]) + r"(?:$|-)")
+        cpu = any(pattern.search(name) for name in loaded)
         cached = r["usage"].get("prompt_tokens_details", {}).get("cached_tokens", 0)
         outcomes["cpu_hit" if cpu else "gpu_hit" if cached else "miss"] += 1
     input_total = sum(r["usage"]["prompt_tokens"] for r in valid)

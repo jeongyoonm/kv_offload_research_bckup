@@ -100,3 +100,34 @@ accounting and ending those sessions early. Increase client read_bufsize to
 targets and serving options stay unchanged. Archive the failed whole episode
 and interrupted mixed episode; restart from cold logical caches. Never retry
 only failed calls inside a throughput cell or accept partial trajectory counts.
+
+2026-10-12 16:08 UTC: Completed all six requested matched pairs,36546 requests.
+GLM5.3 NVFP4 TP8,1M total context; CPU3.03TB requested,3.028TB registered
+on all8 ranks, GPU96GiB/rank. Inferact throughput gains at C8/16/32:
+5.90/9.53/12.33percent. Mixed TraceLab gains:4.72/7.32/7.72percent.
+All input/output, exactly-once, rank-completion and frozen-predictor gates pass.
+All owned servers stopped, GPU process list empty and CPU RAM reclaimed.
+
+The first full C32 attempt was rejected after two ServerDisconnectedError
+failures before response headers. The15s client idle timeout exceeded the5s
+server timeout; reduce client timeout to1s, without retries, and rerun the
+whole episode. Earlier accepted baselines retain15s: disclose this transport
+control difference. ABBA health probes measured0.125ms mean fresh-connection
+overhead; this is not a full POST bound. Model and serving options unchanged.
+Full raw timeline serialization exceeded the10s post-window flush allowance;
+extend it to120s and stream only completion records into the summary while
+retaining full raw timelines. These collection changes occur after timing.
+
+A separate instrumented synthetic CPU-restoration audit used64K-196K prefixes
+and128-4096 uncached suffix tokens. All16 CPU hits passed; predictor unchanged.
+Ten forecasts had57.08ms MAE and39.04ms mean underestimate. This is a small
+diagnostic, excluded from performance and not a trace-wide accuracy result.
+Do not retune the predictor during the comparisons.
+
+The rejected attempt cost about33 minutes. Finish only the last already
+requested TraceLab C8 pair in a bounded recovery window, with fresh baseline
+registration and1M/CPU-restoration gates. No additional repetitions. The last
+pair completed7.35 minutes beyond the planned ten-hour window.
+Final reports, plots, source bundle, fingerprints and failed attempts are in
+/mnt/localnvme/jeongyoon/agentic_1m_20261012. Results are single passes without
+confidence intervals; TraceLab is a structural proxy with fixed source windows.

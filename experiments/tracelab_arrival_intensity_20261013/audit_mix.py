@@ -72,7 +72,8 @@ def summarize():
         for name, field in (
             ("total_input_tokens", "prompt_len"),
             ("recorded_prefix_tokens", "prefix_len"),
-            ("uncached_append_tokens", "input_len"),
+            ("recorded_append_tokens", "input_len"),
+            ("computed_prompt_tokens", "server_uncached_prompt_tokens"),
             ("output_tokens", "output_len_target"),
         ):
             values = [row[field] for row in posted]

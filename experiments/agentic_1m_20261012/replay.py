@@ -36,6 +36,20 @@ class NoLimit:
         return False
 
 
+class Pacer:
+    def __init__(self, rate):
+        self.period_ns = int(1e9 / rate) if rate else 0
+        self.next_ns = 0
+
+    async def arrival(self):
+        stamp = max(time.monotonic_ns(), self.next_ns)
+        self.next_ns = stamp + self.period_ns
+        delay = (stamp - time.monotonic_ns()) / 1e9
+        if delay > 0:
+            await asyncio.sleep(delay)
+        return stamp
+
+
 def setup():
     prior.BASE = BASE
     prior.CAMPAIGN = ROOT
@@ -50,6 +64,7 @@ async def issue(data, spec, directory):
     sem = asyncio.Semaphore(spec["concurrency"])
     timeout = aiohttp.ClientTimeout(total=3600, sock_read=1800)
     interval = float(spec.get("min_interval_seconds", 0))
+    pacer = Pacer(float(spec.get("offered_rps", 0)))
     start = time.monotonic_ns()
     count = sum(len(s["requests"][: spec.get("turns", 100000)]) for s in sessions)
     completed = 0
@@ -64,12 +79,13 @@ async def issue(data, spec, directory):
                 for metadata in item["requests"][: spec.get("turns", 100000)]:
                     if interval:
                         await asyncio.sleep(interval)
-                    ready = time.monotonic_ns()
+                    ready = await pacer.arrival()
                     async with sem:
                         prepare_start = time.monotonic_ns()
                         offset = metadata["offset"]
                         length = metadata["input_tokens"]
-                        prompt = blob[offset : offset + length].tolist()
+                        array = blob[offset : offset + length]
+                        prompt = array.tolist()
                         row = dict(metadata, prompt=prompt)
                         response = await prior.request(
                             http,
@@ -104,6 +120,15 @@ async def issue(data, spec, directory):
 
 def cell(root, arm, spec):
     setup()
+    sensitivity = ROOT / "pacing_sensitivity.json"
+    if spec.get("repeat") == 1 and sensitivity.exists():
+        rate = (
+            json.loads(sensitivity.read_text())
+            .get(spec["dataset"], {})
+            .get(str(spec["concurrency"]))
+        )
+        if rate:
+            spec = dict(spec, offered_rps=rate, intensity_mode="paced_sensitivity")
     directory = root / "cells" / spec["id"]
     directory.mkdir(parents=True, exist_ok=False)
     path = DATA / (spec["dataset"] + ".json")
@@ -204,6 +229,32 @@ def cell(root, arm, spec):
     )
     if not result["accepted"]:
         raise RuntimeError(f"Cell rejected: {directory}")
+    if (
+        arm == "baseline"
+        and spec.get("repeat") == 0
+        and spec["dataset"].startswith("tracelab")
+    ):
+        preemptions = delta.get("vllm:num_preemptions_total", 0)
+        if preemptions / expected >= 0.05:
+            old_rates = (
+                json.loads(sensitivity.read_text()) if sensitivity.exists() else {}
+            )
+            old_rates.setdefault(spec["dataset"], {})[str(spec["concurrency"])] = (
+                result["throughput_rps"] * 0.9
+            )
+            save(sensitivity, old_rates)
+            log(
+                "paced_sensitivity_selected",
+                dataset=spec["dataset"],
+                concurrency=spec["concurrency"],
+                preemptions=preemptions,
+                offered_rps=result["throughput_rps"] * 0.9,
+                reason=(
+                    "Baseline preemptions >=5% of calls. Optional mirrored r1 "
+                    "changes only arrival pacing; retain capacity r0 and "
+                    "distinguish sensitivity from repeats."
+                ),
+            )
     return result
 
 

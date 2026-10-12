@@ -45,6 +45,7 @@ def main():
         assert b["requests"] == f["requests"]
         assert b["input_tokens"] == f["input_tokens"]
         assert b["output_tokens"] == f["output_tokens"]
+        assert b["cpu_cache_bytes_server"] == f["cpu_cache_bytes_server"]
         if not b["accepted"] or not f["accepted"]:
             continue
         pair = dict(
@@ -52,6 +53,9 @@ def main():
             dataset=b["spec"]["dataset"],
             concurrency=b["spec"]["concurrency"],
             repeat=b["spec"].get("repeat", 0),
+            intensity_mode=b["spec"].get("intensity_mode", "capacity"),
+            offered_rps=b["spec"].get("offered_rps"),
+            cpu_cache_bytes_server=b["cpu_cache_bytes_server"],
             requests=b["requests"],
             baseline_rps=b["throughput_rps"],
             full_rps=f["throughput_rps"],
@@ -111,7 +115,8 @@ def main():
         "TraceLab:structural proxy,32 context-stratified sessions/provider, "
         "fixed contiguous source windows up to64 calls/session. "
         "No original text/prefix identities available.",
-        "Both arms use equal96GiB/rank GPU and2.13TB server-wide CPU budgets; "
+        "Both arms use equal96GiB/rank GPU and the frozen maximum validated "
+        "server-wide CPU budget (cache_budget.json); "
         "natural cache evolution, no forced provider-hit ratio.",
         "Original selector/model weights/numerics retained. "
         "No model quality or bitwise equivalence claim.",
@@ -134,11 +139,15 @@ def main():
         )
     (directory / "REPORT.txt").write_text("\n".join(text) + "\n")
     if pairs:
-        keys = sorted(set((p["dataset"], p["concurrency"]) for p in pairs))
+        keys = sorted(
+            set((p["dataset"], p["concurrency"], p["intensity_mode"]) for p in pairs)
+        )
         fig, axes = plt.subplots(1, 2, figsize=(13, 4.5))
         labels = [
-            name.replace("tracelab_", "TraceLab ").replace("_windows", "") + f"\nC={n}"
-            for name, n in keys
+            name.replace("tracelab_", "TraceLab ").replace("_windows", "")
+            + f"\nC={n}"
+            + ("\npaced" if mode != "capacity" else "")
+            for name, n, mode in keys
         ]
         x = np.arange(len(keys))
         width = 0.36
@@ -152,7 +161,8 @@ def main():
                         [
                             p[f"{arm}_{metric}"]
                             for p in pairs
-                            if (p["dataset"], p["concurrency"]) == key
+                            if (p["dataset"], p["concurrency"], p["intensity_mode"])
+                            == key
                         ]
                     )
                     for key in keys

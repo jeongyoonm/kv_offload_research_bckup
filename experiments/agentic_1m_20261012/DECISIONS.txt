@@ -57,3 +57,26 @@ resident memory; extra allowance covers the larger registration tables.
 Freeze this budget; require all8 full registrations and restoration probes.
 CUDA teardown can reclaim RAM later than GPU contexts disappear, so wait for
 sufficient available RAM before each subsequent model-server startup.
+
+2026-10-12 06:36 UTC: The3.97TB trial failed before registration. Kernel
+records show CONSTRAINT_MEMORY_POLICY on bothNUMA nodes; node1 ran out of
+free pages at1,545,781,688KiB shmem, with approximately506GiB inactive file
+pages not reclaimed during allocation. Idle MemAvailable overestimated the
+operational bound. Derive a new equal-rank aggregate from twice this observed
+node1 shmem bound minus128GiB runtime headroom. Preserve failed logs and do
+not claim3.97TB passed. No shared mount/kernel settings altered.
+
+2026-10-12 06:50 UTC: New budget3,028,287,488,000bytes, actual registered
+3,028,011,286,528bytes across8 ranks; every cudaHostRegister result0. Node1
+free memory approximately95GB after registration. Cold probes through1M
+total context and full CPU restoration passed input/output/retirement and
+all-rank audits. Freeze this operational maximum; use identically in both arms.
+
+2026-10-12 07:17 UTC: Inferact C32 shows140 preemptions after2432 calls.
+Keep the primary capacity sweep unchanged. For TraceLab only, if baseline
+preemptions reach5% of calls, schedule optional matched pacing sensitivities
+at90% of the baseline completion rate, if counterpart time fits. Source
+content, token lengths, distribution and order within sessions stay fixed.
+Use r1 IDs as paced sensitivities in those cases, explicitly not repeated
+capacity runs; separate them in reports/plots. Never average paced and
+capacity measurements together. Primary r0 remains available for comparison.

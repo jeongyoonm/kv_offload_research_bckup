@@ -224,7 +224,7 @@ def summarize(directory, start, events):
     )
 
 
-def cell(root, server_process, arm):
+def cell(root, server_process, arm, deadline_epoch=None):
     directory = ROOT / "cells" / arm
     directory.mkdir(parents=True, exist_ok=False)
     run, state, policy = old.prior.configure(root, arm)
@@ -261,7 +261,12 @@ def cell(root, server_process, arm):
             directory / "owner.json", dict(pid=process.pid, controller=os.getpid())
         )
         try:
-            cutoff = time.monotonic() + 4 * 3600
+            remaining = (
+                4 * 3600
+                if deadline_epoch is None
+                else max(0, deadline_epoch - time.time())
+            )
+            cutoff = time.monotonic() + remaining
             with (directory / "runner.log").open() as reader:
                 progress = None
                 while process.poll() is None:
@@ -357,8 +362,14 @@ def cell(root, server_process, arm):
             )[1]
         )
         <= LIMIT,
-        full_measurement_window=len(rows) > 0
-        and max(r["complete_timestamp"] for r in rows) >= clock + WARMUP + MEASURE - 5,
+        full_measurement_window=bool(rows)
+        and max(
+            float(value)
+            for value in re.findall(
+                r"elapsed=([\d.]+)s", (directory / "runner.log").read_text()
+            )
+        )
+        >= WARMUP + MEASURE - 1,
     )
     result.update(
         arm=arm,

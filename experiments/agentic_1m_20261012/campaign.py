@@ -258,12 +258,13 @@ def main():
         reserved = 0
         prior_durations = {}
         for spec in specs:
-            expected = (
-                prior_durations.get(spec["dataset"], 1200)
-                * (32 / spec["concurrency"]) ** 0.4
+            prior_seconds, prior_concurrency = prior_durations.get(
+                spec["dataset"], (1200, 32)
             )
+            expected = prior_seconds * (prior_concurrency / spec["concurrency"]) ** 0.4
             needed = reserved + expected * 2.2 + 900
-            if time.time() + needed > MEASURE_CUTOFF:
+            completed = baseline / "cells" / spec["id"] / "result.json"
+            if not completed.exists() and time.time() + needed > MEASURE_CUTOFF:
                 log(
                     "cell_deferred_before_first_arm",
                     spec=spec,
@@ -272,7 +273,10 @@ def main():
                 )
                 continue
             result = run_cell(baseline, "baseline", spec)
-            prior_durations[spec["dataset"]] = result["seconds"]
+            prior_durations[spec["dataset"]] = (
+                result["seconds"],
+                spec["concurrency"],
+            )
             results.append(dict(root=str(baseline), **result))
             selected.append(spec)
             reserved += result["seconds"] * 1.1
@@ -292,6 +296,41 @@ def main():
         # Reverse-order repeats are optional only after every selected mirror exists.
         repeats = []
         reserved = 0
+        # Revisit deferred primary cells using measured prototype speed before
+        # spending remaining time on repeated cells. Reuse the running full
+        # server, then mirror these on the next baseline launch.
+        for spec in specs:
+            if spec in selected or spec.get("optional"):
+                continue
+            references = [
+                r
+                for r in results
+                if r["arm"] == "baseline" and r["spec"]["dataset"] == spec["dataset"]
+            ]
+            if not references:
+                continue
+            reference = min(
+                references,
+                key=lambda r: abs(r["spec"]["concurrency"] - spec["concurrency"]),
+            )
+            full_reference = next(
+                r
+                for r in results
+                if r["arm"] == "full" and r["spec"]["id"] == reference["spec"]["id"]
+            )
+            scale = (reference["spec"]["concurrency"] / spec["concurrency"]) ** 0.4
+            baseline_expected = reference["seconds"] * scale
+            full_expected = full_reference["seconds"] * scale
+            needed = reserved + 1.2 * (baseline_expected + full_expected) + 1200
+            if time.time() + needed > MEASURE_CUTOFF:
+                log("deferred_primary_still_over_budget", spec=spec, needed=needed)
+                continue
+            result = run_cell(full, "full", spec)
+            results.append(dict(root=str(full), **result))
+            repeats.append(spec)
+            reserved += baseline_expected * 1.2
+            save(ROOT / "reverse_order_mirrors.json", repeats)
+            save(ROOT / "progress.json", dict(results=results))
         for spec in selected:
             reference = next(
                 r

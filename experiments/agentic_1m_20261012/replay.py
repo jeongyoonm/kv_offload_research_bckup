@@ -144,7 +144,7 @@ def cell(root, arm, spec):
         run.configure(True, state)
     client.drain()
     run.reset(spec.get("reset_external", True))
-    prior.flush_timeline(root)
+    prior.flush_timeline(root, completion_only=True)
     before = client.metrics()
     sources_before = prior.token_sources(run)
     trace_before = set((root / "server/timing/late_admission").glob("*.json"))
@@ -180,7 +180,7 @@ def cell(root, arm, spec):
             ),
         )["seal_estimator"]["state"]
         frozen = exported == state
-    events = prior.flush_timeline(root)
+    events = prior.flush_timeline(root, completion_only=True)
     after = client.metrics()
     sources_after = prior.token_sources(run)
     counts = Counter()

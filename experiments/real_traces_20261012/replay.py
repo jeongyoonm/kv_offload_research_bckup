@@ -29,7 +29,7 @@ STATE_SHA256 = "f159f32d226894457fb56b3195c47d4ff6e2a5d982d8d600b1970ea000294f96
 BASE = "http://127.0.0.1:18472"
 
 
-def flush_timeline(root):
+def flush_timeline(root, completion_only=False):
     """Require every worker; an unused baseline engine emits no timeline."""
     directory = root / "server/load_timeline"
     pids = set(
@@ -64,7 +64,14 @@ def flush_timeline(root):
             return [
                 json.loads(line)
                 for path in paths
-                for line in path.read_text().splitlines()
+                for line in path.open()
+                if not completion_only
+                or line.startswith(
+                    (
+                        '{"event": "job_observed_done",',
+                        '{"event": "store_observed_done",',
+                    )
+                )
             ]
         time.sleep(0.05)
     raise RuntimeError("transfer timeline omitted one or more TP ranks")

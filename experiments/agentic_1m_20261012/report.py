@@ -88,6 +88,9 @@ def main():
             pair[f"{arm}_preemptions"] = result["metric_deltas"].get(
                 "vllm:num_preemptions_total", 0
             )
+            pair[f"{arm}_client_keepalive_seconds"] = result.get(
+                "client_transport", {}
+            ).get("keepalive_timeout_seconds", 15.0)
         for metric in ("mean", "p50", "p95", "p99"):
             pair[f"ready_ttft_{metric}_reduction_pct"] = 100 * (
                 1
@@ -134,6 +137,16 @@ def main():
         "Capacity episodes have no external pacing. Paced sensitivities change "
         "only arrival timing and are reported separately, never averaged into "
         "capacity measurements.",
+        "Client idle timeout was reduced from15s to1s after two early-header "
+        "disconnects in a rejected prototype attempt; server timeout remains5s. "
+        "Earlier accepted baselines retain the15s client setting. Serving "
+        "settings/request bodies match, but transport settings are not strictly "
+        "matched for those pairs. A separate ABBA health probe measured0.125ms "
+        "mean fresh-connection overhead; it is not a full POST latency bound. "
+        "No failed calls are retried inside an accepted throughput episode.",
+        "A short instrumented synthetic predictor audit is stored separately "
+        "and excluded from throughput comparisons; its10 forecasts do not "
+        "establish prediction accuracy on the traces.",
         "",
         "Dataset | concurrency | repeat | intensity | baseline_rps | full_rps | "
         "gain% | "

@@ -72,6 +72,8 @@ def main():
             writer.writerows(rows)
     comparisons = []
     for name, arms in pairs.items():
+        if name.startswith("warmup_"):
+            continue
         if set(arms) != {"baseline", "full"}:
             continue
         b, br = arms["baseline"]
@@ -133,6 +135,7 @@ def main():
                     name
                     for name, arms in pairs.items()
                     if set(arms) != {"baseline", "full"}
+                    and not name.startswith("warmup_")
                 ],
             ),
             indent=2,

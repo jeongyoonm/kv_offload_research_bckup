@@ -44,6 +44,23 @@ def write_report():
             f"{r['measured_no_http_in_flight_seconds']:.3f} | "
             f"{r['sampled_fraction_ready_queue_nonempty'] * 100:.2f} | {cpu:.2f}"
         )
+        samples = ROOT / "gpu_samples.jsonl"
+        if samples.exists():
+            a = r["replay_start_timestamp"] + r["warmup_seconds"]
+            b = a + r["measurement_seconds"]
+            values = []
+            for line in samples.read_text().splitlines():
+                try:
+                    sample = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if sample.get("arm") == arm and a <= sample["time"] < b:
+                    values.extend(gpu[1] for gpu in sample["gpus"])
+            if values:
+                lines.append(
+                    f"  Mean sampled GPU utilization: "
+                    f"{sum(values) / len(values):.2f}% across eight ranks"
+                )
     if set(cells) == {"baseline", "full"}:
         b, f = cells["baseline"], cells["full"]
         gain = (f["throughput_rps"] / b["throughput_rps"] - 1) * 100

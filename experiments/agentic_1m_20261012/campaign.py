@@ -3,6 +3,7 @@
 """Reserve mirrors before spending a fixed ten-hour experiment budget."""
 
 import json
+import math
 import subprocess
 import time
 from pathlib import Path
@@ -20,6 +21,36 @@ from experiments.agentic_1m_20261012.common import (
     save,
 )
 from experiments.agentic_1m_20261012.prepare import Writer, finish
+
+
+def estimate_seconds(results, arm, spec):
+    """Budget projection only; use observed scaling of this exact dataset."""
+    references = {
+        r["spec"]["concurrency"]: r["seconds"]
+        for r in results
+        if r["arm"] == arm
+        and r["spec"]["dataset"] == spec["dataset"]
+        and r["spec"].get("repeat", 0) == 0
+        and not r["spec"].get("offered_rps")
+    }
+    n = spec["concurrency"]
+    if n in references:
+        return references[n]
+    closest = sorted(references, key=lambda old: abs(math.log(old / n)))
+    if not closest:
+        return 1200 * (32 / n) ** 0.4
+    old = closest[0]
+    exponent = 0.4
+    if len(closest) >= 2:
+        other = closest[1]
+        exponent = min(
+            1.0,
+            max(
+                0.0,
+                math.log(references[old] / references[other]) / math.log(other / old),
+            ),
+        )
+    return references[old] * (old / n) ** exponent
 
 
 def probe_data():
@@ -309,19 +340,9 @@ def main():
             ]
             if not references:
                 continue
-            reference = min(
-                references,
-                key=lambda r: abs(r["spec"]["concurrency"] - spec["concurrency"]),
-            )
-            full_reference = next(
-                r
-                for r in results
-                if r["arm"] == "full" and r["spec"]["id"] == reference["spec"]["id"]
-            )
-            scale = (reference["spec"]["concurrency"] / spec["concurrency"]) ** 0.4
-            baseline_expected = reference["seconds"] * scale
-            full_expected = full_reference["seconds"] * scale
-            needed = reserved + 1.2 * (baseline_expected + full_expected) + 1200
+            baseline_expected = estimate_seconds(results, "baseline", spec)
+            full_expected = estimate_seconds(results, "full", spec)
+            needed = reserved + 1.2 * (baseline_expected + full_expected) + 900
             if time.time() + needed > MEASURE_CUTOFF:
                 log("deferred_primary_still_over_budget", spec=spec, needed=needed)
                 continue

@@ -63,6 +63,16 @@ pub(crate) struct Args {
     #[arg(long)]
     pub(crate) max_active_sessions: Option<usize>,
 
+    /// Cap outstanding model calls; agents waiting for tools hold no request slot.
+    /// Omit --max-active-sessions to allow every arrived agent to participate.
+    #[arg(long)]
+    pub(crate) max_in_flight_requests: Option<usize>,
+
+    /// Stop issuing calls after this many seconds; complete outstanding calls.
+    /// Session arrivals and tool waits remain unchanged until the cutoff.
+    #[arg(long)]
+    pub(crate) run_seconds: Option<f64>,
+
     /// Validate and summarize the workload without contacting vLLM.
     #[arg(long, default_value_t = false)]
     pub(crate) dry_run: bool,

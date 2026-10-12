@@ -181,13 +181,14 @@ impl GenerationClient {
 
         // Submit raw token ids: no client-side decode, so even million-token prompts cost nothing
         // here and the server's prefix-cache keys match the exact ids we built.
-        let payload = self.backend.build_payload(&GenRequest {
+        let mut payload = self.backend.build_payload(&GenRequest {
             model: &self.model,
             prompt_ids,
             max_tokens: step.output_len,
             temperature: self.temperature,
             stream: true,
         });
+        payload["request_id"] = Value::String(request_id.clone());
 
         let post_timestamp = Some(unix_seconds_now());
         // Monotonic anchor at the send instant: TTFT is measured from here.
@@ -262,8 +263,9 @@ impl GenerationClient {
                                             usage.completion_tokens.or(server_completion_tokens);
                                         server_total_tokens =
                                             usage.total_tokens.or(server_total_tokens);
-                                        server_cached_prompt_tokens =
-                                            usage.cached_prompt_tokens.or(server_cached_prompt_tokens);
+                                        server_cached_prompt_tokens = usage
+                                            .cached_prompt_tokens
+                                            .or(server_cached_prompt_tokens);
                                     }
                                     chunk_count += 1;
                                 }
@@ -336,35 +338,37 @@ impl GenerationClient {
 
         StepOutcome {
             log: StepLog {
-            session_id: step.session_id.clone(),
-            round_idx: step.round_idx,
-            request_id,
-            prefix_len: step.prefix_len,
-            input_len: step.input_len,
-            prompt_len,
-            planned_prefix_hit_rate,
-            output_len_target: step.output_len,
-            output_len_actual,
-            output_len_text_tokens,
-            server_prompt_tokens,
-            server_completion_tokens,
-            server_total_tokens,
-            server_cached_prompt_tokens,
-            server_uncached_prompt_tokens,
-            server_prefix_hit_rate,
-            server_prefix_hit_rate_delta,
-            finish_reason,
-            tool_wait_after_ms: step.tool_wait_after_ms,
-            arrival_time_ms: step.arrival_time,
-            submit_timestamp,
-            post_timestamp,
-            complete_timestamp: unix_seconds_now(),
-            first_token_ms,
-            total_duration_ms: elapsed_ms(start),
-            chunk_count,
-            status,
-            output_preview: output_text.chars().take(100).collect(),
-            error,
+                session_id: step.session_id.clone(),
+                round_idx: step.round_idx,
+                request_id,
+                prefix_len: step.prefix_len,
+                input_len: step.input_len,
+                prompt_len,
+                planned_prefix_hit_rate,
+                output_len_target: step.output_len,
+                output_len_actual,
+                output_len_text_tokens,
+                server_prompt_tokens,
+                server_completion_tokens,
+                server_total_tokens,
+                server_cached_prompt_tokens,
+                server_uncached_prompt_tokens,
+                server_prefix_hit_rate,
+                server_prefix_hit_rate_delta,
+                finish_reason,
+                tool_wait_after_ms: step.tool_wait_after_ms,
+                arrival_time_ms: step.arrival_time,
+                submit_timestamp,
+                ready_timestamp: None,
+                request_slot_wait_ms: 0.0,
+                post_timestamp,
+                complete_timestamp: unix_seconds_now(),
+                first_token_ms,
+                total_duration_ms: elapsed_ms(start),
+                chunk_count,
+                status,
+                output_preview: output_text.chars().take(100).collect(),
+                error,
             },
             output_ids,
         }

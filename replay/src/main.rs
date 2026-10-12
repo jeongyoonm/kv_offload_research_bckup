@@ -1,3 +1,4 @@
+mod admission;
 mod backend;
 mod cli;
 mod record;
@@ -10,8 +11,9 @@ mod workload;
 
 use anyhow::{anyhow, Context, Result};
 use clap::Parser;
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::sync::{mpsc, Semaphore};
 
 use backend::GenerationClient;
@@ -31,8 +33,19 @@ async fn main() -> Result<()> {
     if args.max_active_sessions == Some(0) {
         return Err(anyhow!("--max-active-sessions must be greater than 0"));
     }
+    if args.max_in_flight_requests == Some(0) {
+        return Err(anyhow!("--max-in-flight-requests must be greater than 0"));
+    }
+    if args.max_in_flight_requests.is_some() && args.max_active_sessions.is_some() {
+        return Err(anyhow!("omit --max-active-sessions in request-slot mode so tool waits cannot occupy session permits"));
+    }
+    if args.run_seconds.is_some_and(|s| !s.is_finite() || s <= 0.0) {
+        return Err(anyhow!("--run-seconds must be finite and greater than 0"));
+    }
     if args.fail_on_context_overflow && args.max_model_len.is_none() {
-        return Err(anyhow!("--fail-on-context-overflow requires --max-model-len"));
+        return Err(anyhow!(
+            "--fail-on-context-overflow requires --max-model-len"
+        ));
     }
 
     let sessions = load_sessions(&args.trace, args.max_sessions)?;
@@ -91,12 +104,22 @@ async fn main() -> Result<()> {
         .await
         .context("prefix-cache preflight failed")?;
 
+    let run_start = Instant::now();
+    eprintln!(
+        "replay clock | unix_seconds={:.9} run_seconds={:?}",
+        util::unix_seconds_now(),
+        args.run_seconds
+    );
     let state = Arc::new(AppState {
         args: args.clone(),
         client,
         token_pool,
         stats: Arc::new(Stats::default()),
-        run_start: Instant::now(),
+        run_start,
+        replay_deadline: args
+            .run_seconds
+            .map(|s| tokio::time::Instant::from_std(run_start + Duration::from_secs_f64(s))),
+        request_gate: admission::RequestGate::new(args.max_in_flight_requests),
         session_semaphore: args
             .max_active_sessions
             .map(|n| Arc::new(Semaphore::new(n))),
@@ -106,6 +129,7 @@ async fn main() -> Result<()> {
     let log_task = tokio::spawn(write_logs(args.log_path.clone(), log_rx));
     tokio::spawn(status_task(
         state.stats.clone(),
+        state.request_gate.clone(),
         sessions.len(),
         total_steps,
         state.run_start,
@@ -126,6 +150,14 @@ async fn main() -> Result<()> {
             eprintln!("session task join error: {err}");
         }
     }
+
+    eprintln!(
+        "request slots | limit={:?} peak_in_flight={} waiting={} deadline_stopped_sessions={}",
+        args.max_in_flight_requests,
+        state.request_gate.peak.load(Ordering::Relaxed),
+        state.request_gate.waiting.load(Ordering::Relaxed),
+        state.stats.stopped_sessions.load(Ordering::Relaxed)
+    );
 
     let replay_summary = log_task.await?;
     write_summary_if_requested(

@@ -3,12 +3,13 @@ use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::{mpsc, Semaphore};
 
+use crate::admission::{stop_at, wait_or_stop, RequestGate};
+use crate::backend::{GenerationClient, StepOutcome};
 use crate::cli::Args;
 use crate::record::StepLog;
 use crate::tokens::{PromptBuilder, TokenProvider};
 use crate::trace::SessionStep;
 use crate::util::{prefix_hit_rate, unix_seconds_now};
-use crate::backend::{GenerationClient, StepOutcome};
 
 /// Shared, immutable-per-run state handed to every session task.
 pub(crate) struct AppState {
@@ -18,6 +19,8 @@ pub(crate) struct AppState {
     pub(crate) stats: Arc<Stats>,
     pub(crate) run_start: Instant,
     pub(crate) session_semaphore: Option<Arc<Semaphore>>,
+    pub(crate) request_gate: Arc<RequestGate>,
+    pub(crate) replay_deadline: Option<tokio::time::Instant>,
 }
 
 /// Lock-free progress counters shared with the status reporter.
@@ -27,6 +30,7 @@ pub(crate) struct Stats {
     completed: AtomicUsize,
     failed: AtomicUsize,
     finished_sessions: AtomicUsize,
+    pub(crate) stopped_sessions: AtomicUsize,
 }
 
 impl Stats {
@@ -55,9 +59,21 @@ pub(crate) async fn run_session(
     session_id: String,
     steps: Vec<SessionStep>,
 ) {
-    wait_for_session_arrival(&state, &steps).await;
+    if !wait_for_session_arrival(&state, &steps).await {
+        state.stats.stopped_sessions.fetch_add(1, Ordering::Relaxed);
+        state.stats.record_session_done();
+        return;
+    }
     let _session_permit = match &state.session_semaphore {
-        Some(semaphore) => semaphore.clone().acquire_owned().await.ok(),
+        Some(semaphore) => tokio::select! {
+            biased;
+            _ = stop_at(state.replay_deadline) => {
+                state.stats.stopped_sessions.fetch_add(1, Ordering::Relaxed);
+                state.stats.record_session_done();
+                return;
+            }
+            permit = semaphore.clone().acquire_owned() => permit.ok(),
+        },
         None => None,
     };
 
@@ -74,7 +90,14 @@ pub(crate) async fn run_session(
     let mut prompt_builder = PromptBuilder::new(token_provider);
 
     for step in steps {
+        let ready_timestamp = unix_seconds_now();
         let prompt_ids = prompt_builder.build_prompt(&step);
+        let queue_start = Instant::now();
+        let Some(request_permit) = state.request_gate.acquire(state.replay_deadline).await else {
+            state.stats.stopped_sessions.fetch_add(1, Ordering::Relaxed);
+            break;
+        };
+        let request_slot_wait_ms = queue_start.elapsed().as_secs_f64() * 1000.0;
         let request_id = format!("{}_round_{:06}", session_id, step.round_idx);
         state.stats.record_submit();
         let outcome = if should_skip_context_overflow(&state.args, prompt_ids.len()) {
@@ -90,7 +113,13 @@ pub(crate) async fn run_session(
         } else {
             state.client.run_step(&step, request_id, &prompt_ids).await
         };
-        let StepOutcome { log, output_ids } = outcome;
+        drop(request_permit);
+        let StepOutcome {
+            mut log,
+            output_ids,
+        } = outcome;
+        log.ready_timestamp = Some(ready_timestamp);
+        log.request_slot_wait_ms = request_slot_wait_ms;
         let success = log.status == "SUCCESS";
         let _ = log_tx.send(log).await;
 
@@ -104,7 +133,15 @@ pub(crate) async fn run_session(
         prompt_builder.commit_output(prompt_ids, output_ids);
 
         if step.tool_wait_after_ms > 0.0 {
-            tokio::time::sleep(Duration::from_secs_f64(step.tool_wait_after_ms / 1000.0)).await;
+            if !wait_or_stop(
+                Duration::from_secs_f64(step.tool_wait_after_ms / 1000.0),
+                state.replay_deadline,
+            )
+            .await
+            {
+                state.stats.stopped_sessions.fetch_add(1, Ordering::Relaxed);
+                break;
+            }
         }
     }
 
@@ -150,6 +187,8 @@ fn context_overflow_log(
         tool_wait_after_ms: step.tool_wait_after_ms,
         arrival_time_ms: step.arrival_time,
         submit_timestamp: unix_seconds_now(),
+        ready_timestamp: None,
+        request_slot_wait_ms: 0.0,
         post_timestamp: None,
         complete_timestamp: unix_seconds_now(),
         first_token_ms: None,
@@ -164,25 +203,31 @@ fn context_overflow_log(
     }
 }
 
-async fn wait_for_session_arrival(state: &AppState, steps: &[SessionStep]) {
+async fn wait_for_session_arrival(state: &AppState, steps: &[SessionStep]) -> bool {
     let arrival_ms = steps
         .first()
         .map(|step| step.arrival_time.max(0.0))
         .unwrap_or(0.0);
     if arrival_ms <= 0.0 {
-        return;
+        return state
+            .replay_deadline
+            .is_none_or(|end| tokio::time::Instant::now() < end);
     }
 
     let target = state.run_start + Duration::from_secs_f64(arrival_ms / 1000.0);
     let now = Instant::now();
     if target > now {
-        tokio::time::sleep_until(tokio::time::Instant::from_std(target)).await;
+        return wait_or_stop(target - now, state.replay_deadline).await;
     }
+    state
+        .replay_deadline
+        .is_none_or(|end| tokio::time::Instant::now() < end)
 }
 
 /// Periodic stderr progress reporter; exits once all sessions are finished.
 pub(crate) async fn status_task(
     stats: Arc<Stats>,
+    gate: Arc<RequestGate>,
     total_sessions: usize,
     total_steps: usize,
     start: Instant,
@@ -197,7 +242,7 @@ pub(crate) async fn status_task(
         let finished_steps = completed + failed;
 
         eprintln!(
-            "sessions {}/{} | steps {}/{} completed={} submitted={} active={} failed={} | elapsed={:.1}s",
+            "sessions {}/{} | steps {}/{} completed={} submitted={} active={} failed={} | elapsed={:.1}s | slots_in_flight={} ready_queue={}",
             finished_sessions,
             total_sessions,
             finished_steps,
@@ -207,6 +252,8 @@ pub(crate) async fn status_task(
             active,
             failed,
             start.elapsed().as_secs_f64(),
+            gate.in_flight.load(Ordering::Relaxed),
+            gate.waiting.load(Ordering::Relaxed),
         );
 
         if finished_sessions >= total_sessions {

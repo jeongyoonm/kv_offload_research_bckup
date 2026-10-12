@@ -25,6 +25,9 @@ pub(crate) struct StepLog {
     pub(crate) arrival_time_ms: f64,
     /// Wall-clock (unix seconds) when the round entered the client, before prompt decode.
     pub(crate) submit_timestamp: f64,
+    /// Agent readiness before prompt construction and request-slot queueing.
+    pub(crate) ready_timestamp: Option<f64>,
+    pub(crate) request_slot_wait_ms: f64,
     /// Wall-clock (unix seconds) right before the HTTP request was sent. None if never sent.
     pub(crate) post_timestamp: Option<f64>,
     /// Wall-clock (unix seconds) when the response finished, or the round failed/was skipped.

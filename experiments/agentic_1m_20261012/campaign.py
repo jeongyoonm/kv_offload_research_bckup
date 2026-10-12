@@ -146,6 +146,13 @@ def wait_ready(root, proc=None):
 
 
 def start_server(root, arm):
+    if (root / "owner.json").exists() and not (root / "stopped.json").exists():
+        owner = json.loads((root / "owner.json").read_text())
+        assert owner["arm"] == arm and owner["deadline"] == DEADLINE
+        assert Path(f"/proc/{owner['server_pid']}").exists(), owner
+        wait_ready(root)
+        log("owned_server_reused", root=str(root), arm=arm)
+        return None
     with (ROOT / (root.name + "_supervisor.log")).open("w") as output:
         proc = subprocess.Popen(
             [

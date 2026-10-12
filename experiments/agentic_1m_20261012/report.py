@@ -117,6 +117,9 @@ def main():
         f"Accepted measured cells:{sum(c['accepted'] for c in cells)}.",
         "Inferact:128 seeded sessions, full recorded histories; "
         "completion-paced with32/16/8 HTTP cap.",
+        "Inferact input and recorded assistant text are retokenized with GLM; "
+        "output targets are those assistant-text lengths in GLM tokens. "
+        "TraceLab retains reported provider input/output lengths in its proxy.",
         "TraceLab:structural proxy,32 context-stratified sessions/provider, "
         "fixed contiguous source windows up to64 calls/session. "
         "No original text/prefix identities available.",

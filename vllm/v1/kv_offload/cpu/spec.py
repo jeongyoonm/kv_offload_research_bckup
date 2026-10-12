@@ -104,6 +104,11 @@ class CPUOffloadingSpec(OffloadingSpec):
         self.memory_layout = self.extra_config.get("cpu_cache_layout", "block")
         if self.memory_layout not in ("block", "worker", "private"):
             raise ValueError("cpu_cache_layout must be block, worker or private")
+        self.memory_backing = self.extra_config.get("cpu_cache_backing", "shm")
+        if self.memory_backing not in ("shm", "memfd"):
+            raise ValueError("cpu_cache_backing must be shm or memfd")
+        if self.memory_backing == "memfd" and self.memory_layout != "private":
+            raise ValueError("memfd backing requires private worker layout")
         if self.memory_layout != "block" and (
             config.replicated_layout
             or config.canonical_layout
@@ -279,6 +284,7 @@ class CPUOffloadingSpec(OffloadingSpec):
                 process_rank=self.config.parallel.rank,
                 population_barrier=self.population_barrier,
                 memory_layout=self.memory_layout,
+                memory_backing=self.memory_backing,
             )
         try:
             return CPUOffloadingWorker(

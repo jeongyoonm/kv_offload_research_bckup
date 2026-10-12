@@ -94,6 +94,7 @@ class SharedOffloadRegion:
         process_rank: int | None = None,
         population_barrier: bool = False,
         memory_layout: str = "block",
+        memory_backing: str = "shm",
     ) -> None:
         init_start = time.perf_counter()
         self.init_stats: dict[str, int | float] = {}
@@ -126,6 +127,13 @@ class SharedOffloadRegion:
         ):
             raise ValueError("private layout requires one initializer per worker")
         self.memory_layout = memory_layout
+        if memory_backing not in ("shm", "memfd"):
+            raise ValueError("memory_backing must be shm or memfd")
+        if memory_backing == "memfd" and memory_layout != "private":
+            raise ValueError("memfd backing requires private worker layout")
+        if memory_backing == "memfd" and not hasattr(os, "memfd_create"):
+            raise ValueError("memfd backing requires Linux memfd_create")
+        self.memory_backing = memory_backing
 
         self.num_blocks = num_blocks
         self._row_stride = kv_bytes_per_block
@@ -151,6 +159,7 @@ class SharedOffloadRegion:
         suffix = f"_rank_{rank}" if memory_layout == "private" else ""
         self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}{suffix}.mmap"
         self._creator = False  # set True only if this worker creates the file
+        self.fd: int | None = None
         self.rank = rank
         if rank is not None:
             # byte offset to this worker's first slot within each block row
@@ -161,39 +170,29 @@ class SharedOffloadRegion:
                 self._worker_offset = self.registration_offset
                 self._worker_area_end = self._worker_offset + cpu_page_size
         try:
-            try:
-                self.fd: int | None = os.open(
-                    self.mmap_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600
+            if memory_backing == "memfd":
+                self.fd = os.memfd_create(
+                    f"vllm_offload_{engine_id}{suffix}", os.MFD_CLOEXEC
                 )
-            except FileExistsError:
-                # Joiner path — another worker won O_EXCL. Reopen and wait
-                # for the file to reach expected size.
-                self.fd = os.open(self.mmap_path, os.O_RDWR)
                 try:
-                    _wait_for_file_size(self.fd, self.total_size_bytes)
-                except (TimeoutError, OSError):
-                    os.close(self.fd)
-                    raise
-                logger.info("Opened existing mmap file %s", self.mmap_path)
-            else:
-                # Creator path. We won O_EXCL, so we own the file: any
-                # failure here must clean up so concurrent joiners don't
-                # land on a 0-byte stub and spin in _wait_for_file_size
-                # for the full 30 s timeout.
-                try:
-                    check_shm_free_space(self.total_size_bytes)
                     os.ftruncate(self.fd, self.total_size_bytes)
-                except (RuntimeError, OSError):
-                    os.unlink(self.mmap_path)
+                except OSError:
                     os.close(self.fd)
+                    self.fd = None
                     raise
-                self._creator = True
+                # Private ranks never rendezvous through a filename. This
+                # anonymous tmpfs inode is reclaimed when its last reference
+                # closes, and is independent of the /dev/shm mount capacity.
+                self.mmap_path = f"memfd:vllm_offload_{engine_id}{suffix}"
                 logger.info(
-                    "Created mmap file %s (%.2f GB)",
+                    "Created private memfd %s (%.2f GB)",
                     self.mmap_path,
                     self.total_size_bytes / 1e9,
                 )
+            else:
+                self._open_shared_file()
 
+            assert self.fd is not None
             self.mmap_obj: mmap.mmap | None = mmap.mmap(
                 self.fd,
                 self.total_size_bytes,
@@ -201,13 +200,12 @@ class SharedOffloadRegion:
                 prot=mmap.PROT_READ | mmap.PROT_WRITE,
             )
         except Exception:
+            if memory_backing == "memfd" and self.fd is not None:
+                os.close(self.fd)
+                self.fd = None
             if self._creator:
                 os.unlink(self.mmap_path)
                 self._creator = False
-            # Peers block inside the barrier until the collective times out if
-            # we die before reaching it.  Arrive anyway so every worker calls
-            # barrier() exactly once and they fail on their own errors instead
-            # of hanging; a failure here must not replace ours.
             if barrier is not None:
                 try:
                     barrier()
@@ -218,6 +216,69 @@ class SharedOffloadRegion:
                     )
             raise
 
+        self._populate_region(
+            init_start,
+            barrier,
+            population_mode,
+            population_workers,
+            population_chunk_bytes,
+            num_workers,
+            process_rank,
+            population_barrier,
+            memory_layout,
+            rank,
+            num_blocks,
+            cpu_page_size,
+        )
+
+    def _open_shared_file(self) -> None:
+        try:
+            self.fd = os.open(self.mmap_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+        except FileExistsError:
+            # Joiner path — another worker won O_EXCL. Reopen and wait
+            # for the file to reach expected size.
+            self.fd = os.open(self.mmap_path, os.O_RDWR)
+            try:
+                _wait_for_file_size(self.fd, self.total_size_bytes)
+            except (TimeoutError, OSError):
+                os.close(self.fd)
+                raise
+            logger.info("Opened existing mmap file %s", self.mmap_path)
+        else:
+            # Creator path. We won O_EXCL, so we own the file: any
+            # failure here must clean up so concurrent joiners don't
+            # land on a 0-byte stub and spin in _wait_for_file_size
+            # for the full 30 s timeout.
+            try:
+                check_shm_free_space(self.total_size_bytes)
+                os.ftruncate(self.fd, self.total_size_bytes)
+            except (RuntimeError, OSError):
+                os.unlink(self.mmap_path)
+                os.close(self.fd)
+                raise
+            self._creator = True
+            logger.info(
+                "Created mmap file %s (%.2f GB)",
+                self.mmap_path,
+                self.total_size_bytes / 1e9,
+            )
+
+    def _populate_region(
+        self,
+        init_start,
+        barrier,
+        population_mode,
+        population_workers,
+        population_chunk_bytes,
+        num_workers,
+        process_rank,
+        population_barrier,
+        memory_layout,
+        rank,
+        num_blocks,
+        cpu_page_size,
+    ) -> None:
+        assert self.mmap_obj is not None and self.fd is not None
         self.init_stats["mapping_seconds"] = time.perf_counter() - init_start
         barrier_start = time.perf_counter()
         if barrier is not None:

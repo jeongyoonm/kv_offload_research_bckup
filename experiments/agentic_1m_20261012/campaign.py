@@ -191,8 +191,8 @@ def preflight(root, arm):
 
 
 def main():
-    baseline = Path("/mnt/localnvme/jeongyoon/a1mb4")
-    full = Path("/mnt/localnvme/jeongyoon/a1mf1")
+    baseline = Path("/mnt/localnvme/jeongyoon/a1mb8")
+    full = Path("/mnt/localnvme/jeongyoon/a1mf3")
     owned = [baseline]
     results, selected = [], []
     save(
@@ -290,7 +290,7 @@ def main():
             save(ROOT / "selected_repeats.json", repeats)
         stop_server(full)
         if repeats:
-            second_baseline = Path("/mnt/localnvme/jeongyoon/a1mb5")
+            second_baseline = Path("/mnt/localnvme/jeongyoon/a1mb9")
             owned.append(second_baseline)
             start_server(second_baseline, "baseline")
             preflight(second_baseline, "baseline")

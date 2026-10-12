@@ -10,12 +10,15 @@ import subprocess
 import time
 from pathlib import Path
 
+import regex as re
+
 from experiments.agentic_1m_20261012.common import (
     BASE,
     DEADLINE,
     LIMIT,
     PORT,
     SOURCE,
+    cache_settings,
     log,
     save,
 )
@@ -28,11 +31,26 @@ def launch(root, arm):
         text=True,
     ).strip()
     assert not occupied, occupied
+    budget = cache_settings()
+    # CUDA teardown can reclaim large registered regions after workers exit.
+    reclaim_deadline = time.time() + 240
+    while time.time() < reclaim_deadline:
+        info = (Path("/proc/meminfo")).read_text()
+        available = int(re.search(r"MemAvailable:\s+(\d+)", info)[1]) * 1024
+        if available >= budget["cpu_bytes_to_use"] + budget["startup_allowance_bytes"]:
+            break
+        time.sleep(2)
+    else:
+        raise RuntimeError("Previous registered CPU cache has not reclaimed RAM")
     command, config = old.base.server_command()
     command[0] = str(SOURCE / ".venv/bin/python")
     command[command.index("--max-model-len") + 1] = str(LIMIT)
     command[command.index("--port") + 1] = str(PORT)
     extra = config["kv_connector_extra_config"]
+    extra.update(
+        cpu_bytes_to_use=budget["cpu_bytes_to_use"],
+        cpu_cache_backing=budget["cpu_cache_backing"],
+    )
     if arm == "baseline":
         extra.update(
             async_h2d_submission=False,
@@ -123,6 +141,15 @@ def main():
             if not ready:
                 try:
                     run.call("/health", timeout=1)
+                    registered = re.findall(
+                        r"CPU cache registration rank=(\d+) bytes=(\d+) "
+                        r"seconds=[\d.]+ result=(\d+)",
+                        (root / "server/server.log").read_text(),
+                    )
+                    assert {
+                        int(r) for r, _, code in registered if int(code) == 0
+                    } == set(range(8)), registered
+                    save(root / "registration_audit.json", registered)
                     save(root / "ready.json", dict(time=time.time()))
                     log("server_ready", root=str(root), arm=args.arm)
                     ready = True

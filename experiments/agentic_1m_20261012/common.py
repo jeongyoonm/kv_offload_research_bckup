@@ -21,6 +21,10 @@ STATE = ROOT / "frozen_predictor.json"
 STATE_SHA = "f159f32d226894457fb56b3195c47d4ff6e2a5d982d8d600b1970ea000294f96"
 
 
+def cache_settings():
+    return json.loads((ROOT / "cache_budget.json").read_text())
+
+
 def save(path, value):
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_suffix(path.suffix + ".tmp")

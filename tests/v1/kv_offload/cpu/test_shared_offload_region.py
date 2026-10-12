@@ -23,6 +23,80 @@ from vllm.v1.kv_offload.cpu.shared_offload_region import (
 PAGE_SIZE = mmap.PAGESIZE
 
 
+def test_private_memfd_preserves_views_without_shm_capacity(monkeypatch):
+    import vllm.v1.kv_offload.cpu.shared_offload_region as module
+
+    capacity = MagicMock(side_effect=AssertionError("must not use /dev/shm"))
+    monkeypatch.setattr(module, "check_shm_free_space", capacity)
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=4,
+        rank=0,
+        kv_bytes_per_block=PAGE_SIZE,
+        cpu_page_size=PAGE_SIZE,
+        memory_layout="private",
+        memory_backing="memfd",
+    )
+    fd = region.fd
+    try:
+        view = region.create_next_worker_view(PAGE_SIZE)
+        view.fill_(37)
+        assert view.shape == (4, PAGE_SIZE)
+        assert view.stride() == (PAGE_SIZE, 1)
+        assert region._base[0].item() == 37
+        assert not os.path.exists(region.mmap_path)
+        del view
+    finally:
+        region.cleanup()
+    with pytest.raises(OSError):
+        os.fstat(fd)
+    capacity.assert_not_called()
+
+
+def test_memfd_rejects_shared_layout_before_allocating():
+    with pytest.raises(ValueError, match="requires private"):
+        SharedOffloadRegion(
+            engine_id=str(uuid.uuid4()),
+            num_blocks=4,
+            rank=0,
+            kv_bytes_per_block=PAGE_SIZE,
+            cpu_page_size=PAGE_SIZE,
+            memory_layout="block",
+            memory_backing="memfd",
+        )
+
+
+def test_private_memfd_cuda_registration_and_roundtrip():
+    import torch
+
+    from vllm.platforms import current_platform
+    from vllm.v1.kv_offload.cpu.gpu_worker import pin_mmap_region
+
+    if not current_platform.is_cuda():
+        pytest.skip("CUDA host registration requires CUDA")
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=256,
+        rank=0,
+        kv_bytes_per_block=PAGE_SIZE,
+        cpu_page_size=PAGE_SIZE,
+        memory_layout="private",
+        memory_backing="memfd",
+    )
+    try:
+        pin_mmap_region(region)
+        assert region.is_pinned
+        view = region.create_next_worker_view(PAGE_SIZE)
+        view.random_()
+        device = torch.empty_like(view, device=current_platform.device_type)
+        device.copy_(view, non_blocking=True)
+        restored = device.to("cpu")
+        assert torch.equal(view, restored)
+        del view, device, restored
+    finally:
+        region.cleanup()
+
+
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
 # ---------------------------------------------------------------------------

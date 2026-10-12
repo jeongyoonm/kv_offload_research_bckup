@@ -39,3 +39,21 @@ long-context behavior before any separately named calibration experiment.
 Keep detailed per-token markers disabled; counters and all-rank transfer
 completion auditing remain enabled. Prioritize every selected counterpart
 before optional reverse-order repetitions; reserve shutdown/report time.
+
+2026-10-12 06:24 UTC: User requested maximum possible CPU prefix cache.
+The old2.13TB budget uses98.5% of the2.16TB /dev/shm mount despite4.33TB
+physical RAM. Preserve the partial old-budget cell as interrupted, never mix
+it into results. Isolated branch adds opt-in Linux memfd backing for private
+per-rank regions: same tmpfs page and tensor layout, no shared mount change.
+Both arms receive the same new backing and capacity. Default remains shm.
+
+2026-10-12 06:32 UTC:50 tests passed, including private view geometry, shm
+capacity independence, cleanup, unsupported-layout rejection, CUDA host
+registration and GPU byte roundtrip. Chosen maximum feasible budget is
+3,973,180,293,120bytes (3.97TB,3.614TiB), constrained by measured available
+RAM and equalNUMA placement after80GiB startup allowance and128GiB runtime
+headroom (64GiB/node). The old server added approximately69GB non-cache
+resident memory; extra allowance covers the larger registration tables.
+Freeze this budget; require all8 full registrations and restoration probes.
+CUDA teardown can reclaim RAM later than GPU contexts disappear, so wait for
+sufficient available RAM before each subsequent model-server startup.

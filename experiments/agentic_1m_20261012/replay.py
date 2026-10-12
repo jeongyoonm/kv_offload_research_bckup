@@ -19,6 +19,7 @@ from experiments.agentic_1m_20261012.common import (
     ROOT,
     STATE,
     STATE_SHA,
+    cache_settings,
     digest,
     log,
     save,
@@ -179,7 +180,8 @@ def cell(root, arm, spec):
         max_model_len=LIMIT,
         logical_sessions=spec.get("sessions", len(data["sessions"])),
         gpu_cache_bytes_per_rank=96 * 1024**3,
-        cpu_cache_bytes_server=2130300354560,
+        cpu_cache_bytes_server=cache_settings()["cpu_bytes_to_use"],
+        cpu_cache_backing=cache_settings()["cpu_cache_backing"],
         natural_cache_evolution=True,
         client_materialization_ms=prior.distribution(
             [r["client_materialization_ms"] for r in responses if r["accepted"]]

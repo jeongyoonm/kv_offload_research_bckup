@@ -101,6 +101,16 @@ def main():
             p95_ttft_reduction_percent=(1 - p["p95_ttft_ms"] / b["p95_ttft_ms"]) * 100,
             baseline_scheduled_ttft_ms=b["scheduled_mean_ttft_ms"],
             full_scheduled_ttft_ms=p["scheduled_mean_ttft_ms"],
+            scheduled_ttft_reduction_percent=(
+                1 - p["scheduled_mean_ttft_ms"] / b["scheduled_mean_ttft_ms"]
+            )
+            * 100,
+            baseline_scheduled_p95_ttft_ms=b["scheduled_p95_ttft_ms"],
+            full_scheduled_p95_ttft_ms=p["scheduled_p95_ttft_ms"],
+            scheduled_p95_reduction_percent=(
+                1 - p["scheduled_p95_ttft_ms"] / b["scheduled_p95_ttft_ms"]
+            )
+            * 100,
             baseline_cached_fraction=b["cached_input_fraction"],
             full_cached_fraction=p["cached_input_fraction"],
             baseline_cpu_requests=b["cpu_hit_requests"],
@@ -144,8 +154,12 @@ def main():
             width = 0.36
             for ax, field, label in zip(
                 axes,
-                ["rps", "mean_ttft_ms", "p95_ttft_ms"],
-                ["Completed requests/s", "Mean TTFT (s)", "p95 TTFT (s)"],
+                ["rps", "scheduled_ttft_ms", "scheduled_p95_ttft_ms"],
+                [
+                    "Completed requests/s",
+                    "Mean ready-to-first-token (s)",
+                    "p95 ready-to-first-token (s)",
+                ],
             ):
                 scale = 1 if field == "rps" else 1000
                 for arm, offset, color in [
@@ -182,6 +196,12 @@ def main():
     lines = [
         "GLM 5.3 NVFP4 TP8 — Inferact and Mooncake baseline/full comparison",
         "",
+        (
+            "Headline TTFT starts at scaled trace arrival (Mooncake) or previous "
+            "turn completion (Inferact). CSV also reports HTTP-submission TTFT. "
+            "Driver queueing is included in headline latency."
+        ),
+        "",
         f"Accepted cells: {len(rows)}; matched pairs: {len(comparisons)}.",
         "",
         (
@@ -214,8 +234,10 @@ def main():
         lines.append(
             f"{c['id']} | {c['baseline_rps']:.4f} | {c['full_rps']:.4f} | "
             f"{c['throughput_gain_percent']:+.2f} | "
-            f"{c['baseline_mean_ttft_ms']:.1f}/{c['full_mean_ttft_ms']:.1f} | "
-            f"{c['baseline_p95_ttft_ms']:.1f}/{c['full_p95_ttft_ms']:.1f} | "
+            f"{c['baseline_scheduled_ttft_ms']:.1f}/"
+            f"{c['full_scheduled_ttft_ms']:.1f} | "
+            f"{c['baseline_scheduled_p95_ttft_ms']:.1f}/"
+            f"{c['full_scheduled_p95_ttft_ms']:.1f} | "
             f"{c['baseline_cpu_requests']}/{c['full_cpu_requests']}"
         )
     (out / "REPORT.txt").write_text("\n".join(lines) + "\n")

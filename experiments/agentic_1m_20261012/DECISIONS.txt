@@ -1,0 +1,41 @@
+2026-10-12 06:00 UTC: Ten-hour campaign authorized. GLM5.3 NVFP4 TP8;
+1,048,576 total input+output context limit, original sparse selector retained.
+This limit matches the local weights' max_position_embeddings. Preserve
+recorded output lengths, model weights, numerical execution and cache budgets.
+Source worktree and artifacts under /mnt/localnvme/jeongyoon; HF weights unchanged.
+
+2026-10-12 06:04 UTC: CPU structural adapter tests passed. Serving source is
+unchanged. Reuse the exact prior compiled extensions and DeepGEMM/FlashMLA
+dependencies through symlinks; fresh worktrees omit these generated artifacts.
+Failed startup attempts are preserved separately. No model execution changes.
+
+2026-10-12 06:05 UTC: Prepare all128 previously seeded Inferact sessions,
+without the81,920 cutoff. Keep GLM tokenized recorded histories and outputs;
+later prompts use recorded assistant text. Zero additional tool/user delay
+because raw per-call timestamps are absent. Sample32 complete TraceLab
+sessions/provider, equally from source session-context quartiles, seed frozen.
+TraceLab is a structural proxy: no source text or exact prefix identities.
+Same-session continuity is an explicit reconstruction assumption; reuse at
+most the reported prefix and the preceding observed prompt. Shrinkage starts
+a new identity. Unknown initial context and cross-session sharing are not
+invented. Observed cache hits are determined by the server, not provider counters.
+
+2026-10-12 06:10 UTC: Source-only audit shows one6294-call Codex session and
+one1273-call Claude session dominate sampled complete trajectories. Completing
+these serial tails for every arm/concurrency cannot fit ten hours and would
+measure one active agent. Freeze seeded contiguous windows of up to64 calls
+per selected TraceLab session before performance results. Preserve whole
+request input/output lengths and all preconstructed token identities. Archive
+the complete cohort and report finite-window scope/distribution explicitly.
+This sampling decision is separate from intensity adjustment: after freezing
+the windows, only timing may change. Inferact still uses full128-session cohort.
+
+Primary capacity sweep: HTTP concurrency8,16,32; fixed logical session pool.
+No external wait, fair per-session causality. Cold logical caches each episode;
+kernel warmup/capability probes excluded from measured throughput. Same GPU
+96GiB/rank and CPU2,130,300,354,560bytes server-wide budgets in both arms.
+Frozen predictor is reused without tuning on trace performance. Audit its
+long-context behavior before any separately named calibration experiment.
+Keep detailed per-token markers disabled; counters and all-rank transfer
+completion auditing remain enabled. Prioritize every selected counterpart
+before optional reverse-order repetitions; reserve shutdown/report time.

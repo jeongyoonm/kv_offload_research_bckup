@@ -20,7 +20,7 @@ def collect():
     for root in ROOT.parent.glob("a1m[bf]*"):
         for path in root.glob("cells/*/result.json"):
             result = json.loads(path.read_text())
-            if result["spec"].get("measurement") == "capability":
+            if result["spec"].get("measurement") in ("capability", "diagnostic"):
                 continue
             result["root"] = str(root)
             rows.append(result)
@@ -46,6 +46,8 @@ def main():
         assert b["input_tokens"] == f["input_tokens"]
         assert b["output_tokens"] == f["output_tokens"]
         assert b["cpu_cache_bytes_server"] == f["cpu_cache_bytes_server"]
+        assert b["cpu_cache_backing"] == f["cpu_cache_backing"]
+        assert b["gpu_cache_bytes_per_rank"] == f["gpu_cache_bytes_per_rank"]
         if not b["accepted"] or not f["accepted"]:
             continue
         pair = dict(
@@ -115,6 +117,8 @@ def main():
         "TraceLab:structural proxy,32 context-stratified sessions/provider, "
         "fixed contiguous source windows up to64 calls/session. "
         "No original text/prefix identities available.",
+        "Mixed TraceLab is the exact union of the two frozen provider cohorts: "
+        "64 sessions,1880 calls. Only their seeded interleaving changes.",
         "Both arms use equal96GiB/rank GPU and the frozen maximum validated "
         "server-wide CPU budget (cache_budget.json); "
         "natural cache evolution, no forced provider-hit ratio.",
@@ -124,13 +128,21 @@ def main():
         "diagnostic records; cumulative admissions alone cannot establish them.",
         "Single-pair and two-pair variation is not a confidence interval. "
         "Whole finite-episode throughput includes cold start and serialized tails.",
+        "readyTTFT starts when a causal session is ready to submit its next call; "
+        "HTTP TTFT starts at actual POST submission. The former includes the "
+        "driver concurrency queue. Neither includes unrecorded tool delays.",
+        "Capacity episodes have no external pacing. Paced sensitivities change "
+        "only arrival timing and are reported separately, never averaged into "
+        "capacity measurements.",
         "",
-        "Dataset | concurrency | repeat | baseline_rps | full_rps | gain% | "
+        "Dataset | concurrency | repeat | intensity | baseline_rps | full_rps | "
+        "gain% | "
         "readyTTFTmean reduction% | CPU request% baseline/full",
     ]
     for p in pairs:
         text.append(
             f"{p['dataset']} | {p['concurrency']} | {p['repeat']} | "
+            f"{p['intensity_mode']} | "
             f"{p['baseline_rps']:.4f} | {p['full_rps']:.4f} | "
             f"{p['throughput_gain_pct']:+.2f} | "
             f"{p['ready_ttft_mean_reduction_pct']:+.2f} | "

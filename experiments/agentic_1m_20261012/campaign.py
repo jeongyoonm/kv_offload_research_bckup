@@ -145,10 +145,10 @@ def wait_ready(root, proc=None):
         time.sleep(2)
 
 
-def start_server(root, arm):
+def start_server(root, arm, deadline=DEADLINE):
     if (root / "owner.json").exists() and not (root / "stopped.json").exists():
         owner = json.loads((root / "owner.json").read_text())
-        assert owner["arm"] == arm and owner["deadline"] == DEADLINE
+        assert owner["arm"] == arm and owner["deadline"] == deadline
         assert Path(f"/proc/{owner['server_pid']}").exists(), owner
         wait_ready(root)
         log("owned_server_reused", root=str(root), arm=arm)
@@ -164,6 +164,8 @@ def start_server(root, arm):
                 str(root),
                 "--arm",
                 arm,
+                "--deadline",
+                str(deadline),
             ],
             cwd=SOURCE,
             stdout=output,

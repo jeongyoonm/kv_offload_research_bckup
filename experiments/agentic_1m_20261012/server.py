@@ -117,6 +117,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--arm", choices=["baseline", "full"], required=True)
+    parser.add_argument("--deadline", type=float, default=DEADLINE)
     args = parser.parse_args()
     root = args.root
     assert len(str(root / "tmp")) <= 45
@@ -129,13 +130,13 @@ def main():
         dict(
             supervisor_pid=os.getpid(),
             server_pid=proc.pid,
-            deadline=DEADLINE,
+            deadline=args.deadline,
             arm=args.arm,
         ),
     )
     ready = False
     try:
-        while time.time() < DEADLINE and not (root / "stop.request").exists():
+        while time.time() < args.deadline and not (root / "stop.request").exists():
             if proc.poll() is not None:
                 raise RuntimeError(f"server exited: {proc.returncode}")
             if not ready:

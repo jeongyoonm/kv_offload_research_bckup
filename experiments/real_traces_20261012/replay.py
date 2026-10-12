@@ -24,6 +24,8 @@ from experiments.real_traces_20261012.prepare import OUT, digest
 from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 
 CAMPAIGN = Path("/mnt/localnvme/jeongyoon/real_traces_20261012")
+STATE_PATH = CAMPAIGN / "frozen_predictor.json"
+STATE_SHA256 = "f159f32d226894457fb56b3195c47d4ff6e2a5d982d8d600b1970ea000294f96"
 BASE = "http://127.0.0.1:18472"
 
 
@@ -66,7 +68,8 @@ def configure(root, arm):
     run = old.base.collector
     old.base.module.ROOT = old.base.module.driver.ROOT = run.ROOT = root
     run.BASE = BASE
-    state = json.loads(old.STATE_PATH.read_text())
+    assert digest(STATE_PATH) == STATE_SHA256
+    state = json.loads(STATE_PATH.read_text())
     if arm == "baseline":
         # Preserve the baseline's ordinary connector and scheduler defaults.
         return run, state, validate_experiment_options({})
@@ -336,7 +339,7 @@ def cell(root, arm, spec):
             arm=arm,
             dataset_sha256=digest(data_path),
             policy=policy,
-            predictor_sha256=digest(old.STATE_PATH),
+            predictor_sha256=digest(STATE_PATH),
         ),
     )
     run.log("trace_cell_started", arm=arm, spec=spec)

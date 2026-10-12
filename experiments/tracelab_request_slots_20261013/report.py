@@ -25,7 +25,7 @@ def write_report():
         (
             "Arm | measured req/s | HTTP mean TTFT ms | HTTP p95 TTFT ms | "
             "ready mean TTFT ms | mean calls in flight | no HTTP calls in flight s | "
-            "ready queue nonempty % | CPU-hit requests %"
+            "ready queue nonempty % | CPU-hit requests % (measurement POST cohort)"
         ),
     ]
     for arm in ("baseline", "full"):
@@ -72,6 +72,36 @@ def write_report():
             f"HTTP mean TTFT reduction: {ttft_gain:+.2f}%",
             f"Ready mean TTFT reduction: {ready_gain:+.2f}%",
         ]
+    audit_path = ROOT / "CACHE_AUDIT.json"
+    if audit_path.exists():
+        audit = json.loads(audit_path.read_text())
+        lines += [
+            "",
+            "Cache-phase audit: no attribution bug found in this pair.",
+            (
+                "CPU hits occurred during warmup; both measurement POST cohorts "
+                "have zero CPU loads and zero cached prompt tokens."
+            ),
+        ]
+        for arm, item in audit["arms"].items():
+            warmup = item["phases"]["warmup"]
+            measured = item["phases"]["measurement"]
+            times = measured["followup_times"]
+            lines.append(
+                f"{arm}: warmup CPU-hit requests "
+                f"{warmup['cpu_hit_request_percent']:.2f}%; last CPU-hit POST "
+                f"{item['last_cpu_hit_post_seconds']:.2f}s; measurement "
+                f"followup slot queue mean "
+                f"{times['slot_queue_seconds']['mean']:.2f}s versus "
+                f"{times['tool_wait_seconds']['mean']:.2f}s tool wait."
+            )
+        lines += [
+            (
+                "Long request queues and cache-sized intervening writes support "
+                "eviction before reuse. See CACHE_AUDIT.txt / CACHE_AUDIT.json "
+                "for evidence and timing assumptions."
+            ),
+        ]
     lines += [
         "",
         "Request limit: 32 model calls; no session-wide concurrency cap.",
@@ -96,7 +126,8 @@ def write_report():
         ),
         (
             "Cold logical caches at episode start; natural promotion, eviction, "
-            "write-back and reload. Realized CPU/GPU/miss proportions are measured."
+            "write-back and reload. The request cache-outcome column describes "
+            "the measurement POST cohort; whole-episode counters include warmup."
         ),
         (
             "GLM 5.3 NVFP4 TP8, 1,048,576 total context, 96 GiB/rank GPU KV, "

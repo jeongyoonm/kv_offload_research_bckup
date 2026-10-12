@@ -18,10 +18,11 @@ def write_report():
             cells.append(cell)
     complete = (ROOT / "completed.json").exists()
     failed = (ROOT / "failure.json").exists()
+    plan = json.loads((ROOT / "plan.json").read_text())
     lines = [
         "TraceLab official runner: baseline versus full prototype",
         f"Status: {'complete' if complete else 'failed' if failed else 'running'}",
-        f"Accepted cells: {len(cells)}/6",
+        f"Accepted cells: {len(cells)}/{len(plan['cells'])}",
         "",
         (
             "Active sessions | Baseline req/s | Full req/s | Throughput gain % | "

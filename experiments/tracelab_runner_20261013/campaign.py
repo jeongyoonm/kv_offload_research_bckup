@@ -3,6 +3,7 @@
 
 """Matched serving cells around the unmodified upstream TraceLab runner."""
 
+import argparse
 import hashlib
 import json
 import os
@@ -356,6 +357,13 @@ def report(results):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--concurrencies", nargs="+", type=int, default=[32, 16, 8])
+    parser.add_argument(
+        "--arms", nargs="+", choices=["baseline", "full"], default=["baseline", "full"]
+    )
+    parser.add_argument("--resume", action="store_true")
+    args = parser.parse_args()
     budget = setup()
     save(
         ROOT / "owner.json", dict(pid=os.getpid(), source=str(SOURCE), time=time.time())
@@ -366,7 +374,7 @@ def main():
             cells=[
                 dict(arm=a, concurrency=c)
                 for a in ("baseline", "full")
-                for c in (32, 16, 8)
+                for c in args.concurrencies
             ],
             cpu_cache_budget=budget["cpu_bytes_to_use"],
             gpu_cache_bytes_per_rank=96 * 1024**3,
@@ -384,11 +392,23 @@ def main():
         ),
     )
     results = []
+    if args.resume:
+        for path in sorted((ROOT / "cells").glob("*/result.json")):
+            result = json.loads(path.read_text())
+            if result["accepted"] and result["concurrency"] in args.concurrencies:
+                results.append(result)
     try:
-        for arm in ("baseline", "full"):
+        for arm in args.arms:
+            pending = [
+                c
+                for c in args.concurrencies
+                if not any(r["arm"] == arm and r["concurrency"] == c for r in results)
+            ]
+            if not pending:
+                continue
             root, process = launch(arm)
             try:
-                for concurrency in (32, 16, 8):
+                for concurrency in pending:
                     results.append(cell(root, process, arm, concurrency))
                     report(results)
             finally:
@@ -398,6 +418,9 @@ def main():
                     dict(time=time.time(), returncode=process.poll()),
                 )
                 log("server_stopped", arm=arm)
+        assert {(r["arm"], r["concurrency"]) for r in results} == {
+            (a, c) for a in ("baseline", "full") for c in args.concurrencies
+        }, "A matched baseline/full pair is required for each concurrency"
         save(
             ROOT / "completed.json",
             dict(complete=True, results=results, time=time.time()),

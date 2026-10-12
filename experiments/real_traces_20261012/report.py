@@ -176,12 +176,20 @@ def main():
                         label="Baseline" if arm == "baseline" else "Full prototype",
                         color=color,
                     )
-                    ax.bar_label(bars, fmt="%.2f", fontsize=8, padding=2)
+                    ax.bar_label(
+                        bars,
+                        fmt="%.2f",
+                        fontsize=7,
+                        padding=2 if arm == "baseline" else 12,
+                    )
+                ax.set_ylim(top=ax.get_ylim()[1] * 1.12)
                 ax.set_xticks(
                     x,
                     [
                         c["id"]
                         .replace("moon_", "")
+                        .replace("conversation", "Conv")
+                        .replace("toolagent", "Tool")
                         .replace("_r0", "")
                         .replace("_", "\n")
                         for c in main

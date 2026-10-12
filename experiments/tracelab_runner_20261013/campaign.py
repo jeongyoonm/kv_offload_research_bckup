@@ -376,7 +376,8 @@ def main():
             serving_commit=subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], cwd=SOURCE, text=True
             ).strip(),
-            runner_unmodified=True,
+            runner_rust_source_unmodified=True,
+            compatibility=json.loads((ROOT / "compatibility.json").read_text()),
             exporter_defaults_unmodified=True,
             sampling="Previous frozen 64-session windows",
             replicated=False,

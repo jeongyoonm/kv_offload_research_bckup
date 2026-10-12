@@ -70,7 +70,9 @@ async def issue(data, spec, directory):
     completed = 0
     with (directory / "responses.jsonl").open("w") as sink:
         async with aiohttp.ClientSession(
-            timeout=timeout, connector=aiohttp.TCPConnector(limit=0)
+            timeout=timeout,
+            connector=aiohttp.TCPConnector(limit=0),
+            read_bufsize=8 * 1024**2,
         ) as http:
 
             async def conversation(item):

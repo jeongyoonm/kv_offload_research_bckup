@@ -92,3 +92,11 @@ and reserve its optional prototype mirror. Main matrix now Inferact/mixed
 TraceLab at8/16/32, then provider-specific cells if mirrored time permits.
 Controller resume waits for any prior live cell to finish before configuring
 or resetting caches; completed cells are reused, never rerun silently.
+
+2026-10-12 07:48 UTC: Reject the Codex-only C32 trial because three SSE
+responses exceeded aiohttp's512KiB line limit, preventing verified response
+accounting and ending those sessions early. Increase client read_bufsize to
+8MiB (16MiB line bound), identical in all future arms. Request tokens, output
+targets and serving options stay unchanged. Archive the failed whole episode
+and interrupted mixed episode; restart from cold logical caches. Never retry
+only failed calls inside a throughput cell or accept partial trajectory counts.

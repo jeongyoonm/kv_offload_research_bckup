@@ -54,7 +54,13 @@ def flush_timeline(root):
         }
         if pids <= complete and observed <= complete:
             time.sleep(0.2)
-            paths = list(directory.glob(f"*.{stamp}.jsonl"))
+            paths = [
+                path
+                for path in directory.glob(f"*.{stamp}.jsonl")
+                if (directory / f"{path.name.split('.')[0]}.flushed").exists()
+                and (directory / f"{path.name.split('.')[0]}.flushed").read_text()
+                == str(stamp)
+            ]
             return [
                 json.loads(line)
                 for path in paths

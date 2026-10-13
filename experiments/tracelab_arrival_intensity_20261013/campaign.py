@@ -56,8 +56,9 @@ def setup():
     )
 
 
-def launch(arm, label):
-    root = Path("/mnt/localnvme/jeongyoon/ai13" + label)
+def launch(arm, label, root=None):
+    if root is None:
+        root = Path("/mnt/localnvme/jeongyoon/ai13" + label)
     (root / "server").mkdir(parents=True, exist_ok=False)
     save(ROOT / "active.json", dict(arm=arm, phase="server_startup", label=label))
     process = replay.old.server.launch(root, arm)

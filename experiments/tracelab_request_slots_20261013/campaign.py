@@ -243,7 +243,7 @@ def cell(root, server_process, arm, deadline_epoch=None):
             policy=policy,
             cpu_cache_bytes=3028287488000,
             gpu_cache_bytes_per_rank=96 * 1024**3,
-            request_slots=32,
+            request_slots=LIMIT,
             session_cap=None,
             warmup_seconds=WARMUP,
             measurement_seconds=MEASURE,
@@ -251,7 +251,7 @@ def cell(root, server_process, arm, deadline_epoch=None):
             predictor_sha256=hashlib.sha256(old.STATE.read_bytes()).hexdigest(),
         ),
     )
-    old.log("cell_started", arm=arm, request_slots=32, session_cap=None)
+    old.log("cell_started", arm=arm, request_slots=LIMIT, session_cap=None)
     clock = None
     with (directory / "runner.log").open("w") as output:
         process = subprocess.Popen(
@@ -357,7 +357,7 @@ def cell(root, server_process, arm, deadline_epoch=None):
         bounded_request_slots=result["max_slots_in_flight"] <= LIMIT,
         peak_request_slots=int(
             re.search(
-                r"request slots \| limit=Some\(32\) peak_in_flight=(\d+)",
+                rf"request slots \| limit=Some\({LIMIT}\) peak_in_flight=(\d+)",
                 (directory / "runner.log").read_text(),
             )[1]
         )

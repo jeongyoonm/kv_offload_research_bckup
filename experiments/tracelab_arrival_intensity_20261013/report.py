@@ -44,7 +44,7 @@ def write_report():
             f"{result['mean_http_in_flight']:.2f} | "
             f"{result['metric_deltas'].get('vllm:num_preemptions_total', 0):.0f}"
         )
-    for family in ("primary", "reverse"):
+    for family in ("primary", "reverse", "repair"):
         pair = {
             result["arm"]: result
             for result in results
@@ -87,6 +87,12 @@ def write_report():
             "Pilots: 300s warmup + 600s measurement. Primary: 600s + 1200s. "
             "Optional reverse-order pair: 300s + 900s, reported separately. "
             "Logical CPU/GPU caches reset each episode; submitted calls drain."
+        ),
+        (
+            "Repair pair: 600s warmup + 900s measurement, full first. Both use "
+            "1s HTTP pool idle timeout; no retries. The earlier full run was "
+            "rejected after a transport failure. Earlier baseline is a "
+            "calibration/control, not paired with the repaired client."
         ),
         (
             "Throughput uses fixed-window completion timestamps. HTTP latency "

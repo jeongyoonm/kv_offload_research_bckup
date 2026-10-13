@@ -22,7 +22,8 @@ def write_report():
         (
             "Episode | sessions/s | req/s | HTTP mean TTFT ms | p95 TTFT ms | "
             "CPU-hit requests % | last-half CPU-hit % | cached prompt tokens % | "
-            "queue mean ms | queue p95 ms | GPU mean % | mean calls in flight"
+            "queue mean ms | queue p95 ms | GPU mean % | mean calls in flight | "
+            "GPU preemptions (whole episode)"
         ),
     ]
     for result in results:
@@ -40,7 +41,8 @@ def write_report():
             f"{measured['cached_prompt_token_percent']:.2f} | "
             f"{result['slot_queue_ms']['mean']:.2f} | "
             f"{result['slot_queue_ms']['p95']:.2f} | {gpu_text} | "
-            f"{result['mean_http_in_flight']:.2f}"
+            f"{result['mean_http_in_flight']:.2f} | "
+            f"{result['metric_deltas'].get('vllm:num_preemptions_total', 0):.0f}"
         )
     for family in ("primary", "reverse"):
         pair = {
@@ -90,6 +92,11 @@ def write_report():
             "Throughput uses fixed-window completion timestamps. HTTP latency "
             "and cache-hit requests use the measurement POST cohort, including "
             "responses during drain. Cache ratios exclude warmup."
+        ),
+        (
+            "CPU-hit requests means any observed CPU load for that request. "
+            "Preemptions can produce repeat loads; physical transfer bytes and "
+            "initial-prefill token-source counters are audited separately."
         ),
         (
             "Arrival-limited throughput is not maximum capacity. GPU activity, "

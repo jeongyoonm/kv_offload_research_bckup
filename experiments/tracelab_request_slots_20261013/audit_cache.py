@@ -53,9 +53,10 @@ def audit(arm, wall_minus_monotonic_seconds):
     total_load_bytes = sum(loaded_bytes.values()) + preflight_bytes
     assert total_load_bytes == result["h2d_bytes_all_ranks_whole_episode"]
     assert (
-        total_load_bytes / TOKEN_BYTES_ALL_RANKS
-        == result["token_source_deltas"]["external_kv_transfer"]
+        total_load_bytes == result["metric_deltas"]["vllm:kv_offload_load_bytes_total"]
     )
+    transferred_tokens = total_load_bytes // TOKEN_BYTES_ALL_RANKS
+    initial_prefill_cpu_tokens = result["token_source_deltas"]["external_kv_transfer"]
     assert (
         sum(row["server_cached_prompt_tokens"] for row in rows) + 512
         == result["metric_deltas"]["vllm:prompt_tokens_cached_total"]
@@ -152,6 +153,12 @@ def audit(arm, wall_minus_monotonic_seconds):
         )
         - start,
         accounting_verified=True,
+        transferred_tokens_whole_episode=transferred_tokens,
+        initial_prefill_cpu_tokens_whole_episode=initial_prefill_cpu_tokens,
+        transferred_tokens_minus_initial_prefill_cpu_tokens=(
+            transferred_tokens - initial_prefill_cpu_tokens
+        ),
+        gpu_preemptions=result["metric_deltas"].get("vllm:num_preemptions_total", 0),
     )
 
 

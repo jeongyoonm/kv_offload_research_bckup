@@ -156,6 +156,7 @@ impl GenerationClient {
         );
         let client = reqwest::Client::builder()
             .pool_max_idle_per_host(20_000)
+            .pool_idle_timeout(Duration::from_secs(1))
             .tcp_nodelay(true)
             .timeout(Duration::from_secs(3600))
             .build()?;

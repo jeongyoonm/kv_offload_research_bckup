@@ -63,7 +63,7 @@ def output_iterations(result, samples):
     )
 
 
-def plot(pairs, destination):
+def plot(pairs, destination, unpaired_results=()):
     import matplotlib
 
     matplotlib.use("Agg")
@@ -78,13 +78,19 @@ def plot(pairs, destination):
             (pair for pair in pairs if pair["rate"] == rate and pair["repeat"] == 0),
             key=lambda pair: pair["concurrency"],
         )
-        x = [pair["concurrency"] for pair in selected]
+        unmatched = [
+            r for r in unpaired_results if r["arrival_rate_sessions_per_second"] == rate
+        ]
+        x = sorted(
+            {pair["concurrency"] for pair in selected}
+            | {r["measurement_request_slots"] for r in unmatched}
+        )
         for arm, label, color, marker in (
             ("baseline", "Baseline", "#597594", "o"),
             ("full", "Full prototype", "#bf6434", "s"),
         ):
             axes[0, column].plot(
-                x,
+                [pair["concurrency"] for pair in selected],
                 [pair[arm]["throughput_rps"] for pair in selected],
                 label=label,
                 color=color,
@@ -93,15 +99,44 @@ def plot(pairs, destination):
             )
         axes[0, column].set_title(f"{rate:.2f} new sessions/s")
         gains = [pair["throughput_gain_pct"] for pair in selected]
-        axes[1, column].plot(x, gains, color="#bf6434", marker="s", linewidth=1.8)
+        paired_x = [pair["concurrency"] for pair in selected]
+        axes[1, column].plot(
+            paired_x, gains, color="#bf6434", marker="s", linewidth=1.8
+        )
         axes[1, column].axhline(0, color="0.55", linewidth=0.8)
-        for a, b in zip(x, gains):
+        for a, b in zip(paired_x, gains):
             axes[1, column].annotate(
                 f"{b:+.1f}%",
                 (a, b),
                 xytext=(0, 8),
                 textcoords="offset points",
                 ha="center",
+            )
+        for result in unmatched:
+            concurrency = result["measurement_request_slots"]
+            color = "#597594" if result["arm"] == "baseline" else "#bf6434"
+            axes[0, column].scatter(
+                [concurrency],
+                [result["throughput_rps"]],
+                color=color,
+                marker="o",
+                zorder=3,
+            )
+            axes[0, column].annotate(
+                "Full failed",
+                (concurrency, result["throughput_rps"]),
+                xytext=(0, 10),
+                textcoords="offset points",
+                ha="center",
+                fontsize=8,
+            )
+            axes[1, column].text(
+                concurrency,
+                0.05,
+                "Failed",
+                ha="center",
+                fontsize=8,
+                transform=axes[1, column].get_xaxis_transform(),
             )
         for row in (0, 1):
             axes[row, column].set_xticks(x)
@@ -119,7 +154,7 @@ def plot(pairs, destination):
         0.5,
         0.015,
         "600s warmup + 900s measurement; fixed cache budgets.\n"
-        "Point estimates; optional confirmation reported separately.",
+        "Point estimates; failed full cells have no throughput or gain estimate.",
         ha="center",
         fontsize=8,
     )
@@ -247,7 +282,7 @@ def finalize():
         assert time.monotonic() < cleanup_deadline, "GPU cleanup not verified"
         time.sleep(5)
     assert not owned_gpu_pids
-    plot(pairs, ROOT / "plots")
+    plot(pairs, ROOT / "plots", [r for r in results if r["episode"] in unpaired])
     summary = dict(
         time=time.time(),
         matched_pairs=len(pairs),

@@ -216,19 +216,36 @@ def finalize():
     assert not subprocess.check_output(
         ["git", "diff", "595b8bf", "--", "vllm"], cwd=source, text=True
     )
-    gpu_pids = subprocess.check_output(
-        ["nvidia-smi", "--query-compute-apps=pid", "--format=csv,noheader,nounits"],
-        text=True,
-    ).split()
-    owned_gpu_pids = []
     aliases = [
         json.loads((directory / "path_alias.json").read_text())["alias"]
         for directory in (ROOT / "servers").iterdir()
     ]
-    for pid in gpu_pids:
-        environment = (Path("/proc") / pid / "environ").read_bytes()
-        if any(alias.encode() in environment for alias in aliases):
-            owned_gpu_pids.append(pid)
+    cleanup_deadline = time.monotonic() + 240
+    while True:
+        try:
+            gpu_pids = subprocess.check_output(
+                [
+                    "nvidia-smi",
+                    "--query-compute-apps=pid",
+                    "--format=csv,noheader,nounits",
+                ],
+                text=True,
+                timeout=10,
+            ).split()
+            owned_gpu_pids = []
+            for pid in gpu_pids:
+                try:
+                    environment = (Path("/proc") / pid / "environ").read_bytes()
+                except (FileNotFoundError, ProcessLookupError):
+                    continue
+                if any(alias.encode() in environment for alias in aliases):
+                    owned_gpu_pids.append(pid)
+            if not owned_gpu_pids:
+                break
+        except subprocess.TimeoutExpired:
+            pass
+        assert time.monotonic() < cleanup_deadline, "GPU cleanup not verified"
+        time.sleep(5)
     assert not owned_gpu_pids
     plot(pairs, ROOT / "plots")
     summary = dict(
@@ -237,6 +254,9 @@ def finalize():
         cells=len(results),
         unpaired_cells=unpaired,
         rejected_attempts=rejected,
+        campaign_status=(
+            "completed_with_rejected_attempts" if rejected else "completed"
+        ),
         checks_verified=True,
         trace_content_checks=verified_hashes,
         registered_cpu_bytes=registered,
@@ -277,7 +297,7 @@ def finalize():
         f"Completed {len(results)} accepted cells / {len(pairs)} matched pairs.",
         f"Unpaired accepted controls (no inferred gain): {unpaired}",
         f"Rejected incomplete attempts (not performance samples): {rejected}",
-        "All submitted requests drained, success/token/retirement/rank accounting",
+        "For accepted cells, all submitted requests drained and accounting",
         "checks passed; physical H2D/D2H bytes matched server counters. All owned",
         "servers stopped. Workload nonarrival contents rehashed and verified.",
         "",
@@ -327,6 +347,9 @@ def finalize():
         "do not establish a confidence interval or an asymptotic throughput ceiling.",
         "GPU utilization is a busy-time sample, not peak compute efficiency.",
         "Full-only native execution envelopes are not a paired kernel-level trace.",
+        "Rejected attempts expose a reproducible readiness/preemption protocol",
+        "race; see CONNECTOR_FAILURE_ANALYSIS.txt and cpu_preemption_probe.json.",
+        "No performance estimate or gain is inferred from an incomplete cell.",
     ]
     summary["mean_cell_wall_seconds"] = statistics.mean(
         result["cell_wall_seconds"] for result in results

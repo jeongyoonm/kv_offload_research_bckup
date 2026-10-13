@@ -124,7 +124,7 @@ def main():
             rationale="Run complete windows at the three previously failing points",
         )
         study.run_group(
-            "ef0", "full", [("0.25", 48), ("0.15", 32), ("0.15", 48)], repeat=1
+            "ef0r", "full", [("0.25", 48), ("0.15", 32), ("0.15", 48)], repeat=1
         )
         proofs = proof_events()
         study.decision("fixed_correctness_passed", live_preemption_proofs=len(proofs))

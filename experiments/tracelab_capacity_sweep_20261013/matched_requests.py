@@ -26,6 +26,12 @@ def write():
     for pair in pairs:
         baseline, full = cohort(pair["baseline"]), cohort(pair["full"])
         common = sorted(set(baseline) & set(full))
+        timed_common = [
+            key
+            for key in common
+            if baseline[key]["first_token_ms"] is not None
+            and full[key]["first_token_ms"] is not None
+        ]
         checks = {
             field: all(baseline[key][field] == full[key][field] for key in common)
             for field in (
@@ -40,13 +46,14 @@ def write():
         latencies = {}
         for arm, rows in (("baseline", baseline), ("full", full)):
             selected = [rows[key] for key in common]
+            timed = [rows[key] for key in timed_common]
             latencies[arm] = dict(
-                http_ttft_ms=distribution([row["first_token_ms"] for row in selected]),
+                http_ttft_ms=distribution([row["first_token_ms"] for row in timed]),
                 ready_ttft_ms=distribution(
                     [
                         (row["post_timestamp"] - row["ready_timestamp"]) * 1000
                         + row["first_token_ms"]
-                        for row in selected
+                        for row in timed
                     ]
                 ),
                 cached_input_fraction=sum(
@@ -58,7 +65,7 @@ def write():
             )
         delta = [
             full[key]["first_token_ms"] - baseline[key]["first_token_ms"]
-            for key in common
+            for key in timed_common
         ]
         results.append(
             dict(
@@ -66,6 +73,11 @@ def write():
                 concurrency=pair["concurrency"],
                 repeat=pair["repeat"],
                 common_requests=len(common),
+                common_requests_with_ttft_in_both_arms=len(timed_common),
+                missing_ttft_common={
+                    arm: sum(rows[key]["first_token_ms"] is None for key in common)
+                    for arm, rows in (("baseline", baseline), ("full", full))
+                },
                 baseline_only_requests=len(baseline) - len(common),
                 full_only_requests=len(full) - len(common),
                 length_and_tool_wait_checks=checks,
@@ -87,6 +99,9 @@ def write():
             "inside their windows. It does not replace primary metrics or estimate "
             "throughput, eliminate cache-state differences, or establish causal "
             "latency effects. Generated token contents can differ across arms."
+            " Paired latency distributions use only common requests with a "
+            "recorded TTFT in both arms; missing counts are reported explicitly. "
+            "Cache fractions use all common requests, including untimed ones."
         ),
     )
     (ROOT / "MATCHED_REQUESTS.json").write_text(json.dumps(output, indent=2) + "\n")

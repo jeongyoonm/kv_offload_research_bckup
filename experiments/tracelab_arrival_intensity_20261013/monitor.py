@@ -10,6 +10,8 @@ import urllib.request
 
 from experiments.tracelab_arrival_intensity_20261013.prepare import ROOT
 
+EXTRA_METRIC_PREFIXES = ()
+
 
 def main():
     with (
@@ -82,6 +84,7 @@ def main():
                                 "vllm:num_requests_",
                                 "vllm:num_preemptions_total",
                             )
+                            + EXTRA_METRIC_PREFIXES
                         ):
                             continue
                         key, value = line.split()[:2]

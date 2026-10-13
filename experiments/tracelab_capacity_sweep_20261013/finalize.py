@@ -16,6 +16,53 @@ from experiments.tracelab_capacity_sweep_20261013 import analyze
 ROOT = analyze.ROOT
 
 
+def output_iterations(result, samples):
+    begin = result["replay_start_timestamp"] + result["warmup_seconds"] + 60
+    end = result["replay_start_timestamp"] + 1500
+    selected = []
+    for sample in samples:
+        if sample["episode"] != result["episode"] or not begin <= sample["time"] <= end:
+            continue
+        counters = {
+            field: sum(
+                value
+                for name, value in sample["values"].items()
+                if name.startswith("vllm:iteration_tokens_total_" + field + "{")
+            )
+            for field in ("count", "sum")
+        }
+        if counters["count"]:
+            selected.append((sample["time"], counters))
+    if len(selected) < 2:
+        return dict(available=False, reason="Insufficient iteration counter samples")
+    first, last = selected[0], selected[-1]
+    seconds = last[0] - first[0]
+    count = last[1]["count"] - first[1]["count"]
+    tokens = last[1]["sum"] - first[1]["sum"]
+    assert count >= 0 and tokens >= 0
+    return dict(
+        available=True,
+        start=first[0],
+        end=last[0],
+        observed_seconds=seconds,
+        target_seconds=840,
+        sufficient_coverage=seconds >= 800,
+        output_iterations=count,
+        reported_computed_plus_generated_tokens=tokens,
+        iterations_per_second=count / seconds,
+        reported_tokens_per_iteration=tokens / count if count else None,
+        reported_tokens_per_second=tokens / seconds,
+        scope=(
+            "Existing API iteration histogram; prompt compute is accounted on "
+            "first output, not per chunk. These are output-side iterations, not "
+            "a substitute for native GPU-forward counts or scheduled batch shape. "
+            "Common target is the last840s of the900s measurement because iteration "
+            "sampling was added35s into the first baseline measurement. Actual "
+            "endpoints lie inside that target and are reported without extrapolation."
+        ),
+    )
+
+
 def plot(pairs, destination):
     import matplotlib
 
@@ -202,6 +249,13 @@ def finalize():
             for pair in pairs
         ],
         allocation_end=json.loads((ROOT / "allocation.json").read_text())["deadline"],
+    )
+    samples = [json.loads(line) for line in (ROOT / "cache_samples.jsonl").open()]
+    summary["output_iteration_diagnostics"] = {
+        result["episode"]: output_iterations(result, samples) for result in results
+    }
+    (ROOT / "output_iteration_diagnostics.json").write_text(
+        json.dumps(summary["output_iteration_diagnostics"], indent=2) + "\n"
     )
     base_pairs = [pair for pair in pairs if pair["rate"] == 0.2 and pair["repeat"] == 0]
     original = json.loads(

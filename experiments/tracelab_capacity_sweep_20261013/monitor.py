@@ -7,4 +7,5 @@ from experiments.tracelab_capacity_sweep_20261013.analyze import ROOT
 
 if __name__ == "__main__":
     monitor.ROOT = ROOT
+    monitor.EXTRA_METRIC_PREFIXES = ("vllm:iteration_tokens_total_",)
     monitor.main()

@@ -120,7 +120,7 @@ def write_report():
         (
             "All submitted calls checked for token counts, success, retirement, "
             "eight-rank transfers, frozen predictor, slots, and timed window. "
-            "Single primary pair has no confidence interval."
+            "One matched repair pair has no confidence interval."
         ),
     ]
     if failed:

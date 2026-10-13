@@ -18,6 +18,8 @@ def main():
         ),
         "retimed_baseline_r0.2": ROOT / "episodes/primary_baseline_r0.2",
         "retimed_full_r0.2": ROOT / "episodes/primary_full_r0.2",
+        "repaired_baseline_r0.2": ROOT / "episodes/repair_baseline_r0.2",
+        "repaired_full_r0.2": ROOT / "episodes/repair_full_r0.2",
     }
     results = {}
     for label, directory in cases.items():

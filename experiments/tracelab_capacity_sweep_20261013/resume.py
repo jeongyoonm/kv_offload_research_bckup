@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Resume valid cells after a server failure without changing serving policies."""
 
+import argparse
 import json
 import os
 import signal
@@ -28,6 +29,9 @@ def archive_incomplete():
     failure = root / "failure.json"
     if failure.exists():
         failure.rename(destination / "failure.json")
+    if not rejected and not list(destination.iterdir()):
+        destination.rmdir()
+        return rejected
     study.base.save(
         destination / "exclusion.json",
         dict(episodes=rejected, reason="Incomplete replay; excluded from performance"),
@@ -36,7 +40,18 @@ def archive_incomplete():
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--retry-low-rate-32", action="store_true")
+    args = parser.parse_args()
     root, base = study.ROOT, study.base
+    if args.retry_low_rate_32:
+        completed = root / "completed.json"
+        assert completed.exists(), "Previous controller must finish first"
+        assert study.DEADLINE - time.time() >= 3300
+        completed.rename(root / f"stage_completed_{int(time.time())}.json")
+        base.save(
+            root / "progress.json", dict(complete=False, phase="additional_retry")
+        )
     base.ROOT, base.DEADLINE = root, study.DEADLINE
     replay = base.replay
     replay.ROOT, replay.SOURCE = root, base.SOURCE
@@ -44,7 +59,8 @@ def main():
     replay.setup()
     rejected = archive_incomplete()
     previous_owner = json.loads((root / "owner.json").read_text())
-    base.save(root / "initial_owner.json", previous_owner)
+    owner_path = root / f"owner_history_{int(time.time())}.json"
+    base.save(owner_path, previous_owner)
     base.save(
         root / "owner.json",
         dict(
@@ -79,6 +95,8 @@ def main():
         ],
         "full": [("0.15", 32), ("0.25", 40), ("0.25", 48), ("0.15", 48)],
     }
+    if args.retry_low_rate_32:
+        remaining = {"full": [("0.15", 32)]}
     study.decision(
         "resume_after_connector_assertion",
         rejected=rejected,
@@ -116,6 +134,8 @@ def main():
                     )
                     break
                 label = ("b" if arm == "baseline" else "f") + f"r{attempt}"
+                if args.retry_low_rate_32:
+                    label = "fr3"
                 try:
                     study.run_group(label, arm, cases)
                     break
@@ -123,6 +143,8 @@ def main():
                     rejected = archive_incomplete()
                     failures.append(dict(arm=arm, episodes=rejected, error=repr(error)))
                     study.decision("resumed_group_failed", **failures[-1])
+                    if args.retry_low_rate_32:
+                        break
                     # Continue other cases; do not retry a second failed measurement.
                     cases = [
                         (rate, limit)

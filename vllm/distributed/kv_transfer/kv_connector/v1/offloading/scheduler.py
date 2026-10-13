@@ -39,6 +39,7 @@ from vllm.v1.kv_cache_interface import (
     MambaSpec,
     SlidingWindowSpec,
 )
+from vllm.v1.kv_offload import timeline
 from vllm.v1.kv_offload.base import (
     GPULoadStoreSpec,
     Locality,
@@ -76,6 +77,8 @@ class TransferJobStatus:
     # Offload keys this job covers; passed to manager.complete_*().
     keys: set[OffloadKey]
     is_store: bool
+    # All-rank copy completion can precede ordered worker acknowledgments.
+    load_copy_complete: bool = False
     # Store source blocks fenced after the request finishes.
     deferred_fence_block_ids: list[int] | None = None
     # Store source blocks fenced when the transfer is created.
@@ -1558,9 +1561,22 @@ class OffloadingConnectorScheduler:
             req_status = self._req_status.get(req_id)
             if req_status is None or not req_status.transfer_jobs:
                 continue
-            any_jid = next(iter(req_status.transfer_jobs))
-            assert self._jobs[any_jid].is_store
-            self._current_batch_jobs_to_flush.update(req_status.transfer_jobs)
+            self.validate_preemption(req_id)
+            self._current_batch_jobs_to_flush.update(
+                job_id
+                for job_id in req_status.transfer_jobs
+                if self._jobs[job_id].is_store
+            )
+            if timeline.enabled():
+                for job_id in req_status.transfer_jobs:
+                    job = self._jobs[job_id]
+                    if not job.is_store:
+                        timeline.emit(
+                            "preempt_copy_complete_load_pending_retirement",
+                            request=req_id,
+                            job_id=job_id,
+                            pending_acks=job.pending_count,
+                        )
 
         # Flush jobs that contain re-allocated blocks.
         if (
@@ -1619,14 +1635,29 @@ class OffloadingConnectorScheduler:
             or self.manager.has_pending_work()
         )
 
-    def get_early_ready_request(self, job_id: int) -> ReqId | None:
-        """Resolve an independently completed active load without accounting it."""
+    def mark_early_load_copy_complete(self, job_id: int) -> ReqId | None:
+        """Record all-rank copy completion without retiring worker accounting."""
         if job_id < self._stale_job_threshold:
             return None
         job = self._jobs.get(job_id)
         if job is None or job.is_store:
             return None
-        return job.req_id if job.req_id in self._req_status else None
+        if job.req_id not in self._req_status:
+            return None
+        job.load_copy_complete = True
+        return job.req_id
+
+    def validate_preemption(self, req_id: ReqId) -> None:
+        """Require completed load writes before the allocator releases blocks."""
+        req_status = self._req_status.get(req_id)
+        if req_status is None:
+            return
+        for job_id in req_status.transfer_jobs:
+            job = self._jobs[job_id]
+            assert job.is_store or job.load_copy_complete, (
+                f"Preempting request {req_id} with incomplete load {job_id} "
+                f"({job.pending_count} ordinary acknowledgments pending)"
+            )
 
     def update_connector_output(self, connector_output: KVConnectorOutput):
         """

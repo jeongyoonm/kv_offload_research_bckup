@@ -167,9 +167,13 @@ class OffloadingConnector(KVConnectorBase_V1, SupportsHMA):
         assert self.connector_scheduler is not None
         return self.connector_scheduler.has_pending_push_work()
 
-    def get_early_ready_request(self, job_id: int) -> str | None:
+    def mark_early_load_copy_complete(self, job_id: int) -> str | None:
         assert self.connector_scheduler is not None
-        return self.connector_scheduler.get_early_ready_request(job_id)
+        return self.connector_scheduler.mark_early_load_copy_complete(job_id)
+
+    def validate_preemption(self, req_id: str) -> None:
+        assert self.connector_scheduler is not None
+        self.connector_scheduler.validate_preemption(req_id)
 
     def update_connector_output(self, connector_output: KVConnectorOutput):
         assert self.connector_scheduler is not None

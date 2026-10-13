@@ -1584,6 +1584,9 @@ class Scheduler(SchedulerInterface):
         assert request.status == RequestStatus.RUNNING, (
             "Only running requests can be preempted"
         )
+        validate_preemption = getattr(self.connector, "validate_preemption", None)
+        if validate_preemption is not None:
+            validate_preemption(request.request_id)
         self._free_request_blocks(request)
         self.encoder_cache_manager.free(request)
         self._inflight_prefills.discard(request)
@@ -2958,7 +2961,7 @@ class Scheduler(SchedulerInterface):
     def apply_early_kv_load_completion(self, job_id: int) -> str | None:
         """Expose load readiness while ordinary worker accounting stays pending."""
         connector = self.connector
-        resolver = getattr(connector, "get_early_ready_request", None)
+        resolver = getattr(connector, "mark_early_load_copy_complete", None)
         if resolver is None or (req_id := resolver(job_id)) is None:
             return None
         request = self.requests.get(req_id)

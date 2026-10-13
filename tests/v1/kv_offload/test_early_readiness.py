@@ -146,14 +146,14 @@ def test_scheduler_early_readiness_is_stale_safe_and_deduplicated():
     scheduler.requests = {"req": request}
     scheduler.finished_recving_kv_req_ids = set()
     scheduler.connector = MagicMock()
-    scheduler.connector.get_early_ready_request.return_value = "req"
+    scheduler.connector.mark_early_load_copy_complete.return_value = "req"
 
     assert scheduler.apply_early_kv_load_completion(3) == "req"
     assert scheduler.apply_early_kv_load_completion(3) is None
     request.status = RequestStatus.FINISHED_ABORTED
     scheduler.finished_recving_kv_req_ids.clear()
     assert scheduler.apply_early_kv_load_completion(3) is None
-    scheduler.connector.get_early_ready_request.return_value = None
+    scheduler.connector.mark_early_load_copy_complete.return_value = None
     assert scheduler.apply_early_kv_load_completion(99) is None
 
 
@@ -350,7 +350,7 @@ def test_completion_during_delay_is_ready_for_immediate_successor(monkeypatch):
     scheduler.requests = {"req": request}
     scheduler.finished_recving_kv_req_ids = set()
     scheduler.connector = MagicMock()
-    scheduler.connector.get_early_ready_request.return_value = "req"
+    scheduler.connector.mark_early_load_copy_complete.return_value = "req"
     core.scheduler = scheduler
     predecessor: Future = Future()
     sleeps: list[float] = []

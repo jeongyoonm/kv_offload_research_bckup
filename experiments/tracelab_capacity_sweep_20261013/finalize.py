@@ -138,9 +138,14 @@ def finalize():
     plan = json.loads((ROOT / "plan.json").read_text())
     keys = {(pair["rate"], pair["concurrency"], pair["repeat"]) for pair in pairs}
     assert {(0.2, limit, 0) for limit in (32, 40, 48)} <= keys
-    assert len(results) == 2 * len(pairs), (
-        "An unmatched cell must be disclosed/resolved"
-    )
+    paired_episodes = {
+        pair[arm]["episode"] for pair in pairs for arm in ("baseline", "full")
+    }
+    unpaired = [r["episode"] for r in results if r["episode"] not in paired_episodes]
+    rejected = []
+    for path in sorted((ROOT / "rejected").glob("*/exclusion.json")):
+        rejected.append(dict(path=str(path), **json.loads(path.read_text())))
+    assert len(results) == 2 * len(pairs) + len(unpaired)
     assert all(
         result["accepted"] and all(result["checks"].values()) for result in results
     )
@@ -230,6 +235,8 @@ def finalize():
         time=time.time(),
         matched_pairs=len(pairs),
         cells=len(results),
+        unpaired_cells=unpaired,
+        rejected_attempts=rejected,
         checks_verified=True,
         trace_content_checks=verified_hashes,
         registered_cpu_bytes=registered,
@@ -268,6 +275,8 @@ def finalize():
         "TraceLab capacity sweep: verified final analysis",
         "",
         f"Completed {len(results)} accepted cells / {len(pairs)} matched pairs.",
+        f"Unpaired accepted controls (no inferred gain): {unpaired}",
+        f"Rejected incomplete attempts (not performance samples): {rejected}",
         "All submitted requests drained, success/token/retirement/rank accounting",
         "checks passed; physical H2D/D2H bytes matched server counters. All owned",
         "servers stopped. Workload nonarrival contents rehashed and verified.",
@@ -340,10 +349,7 @@ def main():
         process = Path("/proc") / str(owner["pid"]) / "cmdline"
         while process.exists():
             try:
-                if (
-                    b"tracelab_capacity_sweep_20261013.campaign"
-                    not in process.read_bytes()
-                ):
+                if b"tracelab_capacity_sweep_20261013." not in process.read_bytes():
                     break
             except FileNotFoundError:
                 break

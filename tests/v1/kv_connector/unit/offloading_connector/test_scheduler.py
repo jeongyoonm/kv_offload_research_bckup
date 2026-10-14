@@ -2374,7 +2374,10 @@ def test_decode_cannot_consume_pending_load_suffix_reservation(request_runner):
     assert not ready.preempted_req_ids
 
 
-def test_new_load_reserves_imminent_decode_growth(request_runner):
+@pytest.mark.parametrize("config_reads_allowed", [True, False])
+def test_new_load_reserves_imminent_decode_growth(
+    request_runner, monkeypatch, config_reads_allowed
+):
     runner = request_runner(
         block_size=4,
         num_gpu_blocks=5,
@@ -2387,6 +2390,16 @@ def test_new_load_reserves_imminent_decode_growth(request_runner):
         keys
     )
     runner.new_request(token_ids=[11] * 5)
+    if not config_reads_allowed:
+
+        def unexpected_config_read(_config):
+            raise AssertionError("Dispatch depth must be resolved at initialization")
+
+        monkeypatch.setattr(
+            type(runner.scheduler.vllm_config),
+            "max_concurrent_batches",
+            property(unexpected_config_read),
+        )
     output = runner.scheduler.schedule()
     assert not output.kv_connector_metadata.load_jobs
     assert runner.scheduler.requests["1"].status == RequestStatus.WAITING

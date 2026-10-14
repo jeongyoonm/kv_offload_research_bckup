@@ -126,6 +126,7 @@ class Scheduler(SchedulerInterface):
             else self.scheduler_config.max_num_batched_tokens
         )
         self.max_model_len = vllm_config.model_config.max_model_len
+        self.max_concurrent_batches = vllm_config.max_concurrent_batches
         self.enable_kv_cache_events = (
             self.kv_events_config is not None
             and self.kv_events_config.enable_kv_cache_events
@@ -175,7 +176,7 @@ class Scheduler(SchedulerInterface):
             # still be writing a freed request's KV blocks. A consumer KV
             # Connector can reallocate and fill those blocks via a load that
             # isn't ordered against that write, so defer freeing them.
-            multiple_inflight_batches = self.vllm_config.max_concurrent_batches > 1
+            multiple_inflight_batches = self.max_concurrent_batches > 1
             if multiple_inflight_batches and kv_transfer_config.is_kv_consumer:
                 self.defer_block_free = True
 
@@ -3314,7 +3315,7 @@ class Scheduler(SchedulerInterface):
 
     def _decode_growth_reserved_blocks(self, scheduled: dict[str, int]) -> int:
         """Reserve block-rounded growth over the configured dispatch horizon."""
-        horizon = self.vllm_config.max_concurrent_batches
+        horizon = self.max_concurrent_batches
         growth = horizon * (self.num_sampled_tokens_per_step + self.num_spec_tokens)
         reserved = 0
         for request in self.running:

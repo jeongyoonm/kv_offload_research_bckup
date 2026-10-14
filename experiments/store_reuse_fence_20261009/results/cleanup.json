@@ -1,0 +1,57 @@
+{
+  "time_ns": 2095534189905808,
+  "owned_processes": [
+    {
+      "pid": 3466094,
+      "exists": false
+    },
+    {
+      "pid": 3473644,
+      "exists": false
+    },
+    {
+      "pid": 3476407,
+      "exists": false
+    },
+    {
+      "pid": 3478918,
+      "exists": false
+    },
+    {
+      "pid": 3481548,
+      "exists": false
+    },
+    {
+      "pid": 3485767,
+      "exists": false
+    },
+    {
+      "pid": 3488733,
+      "exists": false
+    },
+    {
+      "pid": 3491619,
+      "exists": false
+    },
+    {
+      "pid": 3494841,
+      "exists": false
+    },
+    {
+      "pid": 3497354,
+      "exists": false
+    }
+  ],
+  "gpu_rows": [
+    "0, 0, 0",
+    "1, 0, 0",
+    "2, 0, 0",
+    "3, 0, 0",
+    "4, 0, 0",
+    "5, 0, 0",
+    "6, 0, 0",
+    "7, 0, 0"
+  ],
+  "gpu_compute_pids": [],
+  "complete": true
+}

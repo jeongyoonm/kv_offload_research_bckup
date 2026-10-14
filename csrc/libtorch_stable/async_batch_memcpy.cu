@@ -1,4 +1,5 @@
 #include "ops.h"
+#include "seal_notifications.h"
 #include <cuda_runtime.h>
 
 #include <algorithm>
@@ -63,6 +64,7 @@ class CompletionRing {
       : path_(std::move(path)), owner_(owner) {
     STD_TORCH_CHECK(session > 0, "completion ring session must be positive");
     STD_TORCH_CHECK(capacity > 0, "completion ring capacity must be positive");
+    if (!owner_) notifier_ = std::make_unique<vllm::SealNotifier>(path_);
     const int flags = owner ? O_RDWR | O_CREAT | O_EXCL : O_RDWR;
     fd_ = open(path_.c_str(), flags, 0600);
     STD_TORCH_CHECK(fd_ >= 0, "failed to open completion ring ", path_, ": ",
@@ -114,12 +116,18 @@ class CompletionRing {
     if (owner_) unlink(path_.c_str());
   }
 
+  void fail() {
+    __atomic_store_n(&header_->failure, 1U, __ATOMIC_RELEASE);
+    if (notifier_) notifier_->kv(-1, false);
+  }
+
   void publish(int64_t job_id, bool success) {
     const uint64_t write =
         __atomic_load_n(&header_->write_pos, __ATOMIC_RELAXED);
     const uint64_t read = __atomic_load_n(&header_->read_pos, __ATOMIC_ACQUIRE);
     if (write - read >= header_->capacity) {
       __atomic_store_n(&header_->overflow, 1U, __ATOMIC_RELEASE);
+      if (notifier_) notifier_->kv(job_id, false);
       throw std::runtime_error("async completion ring overflow for " + path_);
     }
     auto& record = records_[write % header_->capacity];
@@ -144,6 +152,7 @@ class CompletionRing {
       __atomic_store_n(&header_->failure, 1U, __ATOMIC_RELEASE);
     }
     __atomic_store_n(&header_->write_pos, write + 1, __ATOMIC_RELEASE);
+    if (notifier_) notifier_->kv(job_id, success);
   }
 
   std::tuple<std::vector<int64_t>, std::vector<int64_t>, std::vector<int64_t>,
@@ -180,6 +189,7 @@ class CompletionRing {
  private:
   std::string path_;
   bool owner_;
+  std::unique_ptr<vllm::SealNotifier> notifier_;
   int fd_ = -1;
   void* mapping_ = nullptr;
   size_t mapped_size_ = 0;
@@ -409,6 +419,12 @@ class AsyncBatchMemcpySubmitter {
       std::lock_guard<std::mutex> lock(mutex_);
       if (error_.empty()) error_ = std::move(error);
       stopping_ = true;
+    }
+    if (completion_ring_) {
+      try {
+        completion_ring_->fail();
+      } catch (...) {
+      }
     }
     condition_.notify_all();
   }
@@ -818,3 +834,5 @@ void destroy_async_batch_memcpy_submitter(int64_t handle) {
   STD_TORCH_CHECK(false, "async batch memcpy submitter is unavailable");
 #endif
 }
+
+int64_t coalesced_seal_notification_abi() { return 1; }

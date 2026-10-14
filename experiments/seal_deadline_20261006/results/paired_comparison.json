@@ -1,0 +1,62 @@
+{
+  "source_commit": "bcc4212090cd6d67996d02a1c61cd07b96544f83",
+  "aggregate": [
+    {
+      "policy": "compact_shadow",
+      "episodes": 4,
+      "requests": 300,
+      "throughput": 7.106708730992956,
+      "mean_ttft_ms": 3907.06338754,
+      "mean_cell_p95_ttft_ms": 5404.48739935,
+      "compute_rounds": 50,
+      "late_admissions": 280,
+      "recovered_compute_opportunities": 254,
+      "kv_ready_during_compute": 271,
+      "missed_ready_at_worker_entry_with_seal_ack": 3,
+      "total_compute_span_ms": 39307.327941999996,
+      "seal_reasons": {
+        "ordinary": 33,
+        "candidate_target_ready": 43,
+        "deadline": 12,
+        "predecessor_compute_finished": 7
+      },
+      "mean_gap_lower_ms": 518.791002,
+      "mean_gap_upper_ms": 529.7214405,
+      "mean_non_load_late_enqueue_lower_ms": 20.09209725,
+      "throughput_pair_statistics": {
+        "paired_geometric_gain_pct": 0.0,
+        "paired_95pct_lower_gain_pct": 0.0,
+        "paired_95pct_upper_gain_pct": 0.0
+      }
+    },
+    {
+      "policy": "deadline5",
+      "episodes": 4,
+      "requests": 300,
+      "throughput": 7.192922744172112,
+      "mean_ttft_ms": 3858.02576708,
+      "mean_cell_p95_ttft_ms": 5442.760695024999,
+      "compute_rounds": 52,
+      "late_admissions": 276,
+      "recovered_compute_opportunities": 261,
+      "kv_ready_during_compute": 279,
+      "missed_ready_at_worker_entry_with_seal_ack": 8,
+      "total_compute_span_ms": 39478.528368,
+      "seal_reasons": {
+        "ordinary": 36,
+        "candidate_target_ready": 42,
+        "deadline": 12,
+        "compute_seal_deadline": 8
+      },
+      "mean_gap_lower_ms": 383.30650875000003,
+      "mean_gap_upper_ms": 394.870046,
+      "mean_non_load_late_enqueue_lower_ms": 0.0,
+      "throughput_pair_statistics": {
+        "paired_geometric_gain_pct": 1.2134979866543771,
+        "paired_95pct_lower_gain_pct": -0.69066218471594,
+        "paired_95pct_upper_gain_pct": 3.1541685812940257
+      }
+    }
+  ],
+  "scope": "300 measured requests per policy in four independent 75-request episodes, with cache resets and excluded priming between episodes. This is not a continuous 300-request stream. Policy order alternates between pairs. The paired interval uses Student t with 3 degrees of freedom on log throughput ratios."
+}

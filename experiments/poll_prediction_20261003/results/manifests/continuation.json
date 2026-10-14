@@ -1,0 +1,39 @@
+{
+  "name": "confirmation",
+  "workloads": [
+    [
+      8192,
+      95,
+      100
+    ],
+    [
+      61440,
+      95,
+      100
+    ],
+    [
+      61440,
+      99,
+      100
+    ]
+  ],
+  "counts": [
+    300,
+    80,
+    80
+  ],
+  "policies": [
+    "hybrid_50ms",
+    "hybrid_20ms",
+    "recent_1ms",
+    "prediction_5ms",
+    "prediction_1ms",
+    "readiness_10ms",
+    "readiness_1ms",
+    "fixed"
+  ],
+  "repeats": 1,
+  "seed": 56,
+  "distinct_fact_probe": true,
+  "selection_reason": "Fresh-seed reversed-order check of short-readiness10ms gain and prediction5ms signal; retain original1ms controls, fixed control, revised reserve and hybrid50ms. Register before the long prediction and final60K99 screen results; no claim of an optimum. Added hybrid20ms after long95 screen7.19rps vsfixed7.10, before long99 screen; all other selected cells retained."
+}

@@ -100,6 +100,17 @@ class RankFile:
             os.ftruncate(self.fd, CAPACITY * RECORD.size)
         self.mem = mmap.mmap(self.fd, CAPACITY * RECORD.size)
         self.lock = threading.Lock()
+        self.seal = None
+        descriptor = Path(path + ".seal")
+        if path.endswith(".execution") and descriptor.exists():
+            from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+            lines = descriptor.read_text().splitlines()
+            self.seal = SealNotifications(lines[0])
+            self.seal_rank = int(lines[1])
+            if self.seal._get(1) != int(lines[2]):
+                self.seal.close()
+                raise RuntimeError("stale execution notification session")
 
     def write(self, record: list[int]) -> None:
         with self.lock:
@@ -108,6 +119,8 @@ class RankFile:
                 RECORD.pack_into(self.mem, record[0] % CAPACITY * RECORD.size, *record)
             finally:
                 fcntl.flock(self.fd, fcntl.LOCK_UN)
+        if self.seal is not None and (record[5] == 0 or record[8]):
+            self.seal.compute(record[0], self.seal_rank, record[5] != 0)
 
     def read(self, step: int) -> tuple[int, ...] | None:
         return self.read_with_status(step)[0]
@@ -126,6 +139,8 @@ class RankFile:
             fcntl.flock(self.fd, fcntl.LOCK_UN)
 
     def close(self):
+        if self.seal is not None:
+            self.seal.close()
         self.mem.close()
         os.close(self.fd)
 
@@ -160,8 +175,26 @@ class TimingChannel:
         except BaseException:
             self.close()
             raise
-        config.kv_transfer_config.kv_connector_extra_config[PATH_KEY] = self.paths
+        extra = config.kv_transfer_config.kv_connector_extra_config
+        from vllm.v1.kv_offload.seal_notifications import PATH_KEY as SEAL_PATH_KEY
+
+        self.notification_links = []
+        if SEAL_PATH_KEY in extra:
+            from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+            channel = SealNotifications(extra[SEAL_PATH_KEY])
+            try:
+                for rank, path in enumerate(self.paths):
+                    self.notification_links.append(
+                        channel.descriptor(path + ".execution", rank)
+                    )
+            finally:
+                channel.close()
+        extra[PATH_KEY] = self.paths
         self.events: list[dict] = []
+        from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
+
+        self.seal_estimator = ComputeEstimator()
         self.steps: dict[int, dict] = {}
         self.registrations: dict[int, tuple[int, int]] = {}
         self.predictor: Predictor | OverlapPredictor | None = None
@@ -178,6 +211,11 @@ class TimingChannel:
             from vllm.v1.kv_offload.shadow_timing_audit import ShadowTimingAudit
 
             self.audit = ShadowTimingAudit(self.paths)
+        self.dataset_shadow = None
+        if os.environ.get("VLLM_PREDICTOR_DATASET_SHADOW") == "1":
+            from vllm.v1.kv_offload.dataset_shadow import DatasetShadow
+
+            self.dataset_shadow = DatasetShadow(self)
 
     def emit(self, event: str, **fields):
         self.events.append(dict(event=event, time_ns=time.monotonic_ns(), **fields))
@@ -321,6 +359,8 @@ class TimingChannel:
             ):
                 continue
             if complete or now - data["dispatch_ns"] > 60_000_000_000:
+                self.seal_estimator.observe(data, execution)
+                self.seal_estimator.observe_preparation(records, data)
                 self.emit(
                     "step_completion",
                     **data,
@@ -359,6 +399,9 @@ class TimingChannel:
 
     def flush(self):
         self.collect()
+        shadow = getattr(self, "dataset_shadow", None)
+        if shadow is not None:
+            self.events.extend(shadow.drain())
         audit = getattr(self, "audit", None)
         if audit is not None:
             self.events.extend(audit.flush())
@@ -369,6 +412,9 @@ class TimingChannel:
         self.events.clear()
 
     def close(self):
+        shadow = getattr(self, "dataset_shadow", None)
+        if shadow is not None:
+            shadow.close()
         audit = getattr(self, "audit", None)
         if audit is not None:
             audit.close()
@@ -382,6 +428,9 @@ class TimingChannel:
         for path in self.paths:
             with contextlib.suppress(FileNotFoundError):
                 os.unlink(path + ".execution")
+        for path in getattr(self, "notification_links", []):
+            with contextlib.suppress(FileNotFoundError):
+                os.unlink(path)
 
 
 def timing_only(fn):
@@ -440,6 +489,8 @@ class WorkerTiming:
                     else ExecutionObserver(path + ".execution", device)
                 )
             except Exception:
+                if os.path.exists(path + ".execution.seal"):
+                    raise
                 self.execution = UnavailableExecutionObserver(path + ".execution")
         self.thread.start()
 

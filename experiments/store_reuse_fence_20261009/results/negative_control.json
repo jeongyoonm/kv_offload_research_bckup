@@ -1,0 +1,12 @@
+[
+  {
+    "overwrite": "forward",
+    "missing_fence_detected": true,
+    "error": "Tensor-likes are not equal!\n\nMismatched elements: 131072 / 131072 (100.0%)\nGreatest absolute difference: 73 at index (0,)\nGreatest relative difference: 4.294117450714111 at index (0,)"
+  },
+  {
+    "overwrite": "load",
+    "missing_fence_detected": true,
+    "error": "Tensor-likes are not equal!\n\nMismatched elements: 131072 / 131072 (100.0%)\nGreatest absolute difference: 73 at index (0,)\nGreatest relative difference: 4.294117450714111 at index (0,)"
+  }
+]

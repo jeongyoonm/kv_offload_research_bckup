@@ -1,0 +1,8 @@
+{
+  "workload": "unseen48k",
+  "prefixes": 90,
+  "prefix_tokens": 4423680,
+  "conservative_cpu_tokens": 4890240,
+  "gpu_capacity_tokens": 2160960,
+  "cpu_capacity_tokens": 5582080
+}

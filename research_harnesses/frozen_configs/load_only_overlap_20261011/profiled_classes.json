@@ -1,0 +1,14 @@
+{
+  "transfer_heavy": [
+    65536,
+    128
+  ],
+  "compute_heavy": [
+    4096,
+    8192
+  ],
+  "balanced": [
+    32768,
+    512
+  ]
+}

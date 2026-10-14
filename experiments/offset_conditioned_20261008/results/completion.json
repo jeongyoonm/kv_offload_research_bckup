@@ -1,0 +1,93 @@
+{
+  "complete": true,
+  "measured_cells": 9,
+  "measured_requests": 675,
+  "excluded_conditioning_cells": 9,
+  "excluded_conditioning_requests": 288,
+  "all_request_accounting_passed": true,
+  "allocation": {
+    "seconds": 2571.0704250638373,
+    "server_stopped": true
+  },
+  "cleanup": {
+    "owned_server_stopped": true,
+    "owned_active_workers": [],
+    "gpu_memory_released": true,
+    "memory_used_mib": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "compute_apps": "",
+    "checked_at": 1791414596.9465327
+  },
+  "paired_offset_vs_elapsed": {
+    "gain_percent": 4.310330179301072,
+    "bounds": [
+      -33.23040591593802,
+      62.9580819139956
+    ]
+  },
+  "issued_replay_difference_ns": 0,
+  "conditioning_phase_pairs": [
+    {
+      "repeat": 0,
+      "predictor": "matched_elapsed",
+      "common_tree_conditioning_rps": 5.881943729809981,
+      "measured_rps": 5.619264505924627
+    },
+    {
+      "repeat": 0,
+      "predictor": "matched_offset",
+      "common_tree_conditioning_rps": 6.80868750916682,
+      "measured_rps": 7.13383015316383
+    },
+    {
+      "repeat": 0,
+      "predictor": "trees",
+      "common_tree_conditioning_rps": 5.752154006369505,
+      "measured_rps": 5.574062053895528
+    },
+    {
+      "repeat": 1,
+      "predictor": "matched_elapsed",
+      "common_tree_conditioning_rps": 5.915281458003514,
+      "measured_rps": 6.113145531619853
+    },
+    {
+      "repeat": 1,
+      "predictor": "matched_offset",
+      "common_tree_conditioning_rps": 6.559373027412688,
+      "measured_rps": 6.122292309881737
+    },
+    {
+      "repeat": 1,
+      "predictor": "trees",
+      "common_tree_conditioning_rps": 6.836285063800921,
+      "measured_rps": 7.159002864517212
+    },
+    {
+      "repeat": 2,
+      "predictor": "matched_elapsed",
+      "common_tree_conditioning_rps": 6.925780480567939,
+      "measured_rps": 6.871534418519942
+    },
+    {
+      "repeat": 2,
+      "predictor": "matched_offset",
+      "common_tree_conditioning_rps": 5.927896458604799,
+      "measured_rps": 6.133990094472935
+    },
+    {
+      "repeat": 2,
+      "predictor": "trees",
+      "common_tree_conditioning_rps": 5.91686748121981,
+      "measured_rps": 6.118664584048154
+    }
+  ]
+}

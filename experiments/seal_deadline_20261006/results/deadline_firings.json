@@ -1,0 +1,102 @@
+{
+  "source_commit": "bcc4212090cd6d67996d02a1c61cd07b96544f83",
+  "firings": [
+    {
+      "cell": "r0_deadline5",
+      "step": 501,
+      "overshoot_ms": 0.150795,
+      "arm_headroom_ms": 119.29443,
+      "actual_seal_lead_lower_ms": 23.781435,
+      "actual_seal_lead_upper_ms": 24.340419,
+      "actual_enqueue_lead_lower_ms": 20.112326,
+      "actual_enqueue_lead_upper_ms": 20.67131,
+      "last_wait_requested_ms": 0.936626,
+      "last_wait_actual_ms": 0.991586
+    },
+    {
+      "cell": "r0_deadline5",
+      "step": 502,
+      "overshoot_ms": 0.164604,
+      "arm_headroom_ms": 273.940939,
+      "actual_seal_lead_lower_ms": 164.069978,
+      "actual_seal_lead_upper_ms": 164.633888,
+      "actual_enqueue_lead_lower_ms": 158.211547,
+      "actual_enqueue_lead_upper_ms": 158.775457,
+      "last_wait_requested_ms": 1.503874,
+      "last_wait_actual_ms": 1.560373
+    },
+    {
+      "cell": "r1_deadline5",
+      "step": 604,
+      "overshoot_ms": 3.016282,
+      "arm_headroom_ms": 125.639731,
+      "actual_seal_lead_lower_ms": 16.793974,
+      "actual_seal_lead_upper_ms": 17.356065,
+      "actual_enqueue_lead_lower_ms": 13.481193,
+      "actual_enqueue_lead_upper_ms": 14.043284,
+      "last_wait_requested_ms": 2.0,
+      "last_wait_actual_ms": 7.1268
+    },
+    {
+      "cell": "r1_deadline5",
+      "step": 605,
+      "overshoot_ms": 3.616225,
+      "arm_headroom_ms": 269.016853,
+      "actual_seal_lead_lower_ms": 160.803634,
+      "actual_seal_lead_upper_ms": 161.366756,
+      "actual_enqueue_lead_lower_ms": 155.014213,
+      "actual_enqueue_lead_upper_ms": 155.577335,
+      "last_wait_requested_ms": 2.0,
+      "last_wait_actual_ms": 6.971088
+    },
+    {
+      "cell": "r2_deadline5",
+      "step": 923,
+      "overshoot_ms": 1.87328,
+      "arm_headroom_ms": 166.236923,
+      "actual_seal_lead_lower_ms": 127.352233,
+      "actual_seal_lead_upper_ms": 127.512436,
+      "actual_enqueue_lead_lower_ms": 124.618552,
+      "actual_enqueue_lead_upper_ms": 124.778755,
+      "last_wait_requested_ms": 2.0,
+      "last_wait_actual_ms": 6.252387
+    },
+    {
+      "cell": "r2_deadline5",
+      "step": 925,
+      "overshoot_ms": 0.181022,
+      "arm_headroom_ms": 362.82789,
+      "actual_seal_lead_lower_ms": 27.907107,
+      "actual_seal_lead_upper_ms": 28.462415,
+      "actual_enqueue_lead_lower_ms": 16.867754,
+      "actual_enqueue_lead_upper_ms": 17.423062,
+      "last_wait_requested_ms": 0.171384,
+      "last_wait_actual_ms": 0.205927
+    },
+    {
+      "cell": "r3_deadline5",
+      "step": 1029,
+      "overshoot_ms": 0.396393,
+      "arm_headroom_ms": 165.880798,
+      "actual_seal_lead_lower_ms": 160.520337,
+      "actual_seal_lead_upper_ms": 161.083279,
+      "actual_enqueue_lead_lower_ms": 157.035688,
+      "actual_enqueue_lead_upper_ms": 157.59863,
+      "last_wait_requested_ms": 2.0,
+      "last_wait_actual_ms": 7.001998
+    },
+    {
+      "cell": "r3_deadline5",
+      "step": 1031,
+      "overshoot_ms": 0.153336,
+      "arm_headroom_ms": 363.447478,
+      "actual_seal_lead_lower_ms": 26.914701,
+      "actual_seal_lead_upper_ms": 27.471634,
+      "actual_enqueue_lead_lower_ms": 19.377509,
+      "actual_enqueue_lead_upper_ms": 19.934442,
+      "last_wait_requested_ms": 1.656801,
+      "last_wait_actual_ms": 1.712609
+    }
+  ],
+  "scope": "Positive lead means before all-rank preceding execution end. Bounds use instrumented execution timings, not isolated GPU kernel completion. The configured 5 ms applies to predicted completion, not actual completion."
+}

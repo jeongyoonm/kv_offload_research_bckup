@@ -1,0 +1,5 @@
+{
+  "returncode": 0,
+  "stdout": "INFO 10-08 23:59:18 [deep_gemm.py:186] deep_gemm not found in site-packages, trying vendored vllm.third_party.deep_gemm\n/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/vllm/third_party/deep_gemm/__init__.py\n",
+  "stderr": "/mnt/localnvme/vllm_glm53_load_only_deadline_ab_20261008/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:\nNo module named 'vllm._version'\n  from .version import __version__, __version_tuple__  # isort:skip\n"
+}

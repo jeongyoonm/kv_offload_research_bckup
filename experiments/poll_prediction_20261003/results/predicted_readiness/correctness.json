@@ -1,0 +1,102 @@
+{
+  "fixed": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776
+    ],
+    "passed": true
+  },
+  "prediction_1ms": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776
+    ],
+    "passed": true
+  },
+  "readiness_2ms": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776
+    ],
+    "passed": true
+  },
+  "predicted_readiness_50ms": {
+    "text_matches": 16,
+    "requests": 16,
+    "answer": "river flow and rainfall.",
+    "completion_tokens": 5,
+    "cached_tokens": [
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776,
+      11776
+    ],
+    "passed": true
+  }
+}

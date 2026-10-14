@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "source": "/mnt/localnvme/glm53_load_only_deadline_ab_20261008/live/familiar60k/r0_half_on",
+  "diagnostics": {
+    "windows": 14,
+    "progress_polls": 1681,
+    "scheduler_wait_returns": 570,
+    "coarse_wait_returns": 55,
+    "fine_wait_returns": 515,
+    "notification_wait_returns": 50,
+    "progress_bridge_scans": 0,
+    "progress_bridge_notifications": 50,
+    "poll_cpu_ms": 103.014705,
+    "bridge_cpu_ms": 0.0,
+    "total_wait_cpu_ms": 103.014705,
+    "total_wait_wall_ms": 4012.037323,
+    "oversleep_total_ms": 51.802452,
+    "oversleep_p95_ms": 0.05622919999999999,
+    "oversleep_max_ms": 11.184278,
+    "compute_exposed_hold_ms": 0.971097,
+    "compute_exposed_wait_ms": 0.198056,
+    "late_compute_seals": 1,
+    "late_compute_seal_max_ms": 0.971097,
+    "deadline_overshoot_max_ms": 0.245627,
+    "seal_reasons": {
+      "candidate_target_ready": 6,
+      "deadline": 3,
+      "predecessor_compute_finished": 1,
+      "compute_seal_deadline": 4
+    }
+  }
+}

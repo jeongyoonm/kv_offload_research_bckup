@@ -1,0 +1,57 @@
+{
+  "archived_checkpoint": "/mnt/localnvme/glm53_predictor_overnight_20261006/boosted_residual/model.json",
+  "archived_sha256": "d1e51886711ba092148af692929a0024d8d832bd7a89368c8f14f0e30b557ec3",
+  "archived_scores": {
+    "samples": 670,
+    "episodes": 79,
+    "mae_ms": 19.624434137313436,
+    "mape_percent": 5.036860152746364,
+    "bias_ms": -4.374474802985073,
+    "p95_absolute_ms": 60.466819199999925,
+    "under_gt5_percent": 43.582089552238806,
+    "over_gt5_percent": 30.895522388059703,
+    "p95_under_ms": 52.82720925000001,
+    "p95_over_ms": 39.15996019999999,
+    "workload_macro_mae_ms": 18.175088667822724,
+    "worst_workload_mae_ms": 28.57658772789115,
+    "per_workload_mae_ms": {
+      "mixed_h100": 25.37232247058822,
+      "p16384_f95_h100": 21.335540454545455,
+      "p20480_f95_h100": 16.000900466666664,
+      "p24576_f90_h100": 5.384839750000005,
+      "p32768_f90_h100": 11.780946921259844,
+      "p40960_f95_h100": 22.541637812500007,
+      "p49152_f98_h100": 28.57658772789115,
+      "p61440_f95_h100": 14.407933739130442
+    }
+  },
+  "legacy_refit_max_difference_ms": 2.520666384953074e-06,
+  "new_refit_scores": {
+    "samples": 670,
+    "episodes": 79,
+    "mae_ms": 19.0329011821235,
+    "mape_percent": 4.9166527435149785,
+    "bias_ms": -4.304216803168255,
+    "p95_absolute_ms": 59.3499704769772,
+    "under_gt5_percent": 43.43283582089552,
+    "over_gt5_percent": 31.044776119402982,
+    "p95_under_ms": 51.53343729033523,
+    "p95_over_ms": 34.678040807696696,
+    "workload_macro_mae_ms": 17.437057523957968,
+    "worst_workload_mae_ms": 29.877972552940808,
+    "per_workload_mae_ms": {
+      "mixed_h100": 22.49952103752204,
+      "p16384_f95_h100": 18.627133821952736,
+      "p20480_f95_h100": 14.639446199509415,
+      "p24576_f90_h100": 4.722736117554234,
+      "p32768_f90_h100": 11.552916021137065,
+      "p40960_f95_h100": 22.800253268629167,
+      "p49152_f98_h100": 29.877972552940808,
+      "p61440_f95_h100": 14.77648117241829
+    }
+  },
+  "new_refit_max_difference_ms": 52.37186721569424,
+  "weight_max_difference": 9.414691248821327e-14,
+  "features_and_targets_identical": true,
+  "cause": "numpy.sum versus legacy built-in sum for weight normalization; roundoff changes tied Extra Trees split selection"
+}

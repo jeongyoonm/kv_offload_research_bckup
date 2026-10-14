@@ -1,0 +1,537 @@
+{
+  "upstream_commit": "11b8b14c6005808ab272b3431487066832582414",
+  "exporter_command": [
+    "/mnt/localnvme/jeongyoon/trace_characterization_20261012/.venv/bin/python",
+    "/mnt/localnvme/jeongyoon/tracelab_replay_review_20261013/artifacts/trace_facts/csv_export/convert.py",
+    "--db",
+    "/mnt/localnvme/jeongyoon/tracelab_runner_20261013/selected.duckdb",
+    "-o",
+    "/mnt/localnvme/jeongyoon/tracelab_runner_20261013/workload.csv"
+  ],
+  "csv_sha256": "92fd8e5f3bf0b559191f95683fcdec843d3130936a901573b238131da0d4b48f",
+  "source_sha256": "a7bab286bc640844560850965ccf47975cf66407154132abaab90f27ec9be744",
+  "sessions": 64,
+  "requests": 1880,
+  "windows": [
+    {
+      "provider": "codex",
+      "session": "codex:2c526fe7-d6b8-2ccf-cd55-c0c709119afd",
+      "source_start": 0,
+      "source_requests": 41,
+      "requests": 41
+    },
+    {
+      "provider": "codex",
+      "session": "codex:82d0ec72-8dd9-48dc-fa98-9084077b203c",
+      "source_start": 0,
+      "source_requests": 1,
+      "requests": 1
+    },
+    {
+      "provider": "codex",
+      "session": "codex:e1ba2813-d6c2-4680-ffc8-3453f2cafcd5",
+      "source_start": 0,
+      "source_requests": 26,
+      "requests": 26
+    },
+    {
+      "provider": "codex",
+      "session": "codex:39e9cdb3-7fed-d583-4fa3-10e465d90b81",
+      "source_start": 0,
+      "source_requests": 22,
+      "requests": 22
+    },
+    {
+      "provider": "codex",
+      "session": "codex:42bd251c-793b-392d-7163-c08beacefef6",
+      "source_start": 0,
+      "source_requests": 54,
+      "requests": 54
+    },
+    {
+      "provider": "codex",
+      "session": "codex:c3a325a8-d0a6-238a-b4c9-15ff83bdce02",
+      "source_start": 212,
+      "source_requests": 554,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:33bb0656-2cc4-903b-a53f-029ca2955c64",
+      "source_start": 159,
+      "source_requests": 233,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:740165d2-147e-5a07-11bc-b5a844b96e5f",
+      "source_start": 0,
+      "source_requests": 64,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:a4df173a-a231-8a54-3218-5816c5c95472",
+      "source_start": 0,
+      "source_requests": 13,
+      "requests": 13
+    },
+    {
+      "provider": "codex",
+      "session": "codex:ee913a2b-8875-082b-c974-188047b8005d",
+      "source_start": 0,
+      "source_requests": 16,
+      "requests": 16
+    },
+    {
+      "provider": "codex",
+      "session": "codex:b6021319-c841-aefb-d34e-4cb035da47ee",
+      "source_start": 0,
+      "source_requests": 14,
+      "requests": 14
+    },
+    {
+      "provider": "codex",
+      "session": "codex:8c5b3590-e299-a819-8d4d-d89019b16b4d",
+      "source_start": 0,
+      "source_requests": 6,
+      "requests": 6
+    },
+    {
+      "provider": "codex",
+      "session": "codex:9d1596c1-68ab-5b98-ccd0-957bc8ab6d6c",
+      "source_start": 0,
+      "source_requests": 9,
+      "requests": 9
+    },
+    {
+      "provider": "codex",
+      "session": "codex:ea44dfe8-c97e-5308-d3a8-469778084651",
+      "source_start": 31,
+      "source_requests": 162,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:b969597c-d1b4-57f3-1a44-cb64df37d452",
+      "source_start": 0,
+      "source_requests": 22,
+      "requests": 22
+    },
+    {
+      "provider": "codex",
+      "session": "codex:d201d784-6d90-0198-c032-2ea1c7e39709",
+      "source_start": 51,
+      "source_requests": 225,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:b3b1e526-9335-176c-4315-a5c8e3d52f95",
+      "source_start": 0,
+      "source_requests": 18,
+      "requests": 18
+    },
+    {
+      "provider": "codex",
+      "session": "codex:76d41c21-ce35-974a-d78a-ec2afe47b30c",
+      "source_start": 0,
+      "source_requests": 2,
+      "requests": 2
+    },
+    {
+      "provider": "codex",
+      "session": "codex:fe1e864b-a932-2a11-fab6-0c6519be2fc2",
+      "source_start": 5961,
+      "source_requests": 6294,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:2ee19291-1058-ffe7-2c80-3cbdb10680b3",
+      "source_start": 78,
+      "source_requests": 394,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:135585b7-b381-4311-6e8e-a7fe6afc93d1",
+      "source_start": 0,
+      "source_requests": 53,
+      "requests": 53
+    },
+    {
+      "provider": "codex",
+      "session": "codex:f1df3181-d063-3c63-07e3-49367ccb7cc6",
+      "source_start": 4,
+      "source_requests": 81,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:e20782ed-3c5e-2009-4930-9037dfffeb71",
+      "source_start": 0,
+      "source_requests": 32,
+      "requests": 32
+    },
+    {
+      "provider": "codex",
+      "session": "codex:15f480a4-4a0b-eace-77f1-0cf1cf4fa257",
+      "source_start": 0,
+      "source_requests": 56,
+      "requests": 56
+    },
+    {
+      "provider": "codex",
+      "session": "codex:d6800dbe-5714-ed0c-98f8-2c116dfcf456",
+      "source_start": 2,
+      "source_requests": 67,
+      "requests": 64
+    },
+    {
+      "provider": "codex",
+      "session": "codex:e1606ec4-0884-5f42-5f44-5e48cfa1d6d1",
+      "source_start": 0,
+      "source_requests": 1,
+      "requests": 1
+    },
+    {
+      "provider": "codex",
+      "session": "codex:60e8a540-94f4-e5ff-4e52-fbd40c6cf58e",
+      "source_start": 0,
+      "source_requests": 7,
+      "requests": 7
+    },
+    {
+      "provider": "codex",
+      "session": "codex:f74b9540-9d13-65cd-ea2a-eae05bffbefd",
+      "source_start": 0,
+      "source_requests": 8,
+      "requests": 8
+    },
+    {
+      "provider": "codex",
+      "session": "codex:75034b3c-bdf3-2ac8-4d6f-585914410cf7",
+      "source_start": 0,
+      "source_requests": 22,
+      "requests": 22
+    },
+    {
+      "provider": "codex",
+      "session": "codex:52fbf1af-2ac3-20d0-f734-9f552c95d079",
+      "source_start": 0,
+      "source_requests": 9,
+      "requests": 9
+    },
+    {
+      "provider": "codex",
+      "session": "codex:4328f12c-d9fc-0f18-69bf-edf515db9c20",
+      "source_start": 0,
+      "source_requests": 46,
+      "requests": 46
+    },
+    {
+      "provider": "codex",
+      "session": "codex:47eee2c1-3c7d-4f9c-42a7-822632a8de67",
+      "source_start": 55,
+      "source_requests": 154,
+      "requests": 64
+    },
+    {
+      "provider": "claude",
+      "session": "claude:f77bfd88-1435-591f-f8ea-91a6fa7debc2",
+      "source_start": 0,
+      "source_requests": 9,
+      "requests": 9
+    },
+    {
+      "provider": "claude",
+      "session": "claude:a0b76c25-aee1-4904-0fb8-7578d683bb7b",
+      "source_start": 0,
+      "source_requests": 4,
+      "requests": 4
+    },
+    {
+      "provider": "claude",
+      "session": "claude:73b2f932-3060-3e32-5d48-fb6b51ff1e1c",
+      "source_start": 0,
+      "source_requests": 21,
+      "requests": 21
+    },
+    {
+      "provider": "claude",
+      "session": "claude:ad417a7f-7c09-bbb1-cfb8-1759e38b5426",
+      "source_start": 0,
+      "source_requests": 22,
+      "requests": 22
+    },
+    {
+      "provider": "claude",
+      "session": "claude:45af52a5-20bd-4d71-8ea1-d1b2f497b659",
+      "source_start": 0,
+      "source_requests": 33,
+      "requests": 33
+    },
+    {
+      "provider": "claude",
+      "session": "claude:29117115-c22c-c2d4-97d7-09b8d72be196",
+      "source_start": 0,
+      "source_requests": 5,
+      "requests": 5
+    },
+    {
+      "provider": "claude",
+      "session": "claude:2a850a03-6c07-0519-a1a0-b30f2ae058d3",
+      "source_start": 0,
+      "source_requests": 22,
+      "requests": 22
+    },
+    {
+      "provider": "claude",
+      "session": "claude:5817af74-22ff-96ce-f6eb-df723585d2a5",
+      "source_start": 0,
+      "source_requests": 16,
+      "requests": 16
+    },
+    {
+      "provider": "claude",
+      "session": "claude:b710abef-4d2c-68e7-1878-42cf0b3b23ea",
+      "source_start": 0,
+      "source_requests": 1,
+      "requests": 1
+    },
+    {
+      "provider": "claude",
+      "session": "claude:ee61f183-50ea-761d-711a-434ccc64bebc",
+      "source_start": 0,
+      "source_requests": 2,
+      "requests": 2
+    },
+    {
+      "provider": "claude",
+      "session": "claude:08899664-9415-5fe6-fb8e-d4e9dc0819fe",
+      "source_start": 0,
+      "source_requests": 11,
+      "requests": 11
+    },
+    {
+      "provider": "claude",
+      "session": "claude:eb8302f8-bf7a-aa28-2282-f1e915844742",
+      "source_start": 0,
+      "source_requests": 3,
+      "requests": 3
+    },
+    {
+      "provider": "claude",
+      "session": "claude:79a605bf-e443-32e3-f935-247076badc68",
+      "source_start": 0,
+      "source_requests": 16,
+      "requests": 16
+    },
+    {
+      "provider": "claude",
+      "session": "claude:6fafe726-0154-aa97-e9fa-a8f473bed597",
+      "source_start": 0,
+      "source_requests": 12,
+      "requests": 12
+    },
+    {
+      "provider": "claude",
+      "session": "claude:bad58632-5b2d-1777-df40-dc4f5f8b2911",
+      "source_start": 3,
+      "source_requests": 95,
+      "requests": 64
+    },
+    {
+      "provider": "claude",
+      "session": "claude:33592795-7356-f524-c4ec-ee7ed3bda58c",
+      "source_start": 0,
+      "source_requests": 1,
+      "requests": 1
+    },
+    {
+      "provider": "claude",
+      "session": "claude:f19d9453-a179-a07e-34a7-5d80d7b571f0",
+      "source_start": 0,
+      "source_requests": 26,
+      "requests": 26
+    },
+    {
+      "provider": "claude",
+      "session": "claude:6eb6fcd1-538c-518e-8522-dd47ebdcc826",
+      "source_start": 0,
+      "source_requests": 9,
+      "requests": 9
+    },
+    {
+      "provider": "claude",
+      "session": "claude:f75f1cdd-ad21-6e5b-5872-6dfa94d667d8",
+      "source_start": 0,
+      "source_requests": 45,
+      "requests": 45
+    },
+    {
+      "provider": "claude",
+      "session": "claude:253d524d-ad0d-e7f6-9982-cbc1e299c93a",
+      "source_start": 539,
+      "source_requests": 1273,
+      "requests": 64
+    },
+    {
+      "provider": "claude",
+      "session": "claude:3d4c2ea8-9155-a8ca-44a7-e927ec66492b",
+      "source_start": 48,
+      "source_requests": 125,
+      "requests": 64
+    },
+    {
+      "provider": "claude",
+      "session": "claude:e2e59584-4825-ef7e-0c20-297f02325f47",
+      "source_start": 0,
+      "source_requests": 51,
+      "requests": 51
+    },
+    {
+      "provider": "claude",
+      "session": "claude:3ed97ec2-29a7-c03c-1c7d-8244c52ed118",
+      "source_start": 0,
+      "source_requests": 51,
+      "requests": 51
+    },
+    {
+      "provider": "claude",
+      "session": "claude:46f3de37-b2e9-d656-d6de-62e6d19561e6",
+      "source_start": 0,
+      "source_requests": 10,
+      "requests": 10
+    },
+    {
+      "provider": "claude",
+      "session": "claude:76c31b8a-f328-3776-5bd6-e89e0da56757",
+      "source_start": 0,
+      "source_requests": 29,
+      "requests": 29
+    },
+    {
+      "provider": "claude",
+      "session": "claude:9259d7b2-fe53-8052-a46e-f5b042f2dfc9",
+      "source_start": 0,
+      "source_requests": 9,
+      "requests": 9
+    },
+    {
+      "provider": "claude",
+      "session": "claude:9982fd4a-a778-0ae2-74cd-66e9a762cee1",
+      "source_start": 0,
+      "source_requests": 13,
+      "requests": 13
+    },
+    {
+      "provider": "claude",
+      "session": "claude:715aeb01-f3bb-2344-a23d-b658d92efee0",
+      "source_start": 0,
+      "source_requests": 32,
+      "requests": 32
+    },
+    {
+      "provider": "claude",
+      "session": "claude:6b8a8320-20b4-5837-e9e3-305a348d0eb0",
+      "source_start": 3,
+      "source_requests": 90,
+      "requests": 64
+    },
+    {
+      "provider": "claude",
+      "session": "claude:e2efa65c-5a5d-5c7f-4c69-f6b5aefd0da5",
+      "source_start": 0,
+      "source_requests": 11,
+      "requests": 11
+    },
+    {
+      "provider": "claude",
+      "session": "claude:4460217c-0896-6216-4749-54f4713f06e4",
+      "source_start": 0,
+      "source_requests": 28,
+      "requests": 28
+    },
+    {
+      "provider": "claude",
+      "session": "claude:2eef986e-8ee6-8598-e877-32b337ecdc28",
+      "source_start": 0,
+      "source_requests": 14,
+      "requests": 14
+    }
+  ],
+  "tool_wait_seconds_total": 12564.578,
+  "tool_wait_seconds_longest_session": 2557.4570000000003,
+  "tool_wait_seconds_by_session": {
+    "0": 1647.2129999999995,
+    "1": 0.9930000000000001,
+    "2": 0.006,
+    "3": 910.215,
+    "4": 727.38,
+    "5": 1.017,
+    "6": 761.1910000000001,
+    "7": 549.0870000000002,
+    "8": 6.257999999999999,
+    "9": 152.597,
+    "10": 90.94800000000001,
+    "11": 8.685,
+    "12": 43.79100000000001,
+    "13": 2.182,
+    "14": 1734.9779999999998,
+    "15": 17.829,
+    "16": 1.0000000000000002,
+    "17": 0.844,
+    "18": 29.068999999999996,
+    "19": 1.362,
+    "20": 6.011,
+    "21": 1.803,
+    "22": 1.093,
+    "23": 20.275,
+    "24": 114.88100000000001,
+    "25": 0.958,
+    "26": 57.06299999999999,
+    "27": 15.053999999999995,
+    "28": 4.534,
+    "29": 0.0,
+    "30": 8.071,
+    "31": 0.0,
+    "32": 1.2590000000000001,
+    "33": 11.286,
+    "34": 26.991,
+    "35": 0.0,
+    "36": 36.61400000000001,
+    "37": 0.148,
+    "38": 0.0,
+    "39": 707.9310000000002,
+    "40": 18.969999999999995,
+    "41": 63.30799999999999,
+    "42": 0.0,
+    "43": 299.24699999999996,
+    "44": 1.6669999999999998,
+    "45": 5.7059999999999995,
+    "46": 0.0,
+    "47": 27.383000000000003,
+    "48": 0.0,
+    "49": 1278.281,
+    "50": 50.88100000000001,
+    "51": 99.69999999999999,
+    "52": 6.95,
+    "53": 0.9880000000000004,
+    "54": 8.018999999999998,
+    "55": 2557.4570000000003,
+    "56": 1.8289999999999995,
+    "57": 0.003,
+    "58": 266.6609999999999,
+    "59": 88.42800000000004,
+    "60": 1.932,
+    "61": 26.62299999999999,
+    "62": 7.691,
+    "63": 52.237000000000016
+  },
+  "largest_single_wait_seconds": 1518.859,
+  "concurrency_definition": "Unmodified runner max_active_sessions: permit held for complete session including waits",
+  "timing": "Unmodified converter defaults: seeded Poisson session arrivals at 1/s, seed 0, summed wall tool waits; unmodified runner sleeps",
+  "scope": "Same frozen 64-session/1880-round windows as previous comparison; complete request lengths; no delay scaling or wait clipping"
+}

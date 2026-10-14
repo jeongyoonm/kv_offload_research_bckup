@@ -1,0 +1,21 @@
+{
+  "created_at_utc": "2026-10-05T21:45:18.475420+00:00",
+  "implementation_commit": "e45616d04a617454a02f0aafd7036c40e2b514d6",
+  "branch": "experiment/glm53-compact-preparation-tokens-20261006",
+  "artifact_root": "/mnt/localnvme/glm53_compact_prep_20261006",
+  "measured_requests": 720,
+  "accepted_cells": 9,
+  "mean_throughput_gain_percent_vs_cached_pinned": 2.4093781763108613,
+  "mean_throughput_gain_percent_vs_current": 0.7095304158380555,
+  "mean_ttft_reduction_percent_vs_cached_pinned": 2.3044498453932305,
+  "mean_ttft_reduction_percent_vs_current": 0.7544512234104461,
+  "all_three_paired_throughput_ratios_above_one": true,
+  "current_comparison_95_interval": {
+    "geometric_mean_ratio": 1.007096009389452,
+    "lower_95": 0.993800263556962,
+    "upper_95": 1.0205696348862214
+  },
+  "scope": "Single 60K GLM5.3 TP8 workload; three alternating 80-request repeats per policy. Positive point estimates, confidence intervals include no throughput gain. Compact p95 TTFT is better than current but worse than old cached/pinned.",
+  "cleanup": "Driver and owned server/workers exited; all eight GPUs idle at 0 MiB.",
+  "evidence_hooks": "passed"
+}

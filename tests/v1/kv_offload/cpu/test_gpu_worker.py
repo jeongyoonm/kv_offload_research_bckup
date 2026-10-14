@@ -1,7 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
+import concurrent.futures
 import logging
 import random
+import threading
 import time
 import uuid
 from unittest.mock import MagicMock
@@ -84,6 +86,237 @@ def test_worker_shutdown_releases_region_and_runs_both_handlers() -> None:
     load_handler.shutdown.assert_called_once_with()
     mmap_region.cleanup.assert_called_once_with()
     assert worker._mmap_region is None
+
+
+def test_store_reuse_fence_enqueues_only_pending_store_events(monkeypatch) -> None:
+    """Stream ordering must not synchronize or retire the store on the host."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    event = MagicMock()
+    worker._store_handler = MagicMock()
+    worker._store_handler._transfer_events = {1: event}
+    worker._store_handler._async_submitter_handle = None
+    stream = MagicMock()
+    monkeypatch.setattr(current_platform, "is_cuda", lambda: True)
+    monkeypatch.setattr(current_platform, "current_stream", lambda: stream)
+
+    worker.fence_store_reuse({1, 2})
+
+    stream.wait_event.assert_called_once_with(event)
+    event.synchronize.assert_not_called()
+    assert worker._store_handler._transfer_events == {1: event}
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="CUDA stream fence test")
+@torch.inference_mode()
+@pytest.mark.parametrize("async_h2d_submission", [False, True])
+@pytest.mark.parametrize("overwrite", ["forward", "load"])
+def test_gpu_store_reuse_fence_orders_forward_and_independent_h2d(
+    default_vllm_config, async_h2d_submission, overwrite
+) -> None:
+    """Overwriting a store's source must preserve the old CPU bytes."""
+    page_size = 128 * 1024
+    gpu_tensor = torch.full((2, page_size), 0x11, dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[
+                CanonicalKVCacheTensor(tensor=gpu_tensor, page_size_bytes=page_size)
+            ],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=async_h2d_submission,
+        async_h2d_chunk_bytes=8192,
+    )
+    worker.configure_experiment(
+        {"copy_pipeline_depth": 2 if async_h2d_submission else 1}
+    )
+    cpu_tensor = worker._load_handler.src_tensors[0]
+    cpu_tensor[1].fill_(0x5A)
+    spec = GPULoadStoreSpec([0], group_sizes=(1,), block_indices=(0,))
+    try:
+        torch.accelerator.synchronize()
+        assert worker.submit_store(1, spec, CPULoadStoreSpec([0]))
+        transfer = worker._store_handler._transfers[-1]
+        # Extend the store with a delayed DMA read, independently of whether
+        # the driver's batched copy API blocks during the initial submission.
+        with current_platform.stream(transfer.stream):
+            torch.cuda._sleep(100_000_000)
+            cpu_tensor[0].copy_(gpu_tensor[0], non_blocking=True)
+            transfer.end_event.record(transfer.stream)
+        worker.fence_store_reuse({1})
+        assert not transfer.end_event.query(), "GPU fence unexpectedly waited on CPU"
+
+        if overwrite == "forward":
+            gpu_tensor[0].fill_(0x5A)
+        else:
+            assert worker.submit_load(2, CPULoadStoreSpec([1]), spec)
+
+        worker.wait({1, 2})
+        torch.accelerator.synchronize()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        torch.testing.assert_close(
+            gpu_tensor[0].cpu(), torch.full((page_size,), 0x5A, dtype=torch.int8)
+        )
+        finished = worker.get_finished()
+        assert {result.job_id for result in finished} == (
+            {1} if overwrite == "forward" else {1, 2}
+        )
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()
+
+
+def test_native_store_reuse_waits_for_completion_without_early_retirement():
+    """An unrecorded native completion cannot be used as a CUDA stream fence."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    worker._store_handler = MagicMock()
+    worker._store_handler._async_submitter_handle = 17
+    worker.fence_store_reuse({3, 4})
+    worker._store_handler.wait.assert_called_once_with({3, 4})
+    worker._store_handler.get_finished.assert_not_called()
+
+
+def test_native_wait_cannot_skip_a_job_during_registration(monkeypatch):
+    """A concurrent waiter must not consult native jobs before insertion finishes."""
+    handler = gpu_worker.SingleDirectionOffloadingHandler.__new__(
+        gpu_worker.SingleDirectionOffloadingHandler
+    )
+    handler._async_submission = True
+    handler._async_submitter_handle = 17
+    handler._async_transfer_lock = threading.Lock()
+    entered, registered, called = (
+        threading.Event(),
+        threading.Event(),
+        threading.Event(),
+    )
+
+    def native_wait(handle, jobs):
+        called.set()
+        assert registered.is_set(), "Wait skipped an incompletely registered job"
+        assert handle == 17 and jobs == [3]
+
+    def wait_task():
+        entered.set()
+        handler.wait({3})
+
+    monkeypatch.setattr(ops, "wait_async_batch_memcpy", native_wait)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+        with handler._async_transfer_lock:
+            future = executor.submit(wait_task)
+            assert entered.wait(1)
+            assert not called.wait(0.1)
+            registered.set()
+        future.result(timeout=1)
+    assert called.is_set()
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="Native D2H requires CUDA")
+@torch.inference_mode()
+@pytest.mark.parametrize("overwrite", ["forward", "load"])
+def test_native_store_orders_delayed_producer_and_source_reuse(
+    default_vllm_config, overwrite
+):
+    """Capture the source producer before native submission and retain old bytes."""
+    page_size = 128 * 1024
+    tensor = torch.zeros((2, page_size), dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page_size)],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8192,
+        async_d2h_submission=True,
+        async_d2h_chunk_bytes=8192,
+    )
+    worker.configure_experiment({"copy_pipeline_depth": 2})
+    cpu_tensor = worker._load_handler.src_tensors[0]
+    cpu_tensor[1].fill_(0x5A)
+    spec = GPULoadStoreSpec([0], group_sizes=(1,), block_indices=(0,))
+    try:
+        torch.accelerator.synchronize()
+        torch.cuda._sleep(500_000_000)
+        tensor[0].fill_(0x11)
+        producer = torch.Event()
+        producer.record(current_platform.current_stream())
+        assert worker.submit_store(1, spec, CPULoadStoreSpec([0]))
+        assert not producer.query(), "Store submission waited for its producer"
+        assert not worker.get_finished(), "Store retired before producer completion"
+        worker.fence_store_reuse({1})
+        assert producer.query()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        if overwrite == "forward":
+            tensor[0].fill_(0x5A)
+        else:
+            assert worker.submit_load(2, CPULoadStoreSpec([1]), spec)
+        worker.wait({1, 2})
+        torch.accelerator.synchronize()
+        torch.testing.assert_close(
+            cpu_tensor[0], torch.full((page_size,), 0x11, dtype=torch.int8)
+        )
+        torch.testing.assert_close(
+            tensor[0].cpu(), torch.full((page_size,), 0x5A, dtype=torch.int8)
+        )
+        assert {result.job_id for result in worker.get_finished()} == (
+            {1} if overwrite == "forward" else {1, 2}
+        )
+        assert not worker.get_finished()
+    finally:
+        worker.shutdown()
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="Native D2H requires CUDA")
+@torch.inference_mode()
+def test_native_store_fifo_and_shutdown_preserve_overlapping_cpu_writes(
+    default_vllm_config,
+):
+    """Stores to one CPU page remain FIFO; shutdown drains the final native job."""
+    page_size = 64 * 1024
+    tensor = torch.empty((2, page_size), dtype=torch.int8, device=DEVICES[0])
+    tensor[0].fill_(0x11)
+    tensor[1].fill_(0x33)
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page_size)],
+            group_data_refs=[
+                [CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page_size)]
+            ],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_d2h_submission=True,
+        async_d2h_chunk_bytes=8192,
+    )
+    cpu = worker._store_handler.dst_tensors[0]
+    try:
+        for job in (1, 2):
+            spec = GPULoadStoreSpec([job - 1], group_sizes=(1,), block_indices=(0,))
+            assert worker.submit_store(job, spec, CPULoadStoreSpec([0]))
+        worker.wait({1, 2})
+        assert [result.job_id for result in worker.get_finished()] == [1, 2]
+        assert not worker.get_finished()
+        torch.testing.assert_close(
+            cpu[0], torch.full((page_size,), 0x33, dtype=torch.int8)
+        )
+        torch.cuda._sleep(100_000_000)
+        tensor[1].fill_(0x55)
+        spec = GPULoadStoreSpec([1], group_sizes=(1,), block_indices=(0,))
+        assert worker.submit_store(3, spec, CPULoadStoreSpec([1]))
+    finally:
+        worker.shutdown()
+    torch.testing.assert_close(cpu[1], torch.full((page_size,), 0x55, dtype=torch.int8))
+    assert worker._store_handler._async_submitter_handle is None
 
 
 @pytest.mark.parametrize("failing_handler", ["store", "load"])
@@ -709,3 +942,111 @@ def test_invalid_copy_pipeline_depth_rejected(depth):
 
     with pytest.raises(ValueError):
         validate_experiment_options({"copy_pipeline_depth": depth})
+
+
+@pytest.mark.skipif(not current_platform.is_cuda(), reason="native CUDA H2D")
+@pytest.mark.parametrize("dependency", ["independent", "reader", "zero", "store"])
+@torch.inference_mode()
+def test_block_readiness_overlaps_only_independent_destinations(
+    default_vllm_config, dependency
+):
+    """Unrelated compute overlaps; destination readers/zeroing/stores stay ordered."""
+    page = 1024 * 1024
+    tensor = torch.full((2, page), 17, dtype=torch.int8, device=DEVICES[0])
+    worker = CPUOffloadingWorker(
+        kv_caches=CanonicalKVCaches(
+            tensors=[CanonicalKVCacheTensor(tensor=tensor, page_size_bytes=page)],
+            group_data_refs=[[CanonicalKVCacheRef(tensor_idx=0, page_size_bytes=page)]],
+        ),
+        blocks_per_chunk=1,
+        num_cpu_blocks=2,
+        async_h2d_submission=True,
+        async_h2d_chunk_bytes=8192,
+        async_d2h_submission=True,
+    )
+    worker.configure_block_readiness(True)
+    cpu = worker._load_handler.src_tensors[0]
+    cpu[1].fill_(90)
+    spec = GPULoadStoreSpec([1], group_sizes=(1,), block_indices=(0,))
+    end = torch.Event()
+    try:
+        torch.accelerator.synchronize()
+        # Populate the native worker before measuring completion order.
+        worker.submit_load(10, CPULoadStoreSpec([1]), spec)
+        worker.wait({10})
+        worker.get_finished()
+        tensor[1].fill_(17)
+        torch.accelerator.synchronize()
+        torch.cuda._sleep(300_000_000)
+        if dependency == "zero":
+            tensor[1].zero_()
+        if dependency == "store":
+            worker.submit_store(11, spec, CPULoadStoreSpec([0]))
+        else:
+            worker._block_readiness.record(
+                [0] if dependency == "independent" else [1], dependency
+            )
+        end.record()
+        worker.submit_load(12, CPULoadStoreSpec([1]), spec)
+        worker.wait({12})
+        if dependency == "independent":
+            assert not end.query()
+        else:
+            assert end.query()
+        end.synchronize()
+        assert torch.equal(tensor[1].cpu(), cpu[1])
+        if dependency == "store":
+            worker.wait({11})
+            assert torch.all(cpu[0] == 17)
+    finally:
+        worker.shutdown()
+
+
+@pytest.mark.parametrize("resumed", [False, True])
+def test_block_readiness_tracks_all_cached_blocks_and_releases_finished(resumed):
+    """KV readers include old cached blocks; resumed allocations replace old IDs."""
+    from types import SimpleNamespace
+
+    from vllm.v1.kv_offload.h2d_readiness import BlockReadiness
+
+    tracker = BlockReadiness.__new__(BlockReadiness)
+    tracker.requests = {"done": ([9],), "active": ([1, 2],)}
+    output = SimpleNamespace(
+        finished_req_ids={"done"},
+        preempted_req_ids=None,
+        scheduled_new_reqs=[SimpleNamespace(req_id="new", block_ids=([4, 5],))],
+        scheduled_cached_reqs=SimpleNamespace(
+            req_ids=["active"],
+            new_block_ids=[([3],)],
+            resumed_req_ids={"active"} if resumed else set(),
+        ),
+        num_scheduled_tokens={"new": 128, "active": 1},
+    )
+    tracker.begin(output)
+    assert "done" not in tracker.requests
+    seen = []
+    tracker.record = lambda blocks, kind: seen.append((set(blocks), kind))
+    tracker.record_compute(output)
+    expected = {3, 4, 5} if resumed else {1, 2, 3, 4, 5}
+    assert seen == [(expected, "compute")]
+    output.preempted_req_ids = {"active"}
+    output.scheduled_new_reqs = []
+    output.scheduled_cached_reqs.req_ids = []
+    tracker.begin(output)
+    assert set(tracker.requests) == {"new"}
+
+
+def test_block_readiness_retires_store_ownership_without_a_subsequent_load():
+    """Completed stores release physical-block ownership in GPU-only episodes."""
+    worker = CPUOffloadingWorker.__new__(CPUOffloadingWorker)
+    worker._block_readiness = MagicMock()
+    worker._store_blocks = {1: {17}, 2: {18}}
+    stored = MagicMock(job_id=1)
+    loaded = MagicMock(job_id=3)
+    worker._store_handler = MagicMock()
+    worker._store_handler.get_finished.return_value = [stored]
+    worker._load_handler = MagicMock()
+    worker._load_handler.get_finished.return_value = [loaded]
+
+    assert worker.get_finished() == [stored, loaded]
+    assert worker._store_blocks == {2: {18}}

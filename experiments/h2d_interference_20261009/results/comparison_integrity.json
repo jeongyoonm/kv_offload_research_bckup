@@ -1,0 +1,49 @@
+{
+  "complete": true,
+  "arms": [
+    {
+      "chunk_mib": 128,
+      "measured_cells": 6,
+      "requests": 192,
+      "policy_matched": true,
+      "learned_state_matched": true,
+      "only_connector_chunk_bytes_differ": true,
+      "no_measurement_jit_or_error": true
+    },
+    {
+      "chunk_mib": 8,
+      "measured_cells": 6,
+      "requests": 192,
+      "policy_matched": true,
+      "learned_state_matched": true,
+      "only_connector_chunk_bytes_differ": true,
+      "no_measurement_jit_or_error": true
+    },
+    {
+      "chunk_mib": 16,
+      "measured_cells": 6,
+      "requests": 192,
+      "policy_matched": true,
+      "learned_state_matched": true,
+      "only_connector_chunk_bytes_differ": true,
+      "no_measurement_jit_or_error": true
+    }
+  ],
+  "native_binary_hashes_unchanged": [
+    "vllm/_C_stable_libtorch.abi3.so",
+    "vllm/_flashkda_C.abi3.so",
+    "vllm/_flashmla_C.abi3.so",
+    "vllm/_flashmla_extension_C.abi3.so",
+    "vllm/_glm53_async.so",
+    "vllm/_moe_C_stable_libtorch.abi3.so",
+    "vllm/_qutlass_C.abi3.so",
+    "vllm/_rust_tool_parser.abi3.so",
+    "vllm/cumem_allocator.abi3.so",
+    "vllm/fs_io_C.abi3.so",
+    "vllm/spinloop.abi3.so",
+    "vllm/vllm_flash_attn/_vllm_fa2_C.abi3.so",
+    "vllm/vllm_flash_attn/_vllm_fa3_C.abi3.so"
+  ],
+  "measured_cells": 18,
+  "measured_requests": 576
+}

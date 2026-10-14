@@ -1,0 +1,68 @@
+{
+  "borrowed_environment": "/mnt/localnvme/glm53-compat-venv",
+  "binaries": {
+    "vllm/_C_stable_libtorch.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_C_stable_libtorch.abi3.so",
+      "sha256": "0375f3ec05f823961476dfe3450cb67df385eb9541eeed29e5daccc28a142ecb"
+    },
+    "vllm/_flashkda_C.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashkda_C.abi3.so",
+      "sha256": "c03adf54b109aaed7d15c565d65c7d9ece1c5e165e95bc50e5608e2fdc5ccef3"
+    },
+    "vllm/_flashmla_C.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashmla_C.abi3.so",
+      "sha256": "83f1dd7ac31d734ec19da78b417d85b91de79b40c645660ee48e51621d6aa048"
+    },
+    "vllm/_flashmla_extension_C.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_flashmla_extension_C.abi3.so",
+      "sha256": "c9b6fd42b4fa294846a6bd4661be33eb954342014fc716ae07f827da5019a0e8"
+    },
+    "vllm/_glm53_async.so": {
+      "target": "/mnt/localnvme/vllm_glm53_coalesced_notify_20261004/vllm/_glm53_async.so",
+      "sha256": "55b3038d62154fa44ecd20d5b8412422bb964b2809145994104eaa6d5628bdc3"
+    },
+    "vllm/_moe_C_stable_libtorch.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_moe_C_stable_libtorch.abi3.so",
+      "sha256": "b08ed3949171409258e259ff58b3d8f85765bae9ffb79445481a6cf93293e6e4"
+    },
+    "vllm/_qutlass_C.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_qutlass_C.abi3.so",
+      "sha256": "8c491acd0ee844ec79346e153f61f876c475e1f62f0a177535148e0c0611d852"
+    },
+    "vllm/_rust_tool_parser.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/_rust_tool_parser.abi3.so",
+      "sha256": "c5f089d1755688f6d4a2b78c37a711e74f0ed171b9605cc9952d835bf847e921"
+    },
+    "vllm/cumem_allocator.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/cumem_allocator.abi3.so",
+      "sha256": "6e74676bc7f1cc264cefd097992cfe39d8d5b859e6ee10bef20f6920463460d9"
+    },
+    "vllm/fs_io_C.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/fs_io_C.abi3.so",
+      "sha256": "33a2230eee458b5585a1da6a02fa3a2927891e7c29608e2cab1490bec1e9a3f5"
+    },
+    "vllm/spinloop.abi3.so": {
+      "target": "/mnt/localnvme/vllm_glm53_adaptive_control_20261002/vllm/spinloop.abi3.so",
+      "sha256": "d9611e3b08ab8ed4ec80c28d483371aad10b212ab597603e60452ab0e8549b7f"
+    },
+    "vllm/vllm_flash_attn/_vllm_fa2_C.abi3.so": {
+      "target": "/mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/vllm/vllm_flash_attn/_vllm_fa2_C.abi3.so",
+      "sha256": "22fcb3bcfc51bc08d7f6469caf56d009356eac81c35c953f52f5ac5efae89c62"
+    },
+    "vllm/vllm_flash_attn/_vllm_fa3_C.abi3.so": {
+      "target": "/mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/vllm/vllm_flash_attn/_vllm_fa3_C.abi3.so",
+      "sha256": "8759be32480e0a4b0d964bd880da8b108d5647f6a46ff00472597f700d70c70e"
+    }
+  },
+  "vendor_source": "/mnt/localnvme/vllm_glm53_efficient_wait_ab_20261009/vllm/third_party",
+  "attempts": [
+    {
+      "stage": "pilot",
+      "failure": "Missing FlashAttention binary links; failed before model load"
+    },
+    {
+      "stage": "pilot_retry",
+      "failure": "ninja absent from subprocess PATH; model load failed before measurement"
+    }
+  ]
+}

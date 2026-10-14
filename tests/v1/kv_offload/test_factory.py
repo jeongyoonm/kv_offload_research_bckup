@@ -114,6 +114,42 @@ def test_cpu_spec_registered():
     assert cls is CPUOffloadingSpec
 
 
+@pytest.mark.parametrize("budget", [4096, 65536, 2130300354560])
+@pytest.mark.parametrize("layout", ["worker", "private"])
+def test_worker_layout_respects_budget_and_preserves_logical_capacity(budget, layout):
+    """Rank-boundary padding fits the budget even for tiny, unaligned slots."""
+    config = _make_offloading_config(
+        cpu_bytes_to_use=budget,
+        worker_kv_bytes_per_block=4224,
+        world_size=8,
+        extra_config={"cpu_cache_layout": layout},
+    )
+    worker = CPUOffloadingSpec(config)
+    block = CPUOffloadingSpec(
+        _make_offloading_config(
+            cpu_bytes_to_use=budget,
+            worker_kv_bytes_per_block=4224,
+            world_size=8,
+        )
+    )
+    rank_span = ((worker.num_blocks * 4224 + 4095) // 4096) * 4096
+    assert rank_span * 8 <= budget
+    assert 0 <= block.num_blocks - worker.num_blocks <= 1
+
+
+@pytest.mark.parametrize("replicated", [False, True])
+def test_worker_layout_rejects_shared_layout_contracts(replicated):
+    """Shared canonical/secondary layouts cannot silently change their byte order."""
+    config = _make_offloading_config(
+        world_size=8,
+        replicated_layout=replicated,
+        extra_config={"cpu_cache_layout": "worker"},
+    )
+    cls = CPUOffloadingSpec if replicated else TieringOffloadingSpec
+    with pytest.raises(ValueError, match="direct sharded"):
+        cls(config)
+
+
 def test_tiering_spec_registered():
     cls = OffloadingSpecFactory._registry["TieringOffloadingSpec"]()
     assert cls is TieringOffloadingSpec

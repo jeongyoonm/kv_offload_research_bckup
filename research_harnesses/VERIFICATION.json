@@ -1,0 +1,12 @@
+{
+  "prototype_source_commit": "acc46862a8c874a376c896489fa137d392016e27",
+  "prototype_files": 6718,
+  "metadata_exception": "SNAPSHOT.md",
+  "additional_files": 71,
+  "prototype_files_match": true,
+  "verified_payloads": 69,
+  "verified_branch_heads": 178,
+  "harness_python_syntax_files": 71,
+  "repository_connectivity_passed": true,
+  "scope": "Source-only backup verification; no GPU serving launched"
+}

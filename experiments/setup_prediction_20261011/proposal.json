@@ -1,0 +1,9 @@
+{
+  "strategy": "conditional 90th-percentile remaining B setup",
+  "checkpoint": "/mnt/localnvme/jeongyoon/setup_prediction_20261011/frozen_models/uncertainty.json",
+  "sha256": "8b0e644e10f3c1a5b28bc8f03cc4588fd440a95d0d0253cf5da1debd29ae582a",
+  "default": "disabled",
+  "A_predictor": "unchanged",
+  "fallback_lead_ms": 50,
+  "coverage_note": "A learned risk target; held-out coverage was 78%, not a 90% guarantee."
+}

@@ -87,56 +87,112 @@ class SharedOffloadRegion:
         kv_bytes_per_block: int,
         cpu_page_size: int,
         barrier: Callable[[], None] | None = None,
+        population_mode: str = "rank",
+        population_workers: int | None = None,
+        population_chunk_bytes: int = 256 * 1024 * 1024,
+        num_workers: int = 1,
+        process_rank: int | None = None,
+        population_barrier: bool = False,
+        memory_layout: str = "block",
+        memory_backing: str = "shm",
     ) -> None:
+        init_start = time.perf_counter()
+        self.init_stats: dict[str, int | float] = {}
+        if population_mode not in ("rank", "contiguous"):
+            raise ValueError("population_mode must be rank or contiguous")
+        if population_chunk_bytes < mmap.PAGESIZE:
+            raise ValueError("population_chunk_bytes must be at least one page")
+        if population_workers is None:
+            population_workers = num_workers
+        if not 1 <= population_workers <= num_workers:
+            raise ValueError("population_workers must be within num_workers")
+        if num_workers % population_workers:
+            raise ValueError("population_workers must divide num_workers")
+        if population_mode == "contiguous":
+            if process_rank is None or not 0 <= process_rank < num_workers:
+                raise ValueError("contiguous population needs a valid process_rank")
+            if num_workers > 1 and barrier is None:
+                raise ValueError("contiguous population needs a worker barrier")
+            population_barrier = True
         self.page_size = mmap.PAGESIZE
         assert kv_bytes_per_block % self.page_size == 0
+        if memory_layout not in ("block", "worker", "private"):
+            raise ValueError("memory_layout must be block, worker or private")
+        if memory_layout != "block" and (rank is None or not 0 <= rank < num_workers):
+            raise ValueError("worker layout requires a valid worker rank")
+        if (
+            memory_layout == "private"
+            and population_mode == "contiguous"
+            and (population_workers != num_workers)
+        ):
+            raise ValueError("private layout requires one initializer per worker")
+        self.memory_layout = memory_layout
+        if memory_backing not in ("shm", "memfd"):
+            raise ValueError("memory_backing must be shm or memfd")
+        if memory_backing == "memfd" and memory_layout != "private":
+            raise ValueError("memfd backing requires private worker layout")
+        if memory_backing == "memfd" and not hasattr(os, "memfd_create"):
+            raise ValueError("memfd backing requires Linux memfd_create")
+        self.memory_backing = memory_backing
 
         self.num_blocks = num_blocks
         self._row_stride = kv_bytes_per_block
         self.total_size_bytes = self.num_blocks * self._row_stride
+        self.registration_offset = 0
+        self.registration_size_bytes = self.total_size_bytes
+        self._worker_span = (
+            (num_blocks * cpu_page_size + self.page_size - 1)
+            // self.page_size
+            * self.page_size
+        )
+        if memory_layout != "block":
+            assert rank is not None
+            self._row_stride = cpu_page_size
+            self.total_size_bytes = self._worker_span * num_workers
+            self.registration_offset = rank * self._worker_span
+            self.registration_size_bytes = self._worker_span
+        self.cache_size_bytes = self.total_size_bytes
+        if memory_layout == "private":
+            self.total_size_bytes = self._worker_span
+            self.registration_offset = 0
 
-        self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}.mmap"
+        suffix = f"_rank_{rank}" if memory_layout == "private" else ""
+        self.mmap_path = f"/dev/shm/vllm_offload_{engine_id}{suffix}.mmap"
         self._creator = False  # set True only if this worker creates the file
+        self.fd: int | None = None
         self.rank = rank
         if rank is not None:
             # byte offset to this worker's first slot within each block row
             self._worker_offset = rank * cpu_page_size
             # exclusive upper bound for this worker's area within each row
             self._worker_area_end = (rank + 1) * cpu_page_size
+            if memory_layout != "block":
+                self._worker_offset = self.registration_offset
+                self._worker_area_end = self._worker_offset + cpu_page_size
         try:
-            try:
-                self.fd: int | None = os.open(
-                    self.mmap_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600
+            if memory_backing == "memfd":
+                self.fd = os.memfd_create(
+                    f"vllm_offload_{engine_id}{suffix}", os.MFD_CLOEXEC
                 )
-            except FileExistsError:
-                # Joiner path — another worker won O_EXCL. Reopen and wait
-                # for the file to reach expected size.
-                self.fd = os.open(self.mmap_path, os.O_RDWR)
                 try:
-                    _wait_for_file_size(self.fd, self.total_size_bytes)
-                except (TimeoutError, OSError):
-                    os.close(self.fd)
-                    raise
-                logger.info("Opened existing mmap file %s", self.mmap_path)
-            else:
-                # Creator path. We won O_EXCL, so we own the file: any
-                # failure here must clean up so concurrent joiners don't
-                # land on a 0-byte stub and spin in _wait_for_file_size
-                # for the full 30 s timeout.
-                try:
-                    check_shm_free_space(self.total_size_bytes)
                     os.ftruncate(self.fd, self.total_size_bytes)
-                except (RuntimeError, OSError):
-                    os.unlink(self.mmap_path)
+                except OSError:
                     os.close(self.fd)
+                    self.fd = None
                     raise
-                self._creator = True
+                # Private ranks never rendezvous through a filename. This
+                # anonymous tmpfs inode is reclaimed when its last reference
+                # closes, and is independent of the /dev/shm mount capacity.
+                self.mmap_path = f"memfd:vllm_offload_{engine_id}{suffix}"
                 logger.info(
-                    "Created mmap file %s (%.2f GB)",
+                    "Created private memfd %s (%.2f GB)",
                     self.mmap_path,
                     self.total_size_bytes / 1e9,
                 )
+            else:
+                self._open_shared_file()
 
+            assert self.fd is not None
             self.mmap_obj: mmap.mmap | None = mmap.mmap(
                 self.fd,
                 self.total_size_bytes,
@@ -144,13 +200,12 @@ class SharedOffloadRegion:
                 prot=mmap.PROT_READ | mmap.PROT_WRITE,
             )
         except Exception:
+            if memory_backing == "memfd" and self.fd is not None:
+                os.close(self.fd)
+                self.fd = None
             if self._creator:
                 os.unlink(self.mmap_path)
                 self._creator = False
-            # Peers block inside the barrier until the collective times out if
-            # we die before reaching it.  Arrive anyway so every worker calls
-            # barrier() exactly once and they fail on their own errors instead
-            # of hanging; a failure here must not replace ours.
             if barrier is not None:
                 try:
                     barrier()
@@ -161,6 +216,71 @@ class SharedOffloadRegion:
                     )
             raise
 
+        self._populate_region(
+            init_start,
+            barrier,
+            population_mode,
+            population_workers,
+            population_chunk_bytes,
+            num_workers,
+            process_rank,
+            population_barrier,
+            memory_layout,
+            rank,
+            num_blocks,
+            cpu_page_size,
+        )
+
+    def _open_shared_file(self) -> None:
+        try:
+            self.fd = os.open(self.mmap_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600)
+        except FileExistsError:
+            # Joiner path — another worker won O_EXCL. Reopen and wait
+            # for the file to reach expected size.
+            self.fd = os.open(self.mmap_path, os.O_RDWR)
+            try:
+                _wait_for_file_size(self.fd, self.total_size_bytes)
+            except (TimeoutError, OSError):
+                os.close(self.fd)
+                raise
+            logger.info("Opened existing mmap file %s", self.mmap_path)
+        else:
+            # Creator path. We won O_EXCL, so we own the file: any
+            # failure here must clean up so concurrent joiners don't
+            # land on a 0-byte stub and spin in _wait_for_file_size
+            # for the full 30 s timeout.
+            try:
+                check_shm_free_space(self.total_size_bytes)
+                os.ftruncate(self.fd, self.total_size_bytes)
+            except (RuntimeError, OSError):
+                os.unlink(self.mmap_path)
+                os.close(self.fd)
+                raise
+            self._creator = True
+            logger.info(
+                "Created mmap file %s (%.2f GB)",
+                self.mmap_path,
+                self.total_size_bytes / 1e9,
+            )
+
+    def _populate_region(
+        self,
+        init_start,
+        barrier,
+        population_mode,
+        population_workers,
+        population_chunk_bytes,
+        num_workers,
+        process_rank,
+        population_barrier,
+        memory_layout,
+        rank,
+        num_blocks,
+        cpu_page_size,
+    ) -> None:
+        assert self.mmap_obj is not None and self.fd is not None
+        self.init_stats["mapping_seconds"] = time.perf_counter() - init_start
+        barrier_start = time.perf_counter()
         if barrier is not None:
             # Every worker has mapped the file once the barrier releases, so
             # its name is no longer needed and dropping it here means no exit
@@ -179,36 +299,107 @@ class SharedOffloadRegion:
                 self._creator = False
                 logger.info("Unlinked mmap file %s", self.mmap_path)
 
-        populate_write_fn = _get_populate_write_fn(self.mmap_obj)
+        self.init_stats["mapping_barrier_seconds"] = time.perf_counter() - barrier_start
+        populate_start = time.perf_counter()
+        self.init_stats["populate_start_ns"] = time.monotonic_ns()
+        try:
+            populate_write_fn = _get_populate_write_fn(self.mmap_obj)
+            populate_calls = 0
+            populate_bytes = 0
 
-        if rank is not None:
-            # Populate only this worker's pages (one slot per block row).
-            worker_offset = rank * cpu_page_size
-            _t0 = time.perf_counter()
-            page_size = self.page_size
-            for block in range(num_blocks):
-                raw_offset = block * self._row_stride + worker_offset
-                aligned_offset = (raw_offset // page_size) * page_size
-                end = raw_offset + cpu_page_size
-                aligned_length = end - aligned_offset
-                populate_write_fn(self.mmap_obj, aligned_offset, aligned_length)
-            logger.debug(
-                "MADV_POPULATE_WRITE loop: %d blocks in %.3f s",
-                num_blocks,
-                time.perf_counter() - _t0,
-            )
-        else:
-            # No rank — populate the entire shared region in one call.
-            _t0 = time.perf_counter()
-            populate_write_fn(self.mmap_obj, 0, self.total_size_bytes)
-            logger.debug(
-                "MADV_POPULATE_WRITE entire region: %.3f s", time.perf_counter() - _t0
-            )
+            if population_mode == "contiguous":
+                assert process_rank is not None
+                step = num_workers // population_workers
+                if process_rank % step == 0:
+                    owner = process_rank // step
+                    start_block = num_blocks * owner // population_workers
+                    end_block = num_blocks * (owner + 1) // population_workers
+                    if memory_layout == "private":
+                        start = 0
+                        end = self.total_size_bytes
+                    elif memory_layout == "worker":
+                        start = self.total_size_bytes * owner // population_workers
+                        end = self.total_size_bytes * (owner + 1) // population_workers
+                    else:
+                        start = start_block * self._row_stride
+                        end = end_block * self._row_stride
+                    chunk_bytes = (
+                        population_chunk_bytes // self.page_size * self.page_size
+                    )
+                    for offset in range(start, end, chunk_bytes):
+                        length = min(chunk_bytes, end - offset)
+                        populate_write_fn(self.mmap_obj, offset, length)
+                        populate_calls += 1
+                        populate_bytes += length
+            elif memory_layout != "block":
+                start = self.registration_offset
+                end = start + self.registration_size_bytes
+                chunk_bytes = population_chunk_bytes // self.page_size * self.page_size
+                for offset in range(start, end, chunk_bytes):
+                    length = min(chunk_bytes, end - offset)
+                    populate_write_fn(self.mmap_obj, offset, length)
+                    populate_calls += 1
+                    populate_bytes += length
+            elif rank is not None:
+                # Populate only this worker's pages (one slot per block row).
+                worker_offset = rank * cpu_page_size
+                _t0 = time.perf_counter()
+                page_size = self.page_size
+                for block in range(num_blocks):
+                    raw_offset = block * self._row_stride + worker_offset
+                    aligned_offset = (raw_offset // page_size) * page_size
+                    end = raw_offset + cpu_page_size
+                    aligned_length = end - aligned_offset
+                    populate_write_fn(self.mmap_obj, aligned_offset, aligned_length)
+                    populate_calls += 1
+                    populate_bytes += aligned_length
+                logger.debug(
+                    "MADV_POPULATE_WRITE loop: %d blocks in %.3f s",
+                    num_blocks,
+                    time.perf_counter() - _t0,
+                )
+            else:
+                # No rank — populate the entire shared region in one call.
+                _t0 = time.perf_counter()
+                populate_write_fn(self.mmap_obj, 0, self.total_size_bytes)
+                populate_calls = 1
+                populate_bytes = self.total_size_bytes
+                logger.debug(
+                    "MADV_POPULATE_WRITE entire region: %.3f s",
+                    time.perf_counter() - _t0,
+                )
 
+            self.init_stats.update(
+                populate_end_ns=time.monotonic_ns(),
+                populate_seconds=time.perf_counter() - populate_start,
+                populate_calls=populate_calls,
+                populate_bytes=populate_bytes,
+            )
+            population_wait_start = time.perf_counter()
+            if population_barrier and barrier is not None:
+                barrier()
+            self.init_stats["population_barrier_seconds"] = (
+                time.perf_counter() - population_wait_start
+            )
+            logger.info(
+                "CPU cache population rank=%s total_bytes=%d calls=%d seconds=%.3f",
+                rank,
+                self.total_size_bytes,
+                populate_calls,
+                self.init_stats["populate_seconds"],
+            )
+        except Exception:
+            self.mmap_obj.close()
+            os.close(self.fd)
+            if self._creator:
+                os.unlink(self.mmap_path)
+                self._creator = False
+            raise
         self._base = torch.frombuffer(memoryview(self.mmap_obj), dtype=torch.int8)
         self._views: list[torch.Tensor] = []
         self._canonical_offset = 0
         self.is_pinned: bool = False
+        self.init_stats["region_seconds"] = time.perf_counter() - init_start
 
     def create_next_worker_view(self, tensor_page_size: int) -> torch.Tensor:
         """Allocate a strided int8 view for this worker, one canonical tensor.
@@ -281,6 +472,8 @@ class SharedOffloadRegion:
         Args:
             tensor_page_size: Canonical bytes per block for this tensor.
         """
+        if self.memory_layout != "block":
+            raise ValueError("canonical views require block layout")
         new_offset = self._canonical_offset + tensor_page_size
         assert new_offset <= self._row_stride
         view = torch.as_strided(
@@ -299,6 +492,8 @@ class SharedOffloadRegion:
         Shape: (num_blocks, row_stride_bytes). Secondary tiers address
         block *b* as ``view[b]``.
         """
+        if self.memory_layout != "block":
+            raise ValueError("secondary-tier memoryviews require block layout")
         kv_tensor = self._base.view(self.num_blocks, self._row_stride)
         np_arr = kv_tensor.numpy()
         assert np_arr.ctypes.data == self._base.data_ptr(), (
@@ -310,7 +505,7 @@ class SharedOffloadRegion:
     def cleanup(self) -> None:
         if self.is_pinned and self._base is not None:
             if current_platform.is_cuda_alike():
-                base_ptr = self._base.data_ptr()
+                base_ptr = self._base.data_ptr() + self.registration_offset
                 result = torch.cuda.cudart().cudaHostUnregister(base_ptr)
                 if result.value != 0:
                     logger.warning(

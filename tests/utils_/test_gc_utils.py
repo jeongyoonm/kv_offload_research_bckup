@@ -83,3 +83,44 @@ def test_gc_debug_config():
     config = GCDebugConfig('{"top_objects":5}')
     assert config.enabled
     assert config.top_objects == 5
+
+
+def test_timing_only_gc_probe_avoids_heap_walk_and_records_comparable_clock(
+    monkeypatch,
+):
+    """Diagnosing pauses must not scan the heap before the collection being timed."""
+    from unittest.mock import Mock
+
+    from vllm.utils import gc_utils
+
+    clock = iter([0, 1_000_000_000, 1_250_000_000])
+    monkeypatch.setattr(gc_utils.time, "monotonic_ns", lambda: next(clock))
+    walk = Mock(side_effect=AssertionError("timing-only probe walked the heap"))
+    monkeypatch.setattr(gc_utils.gc, "get_objects", walk)
+    log = Mock()
+    monkeypatch.setattr(gc_utils.logger, "info", log)
+    debugger = gc_utils.GCDebugger(
+        GCDebugConfig('{"timing_only":true,"min_duration_ms":10}')
+    )
+    debugger.handle("start", {"generation": 2})
+    debugger.handle("stop", {"generation": 2, "collected": 3})
+    walk.assert_not_called()
+    assert log.call_count == 1
+    assert log.call_args.args[1:5] == (1_000_000_000, 1_250_000_000, 250, 2)
+
+
+def test_timing_only_gc_probe_suppresses_short_collections(monkeypatch):
+    from unittest.mock import Mock
+
+    from vllm.utils import gc_utils
+
+    clock = iter([0, 1_000_000_000, 1_000_050_000])
+    monkeypatch.setattr(gc_utils.time, "monotonic_ns", lambda: next(clock))
+    log = Mock()
+    monkeypatch.setattr(gc_utils.logger, "info", log)
+    debugger = gc_utils.GCDebugger(
+        GCDebugConfig('{"timing_only":true,"min_duration_ms":10}')
+    )
+    debugger.handle("start", {"generation": 0})
+    debugger.handle("stop", {"generation": 0, "collected": 3})
+    log.assert_not_called()

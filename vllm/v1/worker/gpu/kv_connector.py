@@ -25,6 +25,7 @@ from vllm.v1.outputs import (
 
 if TYPE_CHECKING:
     from vllm.v1.core.sched.output import SchedulerOutput
+    from vllm.v1.kv_offload.cpu.gpu_worker import CPUOffloadingWorker
 
 
 class KVConnector:
@@ -44,6 +45,15 @@ class KVConnector:
     def set_disabled(self, disabled: bool) -> None:
         pass
 
+    def begin_block_readiness(self, scheduler_output: "SchedulerOutput") -> None:
+        pass
+
+    def record_block_initialization(self, scheduler_output: "SchedulerOutput") -> None:
+        pass
+
+    def record_compute_blocks(self, scheduler_output: "SchedulerOutput") -> None:
+        pass
+
 
 class ActiveKVConnector(KVConnector):
     def __init__(
@@ -57,6 +67,57 @@ class ActiveKVConnector(KVConnector):
 
         self._pending_load_start = False
         self._disabled = False
+        self._block_readiness_worker: CPUOffloadingWorker | None = None
+        self._preemptions_handled = False
+
+    def begin_block_readiness(self, scheduler_output: "SchedulerOutput") -> None:
+        metadata = scheduler_output.kv_connector_metadata
+        enabled = getattr(metadata, "experiment_options", {}).get(
+            "h2d_block_readiness", False
+        )
+        if not enabled:
+            if self._block_readiness_worker is not None:
+                self._block_readiness_worker.configure_block_readiness(False)
+                self._block_readiness_worker = None
+            return
+        assert metadata is not None
+        from vllm.v1.kv_offload.cpu.gpu_worker import CPUOffloadingWorker
+
+        backend = getattr(self.kv_connector, "connector_worker", None)
+        worker = getattr(backend, "worker", None)
+        parallel = self.vllm_config.parallel_config
+        if (
+            not isinstance(worker, CPUOffloadingWorker)
+            or worker._load_handler._canonical_copy_plans is not None
+            or len(worker._load_handler.layer_refs_per_group) != 1
+            or parallel.pipeline_parallel_size != 1
+            or parallel.data_parallel_size != 1
+            or parallel.enable_expert_parallel
+        ):
+            raise RuntimeError("block readiness requires direct single-group TP")
+        worker.configure_block_readiness(True)
+        self._block_readiness_worker = worker
+        assert worker._block_readiness is not None
+        worker._block_readiness.begin(scheduler_output)
+        # Protect zeroing/copy-on-write before either can overwrite store sources.
+        self.kv_connector.handle_preemptions(metadata)
+        self._preemptions_handled = True
+
+    def record_block_initialization(self, scheduler_output: "SchedulerOutput") -> None:
+        if self._block_readiness_worker is None:
+            return
+        blocks = list(scheduler_output.new_block_ids_to_zero or [])
+        for copy in scheduler_output.kv_cache_block_copies or []:
+            blocks.extend((copy.src_block_id, copy.dst_block_id))
+        readiness = self._block_readiness_worker._block_readiness
+        assert readiness is not None
+        readiness.record(blocks, "initialization")
+
+    def record_compute_blocks(self, scheduler_output: "SchedulerOutput") -> None:
+        if self._block_readiness_worker is not None:
+            readiness = self._block_readiness_worker._block_readiness
+            assert readiness is not None
+            readiness.record_compute(scheduler_output)
 
     def pre_forward(self, scheduler_output: "SchedulerOutput") -> None:
         if self._disabled:
@@ -64,7 +125,9 @@ class ActiveKVConnector(KVConnector):
 
         kv_connector_metadata = scheduler_output.kv_connector_metadata
         assert kv_connector_metadata is not None
-        self.kv_connector.handle_preemptions(kv_connector_metadata)
+        if not self._preemptions_handled:
+            self.kv_connector.handle_preemptions(kv_connector_metadata)
+        self._preemptions_handled = False
         self.kv_connector.bind_connector_metadata(kv_connector_metadata)
 
         early_submission = getattr(kv_connector_metadata, "experiment_options", {}).get(

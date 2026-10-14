@@ -1,0 +1,2 @@
+{"event": "started", "time": 1791242502.4316795, "argv": ["experiments/seal_deadline_20261006/run.py", "--name", "gpu", "--policies", "compact_shadow,deadline5", "--workloads", "61440:95:100", "--requests", "75", "--repeats", "4", "--max-model-len", "65536", "--distinct-fact-probe"]}
+{"event": "completed", "time": 1791245662.4486458}

@@ -38,6 +38,7 @@ from vllm.distributed.kv_transfer.kv_connector.v1.offloading.worker import (
 )
 from vllm.forward_context import ForwardContext
 from vllm.v1.attention.backend import AttentionMetadata
+from vllm.v1.core.block_pool import BlockPool
 from vllm.v1.core.kv_cache_manager import KVCacheBlocks
 from vllm.v1.core.sched.output import SchedulerOutput
 from vllm.v1.kv_cache_interface import KVCacheConfig
@@ -81,6 +82,13 @@ class OffloadingConnector(KVConnectorBase_V1, SupportsHMA):
             self.connector_worker.shutdown()
         if self.connector_scheduler is not None:
             self.connector_scheduler.shutdown()
+
+    def bind_gpu_block_pool(self, gpu_block_pool: BlockPool) -> None:
+        assert self.connector_scheduler is not None
+        self.connector_scheduler.gpu_block_pool = gpu_block_pool
+        gpu_block_pool.pending_store_blocks = (
+            self.connector_scheduler._block_id_to_pending_jobs
+        )
 
     def register_kv_caches(self, kv_caches: dict[str, torch.Tensor]):
         assert self.connector_worker is not None
@@ -159,9 +167,13 @@ class OffloadingConnector(KVConnectorBase_V1, SupportsHMA):
         assert self.connector_scheduler is not None
         return self.connector_scheduler.has_pending_push_work()
 
-    def get_early_ready_request(self, job_id: int) -> str | None:
+    def mark_early_load_copy_complete(self, job_id: int) -> str | None:
         assert self.connector_scheduler is not None
-        return self.connector_scheduler.get_early_ready_request(job_id)
+        return self.connector_scheduler.mark_early_load_copy_complete(job_id)
+
+    def validate_preemption(self, req_id: str) -> None:
+        assert self.connector_scheduler is not None
+        self.connector_scheduler.validate_preemption(req_id)
 
     def update_connector_output(self, connector_output: KVConnectorOutput):
         assert self.connector_scheduler is not None

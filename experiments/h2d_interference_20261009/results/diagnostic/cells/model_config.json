@@ -1,0 +1,38 @@
+{
+  "model": "/mnt/localnvme/huggingface/hub/models--Inferact--GLM-5.3-NVFP4/snapshots/ce67b36f3669192b5bb233819f0fda6c8a9837f8",
+  "tensor_parallel_size": 8,
+  "distributed_executor_backend": "mp",
+  "kv_cache_dtype": "fp8_e4m3",
+  "enable_prefix_caching": true,
+  "enable_chunked_prefill": true,
+  "max_model_len": 65536,
+  "max_num_batched_tokens": 61440,
+  "max_num_seqs": 64,
+  "kv_cache_memory_bytes": 103079215104,
+  "gpu_memory_utilization": 0.8,
+  "block_size": 64,
+  "enable_flashinfer_autotune": false,
+  "async_scheduling": true,
+  "worker_extension_cls": "experiments.h2d_interference_20261009.worker.CalibrationExtension",
+  "numa_bind": true,
+  "numa_bind_nodes": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1
+  ],
+  "numa_bind_cpus": [
+    "0-15,128-143",
+    "16-31,144-159",
+    "32-47,160-175",
+    "48-63,176-191",
+    "64-79,192-207",
+    "80-95,208-223",
+    "96-111,224-239",
+    "112-127,240-255"
+  ]
+}

@@ -288,3 +288,99 @@ def test_pipeline_setting_requires_ordinary_descriptor_reclamation():
         ops.configure_async_batch_memcpy_pipeline(handle, 2)
     finally:
         ops.destroy_async_batch_memcpy_submitter(handle)
+
+
+@pytest.mark.skipif(
+    not current_platform.is_cuda(), reason="async batch memcpy requires CUDA"
+)
+@pytest.mark.parametrize("prep_first", [False, True])
+def test_async_completion_signals_seal_without_ordinary_worker_poll(
+    tmp_path, prep_first
+):
+    """The actual H2D producer publishes readiness after copying, before RPC poll."""
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
+
+    channel = SealNotifications(str(tmp_path / "seal"), 1234, 1)
+    path = str(tmp_path / "completion-ring")
+    channel.descriptor(path, 0)
+    ring = ops.create_async_batch_memcpy_completion_ring(path, 1234)
+    handle = None
+    try:
+        handle = ops.create_async_batch_memcpy_submitter(0, 8192, 4096, path, 1234)
+        ops.configure_async_batch_memcpy_pipeline(handle, 2)
+        channel.arm(9, 1, [[17]], [])
+        ticket = channel.ticket()
+        if prep_first:
+            channel.prepared(9, 0, 1, 0)
+        source = torch.full((16384,), 29, dtype=torch.uint8, pin_memory=True)
+        destination = torch.zeros_like(source, device="cuda")
+        ops.submit_async_batch_memcpy(
+            handle,
+            17,
+            _pinned_i64([source.data_ptr()]),
+            _pinned_i64([destination.data_ptr()]),
+            _pinned_i64([source.numel()]),
+            src_access_any=True,
+        )
+        if not prep_first:
+            ops.wait_async_batch_memcpy(handle, [17])
+            assert channel.ticket() == ticket
+            channel.prepared(9, 0, 1, 0)
+        assert channel.wait(ticket, 2) == "progress"
+        assert torch.equal(source, destination.cpu())
+        sessions, jobs, _, statuses, overflow, failure = (
+            ops.poll_async_batch_memcpy_completion_ring(ring)
+        )
+        assert (sessions, jobs, statuses) == ([1234], [17], [1])
+        assert not overflow and not failure
+        # The notification never consumes ordinary completion or ring records.
+        ops.wait_async_batch_memcpy(handle, [17])
+        assert ops.poll_async_batch_memcpy(handle)[0] == [17]
+        channel.disarm()
+    finally:
+        if handle is not None:
+            ops.destroy_async_batch_memcpy_submitter(handle)
+        ops.destroy_async_batch_memcpy_completion_ring(ring)
+        channel.close()
+
+
+@pytest.mark.skipif(
+    not current_platform.is_cuda(), reason="native compute observer requires CUDA"
+)
+def test_native_compute_observer_signals_seal_after_completion(tmp_path):
+    """The native end-event publication wakes the engine without a scanner."""
+    import os
+
+    from vllm.v1.kv_offload.execution_timing import NativeExecutionObserver
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
+    from vllm.v1.kv_offload.step_timing import RankFile
+
+    library = os.environ.get("VLLM_TEST_SEAL_NATIVE_OBSERVER")
+    if not library:
+        pytest.skip("set VLLM_TEST_SEAL_NATIVE_OBSERVER to the notification build")
+    path = str(tmp_path / "rank.execution")
+    rank = RankFile(path, create=True)
+    channel = SealNotifications(str(tmp_path / "seal"), 1234, 1)
+    channel.descriptor(path, 0)
+    observer = None
+    try:
+        observer = NativeExecutionObserver(path, torch.device("cuda:0"), library)
+        channel.arm(9, 1, [[17]], [8])
+        ticket = channel.ticket()
+        observer.start(8)
+        values = torch.ones(16384, device="cuda")
+        values.mul_(2)
+        observer.finish(
+            8, None, time.monotonic_ns(), stream=torch.cuda.current_stream(0)
+        )
+        assert channel.wait(ticket, 2) == "progress"
+        record = rank.read(8)
+        assert record is not None and record[5] == 1 and record[8] > 0
+        assert torch.all(values == 2)
+        assert channel.scans == 0
+        channel.disarm()
+    finally:
+        if observer is not None:
+            observer.close()
+        rank.close()
+        channel.close()

@@ -1,0 +1,13 @@
+{
+  "selected": "deadline5",
+  "reason": "Highest canary throughput among leads with no fewer late admissions, no additional compute rounds, and lower late enqueue exposure.",
+  "requests_per_policy": 300,
+  "episodes": 4,
+  "requests_per_episode": 75,
+  "workload": [
+    61440,
+    95,
+    100
+  ],
+  "scope": "Selection on one scouting cell is provisional; confirm in four alternating paired episodes."
+}

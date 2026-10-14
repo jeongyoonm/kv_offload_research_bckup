@@ -1,0 +1,12 @@
+{
+  "runner_binary": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/build_keepalive/release/session_runner",
+  "runner_sha256": "a1d83917d7cf74dabccdc14ba4d1396c8a034ef9fc7e3ac60ef66b41f1b73636",
+  "runner_source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013",
+  "http_pool_idle_timeout_seconds": 1,
+  "retries": false,
+  "rate": 0.2,
+  "warmup_seconds": 600,
+  "measurement_seconds": 900,
+  "deadline": 1791856695.7760909,
+  "rationale": "Reject failed transport episode. Use the same short idle timeout in both arms and preserve all trace contents/waits. Use 15min measurement after 10min warmup to reserve time for both reruns, initialization, and draining within 3h."
+}

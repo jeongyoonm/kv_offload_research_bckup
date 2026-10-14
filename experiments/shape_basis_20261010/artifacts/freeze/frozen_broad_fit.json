@@ -1,0 +1,1307 @@
+{
+  "calibration": {
+    "schema": 3,
+    "features": [
+      "intercept",
+      "requests_per_16",
+      "suffix_sum_per_61440",
+      "mean_context_per_60000",
+      "max_suffix_per_4096",
+      "prefix_index_pairs_per_1e9",
+      "raw_duration_per_1000_ms"
+    ],
+    "coefficients": [
+      -59.1335146068465,
+      33.91162052345623,
+      -1448.74947681042,
+      22.15601233231266,
+      1.8452538288429146,
+      -114.43343207414034,
+      813.7248909622068
+    ],
+    "support": {
+      "requests": [
+        1,
+        17
+      ],
+      "context": [
+        15552.0,
+        58368.0
+      ],
+      "suffix": [
+        832.0,
+        3072.0
+      ]
+    },
+    "bias_bounds_ms": [
+      -500,
+      500
+    ],
+    "geometry_support": {
+      "suffix_per_context": [
+        0.013541666666666665,
+        0.2074074074074074
+      ]
+    },
+    "provenance": {
+      "sources": [
+        {
+          "path": "/mnt/localnvme/jeongyoon/shape_calibration_20261010/ns1_rows.json",
+          "sha256": "969cfe5a67eb147c09dde8481561fd3859d2b2822af2049339875374aa8ab513",
+          "rows": 76
+        },
+        {
+          "path": "/mnt/localnvme/jeongyoon/yc1/prediction_rows.json.gz",
+          "sha256": "04ada0bb1a0c8764562e4d5b97dde95111dd35b74babae9f68899b5341c17700",
+          "rows": 178
+        },
+        {
+          "path": "/mnt/localnvme/jeongyoon/yc2/prediction_rows.json.gz",
+          "sha256": "02678fc02cfcd69528c67aa87e355eb0186a79794deb57a7256f074d2de6d80f",
+          "rows": 205
+        }
+      ],
+      "group": "all arms/workloads per allocation repeat",
+      "elapsed_feature": false,
+      "selection": "attention_residual",
+      "alpha": 0.01,
+      "worker": "GLM5.3 TP8 H2D8/depth2 nativeD2H1GiB/depth2 allocator avoidance"
+    }
+  },
+  "candidates": [
+    {
+      "recipe": "tokens_direct",
+      "alpha": 0.001,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000"
+      ],
+      "coefficients": [
+        -4.665382762324695,
+        -10.14481246539563,
+        2083.2158534893138,
+        109.34888558583876
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.41353976124322744,
+        "mae": 25.38658610258913,
+        "p90_absolute": 55.29706635503068
+      },
+      "workload_macro_mae": 30.98293577511629,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -17.80853314505906,
+          "mae": 32.709015548472486,
+          "p90_absolute": 62.266667504906316
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 8.814770224182872,
+          "mae": 15.3339199976213,
+          "p90_absolute": 26.24683438354939
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.8300761858944856,
+          "mae": 23.205894328240774,
+          "p90_absolute": 39.816412270366875
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -18.588886280991712,
+          "mae": 21.79795332135561,
+          "p90_absolute": 55.85728732048924
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 56.665226652513546,
+          "mae": 61.867895679891284,
+          "p90_absolute": 139.97304370042212
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -71.95652237206988,
+          "mae": 79.80942314037772,
+          "p90_absolute": 176.2333738068794
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 37.895440339772584,
+          "mae": 38.120540953672275,
+          "p90_absolute": 55.66905196770342
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -0.5759745563558359,
+          "mae": 26.970019052639145,
+          "p90_absolute": 48.13792662221557
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -76.5477528323263,
+          "mae": 76.5477528323263,
+          "p90_absolute": 110.79884410187037
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 102.90325586348304,
+          "mae": 104.41050037083379,
+          "p90_absolute": 201.59008543460354
+        }
+      },
+      "geometry_macro_mae": 65.17164726996984,
+      "rank": 4,
+      "columns": 4
+    },
+    {
+      "recipe": "tokens_direct",
+      "alpha": 0.01,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000"
+      ],
+      "coefficients": [
+        -5.488018712746298,
+        -6.856933873222513,
+        2078.6426825009216,
+        110.03295887276583
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.3568439686696989,
+        "mae": 25.404393192460354,
+        "p90_absolute": 54.87780228575054
+      },
+      "workload_macro_mae": 30.844718086857945,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -18.19319898559239,
+          "mae": 32.86366421781133,
+          "p90_absolute": 62.78966631041904
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 9.248017620224179,
+          "mae": 15.489842607785206,
+          "p90_absolute": 26.682073666171586
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.9152312339432975,
+          "mae": 23.399227856801375,
+          "p90_absolute": 40.34098232338264
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -18.035233224917583,
+          "mae": 21.76342626577053,
+          "p90_absolute": 55.30667065967959
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 55.332786925317116,
+          "mae": 60.70742948612128,
+          "p90_absolute": 138.30216647189908
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -72.88151781690702,
+          "mae": 80.65693800018059,
+          "p90_absolute": 177.93791938715935
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 38.65305881068815,
+          "mae": 38.8461816748539,
+          "p90_absolute": 56.50248538135157
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -0.7067788074968486,
+          "mae": 27.149441620800655,
+          "p90_absolute": 48.55115625678256
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -73.02320783897606,
+          "mae": 73.02320783897606,
+          "p90_absolute": 107.65411831950595
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 100.73467300612329,
+          "mae": 102.3383794391946,
+          "p90_absolute": 199.0012354182114
+        }
+      },
+      "geometry_macro_mae": 64.40282971480117,
+      "rank": 4,
+      "columns": 4
+    },
+    {
+      "recipe": "tokens_direct",
+      "alpha": 0.1,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000"
+      ],
+      "coefficients": [
+        -13.316402174121624,
+        24.683927397790796,
+        2034.5625260347826,
+        116.55651179215786
+      ],
+      "held": {
+        "count": 459,
+        "mean": 0.18416575355584325,
+        "mae": 26.185714968855304,
+        "p90_absolute": 57.883369514892976
+      },
+      "workload_macro_mae": 30.030885694228175,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -21.91849694472791,
+          "mae": 34.50696338565025,
+          "p90_absolute": 67.15223673141426
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 13.393384680578812,
+          "mae": 17.67040489127144,
+          "p90_absolute": 31.414091615975266
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -4.729878279955084,
+          "mae": 25.20213919727853,
+          "p90_absolute": 45.28056811646323
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -12.71892356418324,
+          "mae": 23.113172101571948,
+          "p90_absolute": 51.01161783446524
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 42.650019453952794,
+          "mae": 49.6617488953687,
+          "p90_absolute": 122.28488977793236
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -81.80244948283665,
+          "mae": 88.84061622897151,
+          "p90_absolute": 194.44617938633678
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 45.90758952185253,
+          "mae": 45.92456303745652,
+          "p90_absolute": 64.47423858426288
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -1.9633473531802539,
+          "mae": 28.83713992389109,
+          "p90_absolute": 53.07271153725939
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -41.769009363915174,
+          "mae": 41.769009363915174,
+          "p90_absolute": 79.59278974653243
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 80.38574847076922,
+          "mae": 83.45988349385088,
+          "p90_absolute": 174.56096093462187
+        }
+      },
+      "geometry_macro_mae": 57.76624240961704,
+      "rank": 4,
+      "columns": 4
+    },
+    {
+      "recipe": "tokens_direct",
+      "alpha": 1.0,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000"
+      ],
+      "coefficients": [
+        -63.35843863618537,
+        244.60588817347022,
+        1712.0748862917121,
+        159.27556481330998
+      ],
+      "held": {
+        "count": 459,
+        "mean": 3.8643598066648224,
+        "mae": 46.8759673447818,
+        "p90_absolute": 96.04372735885136
+      },
+      "workload_macro_mae": 46.16094883535212,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -50.81722727330418,
+          "mae": 56.62253327542583,
+          "p90_absolute": 113.29742645556836
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 42.496559824497844,
+          "mae": 43.72086371874728,
+          "p90_absolute": 65.96728081976144
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -10.447274164159985,
+          "mae": 36.445849434227235,
+          "p90_absolute": 71.35818152712596
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 25.481712518129097,
+          "mae": 48.695574759333404,
+          "p90_absolute": 115.18674961726374
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -42.006462349266464,
+          "mae": 45.319922989026885,
+          "p90_absolute": 73.40076290921532
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -148.1406961529766,
+          "mae": 150.65902262851571,
+          "p90_absolute": 321.76291777165557
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 96.93380355820356,
+          "mae": 96.93380355820356,
+          "p90_absolute": 119.96040384940977
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -10.969581244506399,
+          "mae": 41.44355974892008,
+          "p90_absolute": 79.16965129927173
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 99.52234471969808,
+          "mae": 115.37106630164136,
+          "p90_absolute": 224.99113358619456
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -43.23034435177721,
+          "mae": 49.44351732226985,
+          "p90_absolute": 78.87538602023564
+        }
+      },
+      "geometry_macro_mae": 90.77019391191011,
+      "rank": 4,
+      "columns": 4
+    },
+    {
+      "recipe": "attention_direct",
+      "alpha": 0.001,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9"
+      ],
+      "coefficients": [
+        86.51727681953142,
+        -72.79330850305185,
+        1843.6563790834168,
+        16.55738777787378,
+        -37.49536566720018,
+        125.46810573935326
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.10338068881359551,
+        "mae": 15.232791821469467,
+        "p90_absolute": 29.5236183302951
+      },
+      "workload_macro_mae": 14.50049982946675,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 0.4863002608841232,
+          "mae": 14.387050555528317,
+          "p90_absolute": 25.00839139022637
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -0.3883008530329164,
+          "mae": 14.846854579073604,
+          "p90_absolute": 24.783023297602792
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -2.7052338004191734,
+          "mae": 13.917565388467398,
+          "p90_absolute": 27.67883559412483
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 1.3731940587765201,
+          "mae": 20.60864804531824,
+          "p90_absolute": 41.193032961586944
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 0.12206476437529391,
+          "mae": 8.742380578946184,
+          "p90_absolute": 16.84765895005578
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -10.914218035101687,
+          "mae": 23.710631105476207,
+          "p90_absolute": 43.45357140238152
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -13.483601027110533,
+          "mae": 16.48153227792081,
+          "p90_absolute": 32.790495061508636
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.8266396021728135,
+          "mae": 14.705070644205714,
+          "p90_absolute": 28.8730865072619
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -4.997011948868374,
+          "mae": 28.970839543825875,
+          "p90_absolute": 48.175281371658684
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 12.642817666932133,
+          "mae": 16.657062846894387,
+          "p90_absolute": 26.51509715321581
+        }
+      },
+      "geometry_macro_mae": 20.105027283664597,
+      "rank": 6,
+      "columns": 6
+    },
+    {
+      "recipe": "attention_direct",
+      "alpha": 0.01,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9"
+      ],
+      "coefficients": [
+        84.71775286733632,
+        -66.46119342769852,
+        1828.8584604095122,
+        16.67527007353967,
+        -33.86357610035248,
+        126.87708351497615
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.23045568656191692,
+        "mae": 15.235241936581515,
+        "p90_absolute": 30.147685406459306
+      },
+      "workload_macro_mae": 14.479572074922654,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 1.0542515775464314,
+          "mae": 14.413090411287014,
+          "p90_absolute": 25.53828849063658
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -0.9710892285185518,
+          "mae": 15.018264201279692,
+          "p90_absolute": 24.707038557452453
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -2.549022511427279,
+          "mae": 13.862343325013738,
+          "p90_absolute": 27.74758667914764
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 2.051311965832536,
+          "mae": 20.25440632788611,
+          "p90_absolute": 40.87214274238422
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -2.312546306954728,
+          "mae": 8.849756109146714,
+          "p90_absolute": 17.740506661743414
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -5.3827146466650255,
+          "mae": 22.007798186948868,
+          "p90_absolute": 40.246777527952425
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -21.121805117282058,
+          "mae": 22.129501497826485,
+          "p90_absolute": 40.73824503241835
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.8069126624148297,
+          "mae": 14.678528701303772,
+          "p90_absolute": 28.860246197429387
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 1.0676286860692945,
+          "mae": 25.215834029326537,
+          "p90_absolute": 42.621240112810476
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -2.7283778084078625,
+          "mae": 9.065216394502086,
+          "p90_absolute": 17.761114920694798
+        }
+      },
+      "geometry_macro_mae": 18.61937576198155,
+      "rank": 6,
+      "columns": 6
+    },
+    {
+      "recipe": "attention_direct",
+      "alpha": 0.1,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9"
+      ],
+      "coefficients": [
+        69.00763371611268,
+        -10.109421070186617,
+        1695.469145948358,
+        17.3699510399734,
+        -1.4594499441566455,
+        139.89982557324512
+      ],
+      "held": {
+        "count": 459,
+        "mean": -1.2476128325627354,
+        "mae": 17.689117579111038,
+        "p90_absolute": 36.1064699486401
+      },
+      "workload_macro_mae": 18.66662269983753,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 6.068771797466545,
+          "mae": 15.554693879553035,
+          "p90_absolute": 29.386551788304704
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -5.9547815936478194,
+          "mae": 16.56132351386528,
+          "p90_absolute": 27.865330116115377
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -1.1900073030697256,
+          "mae": 13.562965335358518,
+          "p90_absolute": 27.16839928838506
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 8.144490039454995,
+          "mae": 21.749658432922978,
+          "p90_absolute": 39.583661511590115
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -23.462547495494807,
+          "mae": 25.904472337487828,
+          "p90_absolute": 56.6170615094677
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 40.10179409470509,
+          "mae": 40.10179409470509,
+          "p90_absolute": 67.87790963390513
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -77.27044871208614,
+          "mae": 77.27044871208614,
+          "p90_absolute": 99.1949579177151
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.65061715276223,
+          "mae": 14.420949789446148,
+          "p90_absolute": 28.784665305732318
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 46.00241291930607,
+          "mae": 48.046011795383244,
+          "p90_absolute": 69.69300400751129
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -100.18627030444385,
+          "mae": 101.02008048331322,
+          "p90_absolute": 209.54723425509627
+        }
+      },
+      "geometry_macro_mae": 56.17185697498677,
+      "rank": 6,
+      "columns": 6
+    },
+    {
+      "recipe": "attention_direct",
+      "alpha": 1.0,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9"
+      ],
+      "coefficients": [
+        14.873017292437426,
+        231.6159043715363,
+        1048.6499086284614,
+        5.179489112444222,
+        141.0879583230171,
+        216.76680630305952
+      ],
+      "held": {
+        "count": 459,
+        "mean": -3.3212596494548463,
+        "mae": 36.40173137410652,
+        "p90_absolute": 77.36824762235317
+      },
+      "workload_macro_mae": 46.37030403999891,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 27.513437766261656,
+          "mae": 30.463778022000103,
+          "p90_absolute": 65.99355236196142
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -23.43482355565461,
+          "mae": 25.45127912852422,
+          "p90_absolute": 47.98822979807992
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": 3.8585904073256247,
+          "mae": 12.829226592931443,
+          "p90_absolute": 30.240415324406644
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 38.45116759335956,
+          "mae": 46.68751844890041,
+          "p90_absolute": 84.68015420532082
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -111.96500662128781,
+          "mae": 116.41971800763838,
+          "p90_absolute": 279.5956245402157
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 180.28701607082124,
+          "mae": 180.28701607082124,
+          "p90_absolute": 234.78838094245276
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -181.96149248549287,
+          "mae": 181.96149248549287,
+          "p90_absolute": 208.90108511456407
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -3.9533724053298704,
+          "mae": 15.188809980624937,
+          "p90_absolute": 26.666423280992323
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 156.19902536941402,
+          "mae": 156.59649620100484,
+          "p90_absolute": 233.00321574555574
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -252.75432170949196,
+          "mae": 254.0477752735879,
+          "p90_absolute": 538.3821598835572
+        }
+      },
+      "geometry_macro_mae": 157.61631800230634,
+      "rank": 6,
+      "columns": 6
+    },
+    {
+      "recipe": "attention_residual",
+      "alpha": 0.001,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9",
+        "raw_duration_per_1000_ms"
+      ],
+      "coefficients": [
+        -65.84844448770336,
+        45.800969053825995,
+        -1538.6265725729452,
+        14.328538171406567,
+        11.383069106145985,
+        -115.80646964208591,
+        851.7645415496492
+      ],
+      "held": {
+        "count": 459,
+        "mean": 0.10443566500590283,
+        "mae": 14.485773035733793,
+        "p90_absolute": 28.254355183515138
+      },
+      "workload_macro_mae": 13.235479648104553,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 0.07138335705920679,
+          "mae": 10.732482060101091,
+          "p90_absolute": 20.415211777616836
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 0.3392410628082676,
+          "mae": 17.01529007446861,
+          "p90_absolute": 23.77391799367784
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -4.728594252858274,
+          "mae": 12.055887494466905,
+          "p90_absolute": 21.381385612174608
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 1.0526802052599664,
+          "mae": 18.72352587572025,
+          "p90_absolute": 32.91673539464194
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 4.585315009090444,
+          "mae": 7.650212735765916,
+          "p90_absolute": 14.441174233849374
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -5.245453816503405,
+          "mae": 14.51786159406288,
+          "p90_absolute": 29.961969199974835
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 3.54522421199849,
+          "mae": 18.22498569404534,
+          "p90_absolute": 28.24624111026743
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -6.295521570829737,
+          "mae": 12.115450934083896,
+          "p90_absolute": 24.16077226414291
+        },
+        "short16k": {
+          "count": 88,
+          "mean": -4.638373651367059,
+          "mae": 26.428390357386288,
+          "p90_absolute": 39.36884406789559
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 28.401668825572077,
+          "mae": 29.65761841996034,
+          "p90_absolute": 48.54867006597347
+        }
+      },
+      "geometry_macro_mae": 20.18886139990775,
+      "rank": 7,
+      "columns": 7
+    },
+    {
+      "recipe": "attention_residual",
+      "alpha": 0.01,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9",
+        "raw_duration_per_1000_ms"
+      ],
+      "coefficients": [
+        -59.1335146068465,
+        33.91162052345623,
+        -1448.74947681042,
+        22.15601233231266,
+        1.8452538288429146,
+        -114.43343207414034,
+        813.7248909622068
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.018358324417833704,
+        "mae": 14.248975791747856,
+        "p90_absolute": 28.024480579067635
+      },
+      "workload_macro_mae": 12.758200648377489,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 0.3016533419657616,
+          "mae": 9.689276971247148,
+          "p90_absolute": 20.22333729450721
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 0.07855048371891371,
+          "mae": 17.915331672398853,
+          "p90_absolute": 25.182490179984253
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -5.460265217659971,
+          "mae": 11.572654633752625,
+          "p90_absolute": 23.154814620680053
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 1.448228528587505,
+          "mae": 17.652088812712222,
+          "p90_absolute": 33.36470156497489
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 3.8057210152253553,
+          "mae": 6.961651151776593,
+          "p90_absolute": 14.280165679740103
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 2.128521720372858,
+          "mae": 9.645098219466002,
+          "p90_absolute": 21.053916873294465
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 1.5017600042548391,
+          "mae": 19.401630853542244,
+          "p90_absolute": 28.97114181406671
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -7.058014159647106,
+          "mae": 11.677590736034626,
+          "p90_absolute": 25.053514586235202
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 0.510575102262936,
+          "mae": 21.983113208347962,
+          "p90_absolute": 36.38580709420329
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 19.343851376952685,
+          "mae": 20.30704328446511,
+          "p90_absolute": 30.463589484780957
+        }
+      },
+      "geometry_macro_mae": 16.602895260371188,
+      "rank": 7,
+      "columns": 7
+    },
+    {
+      "recipe": "attention_residual",
+      "alpha": 0.1,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9",
+        "raw_duration_per_1000_ms"
+      ],
+      "coefficients": [
+        -19.441045452349535,
+        -35.36765998557841,
+        -910.8638094712451,
+        69.55986930740713,
+        -54.190959830442736,
+        -105.86201424963073,
+        583.9646093262799
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.5848376882004819,
+        "mae": 17.565376117474468,
+        "p90_absolute": 33.691034055014825
+      },
+      "workload_macro_mae": 15.6565550955067,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 1.4315469362415265,
+          "mae": 13.959626901742944,
+          "p90_absolute": 29.910631332775576
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -0.9762252598809404,
+          "mae": 23.78570443897416,
+          "p90_absolute": 36.172768880333784
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -9.551185682681215,
+          "mae": 15.6096187817802,
+          "p90_absolute": 29.87854669522306
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 3.426793141820619,
+          "mae": 14.304552302455978,
+          "p90_absolute": 43.11158631842336
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 0.11762111881380007,
+          "mae": 10.623273052580231,
+          "p90_absolute": 22.224956826030482
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 34.65843972163338,
+          "mae": 35.89257106856062,
+          "p90_absolute": 64.43977468620379
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": -3.1543655464632145,
+          "mae": 25.520849166973946,
+          "p90_absolute": 44.69472987654897
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -11.48274699738789,
+          "mae": 16.0609030042238,
+          "p90_absolute": 29.216129212700917
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 22.302097526276672,
+          "mae": 25.94495148289286,
+          "p90_absolute": 48.9510361963094
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -21.07947844899963,
+          "mae": 24.65119061321203,
+          "p90_absolute": 67.94254042959132
+        }
+      },
+      "geometry_macro_mae": 25.61409306717265,
+      "rank": 7,
+      "columns": 7
+    },
+    {
+      "recipe": "attention_residual",
+      "alpha": 1.0,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9",
+        "raw_duration_per_1000_ms"
+      ],
+      "coefficients": [
+        28.28638772265696,
+        -100.97860488327592,
+        -182.93555932480254,
+        140.77756152425766,
+        -113.25758950714138,
+        -87.17676984255954,
+        238.27980616024345
+      ],
+      "held": {
+        "count": 459,
+        "mean": -0.22443676968208306,
+        "mae": 26.585870746081216,
+        "p90_absolute": 50.0717319606622
+      },
+      "workload_macro_mae": 24.702658339884344,
+      "workloads": {
+        "familiar60k": {
+          "count": 107,
+          "mean": -0.3432232427650259,
+          "mae": 27.379009955610105,
+          "p90_absolute": 54.13028997608671
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 3.703515820897677,
+          "mae": 30.543919639396172,
+          "p90_absolute": 50.27940521891752
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -16.60822617496457,
+          "mae": 28.468922529123876,
+          "p90_absolute": 45.46983130285188
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 1.9157532656495988,
+          "mae": 21.349459103496898,
+          "p90_absolute": 50.22230832966295
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": 3.3193732088301906,
+          "mae": 15.771980471794674,
+          "p90_absolute": 30.55534974599966
+        }
+      },
+      "leave_geometry_out": {
+        "familiar60k": {
+          "count": 107,
+          "mean": 27.746023055916044,
+          "mae": 42.488185334726715,
+          "p90_absolute": 85.09254741651448
+        },
+        "long_short_suffix": {
+          "count": 168,
+          "mean": 42.267455776346154,
+          "mae": 50.42038186643876,
+          "p90_absolute": 84.59996651840817
+        },
+        "mid32k": {
+          "count": 59,
+          "mean": -18.695562534328012,
+          "mae": 29.239009545879625,
+          "p90_absolute": 46.10050615736037
+        },
+        "short16k": {
+          "count": 88,
+          "mean": 13.222368259971136,
+          "mae": 24.56147834376802,
+          "p90_absolute": 49.86208159320195
+        },
+        "short_long_suffix": {
+          "count": 37,
+          "mean": -10.454744537804032,
+          "mae": 22.451130027598172,
+          "p90_absolute": 61.79914335197363
+        }
+      },
+      "geometry_macro_mae": 33.83203702368226,
+      "rank": 7,
+      "columns": 7
+    }
+  ],
+  "selected": {
+    "recipe": "attention_residual",
+    "alpha": 0.01,
+    "features": [
+      "intercept",
+      "requests_per_16",
+      "suffix_sum_per_61440",
+      "mean_context_per_60000",
+      "max_suffix_per_4096",
+      "prefix_index_pairs_per_1e9",
+      "raw_duration_per_1000_ms"
+    ],
+    "coefficients": [
+      -59.1335146068465,
+      33.91162052345623,
+      -1448.74947681042,
+      22.15601233231266,
+      1.8452538288429146,
+      -114.43343207414034,
+      813.7248909622068
+    ],
+    "held": {
+      "count": 459,
+      "mean": -0.018358324417833704,
+      "mae": 14.248975791747856,
+      "p90_absolute": 28.024480579067635
+    },
+    "workload_macro_mae": 12.758200648377489,
+    "workloads": {
+      "familiar60k": {
+        "count": 107,
+        "mean": 0.3016533419657616,
+        "mae": 9.689276971247148,
+        "p90_absolute": 20.22333729450721
+      },
+      "long_short_suffix": {
+        "count": 168,
+        "mean": 0.07855048371891371,
+        "mae": 17.915331672398853,
+        "p90_absolute": 25.182490179984253
+      },
+      "mid32k": {
+        "count": 59,
+        "mean": -5.460265217659971,
+        "mae": 11.572654633752625,
+        "p90_absolute": 23.154814620680053
+      },
+      "short16k": {
+        "count": 88,
+        "mean": 1.448228528587505,
+        "mae": 17.652088812712222,
+        "p90_absolute": 33.36470156497489
+      },
+      "short_long_suffix": {
+        "count": 37,
+        "mean": 3.8057210152253553,
+        "mae": 6.961651151776593,
+        "p90_absolute": 14.280165679740103
+      }
+    },
+    "leave_geometry_out": {
+      "familiar60k": {
+        "count": 107,
+        "mean": 2.128521720372858,
+        "mae": 9.645098219466002,
+        "p90_absolute": 21.053916873294465
+      },
+      "long_short_suffix": {
+        "count": 168,
+        "mean": 1.5017600042548391,
+        "mae": 19.401630853542244,
+        "p90_absolute": 28.97114181406671
+      },
+      "mid32k": {
+        "count": 59,
+        "mean": -7.058014159647106,
+        "mae": 11.677590736034626,
+        "p90_absolute": 25.053514586235202
+      },
+      "short16k": {
+        "count": 88,
+        "mean": 0.510575102262936,
+        "mae": 21.983113208347962,
+        "p90_absolute": 36.38580709420329
+      },
+      "short_long_suffix": {
+        "count": 37,
+        "mean": 19.343851376952685,
+        "mae": 20.30704328446511,
+        "p90_absolute": 30.463589484780957
+      }
+    },
+    "geometry_macro_mae": 16.602895260371188,
+    "rank": 7,
+    "columns": 7
+  },
+  "fixed90": {
+    "count": 459,
+    "mean": 17.89989428540305,
+    "mae": 73.63187126143791,
+    "p90_absolute": 135.27354759999997
+  },
+  "rows": 459,
+  "groups": [
+    "shape_calibration_20261010:0",
+    "shape_calibration_20261010:1",
+    "shape_calibration_20261010:2",
+    "shape_calibration_20261010:3",
+    "yc1:0",
+    "yc1:1",
+    "yc2:0",
+    "yc2:1"
+  ],
+  "caveat": "Grouped development selection, not final held-out serving accuracy. Leave-geometry-out queries are shadow extrapolation before support/clip guards; they diagnose generalization but are not live accuracy. Use independent seeds and new geometry for frozen300 confirmations."
+}

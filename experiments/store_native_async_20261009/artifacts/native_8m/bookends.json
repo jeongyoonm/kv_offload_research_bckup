@@ -1,0 +1,55 @@
+{
+  "episodes": [
+    {
+      "arm": "gpu",
+      "repeat": 0,
+      "client_elapsed_ms": 9633.582617,
+      "response_span_ms": 9583.105227,
+      "before_first_compute_ms": 233.478895,
+      "gpu_span_ms": 9290.018093,
+      "after_last_compute_ms": 59.608239,
+      "client_harness_overhead_ms": 50.477390000000014
+    },
+    {
+      "arm": "gpu",
+      "repeat": 1,
+      "client_elapsed_ms": 9484.795042,
+      "response_span_ms": 9484.339103,
+      "before_first_compute_ms": 236.442819,
+      "gpu_span_ms": 9158.34499,
+      "after_last_compute_ms": 89.551294,
+      "client_harness_overhead_ms": 0.45593899999948917
+    },
+    {
+      "arm": "gpu",
+      "repeat": 2,
+      "client_elapsed_ms": 9536.735188999999,
+      "response_span_ms": 9536.200047,
+      "before_first_compute_ms": 113.925125,
+      "gpu_span_ms": 9337.52548,
+      "after_last_compute_ms": 84.749442,
+      "client_harness_overhead_ms": 0.5351419999988138
+    },
+    {
+      "arm": "gpu",
+      "repeat": 3,
+      "client_elapsed_ms": 9433.057630000001,
+      "response_span_ms": 9432.55504,
+      "before_first_compute_ms": 228.672169,
+      "gpu_span_ms": 9127.429647,
+      "after_last_compute_ms": 76.453224,
+      "client_harness_overhead_ms": 0.5025900000018737
+    }
+  ],
+  "means": {
+    "gpu": {
+      "client_elapsed_ms": 9522.0426195,
+      "response_span_ms": 9509.049854249999,
+      "before_first_compute_ms": 203.129752,
+      "gpu_span_ms": 9228.3295525,
+      "after_last_compute_ms": 77.59054975000001,
+      "client_harness_overhead_ms": 12.992765250000048
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

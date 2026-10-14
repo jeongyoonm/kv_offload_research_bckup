@@ -1,0 +1,234 @@
+{
+  "source": "/mnt/localnvme/glm53_offset_conditioned_20261008",
+  "forecasts": 45,
+  "issued_replay_max_difference_ns": 0,
+  "issued_feature_max_difference": 0.0,
+  "issued_label_and_deadline_checks": true,
+  "offline_benchmark": [
+    {
+      "predictor": "trees",
+      "metrics": {
+        "samples": 192,
+        "mae_ms": 20.254138348958335,
+        "bias_ms": 12.436554171875002,
+        "mape_percent": 7.5715465659925725,
+        "p95_ms": 100.04791369999998
+      },
+      "scope": "Reused 192-row benchmark, not an independent new test"
+    },
+    {
+      "predictor": "matched_elapsed",
+      "metrics": {
+        "samples": 192,
+        "mae_ms": 5.9565532500000025,
+        "bias_ms": -0.0010083958333322318,
+        "mape_percent": 2.9514105984209738,
+        "p95_ms": 34.22753114999999
+      },
+      "scope": "Reused 192-row benchmark, not an independent new test"
+    },
+    {
+      "predictor": "matched_offset",
+      "metrics": {
+        "samples": 192,
+        "mae_ms": 6.1353950625000016,
+        "bias_ms": -0.5103867708333292,
+        "mape_percent": 3.0556048035419936,
+        "p95_ms": 29.866114150000058
+      },
+      "scope": "Reused 192-row benchmark, not an independent new test"
+    }
+  ],
+  "source_distributions": {
+    "training": {
+      "duration_ms": {
+        "count": 4994,
+        "mean": 475.38996364457347,
+        "median": 312.5217215,
+        "p95": 1318.4269594999998,
+        "maximum": 2022.154907
+      },
+      "elapsed_ms": {
+        "count": 4994,
+        "mean": 18.25505520324389,
+        "median": 5.331355,
+        "p95": 67.09376364999997,
+        "maximum": 172.685056
+      },
+      "queue_ms": {
+        "count": 4994,
+        "mean": 228.7761731696035,
+        "median": 98.54878450000001,
+        "p95": 964.0837798499994,
+        "maximum": 2154.756935
+      }
+    },
+    "reused_benchmark": {
+      "duration_ms": {
+        "count": 192,
+        "mean": 330.610772765625,
+        "median": 183.1747935,
+        "p95": 1807.11757745,
+        "maximum": 1819.491577
+      },
+      "elapsed_ms": {
+        "count": 192,
+        "mean": 0.9869502447916667,
+        "median": 0.637554,
+        "p95": 3.2185862999999992,
+        "maximum": 15.153624
+      },
+      "queue_ms": {
+        "count": 192,
+        "mean": 165.575177609375,
+        "median": 6.1933505,
+        "p95": 1795.9110621,
+        "maximum": 1860.228539
+      }
+    }
+  },
+  "live": [
+    {
+      "workload": "familiar60k",
+      "count": 45,
+      "timing": {
+        "actual_ms": {
+          "count": 45,
+          "mean": 848.148903022222,
+          "median": 807.329895,
+          "p95": 1783.6784807999995,
+          "maximum": 2107.875787
+        },
+        "elapsed_ms": {
+          "count": 45,
+          "mean": 45.439338066666664,
+          "median": 49.196946,
+          "p95": 75.12274479999999,
+          "maximum": 116.667993
+        },
+        "queue_ms": {
+          "count": 45,
+          "mean": 487.88354642222214,
+          "median": 188.577738,
+          "p95": 1841.1474044,
+          "maximum": 1842.848507
+        },
+        "prediction_cost_us": {
+          "count": 45,
+          "mean": 454.74548888888893,
+          "median": 454.511,
+          "p95": 567.8556,
+          "maximum": 594.529
+        },
+        "label_start_uncertainty_ms": {
+          "count": 45,
+          "mean": 0.5476761777777778,
+          "median": 0.562982,
+          "p95": 0.5813280000000001,
+          "maximum": 1.783072
+        },
+        "label_end_observation_window_ms": {
+          "count": 45,
+          "mean": 0.5572357111111111,
+          "median": 0.557781,
+          "p95": 0.568735,
+          "maximum": 0.57683
+        }
+      },
+      "exact_geometry_covered": 44,
+      "models": {
+        "trees": {
+          "accuracy": {
+            "samples": 45,
+            "mae_ms": 45.81829388888889,
+            "bias_ms": -12.136876511111096,
+            "mape_percent": 10.091141077159074,
+            "p95_ms": 149.41371419999984
+          },
+          "zero_elapsed_counterfactual_accuracy": {
+            "samples": 45,
+            "mae_ms": 44.28612779999999,
+            "bias_ms": -14.58277931111108,
+            "mape_percent": 9.686260113824831,
+            "p95_ms": 139.32849619999988
+          },
+          "elapsed_sensitivity": {
+            "count": 45,
+            "mean": 32.467388488888886,
+            "median": 33.60033199999998,
+            "p95": 45.38821199999995,
+            "maximum": 45.50406399999997
+          },
+          "matched_geometry_accuracy": {
+            "samples": 44,
+            "mae_ms": 44.34896440909092,
+            "bias_ms": -9.90206027272726,
+            "mape_percent": 10.182596979641275,
+            "p95_ms": 151.26224990000006
+          }
+        },
+        "matched_elapsed": {
+          "accuracy": {
+            "samples": 45,
+            "mae_ms": 20.133283111111098,
+            "bias_ms": -9.018006088888873,
+            "mape_percent": 3.1959388945301517,
+            "p95_ms": 53.405452399999966
+          },
+          "zero_elapsed_counterfactual_accuracy": {
+            "samples": 45,
+            "mae_ms": 17.02201913333332,
+            "bias_ms": -6.9075493999999775,
+            "mape_percent": 2.279811550814836,
+            "p95_ms": 48.7404499999999
+          },
+          "elapsed_sensitivity": {
+            "count": 45,
+            "mean": 21.03882113333332,
+            "median": 23.420416999999816,
+            "p95": 51.3589639999999,
+            "maximum": 52.69076299999995
+          },
+          "matched_geometry_accuracy": {
+            "samples": 44,
+            "mae_ms": 20.220769704545436,
+            "bias_ms": -9.593048795454534,
+            "mape_percent": 3.2482481816992768,
+            "p95_ms": 53.48151854999997
+          }
+        },
+        "matched_offset": {
+          "accuracy": {
+            "samples": 45,
+            "mae_ms": 16.977873888888873,
+            "bias_ms": -8.562651977777769,
+            "mape_percent": 2.364542017735964,
+            "p95_ms": 46.85536659999993
+          },
+          "zero_elapsed_counterfactual_accuracy": {
+            "samples": 45,
+            "mae_ms": 16.977873888888873,
+            "bias_ms": -8.562651977777769,
+            "mape_percent": 2.364542017735964,
+            "p95_ms": 46.85536659999993
+          },
+          "elapsed_sensitivity": {
+            "count": 45,
+            "mean": 0.0,
+            "median": 0.0,
+            "p95": 0.0,
+            "maximum": 0.0
+          },
+          "matched_geometry_accuracy": {
+            "samples": 44,
+            "mae_ms": 17.11490588636362,
+            "bias_ms": -9.006086477272719,
+            "mape_percent": 2.404615627940217,
+            "p95_ms": 46.938948199999935
+          }
+        }
+      }
+    }
+  ],
+  "limits": "Sensitivity changes one feature with loads held fixed; it is not a causal intervention on GPU execution. Final records provide labels; start/enqueue fields only are used as predictor inputs."
+}

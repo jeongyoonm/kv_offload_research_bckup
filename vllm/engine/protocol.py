@@ -184,8 +184,13 @@ class EngineClient(ABC):
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
         """Configure the experiment-only KV readiness scheduling policy."""
+        raise NotImplementedError
+
+    async def get_deferral_cohort_status(self) -> dict[str, Any]:
+        """Inspect the paused experiment cohort without scheduling requests."""
         raise NotImplementedError
 
     @abstractmethod

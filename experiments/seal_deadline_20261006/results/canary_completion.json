@@ -1,0 +1,10 @@
+{
+  "source_commit": "bcc4212",
+  "accepted_cells": 5,
+  "measured_requests": 400,
+  "model_known_answers_per_policy": 16,
+  "model_distinct_facts_per_policy": 16,
+  "gpus_idle_after_canary": true,
+  "selected_lead_ms": 5,
+  "comparison": "four alternating paired 75-request episodes"
+}

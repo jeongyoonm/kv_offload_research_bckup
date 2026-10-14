@@ -242,6 +242,47 @@ def test_prepare_store_kv_non_replicated_rank_gt_zero_queues_store():
     assert worker._unsubmitted_store_jobs == []
 
 
+@pytest.mark.parametrize("markers", [False, True])
+def test_store_instrumentation_preserves_submission_before_flush_wait(
+    monkeypatch, markers
+):
+    """Tracing must preserve the block-reuse fence and exactly-once submission."""
+    from vllm.v1.kv_offload import queue_stages
+
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    events = []
+    monkeypatch.setattr(queue_stages, "active", markers)
+    monkeypatch.setattr(queue_stages, "emit", lambda event, **kw: events.append(event))
+
+    def submit(*args):
+        events.append("submit")
+        return True
+
+    worker.worker.submit_store.side_effect = submit
+    worker.worker.wait.side_effect = lambda *args: events.append("wait")
+    metadata = _store_metadata(10)
+    metadata.jobs_to_flush = {10}
+    worker.handle_preemptions(metadata)
+    worker.start_kv_transfers(_empty_metadata())
+    assert events == (
+        [
+            "deferred_store_submission_begin",
+            "submit",
+            "deferred_store_submission_end",
+            "store_flush_wait_begin",
+            "wait",
+            "store_flush_wait_end",
+        ]
+        if markers
+        else ["submit", "wait"]
+    )
+    assert not worker._unsubmitted_store_jobs
+    worker.worker.submit_store.assert_called_once()
+    worker.worker.wait.assert_called_once_with({10})
+
+
 def test_handle_preemptions_non_writer_acks_flushed_store():
     worker, _ = _make_worker(
         KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[]),
@@ -260,6 +301,43 @@ def test_handle_preemptions_non_writer_acks_flushed_store():
     meta = worker.build_connector_worker_meta()
     assert meta is not None
     assert meta.completed_jobs == {10: 1}
+
+
+@pytest.mark.parametrize(
+    "force_host,load_pending", [(False, False), (True, False), (False, True)]
+)
+def test_store_reuse_gpu_fence_preserves_reset_and_load_host_waits(
+    force_host, load_pending
+):
+    """Only ordinary store reuse may replace the host completion wait."""
+    worker, _ = _make_worker(
+        KVCacheConfig(num_blocks=0, kv_cache_tensors=[], kv_cache_groups=[])
+    )
+    assert worker.worker is not None
+    events = []
+
+    def submit(*args):
+        events.append("submit")
+        return True
+
+    worker.worker.submit_store.side_effect = submit
+    worker.worker.wait.side_effect = lambda *args: events.append("wait")
+    worker.worker.fence_store_reuse.side_effect = lambda *args: events.append("fence")
+    metadata = _store_metadata(10)
+    metadata.jobs_to_flush = {10}
+    metadata.experiment_options = {"store_reuse_gpu_fence": True}
+    metadata.force_flush_on_host = force_host
+    if load_pending:
+        worker._load_jobs[11] = "loading"
+        metadata.jobs_to_flush.add(11)
+
+    worker.handle_preemptions(metadata)
+    worker.start_kv_transfers(_empty_metadata())
+
+    assert events == ["submit", "wait" if force_host or load_pending else "fence"]
+    worker.worker.submit_store.assert_called_once()
+    assert not metadata.store_jobs
+    assert not worker._unsubmitted_store_jobs
 
 
 def test_start_kv_transfers_non_writer_still_submits_load():

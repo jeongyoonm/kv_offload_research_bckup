@@ -101,6 +101,45 @@ class CPUOffloadingSpec(OffloadingSpec):
             )
 
         world_size = config.parallel.world_size
+        self.memory_layout = self.extra_config.get("cpu_cache_layout", "block")
+        if self.memory_layout not in ("block", "worker", "private"):
+            raise ValueError("cpu_cache_layout must be block, worker or private")
+        self.memory_backing = self.extra_config.get("cpu_cache_backing", "shm")
+        if self.memory_backing not in ("shm", "memfd"):
+            raise ValueError("cpu_cache_backing must be shm or memfd")
+        if self.memory_backing == "memfd" and self.memory_layout != "private":
+            raise ValueError("memfd backing requires private worker layout")
+        if self.memory_layout != "block" and (
+            config.replicated_layout
+            or config.canonical_layout
+            or type(self) is not CPUOffloadingSpec
+        ):
+            raise ValueError("worker layout supports direct sharded CPU caching only")
+        self.population_mode = self.extra_config.get("cpu_cache_population", "rank")
+        self.population_workers = self.extra_config.get(
+            "cpu_cache_population_workers", world_size
+        )
+        self.population_chunk_bytes = self.extra_config.get(
+            "cpu_cache_population_chunk_bytes", 256 * 1024 * 1024
+        )
+        self.population_barrier = self.extra_config.get(
+            "cpu_cache_population_barrier", False
+        )
+        if self.population_mode not in ("rank", "contiguous"):
+            raise ValueError("cpu_cache_population must be rank or contiguous")
+        if (
+            type(self.population_workers) is not int
+            or not 1 <= self.population_workers <= world_size
+            or world_size % self.population_workers
+        ):
+            raise ValueError("cpu_cache_population_workers must divide world_size")
+        if (
+            type(self.population_chunk_bytes) is not int
+            or self.population_chunk_bytes < self.BLOCK_SIZE_ALIGNMENT
+        ):
+            raise ValueError("cpu_cache_population_chunk_bytes must be at least a page")
+        if type(self.population_barrier) is not bool:
+            raise ValueError("cpu_cache_population_barrier must be a boolean")
         self.num_blocks = 0
         self.kv_bytes_per_chunk = 0
         self.cpu_page_size_per_worker = 0
@@ -118,6 +157,14 @@ class CPUOffloadingSpec(OffloadingSpec):
                 kv_bytes_per_chunk, self.BLOCK_SIZE_ALIGNMENT
             )
             self.num_blocks = int(cpu_bytes_to_use) // aligned_kv_bytes_per_chunk
+            if self.memory_layout != "block":
+                # Keep the same logical capacity; only rank-boundary padding
+                # changes. Small caches can need one fewer block to fit.
+                while num_copies * round_up(
+                    self.num_blocks * self.cpu_page_size_per_worker,
+                    self.BLOCK_SIZE_ALIGNMENT,
+                ) > int(cpu_bytes_to_use):
+                    self.num_blocks -= 1
 
             # Expose aligned_kv_bytes_per_chunk as
             # kv_bytes_per_chunk. Note that this might contain
@@ -145,6 +192,19 @@ class CPUOffloadingSpec(OffloadingSpec):
             raise ValueError("async_h2d_chunk_bytes must be a positive integer")
         self.async_h2d_submission = async_h2d_submission
         self.async_h2d_chunk_bytes = async_h2d_chunk_bytes
+        self.async_d2h_submission = self.extra_config.get("async_d2h_submission", False)
+        if not isinstance(self.async_d2h_submission, bool):
+            raise ValueError("async_d2h_submission must be a boolean")
+        if self.async_d2h_submission and not current_platform.is_cuda():
+            raise RuntimeError("async_d2h_submission requires CUDA")
+        self.async_d2h_chunk_bytes = self.extra_config.get(
+            "async_d2h_chunk_bytes", 8 * 1024 * 1024
+        )
+        if (
+            type(self.async_d2h_chunk_bytes) is not int
+            or self.async_d2h_chunk_bytes <= 0
+        ):
+            raise ValueError("async_d2h_chunk_bytes must be a positive integer")
         self.async_h2d_max_descriptors = self.extra_config.get(
             "async_h2d_max_descriptors", 4096
         )
@@ -208,6 +268,8 @@ class CPUOffloadingSpec(OffloadingSpec):
             else:
                 world_size = self.config.parallel.world_size
                 rank = torch.accelerator.current_device_index() % world_size
+                if self.memory_layout != "block":
+                    rank = self.config.parallel.rank
             mmap_region = SharedOffloadRegion(
                 engine_id=self.config.engine_id,
                 num_blocks=self.num_blocks,
@@ -215,6 +277,14 @@ class CPUOffloadingSpec(OffloadingSpec):
                 kv_bytes_per_block=self.kv_bytes_per_chunk,
                 cpu_page_size=self.cpu_page_size_per_worker,
                 barrier=_all_workers_barrier,
+                population_mode=self.population_mode,
+                population_workers=self.population_workers,
+                population_chunk_bytes=self.population_chunk_bytes,
+                num_workers=self.config.parallel.world_size,
+                process_rank=self.config.parallel.rank,
+                population_barrier=self.population_barrier,
+                memory_layout=self.memory_layout,
+                memory_backing=self.memory_backing,
             )
         try:
             return CPUOffloadingWorker(
@@ -228,6 +298,8 @@ class CPUOffloadingSpec(OffloadingSpec):
                 async_h2d_completion_ring_path=(self.async_h2d_completion_ring_path),
                 async_h2d_completion_session=self.async_h2d_completion_session,
                 force_h2d_dma=self.force_h2d_dma,
+                async_d2h_submission=self.async_d2h_submission,
+                async_d2h_chunk_bytes=self.async_d2h_chunk_bytes,
             )
         except Exception:
             if mmap_region is not None:

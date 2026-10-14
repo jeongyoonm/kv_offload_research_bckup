@@ -1,0 +1,653 @@
+{
+  "created_at": 1791959555.2173114,
+  "source": "/mnt/localnvme/jeongyoon/vllm_cached_dispatch_horizon_20261014",
+  "prototype_commit": "acc46862a8c874a376c896489fa137d392016e27",
+  "previous_main": "5147414",
+  "previous_main_archive": "archive/main-before-prototype-20261014",
+  "prototype_branches": {
+    "experiment/agentic-million-context-20261012": "cb5900ce4e9ea474e15113ecde443665fd55c0a6",
+    "experiment/agentic-private-memfd-maxcache-20261012": "4f9e322a6d7936901b2aec4315faac23b3346487",
+    "experiment/cached-dispatch-horizon-20261014": "acc46862a8c874a376c896489fa137d392016e27",
+    "experiment/cpu-cache-bulk-population-20261007": "42eabd8759678cbca4d8c21b578a70416ca97864",
+    "experiment/cpu-cache-correctness-diagnosis-20261007": "d719a98296a63fd95f8d1f442028972df9dcb923",
+    "experiment/cpu-cache-init-20261007": "e2c5262cdcc0325e87e74d1dafd265f5ee59e59f",
+    "experiment/cpu-cache-private-regions-20261007": "43586ecca62c672a057c0835d47b75928af3cf5e",
+    "experiment/cpu-cache-worker-layout-20261007": "ef60cb102d058dfc3479d82dd8f9cd58f9ea82ff",
+    "experiment/cpu-private-tensor-layout-20261009": "cbfdb998395264934e5f019c27e9c6daada6e212",
+    "experiment/cpu-recycled-block-order-20261009": "1ec7336127148f108f876819906d9d5d1fd0cee8",
+    "experiment/current-chunk-architecture-20261010": "0ea061587a0c9293321e43b8426cbec736eaa9ca",
+    "experiment/current-chunk-coverage-20261010": "33fcea072db1da1470adba7fe9dafe1d6cbcc2f9",
+    "experiment/current-chunk-deadline-leads-20261010": "875d1cf474c6348b796604bd19c17026dca86096",
+    "experiment/current-chunk-envelope-offset-20261010": "edb8cf6c0c89c9e97e8c11a8f96624f9a0886651",
+    "experiment/current-chunk-predictor-retrain-20261010": "54ef75d6d89ad0ce56481b12c593ee5002d2429a",
+    "experiment/current-chunk-predictor-serving-20261010": "20a96cebed73fadde173e2b6fdc8003854c273e6",
+    "experiment/descriptor-order-preservation-20261009": "30721e442351ac75872e53e657e32d9d89398ad0",
+    "experiment/diverse-cache-evaluation-20261011": "db48a3a96dfa934df87668c6804bf497f77c0dcf",
+    "experiment/early-ready-preemption-fix-20261014": "65158cc9d3990d4f5505d1107f990fb7c7a9885e",
+    "experiment/glm53-dataset-combined-20261007": "e871ae1f79cc1a7b510729c0090b641c0782133b",
+    "experiment/glm53-dataset-combined-mass-matched-20261007": "9055a142c526497fb977806a5fa5a21527cc234a",
+    "experiment/glm53-dataset-combined-n300-20261007": "71954a2ee450e4c8730f5b5d6d435aabfa175c2a",
+    "experiment/glm53-dataset-combined-n300-mass-matched-20261007": "1bf021d7b591a970094f27f1a461b258a4364982",
+    "experiment/glm53-dataset-composition-20261007": "2510b527813e9dd91b724a0b15a8191326ca6d2f",
+    "experiment/glm53-dataset-composition-mass-matched-20261007": "c8797c46106c990fb6314b320bd095f0ee05b2c4",
+    "experiment/glm53-dataset-coverage-20261007": "70bce4c81a53dec34448974edb92056d1ea06921",
+    "experiment/glm53-dataset-familiar-full-20261007": "cf9346872218e80edbfcc728f00e163959b5f3bb",
+    "experiment/glm53-dataset-familiar-full-mass-matched-20261007": "32a807add7f280860dee7c12a546608d92c332a3",
+    "experiment/glm53-dataset-familiar-n300-20261007": "2219f1f41369fead1ae6c8e6473687ccf2257387",
+    "experiment/glm53-dataset-familiar-n300-mass-matched-20261007": "7bc22884a5a15344accbefcc89e95c0d44bdd645",
+    "experiment/glm53-dataset-familiar-small-20261007": "76ea4be8051e66feb9f46e25d5d47579c46ae8ce",
+    "experiment/glm53-dataset-familiar-small-mass-matched-20261007": "d90e130d28175ba8f2f4b44d2b3a611e2348efaa",
+    "experiment/glm53-dataset-geometry-20261007": "6ab5e415fa0d55246a09ce82a65d601d89d665ec",
+    "experiment/glm53-dataset-geometry-mass-matched-20261007": "d7c02db442201308ad997f2cc70574403acb29a9",
+    "experiment/glm53-dataset-historical-refit-20261007": "3c0d3e408385a8ae9af8b00e03f25ad4ec6d1d6e",
+    "experiment/glm53-dataset-transfer-20261007": "7b740671770c3acb7d3b7af9eb043b3f875bb9b6",
+    "experiment/glm53-dataset-transfer-mass-matched-20261007": "0ce63e9d1dbd2991f2cbbc83ea678142214df782",
+    "experiment/glm53-dataset-without-composition-20261007": "c3b4d649a7cf440674d1e934d1e2e5f2dc082ec8",
+    "experiment/glm53-dataset-without-composition-mass-matched-20261007": "2d116fda04a43fff6a1ad08a5270e7c4900eaa20",
+    "experiment/glm53-dataset-without-geometry-20261007": "b4c701a2acca90ed6457567ad781de04f5157d2a",
+    "experiment/glm53-dataset-without-geometry-mass-matched-20261007": "984fbd4ce3aec67e9340a61e9a31134f98947989",
+    "experiment/glm53-dataset-without-transfer-20261007": "7a6e0ab0b4419b9044a41569cd6e01b6242ae249",
+    "experiment/glm53-dataset-without-transfer-mass-matched-20261007": "ed6bf36c1338a7b28c8b9361bfde47eb912fd879",
+    "experiment/glm53-efficient-wait-ablation-20261009": "6e0409748187179aac5e2049c56adfa187a14c26",
+    "experiment/glm53-envelope-envelope-absolute-20261007": "f35fe8741ab69c44e80169c6281461de1ed6ecbc",
+    "experiment/glm53-envelope-envelope-boost-20261007": "25ce85c30a91c7a6be927f74a5744e1ec7b36211",
+    "experiment/glm53-envelope-envelope-mlp-20261007": "a2c146ea86c97f57861fc9e8e03c453fd00d323d",
+    "experiment/glm53-envelope-envelope-only-20261007": "792ccfa77b4ecac978e64b13a7de436b2b1cd8dd",
+    "experiment/glm53-envelope-envelope-sparse-blend-20261007": "f6e1f5cd72d6b2bc838291d779ac377feee68aca",
+    "experiment/glm53-envelope-envelope-sparse-mlp-20261007": "3604e71497198ca4e4b6e153c1742886ba314c93",
+    "experiment/glm53-envelope-geometry-guard-envelope-absolute-20261007": "e0fd06bcd64cff16b722b2511cd892d447f33fa8",
+    "experiment/glm53-envelope-geometry-guard-envelope-boost-20261007": "6d55c82cb9e10dc30f3495db884f4db9d1741d9d",
+    "experiment/glm53-envelope-geometry-guard-envelope-mlp-20261007": "1d4973e7fab15074f2ca4c74bc766378828e000d",
+    "experiment/glm53-envelope-geometry-guard-envelope-only-20261007": "b145ea524bcf821de17acf0aa51f34a4762ad26c",
+    "experiment/glm53-envelope-sparse-blend-20261007": "1c6309c6e59833e521a11950b53ff96a38913f15",
+    "experiment/glm53-envelope-suffix-guard-20261007": "2d74aa2de1da062ea82fe88e1a929cec70c20039",
+    "experiment/glm53-envelope-suffix-guard-envelope-absolute-20261007": "256027b123a583fdafd4d7d6cb4181b83fa7b955",
+    "experiment/glm53-envelope-suffix-guard-envelope-boost-20261007": "6a2faee7340fbc40d7446b2fd2f43abc816f5fbb",
+    "experiment/glm53-envelope-suffix-guard-envelope-mlp-20261007": "90794bd4c201192ada893ab87811b61f0fef26ff",
+    "experiment/glm53-envelope-suffix-guard-envelope-only-20261007": "54a204c53d6f64000dd3644ae0fc3cb6c6f7cb54",
+    "experiment/glm53-expanded-architecture-20261007": "a5a1ad439bb173b303b9b62570bda256416cf7d1",
+    "experiment/glm53-expanded-architecture-mlp-base-only-20261007": "dc34666966498c0544e337f53f57912acff79fb7",
+    "experiment/glm53-expanded-architecture-mlp-direct-20261007": "666cfc05e744b650831f535d111b0316ae2d392a",
+    "experiment/glm53-expanded-architecture-mlp-mlp-20261007": "79d45d479f71a3beeb37a400d9418a31f30fb7f4",
+    "experiment/glm53-expanded-architecture-mlp-tree-20261007": "9dae6c966b046ae68e748e3b0ecb8aae9775947f",
+    "experiment/glm53-expanded-architecture-tree-base-only-20261007": "8e0e64fb103ca8f9f13bf5eaea58607e5fe67462",
+    "experiment/glm53-expanded-architecture-tree-direct-20261007": "28acd549f2957c55b3ce3cf479f57f8dd66547e6",
+    "experiment/glm53-expanded-architecture-tree-mlp-20261007": "59b432357b31627d23e773484dd8d6c11e5b29fe",
+    "experiment/glm53-expanded-architecture-trees-fixed-20261007": "52f8672446bce32dd5741bf81249c42902181fcb",
+    "experiment/glm53-expanded-architecture-trees-tuned-20261007": "5ed3ea7c67e4750ee28a944b6d318728fc854b2b",
+    "experiment/glm53-expanded-enqueue-extraction-20261007": "5a10193aa2fcbd775f505a4d919fb59bc4977df8",
+    "experiment/glm53-expanded-improvement-blend-fixed-20261007": "aa15dd2f10cbad7f26c901cfc53f3df0c87d48f0",
+    "experiment/glm53-expanded-improvement-global-calibration-20261007": "41e99e10f6a19b150fc7abb34cc8c3c78bd72289",
+    "experiment/glm53-expanded-improvement-gpu-enqueue-blend-fixed-20261007": "c65963b1249cf49f37c4c8e0e0d2a433340c44ab",
+    "experiment/glm53-expanded-improvement-gpu-enqueue-features-20261007": "c9032e31340187807f1473af1d35dff455eedab7",
+    "experiment/glm53-expanded-improvement-gpu-enqueue-gap-only-20261007": "768c652a51627fa95b4c9723823550d0d41357f8",
+    "experiment/glm53-expanded-improvement-gpu-gap-blend-fixed-20261007": "33307ea1c9e8376d53bb088d29d9e6c1eadc6072",
+    "experiment/glm53-expanded-improvement-group-calibration-20261007": "f8215f5a4a08f9d75d81757b818bfc8119dfba7a",
+    "experiment/glm53-expanded-improvement-guarded-sparse-blend-20261007": "e3a031956cd84f0b00bc6540a69123e0cf5e0c49",
+    "experiment/glm53-expanded-improvement-guarded-sparse-mlp-20261007": "e039aa44afca73bdbd6690a83e284aecb1d3694d",
+    "experiment/glm53-expanded-improvement-legacy-weights-20261007": "52b75fa4bcee8892291bdef994db5743fee60c73",
+    "experiment/glm53-expanded-improvement-rank-skew-only-20261007": "73c59e1ef6f54de114ebec3854d622d5ad68ab2b",
+    "experiment/glm53-expanded-improvement-sparse-mlp-20261007": "7091b610c946ef9d0cd6b56c3d3a439762da043e",
+    "experiment/glm53-expanded-improvement-sparse-mlp-blend-fixed-20261007": "e63d4f582345773f78e8ed3cfd7fa8808ec35b21",
+    "experiment/glm53-expanded-improvement-sparse-mlp-enqueue-20261007": "63d8ad84aa57277d920398dc4c578a5eeabdf4d1",
+    "experiment/glm53-expanded-improvement-sparse-mlp-enqueue-blend-fixed-20261007": "7f136bb68b49663f184f33cf256904f568a9576e",
+    "experiment/glm53-expanded-improvement-sparse-trend-absolute-20261007": "81c5df58b3d31d0790c70bd9203482dd6c7b3125",
+    "experiment/glm53-expanded-improvement-sparse-trend-boost-20261007": "04b137a921b1b47596bc3da13125702c0a80ba83",
+    "experiment/glm53-expanded-improvement-sparse-trend-only-20261007": "3157be88aae30b626473cc7ab1f66cd65de1c29a",
+    "experiment/glm53-expanded-improvement-tree-absolute-20261007": "c2a087000ffd80240ca85c1b5e3a15efa820f2ff",
+    "experiment/glm53-expanded-improvement-tree-median-20261007": "e980eb9af4f6e656d5a9cd941a5e2793a8bd09cb",
+    "experiment/glm53-expanded-improvement-tree-median-absolute-20261007": "2efa7acf91e880e224653900fa65d9547619087d",
+    "experiment/glm53-expanded-improvement-tree-tuned-control-20261007": "fef7ebba9f774ead1a655e245930f04edec5eb79",
+    "experiment/glm53-expanded-improvement-trend-absolute-20261007": "c7613432c3e6f4e9f16382bac0246a82e9848f94",
+    "experiment/glm53-expanded-improvement-trend-boost-20261007": "888f5b63670cf1a957f9eecbf7e32cbbe8b74f20",
+    "experiment/glm53-expanded-improvement-trend-only-20261007": "6b4101f1decc6dc64ea0ba60492cbad1b73f1322",
+    "experiment/glm53-launch-envelope-20261007": "88b0a9c6b511685544ce165eeae35d0374678732",
+    "experiment/glm53-live-predictor-comparison-20261008": "9196e09f429da1280aad5be2d653fc4f5e1aeda1",
+    "experiment/glm53-load-only-deadline-ab-20261008": "e2ec78aee1f8b76eb1ebfde73c16222744d4111a",
+    "experiment/glm53-load-only-fraction-20261008": "673ddfa9fc3a2a02df2d202de01166b428624a05",
+    "experiment/glm53-offset-conditioned-comparison-20261008": "fd3be1d3b9095c09013badb9c69922319b865ff1",
+    "experiment/glm53-offset-deadline-ab-20261008": "24c30df0e0bf02bb85229f0b90064726fe22bae0",
+    "experiment/glm53-offset-only-predictor-20261008": "4d4a96e372b1a9570647bee51d09094201ec1e6b",
+    "experiment/glm53-prediction-gap-attribution-20261008": "9c688a36d927df62ab801757fb7fe67b65907e52",
+    "experiment/glm53-predictor-architecture-cpu-20261007": "3afc0a7bb4a62c050ee44fbc2a74eef99418078b",
+    "experiment/glm53-predictor-compute-support-20261007": "14579164619b03e0a6a391d85ec7e1e667bda84c",
+    "experiment/glm53-predictor-geometry-control-20261007": "0c512ce553925489b7531bcb147921fa5b7ee992",
+    "experiment/glm53-predictor-support-routing-20261007": "9c2c0a8e8beef21811bac89aa9de0baf29c11e47",
+    "experiment/glm53-support-compute-known-blend-else-envelope-20261007": "9f468b0c2413082d9776f59b51b73496ec0b5662",
+    "experiment/glm53-support-known-blend-else-envelope-20261007": "da04ccffaa433ed6a48ab5a04de1e537eb59e809",
+    "experiment/glm53-support-known-mlp-else-envelope-20261007": "38163e91433721bb5960f0ee15c5b68b6dbcd221",
+    "experiment/gpu-prefix-ceiling-controls-20261009": "c825cd5447c0ad87dc1dbe9fc0c348eaae8e30c8",
+    "experiment/gpu-prefix-ceiling-independent-controls-20261009": "544cd19ea97528fd38862f43ce51c13f06bfdecb",
+    "experiment/gpu-prefix-ceiling-native-controls-20261009": "7b9e4b07479e79bb13180ea5998b2e6d8f62eee7",
+    "experiment/gpu-prefix-ceiling-tensor-controls-20261009": "c545d9a760d5263c74de554c4a243063aaac72b0",
+    "experiment/gpu-prefix-ceiling-thp-matched-20261009": "495ce6b9bdf17418b295114e6cc6c406640e667b",
+    "experiment/h2d-block-readiness-20261011": "d0ae3fab048850365ec59e0fecf4f93ee4c00d80",
+    "experiment/h2d-block-readiness-vectorized-20261011": "839d824a5d05e763cfe348dfe0ef38e77daed890",
+    "experiment/h2d-compute-interference-calibration-20261009": "ac32eb0243fd3069c978e44b4048282d51ee557b",
+    "experiment/h2d-pending-store-ownership-20261011": "d97c36cfa418998f1abc03b3dffe554986a32e3b",
+    "experiment/h2d-startup-calibration-20261009": "ae1bba4c7012b29cd1235155692de4c5f916973a",
+    "experiment/h2d8-deadline-bias-setup-20261009": "38ac0297c9781cc956ed34f1f75d0819e63b47b5",
+    "experiment/h2d8-scheduler-ablation-20261009": "42b20bebbe067e3803bbd4fd071f8fd6b12298d4",
+    "experiment/inferact-mooncake-traces-20261012": "13ad6c607e5e8766033acb106706ace1854c7a75",
+    "experiment/kv-allocation-order-coalescing-20261009": "2e3eb2ff0e2c2d33f2b536a62748aa413914c809",
+    "experiment/kv-capacity-retirement-fix-20261014": "b4c3523800bdad6c74b1498ddf9054a5240dc5e4",
+    "experiment/kv-packet-aligned-coalescing-20261009": "ddc170238fd450a48f840525975b0d9ab1a14bbf",
+    "experiment/load-independent-ready-stream-20261009": "e34702f4dee78188d75bbb4a5de308e30f29c469",
+    "experiment/load-only-idle-policy-20261011": "b48add4745ef4ce4ef1931e32fce4ff6f027522f",
+    "experiment/load-store-descriptor-coalescing-20261009": "09b1091a362036570275a1b71229602cbe209770",
+    "experiment/native-d2h-deadline-lead-calibration-20261009": "b10294927a4652a50db07b3aa2db33d68ef065fc",
+    "experiment/native-worker-scheduler-ablation-20261010": "44fa24c4836205021c780ace8e53bf6f9c7c401d",
+    "experiment/setup-data-audit-20261011": "e96b293d771746893a82319a6ebfdf419089e424",
+    "experiment/setup-gap-root-cause-20261011": "e103d4feca79469a12a17274aaa617bccc0d3c32",
+    "experiment/setup-history-study-20261011": "3d77743b395e0bf2bc6a24cdd9d5af9f9d66d21b",
+    "experiment/setup-mean-deadline-20261011": "b5de2a454076fefa7229666dd12d34f98a7ff560",
+    "experiment/setup-mixed-coverage-20261011": "3ae1a05d4cadd84357033dbb8dfca6e0d1a3c90f",
+    "experiment/setup-models-20261011": "1c49fc4cbad2e2099daefc29c66014b48118034d",
+    "experiment/setup-quantile-deadline-20261011": "eac5294fc6562128862d51fad0d0a24eb5adce8f",
+    "experiment/setup-reference-leads-20261011": "0ba1c266f4cf5b9b24a52dccff17e39750253d51",
+    "experiment/setup-seal-snapshot-training-20261011": "fdcbc4189151816fbd967de86f7e74f51073580b",
+    "experiment/setup-serving-audit-20261011": "c6cbaac31c39316ace62ebabfd6c9f5b3b8e01d8",
+    "experiment/setup-shadow-fixed50-20261011": "209247ab053cd71c8b8c22bddf1737a35e16995a",
+    "experiment/shape-basis-calibration-20261010": "c1599acd7a7572439a4aa01a51361f216421c735",
+    "experiment/shape-calibration-20261010": "3b9779003e7780955383cc4f8164a58266fbfcf4",
+    "experiment/shape-complete-deadline-margin-20261010": "c50802023c85ce1e2b11f33f989bf004f8088aac",
+    "experiment/shape-deadline-margin-20261010": "6774689d9a0f7a4a6c93382ca8c673141c106d01",
+    "experiment/shape-direct-duration-20261010": "0e6decc577bff21290ce0ce4739de28473bc90b3",
+    "experiment/shape-gc-timing-diagnosis-20261010": "7301ea82ebc64c1dc8ec020402cfb4b5ad977531",
+    "experiment/shape-geometry-calibration-20261010": "a1afb31feebbd4577dcc34b3f81f5cde213aac62",
+    "experiment/shape-joint-guard-20261010": "4e91e8ca94800d7b4595a27aec7976a6023df305",
+    "experiment/shape-margin-productive-combined-20261010": "debe3395f366779dc2bc5557fbcf2a6d99dcc856",
+    "experiment/shape-packed-checkpoint-20261010": "5cfc192ac79789ab9e6838ffe11d93568bacb98c",
+    "experiment/shape-productive-load-only-20261010": "f57d5ca532efb7d65b46a5ad9e5dc35ddc4d6d50",
+    "experiment/shape-submission-floor-20261010": "32cbbc87ab659b89e94f9330e5dc236fb5a82ec0",
+    "experiment/store-critical-submission-20261009": "53a075f614856016af4fada3d00565b12bed4a2e",
+    "experiment/store-descriptor-coalescing-20261009": "f5dba92155eb94f2ee7a61de147487aa117d203f",
+    "experiment/store-driver-chunk-sweep-20261009": "d514e5c5f6a58d287ca91eda5cdf529b74a79842",
+    "experiment/store-merged-serving-validation-20261009": "1b46fecdcb11d1dadf66b7ab6e5b6775f647f8d4",
+    "experiment/store-native-async-submission-20261009": "130630e191661d2e1096cdf4ccb6b87e351509f2",
+    "experiment/store-noncritical-after-forward-20261009": "48f716c8560192334f75ddf38ccaf0dec1d57c2c",
+    "experiment/store-overlap-overnight-report-20261009": "e91d2071a1cd5ed8f373e55a2611fdc7b7d3efdd",
+    "experiment/store-preencoded-client-controls-20261009": "6536d16726710ae9ef8060f860814b5c6849f565",
+    "experiment/store-reuse-allocator-preference-20261009": "82ae385c7b30f51b3192202c378fa99612584f3d",
+    "experiment/store-reuse-gpu-fence-20261009": "6aeab5271f8a4e153b6aaa779d0411d0f006a677",
+    "experiment/store-reuse-load-reservations-20261009": "bbf91deb64a66504868e2242625335ed6c202f9c",
+    "experiment/store-reuse-scoped-fences-20261009": "26c4cb717cbee6337523cf3c5f5d0e7a4feac02a",
+    "experiment/store-specific-producer-events-20261009": "ac00caf7c714748582e3269fa70a6353b0dfeee5",
+    "experiment/store-submission-contention-probe-20261009": "9fec5d9d6fd3f253eb2722d8fd57832f69f789c5",
+    "experiment/trace-capacity-recovery-20261011": "c3c1a84dbfb935471b97e511ad7b2c0c9c11de1a",
+    "experiment/tracelab-arrival-intensity-20261013": "89db662fd474fdb4b7ac6eee25a0509b029fab7e",
+    "experiment/tracelab-capacity-sweep-20261013": "d4cb77b111b04d1591bae7a46faf439aefe3528a",
+    "experiment/tracelab-concurrency-8-16-20261013": "595b8bfe9c3c754838683d505fbdb1ad333f029b",
+    "experiment/tracelab-official-runner-20261013": "9b8cc56549019bbdf5325ccef1fc164f9dd41b4a",
+    "experiment/tracelab-request-slots-20261013": "9f297ccac0a825e8e08dd5d1f224677df73c762b"
+  },
+  "runner_branches": {
+    "experiment/tracelab-runner/official": "1f6c60b9eecfc9a01573cc2a343cce6d92a399a9",
+    "experiment/tracelab-runner/request-slots": "e9225c2c8334f945ada88fd4fb1d3a3083a4356d",
+    "experiment/tracelab-runner/keepalive": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+  },
+  "files": [
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/LICENSE",
+      "backup": "research_harnesses/tracelab_runner/LICENSE",
+      "sha256": "122da5085778889f4c36d898b7f7998345876cb75345d66b1418ae5aff0d1843",
+      "bytes": 11365,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/LICENSE-DATASET.md",
+      "backup": "research_harnesses/tracelab_runner/LICENSE-DATASET.md",
+      "sha256": "1e96a0ec55f98ee0e4e2432626c0201104ebfb7f98cecf0a31d5313ddad92e9a",
+      "bytes": 2061,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/README.md",
+      "backup": "research_harnesses/tracelab_runner/README.md",
+      "sha256": "a3c6d004a2c66eb5e059fb392fab4cafc23923fc4b7b6bacb2de8b736ba52bce",
+      "bytes": 19265,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/trace_facts/csv_export/README.md",
+      "backup": "research_harnesses/tracelab_runner/artifacts/trace_facts/csv_export/README.md",
+      "sha256": "c259bd2b838d653a2b7c3ec24dd740fba17d9cdbe4b9ecf24a315216bdf9449c",
+      "bytes": 5759,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/trace_facts/csv_export/convert.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/trace_facts/csv_export/convert.py",
+      "sha256": "149eac5c542ad44b2fde3f4c60447a756c2592ae6363ea310b45eeccf4b003c2",
+      "bytes": 16184,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/DB_SCHEMA.md",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/DB_SCHEMA.md",
+      "sha256": "036abc20eec0ea6a52647f90175b4ed9612de1543c159571d91456e0ed581ac1",
+      "bytes": 9124,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/README.md",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/README.md",
+      "sha256": "32b5c0639116a4b0c29e17b981a615c01b4332f4c732746a0663506be2467dfc",
+      "bytes": 6190,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/accumulators.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/accumulators.py",
+      "sha256": "610653c8cf842f0ee86be51ed73012af7ac2c8c4e24142181bfbf14305751ca0",
+      "bytes": 9879,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/cdf.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/cdf.py",
+      "sha256": "deffcab0f52ae65ddf4cf209cf33f2003b3f12e1e4bbc512e6d237a0ae9ed2fb",
+      "bytes": 30509,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/command_chains.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/command_chains.py",
+      "sha256": "1c2173711b7f064cafe9ff0b980ac5ea9763970c6092e46d224f424c856d179b",
+      "bytes": 4445,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/formatters.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/formatters.py",
+      "sha256": "7cb59409ea9c27997081dc7ab5f180d12fa58cdcb92a3aceade83c65478d93e5",
+      "bytes": 11773,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/growth.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/growth.py",
+      "sha256": "ac404e18059b565e76b9b9dd720b9d0324a38963a9b30f2699bd2376e71f7c8b",
+      "bytes": 15868,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/md_table.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/md_table.py",
+      "sha256": "ed8a49cc8f4d3bbe7180187eb900f67c9da16370c39d2c5bc71cf4e84826b22e",
+      "bytes": 1973,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/png_sidecar.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/png_sidecar.py",
+      "sha256": "2d4c3b7cac4636220519ec035e3cfbef1a4cddb2a1a4364f75585e6793f7c0a5",
+      "bytes": 8162,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/pricing.json",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/pricing.json",
+      "sha256": "14f6732e434f5e99cbd7969a222cb29c67bd4d3eca5fded207e7634cf75e740a",
+      "bytes": 2117,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/style.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/style.py",
+      "sha256": "828b1420fe81ba2af092d1f6649b30b0f1f5399f7542bd11dd0b41f5dd84eb96",
+      "bytes": 4025,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/timing.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/timing.py",
+      "sha256": "e979ea96163ccc6f01cd115e998b392531215d0aed9fa1e00a55e5bb65ec8d8f",
+      "bytes": 6878,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/tool_stats.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/tool_stats.py",
+      "sha256": "ddbe7abd59d9a4d8a132f6c8c108eca52344bfe8cd71cd6807079cc2d7afb30c",
+      "bytes": 4762,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/trace_db.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/trace_db.py",
+      "sha256": "ba24a25306fa5a39de1d1289a1c3a205b0c2e3ab3c4aff71531f34e4a4d1ef94",
+      "bytes": 23301,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/artifacts/utils/trace_loader.py",
+      "backup": "research_harnesses/tracelab_runner/artifacts/utils/trace_loader.py",
+      "sha256": "1be4d6f5881a4aff0cca7ebd770cb73487bd90847faefbdb58e1261cad7109cf",
+      "bytes": 15631,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/pyproject.toml",
+      "backup": "research_harnesses/tracelab_runner/pyproject.toml",
+      "sha256": "769efcc7001e68bca5d58cee15fbfb5f7e2fd89e5536ccc5a05bb0e3343ea0b3",
+      "bytes": 1380,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/.gitignore",
+      "backup": "research_harnesses/tracelab_runner/replay/.gitignore",
+      "sha256": "082e0ee16fc92eacdba91322bb2ce3e60b2593a438af89bc13a22722c223022f",
+      "bytes": 75,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/Cargo.lock",
+      "backup": "research_harnesses/tracelab_runner/replay/Cargo.lock",
+      "sha256": "3090f894916a4f2d6b6caf9219af03f66ed327871b6a2d84f15c6da1af29d2d2",
+      "bytes": 69109,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/Cargo.toml",
+      "backup": "research_harnesses/tracelab_runner/replay/Cargo.toml",
+      "sha256": "ad56b25891c0fde9ddd815d5f81cd3609f653ff10d21ce51b2cc5fde6ab9d896",
+      "bytes": 581,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/README.md",
+      "backup": "research_harnesses/tracelab_runner/replay/README.md",
+      "sha256": "c96bda34b39602d0b6cd27188e4acab4fbf41d36fceb1b13bd525ce6f0be9ebc",
+      "bytes": 8420,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/examples/multi_session_example.csv",
+      "backup": "research_harnesses/tracelab_runner/replay/examples/multi_session_example.csv",
+      "sha256": "cc1517d38aa314ed0182bc4fb4bcd34e7a9070b3fae2b9865bd8cd0fdd1c015e",
+      "bytes": 247,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/examples/multi_session_large.csv",
+      "backup": "research_harnesses/tracelab_runner/replay/examples/multi_session_large.csv",
+      "sha256": "8afdf8d3ae742aa73a17ab93a4f11edafa6076fdfb47d0fb96d2c3defc6de8ab",
+      "bytes": 7923,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/examples/session_workload_example.csv",
+      "backup": "research_harnesses/tracelab_runner/replay/examples/session_workload_example.csv",
+      "sha256": "66ce858afdba777608398bd1c8e073feedcb26a6b4f1dfb7b40a10166efa917a",
+      "bytes": 329,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/admission.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/admission.rs",
+      "sha256": "5e502340008540016595d5229591af899d1f75671b34f9002e36c90b203cf866",
+      "bytes": 2270,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/backend.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/backend.rs",
+      "sha256": "71385f280c3f78d429859faab917dfa734e8407ad49f6f3551e826da51852bd1",
+      "bytes": 19519,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/cli.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/cli.rs",
+      "sha256": "a2e11ff9211285b288e07da92d24f2d68faed1e56c19ad0bb49b5e48f80094db",
+      "bytes": 3146,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/main.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/main.rs",
+      "sha256": "4dcaefba5eb7825708281463f8fb9e2178d381dc72671e5468f678b81969ce42",
+      "bytes": 6159,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/record.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/record.rs",
+      "sha256": "dfd4e4305c03763e6e30c7009be2dd905d516bbb5e5a51478464ad7605e576dd",
+      "bytes": 2073,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/session.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/session.rs",
+      "sha256": "030d04075748cb8e204ba59cddc2755beddf45289d62b9161146d711e6a3116d",
+      "bytes": 8797,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/summary.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/summary.rs",
+      "sha256": "460ac2196928d2dbc73f0888d98a169d1eb631b839094ee7969fb94e0a951698",
+      "bytes": 8226,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/tokens.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/tokens.rs",
+      "sha256": "6dd6b304922ce8f51ba3eb000e8f4a1372b00a636e545dbdaf3b2f3c796474ca",
+      "bytes": 4521,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/trace.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/trace.rs",
+      "sha256": "c7fb6398720187c1870189b8d286c69bb8dda3e2ddb5921a58fc64905f1118a2",
+      "bytes": 1454,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/util.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/util.rs",
+      "sha256": "c2323d2a2a75e229a3ae9d9d8db19990d9c1096c038377e5ddd5dbf651ad98a5",
+      "bytes": 892,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_src_20261013/replay/src/workload.rs",
+      "backup": "research_harnesses/tracelab_runner/replay/src/workload.rs",
+      "sha256": "e10604f33f241812b706baa0f943ea3638bbe828d3178b1805e653139e0d4f4f",
+      "bytes": 3580,
+      "git_commit": "98ab008c923adcdc310aff2aabcad6d5324f1ea1"
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/assemble_report.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/assemble_report.py",
+      "sha256": "1f4f581657553459907593969a61fcbf83e4176eb8cd99d6ed506b9092587cd1",
+      "bytes": 10485
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/deadline_watch.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/deadline_watch.py",
+      "sha256": "e3e445cfa0e0ca385e5a1dda9bcd4c4e31c7c1299e79e1b6610744e54a093494",
+      "bytes": 1154
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/finalize_measurements.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/finalize_measurements.py",
+      "sha256": "bf4b66c5800b620ec543a9d58cd67ecb4a9ee2644095ff07691546e1781586c4",
+      "bytes": 1143
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/prepare_datasets.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/prepare_datasets.py",
+      "sha256": "03ee845baaffb8f5783b0a65487d66d80e01fd6535c45d2a0c756d645e1d86d7",
+      "bytes": 663
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/prepare_evolving.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/prepare_evolving.py",
+      "sha256": "4f7b146094240ab43d67c3db612c6d7595cffb3553fee4751292124708458004",
+      "bytes": 671
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_audit_after_idle.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_audit_after_idle.sh",
+      "sha256": "28efe7596802dc0bb442678878fac505937252d22549b5fcb9e24bd52aa8795c",
+      "bytes": 1044
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_grid_after_perf.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_grid_after_perf.sh",
+      "sha256": "a3eda633d078e8e69f29073757d181e8141b39b8b147fbf3743f9724cd2c3988",
+      "bytes": 2818
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_grid_after_perf_b.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_grid_after_perf_b.sh",
+      "sha256": "ceb56b4a93cea4a154adc3fac97f787efeeb57821d5fc988e93f1e47febb2928",
+      "bytes": 1511
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_grid_after_perf_c.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_grid_after_perf_c.sh",
+      "sha256": "3cbb433b50d28b3a700d0dc5d350344555d47a69c09a5e6b55b363f52a614ea4",
+      "bytes": 721
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_perf_after_audit.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_perf_after_audit.sh",
+      "sha256": "67266feedb43b1a62f218cb83602fb7be6f3c52bfabdfeb0a5e30c469db63c58",
+      "bytes": 2310
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_perf_after_audit_b.sh",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_perf_after_audit_b.sh",
+      "sha256": "0029fb33470ec21b07e2b8dc8df202b6c6ac80c8f3ce021749baf5470e2b66dd",
+      "bytes": 1172
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/run_remaining_campaign.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/run_remaining_campaign.py",
+      "sha256": "cca68b112223fa64ec5c32dd48e606463e8916a97dbaea2175b9fb23fed0ad0f",
+      "bytes": 3195
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/validate_final_measurements.py",
+      "backup": "research_harnesses/launch_helpers/load_only_overlap_20261011/validate_final_measurements.py",
+      "sha256": "8fa3d208aa83cb16e5f6fadbb8aab2a2b2151415044e0c4af420930401c40b94",
+      "bytes": 7969
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/trace_characterization_20261012/analyze.py",
+      "backup": "research_harnesses/launch_helpers/trace_characterization_20261012/analyze.py",
+      "sha256": "13d6c63e51e4bdf9eafd6bad1ce6a7aea953bb92f9685e31e3922b18f5cb0fa1",
+      "bytes": 6488
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/trace_characterization_20261012/download_traces.py",
+      "backup": "research_harnesses/launch_helpers/trace_characterization_20261012/download_traces.py",
+      "sha256": "d151caedbe8f4c19416f8a80b4c5d6237a456a8fcf4a966e2530294451eb6e90",
+      "bytes": 2287
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/trace_characterization_20261012/validate.py",
+      "backup": "research_harnesses/launch_helpers/trace_characterization_20261012/validate.py",
+      "sha256": "e8d6c312b0d737c48bdc149fc770fa4a3814ee522c8d051d2045d89351a5338f",
+      "bytes": 1829
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/profiled_classes.json",
+      "backup": "research_harnesses/frozen_configs/load_only_overlap_20261011/profiled_classes.json",
+      "sha256": "c83493330381f5ce4081aa9c181dcd10e7a01b1e127329e8a16fc80b41516d91",
+      "bytes": 133
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/profiled_classes.profiles.json",
+      "backup": "research_harnesses/frozen_configs/load_only_overlap_20261011/profiled_classes.profiles.json",
+      "sha256": "b9905f613eeb8d6c4fa3622954ebe9d5597b03ad207f85ba5dd5f37d18d31dba",
+      "bytes": 6975
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/coverage_plan.json",
+      "backup": "research_harnesses/frozen_configs/load_only_overlap_20261011/coverage_plan.json",
+      "sha256": "4344402c522b0dcd75cf877867ababe52bdbf5a082346deac1fe5e9e2f8aa52e",
+      "bytes": 510
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/load_only_overlap_20261011/frozen_policy_choice.json",
+      "backup": "research_harnesses/frozen_configs/load_only_overlap_20261011/frozen_policy_choice.json",
+      "sha256": "2c8ccf0f64db430894bc2bf1c233e9df202a06936c55062437a7843459375f45",
+      "bytes": 563
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/agentic_1m_20261012/cache_budget.json",
+      "backup": "research_harnesses/frozen_configs/agentic_1m_20261012/cache_budget.json",
+      "sha256": "1ce8b8b9fc9ad234f01ec64920070a6e41df2ddc7dbaae8a18d0ba114121d0ee",
+      "bytes": 4103
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/agentic_1m_20261012/primary_plan.json",
+      "backup": "research_harnesses/frozen_configs/agentic_1m_20261012/primary_plan.json",
+      "sha256": "a9a59666cabb2fde19b9df45014487276cd56f4900a5adbcff4dc616728ad73e",
+      "bytes": 1078
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_runner_20261013/dataset_manifest.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_runner_20261013/dataset_manifest.json",
+      "sha256": "9ac6779e55ad69bbaf46db89f1e64f3083f1b9b3386e1f21f848d8ddd900badf",
+      "bytes": 14185
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_runner_20261013/compatibility.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_runner_20261013/compatibility.json",
+      "sha256": "7c629b830287f7b239ce3a54503962dd71c50d292176a0a177770e909bf58eac",
+      "bytes": 543
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_request_slots_20261013/dataset_manifest.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_request_slots_20261013/dataset_manifest.json",
+      "sha256": "8bf55d9d94d37560a6e9fa3623119d123bf19e0ee197dec93039edd3ae2da57f",
+      "bytes": 1348
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/dataset_manifest.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_arrival_intensity_20261013/dataset_manifest.json",
+      "sha256": "5425e89559644bfca37c2627ba56c9b478322589c62deb0123e7fefe2f3b5a1a",
+      "bytes": 3101
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/session_metadata.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_arrival_intensity_20261013/session_metadata.json",
+      "sha256": "6294eff31decf7c9298688d2c771633e1598247e9badf020aa04c6094de2b89c",
+      "bytes": 1633678
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/repaired_client_provenance.json",
+      "backup": "research_harnesses/frozen_configs/tracelab_arrival_intensity_20261013/repaired_client_provenance.json",
+      "sha256": "845d327dc01f6dc8f614e5519134b0ee0d74bd7196251a761f4a536754a71de9",
+      "bytes": 711
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/lo11c/server/environment.json",
+      "backup": "research_harnesses/frozen_configs/load_only_environment.json",
+      "sha256": "3a1bacf3e1b5a7d14ab406ff173429ad3b1c8ab3a1ce4c0e1c5b8d83de3c8298",
+      "bytes": 1164
+    },
+    {
+      "source": "/mnt/localnvme/jeongyoon/agentic_1m_20261012/frozen_predictor.json",
+      "backup": "research_harnesses/frozen_configs/frozen_predictor.json.gz",
+      "sha256": "d3a51ab6efc5135b67c2e521a5375dc58857d19f39f65772b4e2824a0031f68d",
+      "uncompressed_sha256": "f159f32d226894457fb56b3195c47d4ff6e2a5d982d8d600b1970ea000294f96",
+      "bytes": 5478011
+    }
+  ],
+  "scope": "Source snapshots and available local histories; external TraceLab shallow boundaries retained. Model weights, raw traces, corpus, virtual environments and compiled binaries remain external.",
+  "entrypoints": {
+    "homogeneous": "experiments/load_only_overlap_20261011/evaluate.py --suite grid",
+    "heterogeneous": "experiments/load_only_overlap_20261011/evaluate.py --suite heterogeneous --classes PATH",
+    "inferact": "experiments/agentic_1m_20261012/prepare.py + replay.py; experiments/real_traces_20261012 for earlier adapters",
+    "tracelab": "experiments/tracelab_capacity_sweep_20261013, tracelab_arrival_intensity_20261013, tracelab_request_slots_20261013",
+    "latest_fix": "experiments/cached_dispatch_horizon_20261014/campaign.py"
+  }
+}

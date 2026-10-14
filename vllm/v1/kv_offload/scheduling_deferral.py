@@ -4,6 +4,8 @@
 
 import json
 import math
+import time
+from collections import deque
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -288,9 +290,12 @@ class OutstandingLoads:
 
     def __init__(self):
         self.jobs = {}
+        self.started = {}
+        self.completed: deque[tuple[int, int, int]] = deque(maxlen=4096)
         self.valid = True
 
     def dispatch(self, jobs):
+        now = time.monotonic_ns()
         for job_id, job in jobs.items():
             tokens = job.external_tokens
             if (
@@ -302,13 +307,48 @@ class OutstandingLoads:
                 self.valid = False
                 continue
             self.jobs[job_id] = tokens
+            self.started[job_id] = now
 
     def complete(self, job_id):
-        self.jobs.pop(job_id, None)
+        tokens = self.jobs.pop(job_id, None)
+        begin = self.started.pop(job_id, None)
+        if tokens is not None and begin is not None:
+            self.completed.append((begin, time.monotonic_ns(), tokens))
 
     def snapshot(self):
         return [len(self.jobs), sum(self.jobs.values())] if self.valid else None
 
+    def forecast_features(self, data, now):
+        """Read transfer age and progress from engine receipts, without polling."""
+        if not self.valid:
+            return None
+        jobs = [(self.started[key], tokens) for key, tokens in self.jobs.items()]
+        ages = [(max(0, now - begin) / NS_MS, tokens) for begin, tokens in jobs]
+        tokens = sum(self.jobs.values())
+        cutoff = data["dispatch_ns"]
+        old = [job for job in jobs if job[0] <= cutoff]
+        new = [job for job in jobs if job[0] > cutoff]
+        completed_old = 0
+        for begin, end, count in reversed(self.completed):
+            if end <= cutoff:
+                break
+            if begin <= cutoff and end <= now:
+                completed_old += count
+        return [
+            len(jobs),
+            tokens,
+            min((age for age, _ in ages), default=0),
+            max((age for age, _ in ages), default=0),
+            sum(age * count for age, count in ages) / tokens if tokens else 0,
+            len(old),
+            sum(count for _, count in old),
+            len(new),
+            sum(count for _, count in new),
+            completed_old,
+        ]
+
     def reset(self):
         self.jobs.clear()
+        self.started.clear()
+        self.completed.clear()
         self.valid = True

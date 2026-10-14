@@ -1,0 +1,152 @@
+[
+  {
+    "cell": "r0_shape5",
+    "predecessor_step": 413,
+    "next_step": 414,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 453.143616,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": 5.438957000000016,
+    "late_enqueue_lower_ms": 15.837107,
+    "seal_reason": "predecessor_compute_finished",
+    "actual_seal_lead_upper_ms": -7.479472,
+    "seal_to_enqueue_ms": 8.357635,
+    "predicted_deadline_lead_upper_ms": -4.553021,
+    "deadline_overshoot_ms": 2.926451
+  },
+  {
+    "cell": "r0_shape5",
+    "predecessor_step": 417,
+    "next_step": 418,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 449.200653,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": 9.381920000000036,
+    "late_enqueue_lower_ms": 26.741366,
+    "seal_reason": "predecessor_compute_finished",
+    "actual_seal_lead_upper_ms": -15.735104,
+    "seal_to_enqueue_ms": 11.006262,
+    "predicted_deadline_lead_upper_ms": -4.523986,
+    "deadline_overshoot_ms": 11.211118
+  },
+  {
+    "cell": "r1_shape5",
+    "predecessor_step": 520,
+    "next_step": 521,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 455.711212,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": 2.871361000000036,
+    "late_enqueue_lower_ms": 16.880831,
+    "seal_reason": "predecessor_compute_finished",
+    "actual_seal_lead_upper_ms": -8.714843,
+    "seal_to_enqueue_ms": 8.165988,
+    "predicted_deadline_lead_upper_ms": -3.02651,
+    "deadline_overshoot_ms": 5.688333
+  },
+  {
+    "cell": "r1_shape5",
+    "predecessor_step": 524,
+    "next_step": 525,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 459.546692,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": -0.9641189999999824,
+    "late_enqueue_lower_ms": 16.822405,
+    "seal_reason": "predecessor_compute_finished",
+    "actual_seal_lead_upper_ms": -5.16887,
+    "seal_to_enqueue_ms": 11.653535,
+    "predicted_deadline_lead_upper_ms": 5.440503,
+    "deadline_overshoot_ms": 10.609373
+  },
+  {
+    "cell": "r3_shape5",
+    "predecessor_step": 943,
+    "next_step": 944,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 455.312683,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": 3.269890000000032,
+    "late_enqueue_lower_ms": 7.825708,
+    "seal_reason": "predecessor_compute_finished",
+    "actual_seal_lead_upper_ms": -0.816236,
+    "seal_to_enqueue_ms": 7.009472,
+    "predicted_deadline_lead_upper_ms": -2.639112,
+    "deadline_overshoot_ms": 0.0
+  },
+  {
+    "cell": "r3_shape5",
+    "predecessor_step": 947,
+    "next_step": 948,
+    "a_requests": 2,
+    "a_shapes": [
+      [
+        3072,
+        58368
+      ],
+      [
+        3072,
+        58368
+      ]
+    ],
+    "execution_ms": 455.397736,
+    "predicted_duration_ms": 458.582573,
+    "prediction_error_ms": 3.184837000000016,
+    "late_enqueue_lower_ms": 20.467071,
+    "seal_reason": "compute_seal_deadline",
+    "actual_seal_lead_upper_ms": 1.35661,
+    "seal_to_enqueue_ms": 21.823681,
+    "predicted_deadline_lead_upper_ms": 1.531404,
+    "deadline_overshoot_ms": 0.174794
+  }
+]

@@ -1,0 +1,13 @@
+......................                                                   [100%]
+=============================== warnings summary ===============================
+vllm/__init__.py:7
+  /mnt/localnvme/vllm_glm53_load_only_fraction_20261008/vllm/__init__.py:7: RuntimeWarning: Failed to read commit hash:
+  No module named 'vllm._version'
+    from .version import __version__, __version_tuple__  # isort:skip
+
+.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: 14 warnings
+  /mnt/localnvme/vllm_glm53_load_only_fraction_20261008/.venv/lib/python3.12/site-packages/torch/jit/_script.py:365: DeprecationWarning: `torch.jit.script_method` is deprecated. Please switch to `torch.compile` or `torch.export`.
+    warnings.warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+22 passed, 583 deselected, 15 warnings in 4.17s

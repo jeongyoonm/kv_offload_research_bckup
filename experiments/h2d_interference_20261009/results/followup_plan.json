@@ -1,0 +1,23 @@
+{
+  "stages": [
+    "confirmation",
+    "diagnostic",
+    "serving_128mib",
+    "serving_8mib",
+    "serving_16mib"
+  ],
+  "serving_order": [
+    128,
+    8,
+    16
+  ],
+  "serving_repeats": 2,
+  "requests_per_episode": 32,
+  "concurrency": 32,
+  "serving_workloads": [
+    "short16k",
+    "familiar60k",
+    "heterogeneous"
+  ],
+  "decision": "No serving default changes; candidates frozen from screen. Serving validation is small and has separate-allocation/order limitations."
+}

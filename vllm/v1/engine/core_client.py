@@ -258,7 +258,11 @@ class EngineCoreClient(ABC):
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
+        raise NotImplementedError
+
+    async def get_deferral_cohort_status_async(self) -> dict[str, Any]:
         raise NotImplementedError
 
     async def reset_encoder_cache_async(self) -> None:
@@ -1194,16 +1198,21 @@ class AsyncMPClient(MPClient):
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
         return await self.call_utility_async(
             "set_kv_load_scheduling",
             early_load_completion,
             schedule_delay_ms,
             experiment_options,
+            *((seal_estimator,) if seal_estimator is not None else ()),
         )
 
     async def reset_encoder_cache_async(self) -> None:
         await self.call_utility_async("reset_encoder_cache")
+
+    async def get_deferral_cohort_status_async(self) -> dict[str, Any]:
+        return await self.call_utility_async("get_deferral_cohort_status")
 
     async def sleep_async(self, level: int = 1, mode: PauseMode = "abort") -> None:
         await self.call_utility_async("sleep", level, mode)

@@ -22,7 +22,7 @@ from vllm.v1.kv_cache_interface import (
     UniformTypeKVCacheSpecs,
     group_kernel_blocks,
 )
-from vllm.v1.kv_offload import timeline
+from vllm.v1.kv_offload import queue_stages, timeline
 from vllm.v1.kv_offload.base import (
     CanonicalKVCacheRef,
     CanonicalKVCaches,
@@ -215,6 +215,11 @@ class OffloadingConnectorWorker:
 
     def handle_preemptions(self, kv_connector_metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
+        if queue_stages.active and kv_connector_metadata.store_allocation_audit:
+            queue_stages.emit(
+                "store_allocation_audit",
+                allocations=kv_connector_metadata.store_allocation_audit,
+            )
 
         # Pop jobs_to_flush from store_jobs into _unsubmitted_store_jobs
         # so the existing submission loop below submits them before wait().
@@ -231,23 +236,61 @@ class OffloadingConnectorWorker:
                     )
 
         # Submit deferred stores from previous step (and jobs_to_flush above).
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_begin",
+                scope="handle_preemptions",
+                jobs=[job[0] for job in self._unsubmitted_store_jobs],
+            )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
             assert isinstance(src_spec, GPULoadStoreSpec)
             success = self.worker.submit_store(job_id, src_spec, dst_spec)
             assert success
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_end", scope="handle_preemptions"
+            )
         self._unsubmitted_store_jobs.clear()
 
         if kv_connector_metadata.jobs_to_flush:
-            self.worker.wait(kv_connector_metadata.jobs_to_flush)
+            gpu_fence = (
+                kv_connector_metadata.experiment_options.get(
+                    "store_reuse_gpu_fence", False
+                )
+                and not kv_connector_metadata.force_flush_on_host
+                and kv_connector_metadata.jobs_to_flush.isdisjoint(self._load_jobs)
+            )
+            phase = "store_reuse_fence_enqueue" if gpu_fence else "store_flush_wait"
+            if queue_stages.active:
+                queue_stages.emit(
+                    f"{phase}_begin",
+                    jobs=list(kv_connector_metadata.jobs_to_flush),
+                )
+            if gpu_fence:
+                self.worker.fence_store_reuse(kv_connector_metadata.jobs_to_flush)
+            else:
+                self.worker.wait(kv_connector_metadata.jobs_to_flush)
+            if queue_stages.active:
+                queue_stages.emit(f"{phase}_end")
 
     def start_kv_transfers(self, metadata: OffloadingConnectorMetadata):
         assert self.worker is not None
         configure = getattr(self.worker, "configure_experiment", None)
         if configure is not None:
             configure(metadata.experiment_options)
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_begin",
+                scope="start_kv_transfers",
+                jobs=[job[0] for job in self._unsubmitted_store_jobs],
+            )
         for job_id, src_spec, dst_spec in self._unsubmitted_store_jobs:
             success = self.worker.submit_store(job_id, src_spec, dst_spec)
             assert success
+        if queue_stages.active and self._unsubmitted_store_jobs:
+            queue_stages.emit(
+                "deferred_store_submission_end", scope="start_kv_transfers"
+            )
         self._unsubmitted_store_jobs.clear()
 
         if self._grouped_load_completion and metadata.load_jobs:
@@ -317,6 +360,16 @@ class OffloadingConnectorWorker:
                     job_id=job_id,
                     request=req_id,
                     transfer_bytes=transfer_result.transfer_size,
+                    transfer_time_seconds=transfer_result.transfer_time,
+                    rank=self.spec.config.parallel.rank,
+                )
+            if timeline.enabled() and req_id is None:
+                timeline.emit(
+                    "store_observed_done",
+                    job_id=job_id,
+                    transfer_bytes=transfer_result.transfer_size,
+                    transfer_time_seconds=transfer_result.transfer_time,
+                    rank=self.spec.config.parallel.rank,
                 )
             if req_id is not None and self._grouped_load_completion:
                 self._completed_group_loads.add(job_id)

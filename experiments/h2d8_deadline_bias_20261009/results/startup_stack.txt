@@ -1,0 +1,118 @@
+[New LWP 79747]
+[New LWP 82151]
+[New LWP 82152]
+[New LWP 82153]
+[New LWP 82154]
+[New LWP 82159]
+[New LWP 105964]
+[New LWP 105966]
+[New LWP 105988]
+[New LWP 105991]
+[New LWP 106068]
+[New LWP 106081]
+[New LWP 106082]
+[New LWP 106235]
+[New LWP 106351]
+[New LWP 107061]
+[New LWP 107062]
+[New LWP 107067]
+[New LWP 107075]
+[New LWP 107080]
+[New LWP 107089]
+[New LWP 107094]
+[New LWP 107100]
+[New LWP 107108]
+[New LWP 107116]
+[New LWP 107121]
+[New LWP 107127]
+[New LWP 107197]
+[New LWP 107700]
+[New LWP 107706]
+[New LWP 108734]
+[New LWP 108735]
+[New LWP 108750]
+[New LWP 108753]
+[New LWP 108767]
+[New LWP 108778]
+[New LWP 108779]
+[New LWP 108792]
+[New LWP 108793]
+[New LWP 108811]
+[New LWP 108822]
+[New LWP 108823]
+[New LWP 108827]
+[New LWP 108832]
+[New LWP 108891]
+[New LWP 108904]
+[New LWP 108905]
+[New LWP 108906]
+[New LWP 108907]
+[New LWP 108980]
+[New LWP 108993]
+[New LWP 108994]
+[New LWP 108996]
+[New LWP 108997]
+[New LWP 109069]
+[New LWP 109092]
+[New LWP 109093]
+[New LWP 109773]
+[New LWP 109781]
+[New LWP 110380]
+[New LWP 110384]
+[New LWP 111466]
+[New LWP 183234]
+[New LWP 183239]
+[New LWP 183241]
+[New LWP 183243]
+[New LWP 183244]
+[New LWP 183249]
+
+warning: Loadable section ".dynstr" outside of ELF segments
+
+warning: Expected absolute pathname for libpthread in the inferior, but got .gnu_debugdata for /lib64/libpthread.so.0.
+
+warning: File "/usr/lib64/libthread_db.so.1" auto-loading has been declined by your `auto-load safe-path' set to "$debugdir:$datadir/auto-load".
+To enable execution of this file add
+	add-auto-load-safe-path /usr/lib64/libthread_db.so.1
+line to your configuration file "/root/.gdbinit".
+To completely disable this security protection add
+	set auto-load safe-path /
+line to your configuration file "/root/.gdbinit".
+For more information about this security protection see the
+"Auto-loading safe path" section in the GDB manual.  E.g., run from the shell:
+	info "(gdb)Auto-loading safe path"
+
+warning: Unable to find libthread_db matching inferior's thread library, thread debugging will not be available.
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+
+warning: Loadable section ".note.gnu.property" outside of ELF segments
+[Thread debugging using libthread_db enabled]
+Using host libthread_db library "/lib64/libthread_db.so.1".
+0x00007f416ef786c5 in clock_nanosleep@GLIBC_2.2.5 () from /lib64/libc.so.6
+[Switching to thread 1 (Thread 0x7f416ee77740 (LWP 79182))]
+#0  0x00007f416ef786c5 in clock_nanosleep@GLIBC_2.2.5 () from /lib64/libc.so.6
+#0  0x00007f416ef786c5 in clock_nanosleep@GLIBC_2.2.5 () from /lib64/libc.so.6
+#1  0x000000000197c205 in time_sleep ()
+#2  0x0000000001813be1 in _PyEval_EvalFrameDefault ()
+#3  0x0000000001812c89 in method_vectorcall.llvm ()
+#4  0x000000000181fe54 in _PyEval_EvalFrameDefault ()
+#5  0x00000000018a233f in infinite_lru_cache_wrapper ()
+#6  0x000000000181514c in _PyEval_EvalFrameDefault ()
+#7  0x000000000193d5fd in PyObject_Vectorcall ()
+#8  0x00007f40e4a69815 in pybind11::detail::unpacking_collector<(pybind11::return_value_policy)1>::call(_object*) const () from /mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+#9  0x00007f40e4e86305 in pybind11::object pybind11::detail::object_api<pybind11::handle>::operator()<(pybind11::return_value_policy)1, pybind11::detail::args_proxy, pybind11::detail::kwargs_proxy>(pybind11::detail::args_proxy&&, pybind11::detail::kwargs_proxy&&) const () from /mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+#10 0x00007f40e5211071 in torch::impl::dispatch::PythonKernelHolder::operator()(c10::OperatorHandle const&, c10::DispatchKeySet, std::vector<c10::IValue, std::allocator<c10::IValue> >*) () from /mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/torch/lib/libtorch_python.so
+#11 0x00007f40d588c5ff in c10::Dispatcher::callBoxed(c10::OperatorHandle const&, std::vector<c10::IValue, std::allocator<c10::IValue> >*) const [clone .isra.0] () from /mnt/localnvme/glm53-compat-venv/lib/python3.12/site-packages/torch/lib/libtorch_cpu.so
+Undefined command: "py-bt".  Try "help".
+[Inferior 1 (process 79182) detached]

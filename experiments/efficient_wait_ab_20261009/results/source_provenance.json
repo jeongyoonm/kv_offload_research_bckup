@@ -1,0 +1,6 @@
+{
+  "source": "/mnt/localnvme/vllm_glm53_efficient_wait_ab_20261009",
+  "branch": "experiment/glm53-efficient-wait-ablation-20261009",
+  "commit": "e0052bccaf4cfedd37a42cda20bb9e308e9a0808",
+  "serving_parent": "673ddfa9fc3a2a02df2d202de01166b428624a05"
+}

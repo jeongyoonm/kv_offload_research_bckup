@@ -1,0 +1,45 @@
+{
+  "time": 1791480675.8417807,
+  "all_owned_processes_stopped": false,
+  "owned_processes": [
+    {
+      "pid": 2886238,
+      "sid": 2873334,
+      "state": "D",
+      "name": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2890223,
+      "sid": 2873334,
+      "state": "D",
+      "name": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2893252,
+      "sid": 2873334,
+      "state": "D",
+      "name": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2896295,
+      "sid": 2873334,
+      "state": "D",
+      "name": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2899632,
+      "sid": 2873334,
+      "state": "R",
+      "name": "VLLM::Worker_TP"
+    },
+    {
+      "pid": 2902038,
+      "sid": 2873334,
+      "state": "D",
+      "name": "VLLM::Worker_TP"
+    }
+  ],
+  "gpu_memory_used_mib": {},
+  "query_error": "NVML query timed out during teardown",
+  "clean": false
+}

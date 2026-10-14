@@ -1,0 +1,80 @@
+[
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "cached_pinned",
+    "repeats": 2,
+    "throughput": 6.846430710971305,
+    "mean_ttft_ms": 3894.4450292343745,
+    "p95_ttft_ms": 5424.862716199998,
+    "compute_rounds": 10.5,
+    "prefill_setup_median_ms": 58.1820965,
+    "prefill_handoff_median_ms": 67.60221475,
+    "prefill_dispatch_to_gpu_median_ms": 300.56244200000003,
+    "referenced_requests": 125
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "current",
+    "repeats": 2,
+    "throughput": 6.9097399349144855,
+    "mean_ttft_ms": 3856.170008984375,
+    "p95_ttft_ms": 5532.995059774999,
+    "compute_rounds": 10,
+    "prefill_setup_median_ms": 51.96927775,
+    "prefill_handoff_median_ms": 72.20913999999999,
+    "prefill_dispatch_to_gpu_median_ms": 225.4653985,
+    "referenced_requests": 0
+  },
+  {
+    "workload": "p61440_f95_h100",
+    "mode": "references",
+    "repeats": 2,
+    "throughput": 6.8549091256160954,
+    "mean_ttft_ms": 3878.6336000624997,
+    "p95_ttft_ms": 5572.797779574999,
+    "compute_rounds": 10,
+    "prefill_setup_median_ms": 50.898377749999995,
+    "prefill_handoff_median_ms": 43.52972975,
+    "prefill_dispatch_to_gpu_median_ms": 231.28471375,
+    "referenced_requests": 127
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "mode": "cached_pinned",
+    "repeats": 2,
+    "throughput": 35.080124912667046,
+    "mean_ttft_ms": 772.1183449453124,
+    "p95_ttft_ms": 1059.19640515,
+    "compute_rounds": 9.5,
+    "prefill_setup_median_ms": 8.529828,
+    "prefill_handoff_median_ms": 89.1464435,
+    "prefill_dispatch_to_gpu_median_ms": 106.074379,
+    "referenced_requests": 127
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "mode": "current",
+    "repeats": 2,
+    "throughput": 32.32622045845474,
+    "mean_ttft_ms": 835.717006609375,
+    "p95_ttft_ms": 1114.221828625,
+    "compute_rounds": 10.5,
+    "prefill_setup_median_ms": 11.3811275,
+    "prefill_handoff_median_ms": 96.19586425,
+    "prefill_dispatch_to_gpu_median_ms": 114.01812375,
+    "referenced_requests": 0
+  },
+  {
+    "workload": "p8192_f95_h100",
+    "mode": "references",
+    "repeats": 2,
+    "throughput": 34.02733030556239,
+    "mean_ttft_ms": 800.4015739921874,
+    "p95_ttft_ms": 1086.16802055,
+    "compute_rounds": 10,
+    "prefill_setup_median_ms": 12.110118499999999,
+    "prefill_handoff_median_ms": 90.62222600000001,
+    "prefill_dispatch_to_gpu_median_ms": 116.9623525,
+    "referenced_requests": 128
+  }
+]

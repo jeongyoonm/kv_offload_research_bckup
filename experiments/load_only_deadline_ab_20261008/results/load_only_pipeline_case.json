@@ -1,0 +1,301 @@
+[
+  {
+    "policy": "all_on",
+    "throughput_rps": 6.0154418075523575,
+    "compute_rounds": 8,
+    "diagnostics": {
+      "compute_rounds": 8,
+      "gpu_gap_ms": 2927.5190310000003,
+      "gpu_gap_lower_ms": 2924.127649,
+      "gpu_gap_upper_ms": 2931.291444,
+      "gpu_compute_span_ms": 8979.994687,
+      "cpu_enqueue_lead_ms": [
+        0.033712,
+        0.581075,
+        439.765466,
+        435.018048,
+        0.570834,
+        445.410699,
+        321.43531,
+        2.679374
+      ],
+      "batch_requests": [
+        3,
+        16,
+        13,
+        3,
+        16,
+        9,
+        7,
+        8
+      ],
+      "prediction_errors_ms": [
+        -46.1743899999999,
+        -13.271223999999847,
+        16.632098000000042,
+        7.033203000000185
+      ],
+      "prediction_cost_us": [
+        486.172,
+        567.963,
+        385.112,
+        445.819
+      ],
+      "actual_seal_lead_ms": [
+        1160.234894,
+        1303.439336,
+        1395.184289,
+        630.051099
+      ],
+      "actual_enqueue_lead_ms": [
+        1148.466535,
+        1296.371017,
+        1386.306155,
+        584.78047
+      ],
+      "backends": {
+        "native_forest": 4
+      },
+      "seal_reasons": {
+        "ordinary": 8,
+        "candidate_target_ready": 8,
+        "deadline": 5,
+        "unknown": 1
+      },
+      "point_predictions": 4,
+      "initial_compute_batches_before_first_forecast": [
+        3,
+        16
+      ],
+      "all_compute_batch_sizes": [
+        3,
+        16,
+        13,
+        3,
+        16,
+        9,
+        7,
+        8
+      ],
+      "first_request_to_first_compute_ms": 365.332298,
+      "last_compute_to_last_response_ms": 194.638943,
+      "gap_categories_ms": {
+        "load_only": 2925.894323,
+        "other": 1.624708
+      },
+      "gap_category_counts": {
+        "load_only": 3,
+        "other": 4
+      },
+      "load_only_seals": [
+        {
+          "step": 1737,
+          "pending": 3,
+          "target": 3,
+          "reason": "candidate_target_ready",
+          "activated": 3,
+          "selected": 3,
+          "ready": 3,
+          "unready": 0,
+          "kv_pending_at_seal": 0,
+          "cohort_kv_pending_at_compute_start": 0,
+          "cohort_kv_completions_during_compute": 0,
+          "wait_after_base_ms": 193.475538
+        },
+        {
+          "step": 1741,
+          "pending": 16,
+          "target": 16,
+          "reason": "candidate_target_ready",
+          "activated": 16,
+          "selected": 16,
+          "ready": 16,
+          "unready": 0,
+          "kv_pending_at_seal": 0,
+          "cohort_kv_pending_at_compute_start": 0,
+          "cohort_kv_completions_during_compute": 0,
+          "wait_after_base_ms": 990.956002
+        },
+        {
+          "step": 1746,
+          "pending": 16,
+          "target": 16,
+          "reason": "candidate_target_ready",
+          "activated": 16,
+          "selected": 16,
+          "ready": 16,
+          "unready": 0,
+          "kv_pending_at_seal": 0,
+          "cohort_kv_pending_at_compute_start": 0,
+          "cohort_kv_completions_during_compute": 0,
+          "wait_after_base_ms": 954.506221
+        },
+        {
+          "step": 1750,
+          "pending": 8,
+          "target": 8,
+          "reason": "candidate_target_ready",
+          "activated": 8,
+          "selected": 8,
+          "ready": 8,
+          "unready": 0,
+          "kv_pending_at_seal": 0,
+          "cohort_kv_pending_at_compute_start": 0,
+          "cohort_kv_completions_during_compute": 0,
+          "wait_after_base_ms": 521.404421
+        }
+      ]
+    }
+  },
+  {
+    "policy": "half_on",
+    "throughput_rps": 6.549187586570371,
+    "compute_rounds": 9,
+    "diagnostics": {
+      "compute_rounds": 9,
+      "gpu_gap_ms": 1940.033234,
+      "gpu_gap_lower_ms": 1936.9861310000001,
+      "gpu_gap_upper_ms": 1945.174978,
+      "gpu_compute_span_ms": 9207.665026,
+      "cpu_enqueue_lead_ms": [
+        0.04006,
+        0.58654,
+        195.105837,
+        458.922636,
+        0.582294,
+        209.061755,
+        458.558961,
+        3.32195,
+        215.35748
+      ],
+      "batch_requests": [
+        1,
+        9,
+        16,
+        7,
+        9,
+        16,
+        7,
+        5,
+        5
+      ],
+      "prediction_errors_ms": [
+        -44.35210899999993,
+        -4.189384000000018,
+        7.54364099999998,
+        15.789292000000046
+      ],
+      "prediction_cost_us": [
+        430.573,
+        423.295,
+        466.892,
+        512.667
+      ],
+      "actual_seal_lead_ms": [
+        223.713545,
+        1605.486941,
+        1402.43509,
+        378.403816
+      ],
+      "actual_enqueue_lead_ms": [
+        205.030293,
+        1597.611709,
+        1392.068755,
+        371.171144
+      ],
+      "backends": {
+        "native_forest": 4
+      },
+      "seal_reasons": {
+        "ordinary": 6,
+        "unknown": 4,
+        "candidate_target_ready": 9,
+        "deadline": 6
+      },
+      "point_predictions": 4,
+      "initial_compute_batches_before_first_forecast": [
+        1,
+        9
+      ],
+      "all_compute_batch_sizes": [
+        1,
+        9,
+        16,
+        7,
+        9,
+        16,
+        7,
+        5,
+        5
+      ],
+      "first_request_to_first_compute_ms": 199.051253,
+      "last_compute_to_last_response_ms": 108.202226,
+      "gap_categories_ms": {
+        "load_only": 1935.667242,
+        "other": 4.365992
+      },
+      "gap_category_counts": {
+        "load_only": 3,
+        "other": 5
+      },
+      "load_only_seals": [
+        {
+          "step": 1977,
+          "pending": 1,
+          "target": 1,
+          "reason": "candidate_target_ready",
+          "activated": 1,
+          "selected": 1,
+          "ready": 1,
+          "unready": 0,
+          "kv_pending_at_seal": 0,
+          "cohort_kv_pending_at_compute_start": 0,
+          "cohort_kv_completions_during_compute": 0,
+          "wait_after_base_ms": 63.958112
+        },
+        {
+          "step": 1980,
+          "pending": 16,
+          "target": 8,
+          "reason": "candidate_target_ready",
+          "activated": 8,
+          "selected": 9,
+          "ready": 8,
+          "unready": 8,
+          "kv_pending_at_seal": 8,
+          "cohort_kv_pending_at_compute_start": 8,
+          "cohort_kv_completions_during_compute": 8,
+          "wait_after_base_ms": 477.463241
+        },
+        {
+          "step": 1985,
+          "pending": 16,
+          "target": 8,
+          "reason": "candidate_target_ready",
+          "activated": 8,
+          "selected": 9,
+          "ready": 8,
+          "unready": 8,
+          "kv_pending_at_seal": 8,
+          "cohort_kv_pending_at_compute_start": 8,
+          "cohort_kv_completions_during_compute": 8,
+          "wait_after_base_ms": 541.373032
+        },
+        {
+          "step": 1990,
+          "pending": 10,
+          "target": 5,
+          "reason": "candidate_target_ready",
+          "activated": 5,
+          "selected": 5,
+          "ready": 5,
+          "unready": 5,
+          "kv_pending_at_seal": 5,
+          "cohort_kv_pending_at_compute_start": 5,
+          "cohort_kv_completions_during_compute": 5,
+          "wait_after_base_ms": 354.418514
+        }
+      ]
+    }
+  }
+]

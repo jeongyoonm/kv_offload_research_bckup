@@ -1,0 +1,33 @@
+{
+  "sessions": 8058,
+  "calls": 665453,
+  "source_counts": [
+    [
+      "claude",
+      5319,
+      305445
+    ],
+    [
+      "codex",
+      2739,
+      360008
+    ]
+  ],
+  "source_sha256": "a7bab286bc640844560850965ccf47975cf66407154132abaab90f27ec9be744",
+  "csv_sha256": "9f077ff969a2d839e6753d4e58e7796fcfdf62fd8bc6f28873b3b6acdc3c7e65",
+  "exporter_command": [
+    "/mnt/localnvme/jeongyoon/trace_characterization_20261012/.venv/bin/python",
+    "/mnt/localnvme/jeongyoon/tracelab_request_slots_src_20261013/artifacts/trace_facts/csv_export/convert.py",
+    "--db",
+    "/mnt/localnvme/jeongyoon/trace_characterization_20261012/tracelab/tracelab_v0.0.2.duckdb",
+    "-o",
+    "/mnt/localnvme/jeongyoon/tracelab_request_slots_20261013/workload.csv"
+  ],
+  "max_input_plus_output": 1006780,
+  "total_recorded_tool_wait_seconds": 11061086.477,
+  "zero_length_source_rows": 287,
+  "zero_handling": "Native exporter maps append/output lengths to minimum 1",
+  "sampling": "All released sessions and calls; no windows or session sampling",
+  "timing": "Native defaults: shuffled seed 0, Poisson arrivals 1 session/s, summed wall tool waits; no clipping or scaling",
+  "evaluation": "Bounded 600s warmup + 1200s measurement. Session arrivals beyond 1800s and not-yet-submitted calls remain unissued. Calls already submitted drain to completion."
+}

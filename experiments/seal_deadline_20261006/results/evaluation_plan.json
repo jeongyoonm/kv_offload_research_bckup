@@ -1,0 +1,23 @@
+{
+  "source_commit": "bcc4212",
+  "control": "compact_shadow",
+  "leads_ms": [
+    0,
+    5,
+    10,
+    20
+  ],
+  "canary": {
+    "model": "GLM5.3 NVFP4",
+    "parallelism": "TP8",
+    "requests_per_policy": 80,
+    "repeats": 1,
+    "prompt_tokens": 61440,
+    "cached_prefix_tokens": 58368,
+    "cpu_hit_percent": 100,
+    "concurrency": 32,
+    "output_tokens": 1
+  },
+  "advancement_gate": "Model correctness, valid timing, earlier enqueue, no lower actual admissions and no extra compute rounds versus control; a useful throughput point estimate. One canary cell does not establish a speedup. If no candidate passes, report the failed gate and do not launch the larger comparison.",
+  "full_cohort_constraint": "300 unique 61440-token prompts exceed the unchanged 1984 GiB CPU cache. A subsequent continuous 300-request comparison needs a shorter prompt workload or an explicitly designed prefix-reuse protocol that excludes GPU hits."
+}

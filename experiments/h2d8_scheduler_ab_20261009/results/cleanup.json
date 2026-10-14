@@ -1,0 +1,5 @@
+{
+  "owned_processes_remaining": [],
+  "gpus": "0, 0 MiB, 0 %\n1, 0 MiB, 0 %\n2, 0 MiB, 0 %\n3, 0 MiB, 0 %\n4, 0 MiB, 0 %\n5, 0 MiB, 0 %\n6, 0 MiB, 0 %\n7, 0 MiB, 0 %\n",
+  "loaded_state_sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3"
+}

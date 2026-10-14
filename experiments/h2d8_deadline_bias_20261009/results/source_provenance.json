@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_h2d_interference_20261009",
+  "branch": "experiment/h2d8-deadline-bias-setup-20261009",
+  "commit": "5827ae5e476cd41f92945fdad51667df05c1ad5e"
+}

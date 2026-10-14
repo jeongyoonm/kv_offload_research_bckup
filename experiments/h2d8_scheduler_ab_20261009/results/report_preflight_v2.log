@@ -1,0 +1,2 @@
+{'inter_compute_gap_ms': 149.818185, 'hold_without_compute_ms': 0.0, 'seal_reasons': {}}
+{'inter_compute_gap_ms': 73.365419, 'hold_without_compute_ms': 2.16338, 'seal_reasons': {'ordinary_or_fallback': 22, 'predecessor_compute_finished': 3, 'candidate_target_ready': 1, 'deadline': 3}}

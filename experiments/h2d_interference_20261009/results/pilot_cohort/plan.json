@@ -1,0 +1,232 @@
+{
+  "cells": [
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 1
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 2
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 3
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 4
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 5
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 6
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "compute_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 7
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 8
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 9
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 10
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 11
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 12
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 13
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 14
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 15
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 16
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "16k",
+      "jobs": 4,
+      "id": 17
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 4,
+      "id": 18
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "after_enqueued",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 4,
+      "id": 19
+    }
+  ],
+  "geometry": {
+    "short": {
+      "context": 4096,
+      "suffix": 64,
+      "batch": 8
+    },
+    "medium": {
+      "context": 15552,
+      "suffix": 512,
+      "batch": 8
+    },
+    "long": {
+      "context": 58368,
+      "suffix": 2048,
+      "batch": 8
+    }
+  },
+  "configs": [
+    [
+      128,
+      2
+    ],
+    [
+      16,
+      2
+    ]
+  ],
+  "shapes": [
+    "short"
+  ],
+  "repeats": 1,
+  "modes": [
+    "concurrent",
+    "after_enqueued"
+  ],
+  "seed": 9109,
+  "prompt_distribution": "Tokenized random kv-number text, matching serving generator",
+  "scope": "Real cached GLM forward, independent reconstructed KV copies; GPU-resident prefixes, fixed cohorts, no scheduler late admission; not serving throughput or full model-output equivalence."
+}

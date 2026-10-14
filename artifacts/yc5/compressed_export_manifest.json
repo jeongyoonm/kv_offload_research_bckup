@@ -1,0 +1,37 @@
+[
+  {
+    "source": "comparison.json",
+    "export": "comparison.json.gz",
+    "bytes": 7945617,
+    "sha256": "06af770bd5b983e7298b664a38dd93b813ee861a32f28bf1a2afbe7f571a2386",
+    "verified": true
+  },
+  {
+    "source": "loaded_predictor.json",
+    "export": "loaded_predictor.json.gz",
+    "bytes": 78014223,
+    "sha256": "dc8c7df295483c13a743cdded7cf1daa276cb77474cdc6763b8281ad1e3895e3",
+    "verified": true
+  },
+  {
+    "source": "plan.json",
+    "export": "plan.json.gz",
+    "bytes": 18960,
+    "sha256": "7e29aa30818b8bec9ecbf1371730a6ff15d4a0bf834f58b57fa8e65e6c5af6ac",
+    "verified": true
+  },
+  {
+    "source": "source_provenance.json",
+    "export": "source_provenance.json.gz",
+    "bytes": 196,
+    "sha256": "18d84d5127065d37f7daba0a70ed6105a9b79c359a165632cfaa14685d888edf",
+    "verified": true
+  },
+  {
+    "source": "summary.json",
+    "export": "summary.json.gz",
+    "bytes": 1827915,
+    "sha256": "3198fd74b3063b39f8c3acbae23013b12f4e688b118182e197fa6088888fdd1c",
+    "verified": true
+  }
+]

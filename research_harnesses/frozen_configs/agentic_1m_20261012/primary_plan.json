@@ -1,0 +1,52 @@
+[
+  {
+    "id": "inferact_n32_r0",
+    "dataset": "inferact",
+    "concurrency": 32,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "tracelab_mixed_windows_n32_r0",
+    "dataset": "tracelab_mixed_windows",
+    "concurrency": 32,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "inferact_n16_r0",
+    "dataset": "inferact",
+    "concurrency": 16,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "tracelab_mixed_windows_n16_r0",
+    "dataset": "tracelab_mixed_windows",
+    "concurrency": 16,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "inferact_n8_r0",
+    "dataset": "inferact",
+    "concurrency": 8,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "tracelab_mixed_windows_n8_r0",
+    "dataset": "tracelab_mixed_windows",
+    "concurrency": 8,
+    "min_interval_seconds": 0,
+    "repeat": 0
+  },
+  {
+    "id": "tracelab_codex_windows_n32_r0",
+    "dataset": "tracelab_codex_windows",
+    "concurrency": 32,
+    "min_interval_seconds": 0,
+    "repeat": 0,
+    "optional": true
+  }
+]

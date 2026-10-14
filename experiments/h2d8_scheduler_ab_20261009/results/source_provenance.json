@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/vllm_h2d_interference_20261009",
+  "branch": "experiment/h2d8-scheduler-ablation-20261009",
+  "commit": "70a9edb55073be299029bb0ba663f821db2e6ac2"
+}

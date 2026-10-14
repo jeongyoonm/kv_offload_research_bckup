@@ -14,6 +14,7 @@ from vllm.v1.kv_offload import timeline
 
 if TYPE_CHECKING:
     from vllm.config import VllmConfig
+    from vllm.v1.kv_offload.seal_notifications import SealNotifications
 
 RING_CAPACITY = 4096
 EARLY_COMPLETION_KEY = "early_load_completion"
@@ -25,8 +26,38 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "zero_token_queue_credit": 0,
     "late_admission_mode": 0,
     "late_admission_markers": False,
+    "late_cached_requests": False,
+    "late_pinned_packing": False,
+    "late_compact_tokens": False,
     "late_seal_delay_us": 0,
     "late_seal_extension_us": 0,
+    "late_seal_policy": "fixed",
+    "late_seal_target_candidates": 4,
+    "late_seal_load_only_target_candidates": 0,
+    "late_seal_load_only_ready_percent": 0,
+    "late_seal_load_only_consistent": False,
+    "late_seal_load_only_idle_target": 0,
+    "late_seal_repeat_us": 25_000,
+    "late_seal_condition_preparation": False,
+    "late_seal_recent_preparation": False,
+    "late_seal_poll_us": 25,
+    "late_seal_adaptive_poll_us": 1000,
+    "late_seal_hybrid_wait_us": 0,
+    "late_seal_hybrid_guard_us": 50_000,
+    "late_seal_prediction_to_readiness": False,
+    "late_seal_compute_deadline": False,
+    "late_seal_compute_deadline_shadow": False,
+    "late_seal_compute_deadline_lead_us": 0,
+    "late_seal_full_prediction_wait": False,
+    "late_seal_coalesced_notifications": False,
+    "late_seal_freeze_estimator": False,
+    "late_seal_native_predictor": False,
+    "late_seal_calibration": "legacy",
+    "late_seal_wait_trace": False,
+    "late_seal_prediction_reserve_us": 10_000,
+    "late_seal_prediction_scale_percent": 100,
+    "late_seal_prediction_bias_us": 0,
+    "late_seal_safety_us": 2_000_000,
     "late_seal_when_all_candidates_ready": False,
     "late_candidate_slots": 4,
     "late_partial_min_pending_candidates": 0,
@@ -40,8 +71,12 @@ EXPERIMENT_DEFAULTS: dict[str, Any] = {
     "optimistic_min_ranks": 7,
     "optimistic_window_ms": 20,
     "early_submission": False,
+    "h2d_block_readiness": False,
     "background_prepare": False,
     "copy_pipeline_depth": 1,
+    "store_reuse_gpu_fence": False,
+    "store_reuse_allocator_preference": False,
+    "store_reuse_allocator_audit": False,
     "deferral_policy": "disabled",
     "deferral_hold_ms": 120,
     "deferral_target_gain": 2,
@@ -58,11 +93,25 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         if key not in result or type(value) is not type(result[key]):
             raise ValueError(f"invalid experimental option: {key}")
         result[key] = value
+    if result["late_seal_calibration"] not in ("legacy", "raw", "shape"):
+        raise ValueError("invalid experimental option: late_seal_calibration")
     for key, upper in (
         ("zero_token_queue_credit", 1),
         ("late_admission_mode", 4),
         ("late_seal_delay_us", 300_000),
         ("late_seal_extension_us", 100_000),
+        ("late_seal_prediction_reserve_us", 100_000),
+        ("late_seal_prediction_scale_percent", 200),
+        ("late_seal_prediction_bias_us", 300_000),
+        ("late_seal_safety_us", 5_000_000),
+        ("late_seal_hybrid_wait_us", 50_000),
+        ("late_seal_hybrid_guard_us", 100_000),
+        ("late_seal_compute_deadline_lead_us", 100_000),
+        ("late_seal_target_candidates", 16),
+        ("late_seal_load_only_target_candidates", 16),
+        ("late_seal_load_only_ready_percent", 100),
+        ("late_seal_load_only_idle_target", 16),
+        ("late_seal_repeat_us", 100_000),
         ("late_candidate_slots", 16),
         ("late_partial_min_pending_candidates", 16),
         ("late_partial_ready_percent", 100),
@@ -73,6 +122,10 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
     ):
         if not 0 <= result[key] <= upper:
             raise ValueError(f"invalid experimental option: {key}")
+    if not 1 <= result["late_seal_poll_us"] <= 5000:
+        raise ValueError("invalid experimental option: late_seal_poll_us")
+    if not 1 <= result["late_seal_adaptive_poll_us"] <= 10_000:
+        raise ValueError("invalid experimental option: late_seal_adaptive_poll_us")
     if result["zero_token_queue_credit"] and (
         not result["cooperative_response_progress"]
         or result["deferral_policy"] not in ("disabled", "timing")
@@ -82,6 +135,105 @@ def validate_experiment_options(options: dict) -> dict[str, Any]:
         raise ValueError(
             "zero-token credit requires cooperative progress without holds"
         )
+    if (result["late_cached_requests"] or result["late_pinned_packing"]) and (
+        result["late_admission_mode"] != 4
+    ):
+        raise ValueError("cached/pinned preparation requires admission mode 4")
+    if result["late_compact_tokens"] and not (
+        result["late_cached_requests"] or result["late_pinned_packing"]
+    ):
+        raise ValueError("compact tokens require cached/pinned preparation")
+    if result["late_seal_policy"] not in ("fixed", "predictive", "event") or (
+        result["late_seal_policy"] == "predictive"
+        and (
+            result["late_admission_mode"] != 4
+            or not result["late_seal_prediction_scale_percent"]
+            or not result["late_seal_safety_us"]
+        )
+    ):
+        raise ValueError("predictive seal requires mode 4 and positive timing")
+    if (
+        result["late_seal_prediction_bias_us"]
+        and result["late_seal_policy"] != "predictive"
+    ):
+        raise ValueError("prediction bias requires predictive seal")
+    if result["late_seal_policy"] == "event" and (
+        result["late_admission_mode"] != 4
+        or not result["late_seal_safety_us"]
+        or not result["late_seal_target_candidates"]
+        or not result["late_seal_repeat_us"]
+    ):
+        raise ValueError("event seal requires mode 4 and positive target/timing")
+    if result["late_seal_recent_preparation"] and (
+        result["late_seal_policy"] != "predictive"
+        or not result["late_seal_condition_preparation"]
+    ):
+        raise ValueError("recent preparation requires conditioned predictive seal")
+    if (
+        result["late_seal_hybrid_wait_us"]
+        and result["late_seal_policy"] != "predictive"
+    ):
+        raise ValueError("hybrid wait requires predictive seal")
+    if result["late_seal_prediction_to_readiness"] and (
+        result["late_seal_policy"] != "predictive"
+        or not result["late_seal_target_candidates"]
+        or not result["late_seal_repeat_us"]
+    ):
+        raise ValueError("prediction-to-readiness requires predictive seal and target")
+    if result["late_seal_load_only_ready_percent"] and (
+        result["late_admission_mode"] != 4
+        or not (
+            result["late_seal_policy"] == "event"
+            or (
+                result["late_seal_policy"] == "predictive"
+                and result["late_seal_prediction_to_readiness"]
+            )
+        )
+    ):
+        raise ValueError("load-only percentage requires mode 4 and readiness seal")
+    if result["late_seal_load_only_consistent"] and (
+        result["late_admission_mode"] != 4
+        or not (
+            result["late_seal_policy"] == "event"
+            or result["late_seal_prediction_to_readiness"]
+        )
+    ):
+        raise ValueError("consistent load-only policy requires readiness seal")
+    if (
+        result["late_seal_load_only_idle_target"]
+        and not result["late_seal_load_only_consistent"]
+    ):
+        raise ValueError("idle load-only target requires consistent policy")
+    deadline_options = (
+        result["late_seal_compute_deadline"]
+        or result["late_seal_compute_deadline_shadow"]
+    )
+    if (
+        result["late_seal_native_predictor"]
+        and result["late_seal_policy"] != "predictive"
+    ):
+        raise ValueError("native predictor requires predictive seal")
+    if deadline_options and not result["late_seal_prediction_to_readiness"]:
+        raise ValueError("compute seal deadline requires prediction-to-readiness")
+    if (
+        result["late_seal_compute_deadline"]
+        and result["late_seal_compute_deadline_shadow"]
+    ):
+        raise ValueError("compute seal deadline and shadow are mutually exclusive")
+    if result["late_seal_compute_deadline_lead_us"] and not deadline_options:
+        raise ValueError("compute seal lead requires deadline or shadow")
+    if result["late_seal_full_prediction_wait"] and (
+        not result["late_seal_prediction_to_readiness"]
+        or not result["late_seal_condition_preparation"]
+    ):
+        raise ValueError(
+            "full predicted wait requires conditioned prediction-to-readiness"
+        )
+    if (
+        result["late_seal_coalesced_notifications"]
+        and not result["late_seal_full_prediction_wait"]
+    ):
+        raise ValueError("coalesced notifications require full predicted waits")
     if result["late_admission_mode"] and (
         not result["cooperative_response_progress"]
         or result["zero_token_queue_credit"]
@@ -181,6 +333,7 @@ class EarlyLoadReadiness:
         self._released_jobs: set[int] = set()
         self._closed = False
         self.experiment_options = dict(EXPERIMENT_DEFAULTS)
+        self.seal_notifications: SealNotifications | None = None
 
     @classmethod
     def from_config(cls, vllm_config: "VllmConfig") -> "EarlyLoadReadiness | None":
@@ -231,7 +384,35 @@ class EarlyLoadReadiness:
 
         extra[_RING_PATHS_KEY] = paths
         extra[_SESSION_KEY] = session
-        return cls(session, handles, paths, enabled, delay)
+        readiness = cls(session, handles, paths, enabled, delay)
+        opt_in = extra.get("coalesced_seal_notifications", False)
+        if type(opt_in) is not bool:
+            readiness.close()
+            raise ValueError("coalesced_seal_notifications must be a boolean")
+        if opt_in:
+            from vllm.v1.kv_offload.seal_notifications import (
+                PATH_KEY,
+                SealNotifications,
+            )
+
+            try:
+                import torch
+
+                abi = getattr(
+                    torch.ops._C_cache_ops, "coalesced_seal_notification_abi", None
+                )
+                if abi is None or abi() != 1:
+                    raise RuntimeError("async KV extension lacks seal notifications")
+                readiness.seal_notifications = SealNotifications(
+                    str(directory / (prefix + "-seal")), session, world_size
+                )
+                for rank, path in enumerate(paths):
+                    readiness.seal_notifications.descriptor(path, rank)
+                extra[PATH_KEY] = readiness.seal_notifications.path
+            except BaseException:
+                readiness.close()
+                raise
+        return readiness
 
     @property
     def world_size(self) -> int:
@@ -331,6 +512,8 @@ class EarlyLoadReadiness:
         if self._closed:
             return
         self._closed = True
+        if self.seal_notifications is not None:
+            self.seal_notifications.close()
         for handle in self.handles:
             ops.destroy_async_batch_memcpy_completion_ring(handle)
         self.handles.clear()

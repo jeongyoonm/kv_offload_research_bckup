@@ -1,0 +1,1861 @@
+{
+  "time": 1791073700.4683518,
+  "status": "verified",
+  "accepted_cells": 48,
+  "measured_requests": 7360,
+  "nominal_work_equal": true,
+  "all_primary_completions_valid": true,
+  "missing_execution_timing_steps": {},
+  "correctness": {
+    "screen/correctness": {
+      "capped50_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "readiness2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine10": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine10": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      }
+    },
+    "screen/correctness_distinct": {
+      "capped50_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "readiness2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin50_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 13,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin50_fine5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin50_fine10": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 14,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin0_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin0_fine5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      },
+      "full_margin0_fine10": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368,
+          58368
+        ],
+        "passed": true
+      }
+    },
+    "confirmation/correctness": {
+      "full_margin0_fine10": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine10": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine5": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "readiness2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "capped50_fine2": {
+        "text_matches": 16,
+        "requests": 16,
+        "answer": "river flow and rainfall.",
+        "completion_tokens": 5,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      }
+    },
+    "confirmation/correctness_distinct": {
+      "full_margin0_fine10": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 14,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin0_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine10": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine5": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 14,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "full_margin50_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "readiness2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 16,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      },
+      "capped50_fine2": {
+        "requests": 16,
+        "expected": [
+          [
+            "temperature",
+            "pressure"
+          ],
+          [
+            "speed",
+            "distance"
+          ],
+          [
+            "voltage",
+            "current"
+          ],
+          [
+            "height",
+            "weight"
+          ],
+          [
+            "rainfall",
+            "humidity"
+          ],
+          [
+            "length",
+            "width"
+          ],
+          [
+            "mass",
+            "volume"
+          ],
+          [
+            "latitude",
+            "longitude"
+          ],
+          [
+            "frequency",
+            "amplitude"
+          ],
+          [
+            "density",
+            "viscosity"
+          ],
+          [
+            "wavelength",
+            "intensity"
+          ],
+          [
+            "conductivity",
+            "resistance"
+          ],
+          [
+            "depth",
+            "turbidity"
+          ],
+          [
+            "altitude",
+            "velocity"
+          ],
+          [
+            "acidity",
+            "salinity"
+          ],
+          [
+            "diameter",
+            "circumference"
+          ]
+        ],
+        "factual_matches": 16,
+        "exact_cold_matches": 15,
+        "cached_tokens": [
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776,
+          11776
+        ],
+        "passed": true
+      }
+    }
+  },
+  "gpu_processes_remaining": 0,
+  "runtime_commit": "721ef7e22daf81f3d8f802e2c8afd50b4abf1a52"
+}

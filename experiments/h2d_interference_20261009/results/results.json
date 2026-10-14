@@ -1,0 +1,263 @@
+{
+  "calibration": [
+    {
+      "chunk_mib": 8,
+      "depth": 2,
+      "joint_finish_ms": {
+        "gain_percent": 10.297399799246874,
+        "bounds": [
+          9.55869330071785,
+          11.041087073600519
+        ],
+        "repeats": 8
+      },
+      "forward_enqueue_ms": {
+        "gain_percent": 25.196900080249463,
+        "bounds": [
+          23.974715109437085,
+          26.431133766814575
+        ],
+        "repeats": 8
+      },
+      "first_ready_ms": {
+        "gain_percent": 1.7582759082947228,
+        "bounds": [
+          0.5600565578610255,
+          2.9707725936951883
+        ],
+        "repeats": 8
+      }
+    },
+    {
+      "chunk_mib": 16,
+      "depth": 2,
+      "joint_finish_ms": {
+        "gain_percent": 9.516624762912796,
+        "bounds": [
+          9.135366701097306,
+          9.899214727612687
+        ],
+        "repeats": 8
+      },
+      "forward_enqueue_ms": {
+        "gain_percent": 19.82101671249813,
+        "bounds": [
+          19.1438333254772,
+          20.50204903845998
+        ],
+        "repeats": 8
+      },
+      "first_ready_ms": {
+        "gain_percent": 3.954502430860706,
+        "bounds": [
+          2.4935442174676066,
+          5.436285359776883
+        ],
+        "repeats": 8
+      }
+    },
+    {
+      "chunk_mib": 128,
+      "depth": 2,
+      "joint_finish_ms": {
+        "gain_percent": 0.0,
+        "bounds": [
+          0.0,
+          0.0
+        ],
+        "repeats": 8
+      },
+      "forward_enqueue_ms": {
+        "gain_percent": 0.0,
+        "bounds": [
+          0.0,
+          0.0
+        ],
+        "repeats": 8
+      },
+      "first_ready_ms": {
+        "gain_percent": 0.0,
+        "bounds": [
+          0.0,
+          0.0
+        ],
+        "repeats": 8
+      }
+    }
+  ],
+  "serving": [
+    {
+      "workload": "familiar60k",
+      "chunk_mib": 128,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 6.480674378341183,
+      "throughput_rps_change_percent": 0.0,
+      "mean_ttft_ms": 3783.289256109375,
+      "mean_ttft_ms_change_percent": 0.0,
+      "p50_ttft_ms": 4296.74147925,
+      "p50_ttft_ms_change_percent": 0.0,
+      "p95_ttft_ms": 4864.8186654,
+      "p95_ttft_ms_change_percent": 0.0,
+      "compute_rounds": 4,
+      "compute_rounds_change_percent": 0.0,
+      "late_admissions": 28.5,
+      "late_admissions_change_percent": 0.0
+    },
+    {
+      "workload": "familiar60k",
+      "chunk_mib": 8,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 7.139008622328347,
+      "throughput_rps_change_percent": 10.166313799444461,
+      "mean_ttft_ms": 3085.9697982968746,
+      "mean_ttft_ms_change_percent": -18.437205034927953,
+      "p50_ttft_ms": 2789.06685975,
+      "p50_ttft_ms_change_percent": -35.13266526206343,
+      "p95_ttft_ms": 4430.4469726,
+      "p95_ttft_ms_change_percent": -8.922249368052606,
+      "compute_rounds": 5,
+      "compute_rounds_change_percent": 25.0,
+      "late_admissions": 30,
+      "late_admissions_change_percent": 5.4092553389459805
+    },
+    {
+      "workload": "familiar60k",
+      "chunk_mib": 16,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 7.089036962592914,
+      "throughput_rps_change_percent": 9.385653207052837,
+      "mean_ttft_ms": 3149.064571625,
+      "mean_ttft_ms_change_percent": -16.76355527314453,
+      "p50_ttft_ms": 3367.87763525,
+      "p50_ttft_ms_change_percent": -21.98813362178777,
+      "p95_ttft_ms": 4447.86895905,
+      "p95_ttft_ms_change_percent": -8.573816069437797,
+      "compute_rounds": 5,
+      "compute_rounds_change_percent": 25.0,
+      "late_admissions": 31,
+      "late_admissions_change_percent": 8.922897183577517
+    },
+    {
+      "workload": "heterogeneous",
+      "chunk_mib": 128,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 1.7049171850737834,
+      "throughput_rps_change_percent": 0.0,
+      "mean_ttft_ms": 11413.916093828124,
+      "mean_ttft_ms_change_percent": 0.0,
+      "p50_ttft_ms": 11279.03619125,
+      "p50_ttft_ms_change_percent": 0.0,
+      "p95_ttft_ms": 18733.410644900003,
+      "p95_ttft_ms_change_percent": 0.0,
+      "compute_rounds": 11.5,
+      "compute_rounds_change_percent": 0.0,
+      "late_admissions": 1.5,
+      "late_admissions_change_percent": 0.0
+    },
+    {
+      "workload": "heterogeneous",
+      "chunk_mib": 8,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 1.7046222190547842,
+      "throughput_rps_change_percent": -0.017257610438202002,
+      "mean_ttft_ms": 11233.737370015624,
+      "mean_ttft_ms_change_percent": -1.588199241350051,
+      "p50_ttft_ms": 11587.92497325,
+      "p50_ttft_ms_change_percent": 2.806395542092876,
+      "p95_ttft_ms": 18610.795489325,
+      "p95_ttft_ms_change_percent": -0.6559926370335936,
+      "compute_rounds": 12.5,
+      "compute_rounds_change_percent": 8.711461300921794,
+      "late_admissions": 2,
+      "late_admissions_change_percent": 41.4213562373095
+    },
+    {
+      "workload": "heterogeneous",
+      "chunk_mib": 16,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 1.7019010745404335,
+      "throughput_rps_change_percent": -0.17682657096482604,
+      "mean_ttft_ms": 11262.48154875,
+      "mean_ttft_ms_change_percent": -1.3286452647268723,
+      "p50_ttft_ms": 11875.717903249999,
+      "p50_ttft_ms_change_percent": 5.46174216974764,
+      "p95_ttft_ms": 18641.031683825,
+      "p95_ttft_ms_change_percent": -0.4961821731162765,
+      "compute_rounds": 11.5,
+      "compute_rounds_change_percent": -5.551115123125783e-15,
+      "late_admissions": 2,
+      "late_admissions_change_percent": 41.4213562373095
+    },
+    {
+      "workload": "short16k",
+      "chunk_mib": 128,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 20.899535214928,
+      "throughput_rps_change_percent": 0.0,
+      "mean_ttft_ms": 1112.746119640625,
+      "mean_ttft_ms_change_percent": 0.0,
+      "p50_ttft_ms": 1244.3151349999998,
+      "p50_ttft_ms_change_percent": 0.0,
+      "p95_ttft_ms": 1514.7251915499999,
+      "p95_ttft_ms_change_percent": 0.0,
+      "compute_rounds": 4.5,
+      "compute_rounds_change_percent": 0.0,
+      "late_admissions": 26,
+      "late_admissions_change_percent": 0.0
+    },
+    {
+      "workload": "short16k",
+      "chunk_mib": 8,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 24.571819464696603,
+      "throughput_rps_change_percent": 17.693726368600572,
+      "mean_ttft_ms": 894.22559,
+      "mean_ttft_ms_change_percent": -19.62315616785627,
+      "p50_ttft_ms": 954.6316240000001,
+      "p50_ttft_ms_change_percent": -23.828998936768535,
+      "p95_ttft_ms": 1285.1424769,
+      "p95_ttft_ms_change_percent": -15.059454451415396,
+      "compute_rounds": 5,
+      "compute_rounds_change_percent": 9.544511501033226,
+      "late_admissions": 31,
+      "late_admissions_change_percent": 20.03247936266677
+    },
+    {
+      "workload": "short16k",
+      "chunk_mib": 16,
+      "depth": 2,
+      "repeats": 2,
+      "requests": 64,
+      "throughput_rps": 24.67931952830778,
+      "throughput_rps_change_percent": 18.347085391446896,
+      "mean_ttft_ms": 940.9761451562499,
+      "mean_ttft_ms_change_percent": -15.44286720960624,
+      "p50_ttft_ms": 1079.5609465000002,
+      "p50_ttft_ms_change_percent": -14.696683872975717,
+      "p95_ttft_ms": 1275.6992470999999,
+      "p95_ttft_ms_change_percent": -15.585473595829546,
+      "compute_rounds": 4.5,
+      "compute_rounds_change_percent": 0.0,
+      "late_admissions": 31,
+      "late_admissions_change_percent": 20.03247936266677
+    }
+  ],
+  "scope": "Calibration: equal-weight nine fixed geometries, eight paired repeats. Serving: two matched reset/primed 32-request episodes/workload/config; separate allocations, not a continuous 300-request evaluation.",
+  "uncertainty": "Calibration intervals are nominal, unadjusted for multiple comparisons. Serving has only two repeats and allocation/order confounds; descriptive gains are not statistical equivalence or universal speedups."
+}

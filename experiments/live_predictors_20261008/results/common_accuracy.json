@@ -1,0 +1,106 @@
+{
+  "metrics": [
+    {
+      "workload": "familiar60k",
+      "predictor": "trees",
+      "count": 92,
+      "mae_ms": 39.55885130434783,
+      "bias_ms": -7.436914847826091,
+      "mape_percent": 8.30766419555511,
+      "p95_absolute_ms": 131.29048435,
+      "overpredicted_by_more_than_deadline_lead": 40,
+      "underpredicted_by_more_than_50ms": 15
+    },
+    {
+      "workload": "familiar60k",
+      "predictor": "guarded_sparse_mlp",
+      "count": 92,
+      "mae_ms": 37.29637505434782,
+      "bias_ms": -11.037753510869573,
+      "mape_percent": 7.683498472422172,
+      "p95_absolute_ms": 153.09636774999998,
+      "overpredicted_by_more_than_deadline_lead": 42,
+      "underpredicted_by_more_than_50ms": 14
+    },
+    {
+      "workload": "familiar60k",
+      "predictor": "envelope_sparse_mlp",
+      "count": 92,
+      "mae_ms": 37.690628369565225,
+      "bias_ms": 9.26612030434782,
+      "mape_percent": 8.431958746369176,
+      "p95_absolute_ms": 119.15793585000006,
+      "overpredicted_by_more_than_deadline_lead": 41,
+      "underpredicted_by_more_than_50ms": 10
+    },
+    {
+      "workload": "short16k",
+      "predictor": "trees",
+      "count": 112,
+      "mae_ms": 18.55748392857143,
+      "bias_ms": -2.248876303571429,
+      "mape_percent": 9.981305836251277,
+      "p95_absolute_ms": 50.54500784999998,
+      "overpredicted_by_more_than_deadline_lead": 32,
+      "underpredicted_by_more_than_50ms": 7
+    },
+    {
+      "workload": "short16k",
+      "predictor": "guarded_sparse_mlp",
+      "count": 112,
+      "mae_ms": 30.952281151785712,
+      "bias_ms": 5.791161401785713,
+      "mape_percent": 16.279499326204487,
+      "p95_absolute_ms": 77.08583454999994,
+      "overpredicted_by_more_than_deadline_lead": 57,
+      "underpredicted_by_more_than_50ms": 9
+    },
+    {
+      "workload": "short16k",
+      "predictor": "envelope_sparse_mlp",
+      "count": 112,
+      "mae_ms": 20.712321089285712,
+      "bias_ms": 10.289578053571429,
+      "mape_percent": 11.769983193909543,
+      "p95_absolute_ms": 54.64034665,
+      "overpredicted_by_more_than_deadline_lead": 64,
+      "underpredicted_by_more_than_50ms": 1
+    },
+    {
+      "workload": "heterogeneous",
+      "predictor": "trees",
+      "count": 11,
+      "mae_ms": 39.65911454545456,
+      "bias_ms": 21.872605090909072,
+      "mape_percent": 2.4974368002638503,
+      "p95_absolute_ms": 70.06759150000005,
+      "overpredicted_by_more_than_deadline_lead": 7,
+      "underpredicted_by_more_than_50ms": 0
+    },
+    {
+      "workload": "heterogeneous",
+      "predictor": "guarded_sparse_mlp",
+      "count": 11,
+      "mae_ms": 70.98464336363635,
+      "bias_ms": 50.50112354545449,
+      "mape_percent": 5.214087398250116,
+      "p95_absolute_ms": 116.523484,
+      "overpredicted_by_more_than_deadline_lead": 9,
+      "underpredicted_by_more_than_50ms": 1
+    },
+    {
+      "workload": "heterogeneous",
+      "predictor": "envelope_sparse_mlp",
+      "count": 11,
+      "mae_ms": 39.4580416363636,
+      "bias_ms": 30.826401454545422,
+      "mape_percent": 2.927031249247662,
+      "p95_absolute_ms": 66.36015049999997,
+      "overpredicted_by_more_than_deadline_lead": 9,
+      "underpredicted_by_more_than_50ms": 0
+    }
+  ],
+  "snapshots": 215,
+  "causal_features": true,
+  "scope": "Same snapshots for all predictors, sampled by the union of three live policies; final execution records provide labels and start-marker-only features."
+}

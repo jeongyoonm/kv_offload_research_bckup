@@ -1,0 +1,57 @@
+[
+  {
+    "mode": "pinned",
+    "packet_ms": {
+      "prep_pickle_load": {
+        "median": 11.654878,
+        "max": 14.637874,
+        "count": 24
+      },
+      "prep_list_to_numpy": {
+        "median": 11.628517500000001,
+        "max": 11.954919999999998,
+        "count": 24
+      },
+      "prep_pinned_allocation": {
+        "median": 0.105986,
+        "max": 0.147611,
+        "count": 24
+      },
+      "prep_numpy_copy": {
+        "median": 0.182225,
+        "max": 0.234649,
+        "count": 24
+      },
+      "preparation_packet": {
+        "median": 27.234397,
+        "max": 30.278263,
+        "count": 24
+      }
+    }
+  },
+  {
+    "mode": "compact_pinned",
+    "packet_ms": {
+      "prep_pickle_load": {
+        "median": 0.4306305,
+        "max": 0.491296,
+        "count": 24
+      },
+      "prep_pinned_allocation": {
+        "median": 0.041885000000000006,
+        "max": 0.056717000000000004,
+        "count": 24
+      },
+      "prep_numpy_copy": {
+        "median": 0.196154,
+        "max": 0.22779200000000002,
+        "count": 24
+      },
+      "preparation_packet": {
+        "median": 0.8877395,
+        "max": 1.019347,
+        "count": 24
+      }
+    }
+  }
+]

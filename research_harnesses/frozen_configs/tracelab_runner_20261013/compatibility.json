@@ -1,0 +1,15 @@
+{
+  "upstream_base_commit": "11b8b14c6005808ab272b3431487066832582414",
+  "tokenizers_dependency": {
+    "upstream": "0.19",
+    "experiment": "0.23.2",
+    "reason": "GLM tokenizer JSON compatibility; same version as serving environment"
+  },
+  "runner_rust_source_diff": "",
+  "corpus": {
+    "name": "enwik9",
+    "url": "https://mattmahoney.net/dc/enwik9.zip",
+    "sha256": "159b85351e5f76e60cbe32e04c677847a9ecba3adc79addab6f4c6c7aa3744bc"
+  },
+  "model_selector": "Original sparse attention selector; no stable-topk or model changes"
+}

@@ -1,0 +1,27 @@
+{
+  "branch": "experiment/glm53-coalesced-seal-notify-20261004",
+  "parent_commit": "feb3b0a4cafde32408d17f3c5e448dd9079f892c",
+  "tests": {
+    "cpu_protocol_and_predictor": 135,
+    "configuration": 31,
+    "cuda_mechanism": 9,
+    "total_passed": 175
+  },
+  "full_benchmark_run": false,
+  "model_loaded": false,
+  "feature_default": false,
+  "coarse_wait_background_scans": 0,
+  "fine_polling_unchanged": true,
+  "native_source_sha256": {
+    "csrc/libtorch_stable/seal_notifications.h": "3d8f135edc50042d8e7bc86ab3a8d5abf326967d513a62f7039532d1a5b1acc5",
+    "experiments/coalesced_notify_20261004/observer.cpp": "5c7b06978d2a9dab67640e56da0d2bbafb9ee791c481d2b3d8590953dce900b9",
+    "experiments/coalesced_notify_20261004/native_harness.cpp": "cc98f69c9182dd339bac41e79acb03eba43d2f21463dc9562c6bcf103c744926",
+    "csrc/libtorch_stable/async_batch_memcpy.cu": "ca175522fd12d1074bad760b9c38bbeb7745f00da97f47e55b0eb7082cabe595",
+    "csrc/libtorch_stable/async_batch_bindings.cpp": "a9d5f5b078b87a4a7777c07698267be2f22bcfedf70e375a08ddda317ddf11d7"
+  },
+  "native_binary_sha256": {
+    "/mnt/localnvme/glm53_coalesced_notify_20261004/build/libseal_native_harness.so": "e081d9be545c661fda72be2d301862e3617e91a381a8cf5ca4bbebb8a439427c",
+    "/mnt/localnvme/glm53_coalesced_notify_20261004/build/libseal_execution_observer.so": "58fcf5e4af6008e9780b7b4d75b2199eb9f785b739cca5841d02c2aa8a48890e",
+    "/mnt/localnvme/glm53_coalesced_notify_20261004/build/_glm53_async.so": "55b3038d62154fa44ecd20d5b8412422bb964b2809145994104eaa6d5628bdc3"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "mechanism_confirmed_in_probe": "Preparation-thread GIL ownership blocks main-thread CUDA submission; already queued GPU work is unaffected in the tested sequence.",
+  "cuda_driver_or_preparation_mutex_dominant_in_probe": false,
+  "serving_causal_attribution": "Relevant overlap exists in TP8; exact contribution to the 1.55% serving regression is not quantified.",
+  "fix_direction": "Publish contiguous immutable token buffers and avoid Python-list reconstruction/conversion in the compute worker interpreter; preserve final membership authority and bounded ownership.",
+  "source": {
+    "created_at_utc": "2026-10-05T20:25:46.773661+00:00",
+    "base_serving_commit": "17c9739e46054bbe5b597e93f47a58d7d7993901",
+    "final_probe_sha256": "235240af950f1806f81391d0cde11fdf553a6c74937073a040577f4167ab061f",
+    "first_probe_sha256": "1ea520547c6abde829c5b16bdb5130d37170370d4a75f4f1c72b5270deec24f9",
+    "artifacts": "/mnt/localnvme/glm53_prep_contention_20261006",
+    "unprofiled_and_first_nsight_runs_source": "/mnt/localnvme/glm53_prep_contention_20261006/probe_v1.py",
+    "arrays_and_prequeued_runs_source": "/mnt/localnvme/glm53_prep_contention_20261006/probe_v2.py",
+    "first_startup_error": "Ignored compiled extension absent from fresh worktree; resolved with symlinks to the measured parent libraries before accepted probes.",
+    "limits": [
+      "One-GPU submission interference probe; no model or KV-transfer workload",
+      "Notification publication disabled to isolate preparation work",
+      "Array wire treatment is decode-only and not an integrated cached-request format",
+      "TP8 boundary includes sampling/output enqueue; does not identify individual kernel submission",
+      "Does not quantify what fraction of the serving throughput regression comes from GIL contention"
+    ],
+    "summaries_sha256": {
+      "unprofiled_summary.json": "233452211bce430ef2e2093a80e4aebee4fe6df1229d297b4d1f1d6516c34449",
+      "array_wire_summary.json": "9372fbc305968433c6f73a587841f27bc755cf95043e17bc64dc0a74e73d7046",
+      "prequeued_summary.json": "71ecb95e26200982953430d55a87efd2c0ec264c5d592b5cf4918aac9f00ac4a",
+      "gil_trace_summary.json": "44279dc08322effb19ddfc01fd825a1aa55ae737b3edb61073a5afd434be907c",
+      "serving_overlap.json": "44ef1f990c3f5795e4234b5b02308f133a08b1771a202561b538f2a2e4100beb"
+    },
+    "arrays_and_prequeued_runs_sha256": "01c1b12eea03227b71174990ef20ccadf2a8301be66ff81d8d42678bc9c2cf1a",
+    "post_measurement_changes": "Device selection and synchronization use torch.accelerator equivalents for the repository hook; original measured probe sources archived unchanged. Final source checked with a short graph smoke run.",
+    "verification": {
+      "pre_commit": "all applicable hooks passed",
+      "final_smoke": "21 graph trials completed; adoption assertions passed",
+      "gpu_cleanup": "no compute processes remain"
+    }
+  }
+}

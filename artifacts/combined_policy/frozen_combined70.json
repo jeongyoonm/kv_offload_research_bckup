@@ -1,0 +1,138 @@
+{
+  "calibration": {
+    "schema": 6,
+    "features": [
+      "intercept",
+      "requests_per_16",
+      "suffix_sum_per_61440",
+      "mean_context_per_60000",
+      "max_suffix_per_4096",
+      "prefix_index_pairs_per_1e9",
+      "raw_duration_per_1000_ms"
+    ],
+    "coefficients": [
+      -59.1335146068465,
+      33.91162052345623,
+      -1448.74947681042,
+      22.15601233231266,
+      1.8452538288429146,
+      -114.43343207414034,
+      813.7248909622068
+    ],
+    "support": {
+      "requests": [
+        1,
+        17
+      ],
+      "context": [
+        15552.0,
+        58368.0
+      ],
+      "suffix": [
+        832.0,
+        3072.0
+      ]
+    },
+    "bias_bounds_ms": [
+      -500,
+      500
+    ],
+    "geometry_support": {
+      "suffix_per_context": [
+        0.013541666666666665,
+        0.2074074074074074
+      ]
+    },
+    "provenance": {
+      "sources": [
+        {
+          "path": "/mnt/localnvme/jeongyoon/shape_calibration_20261010/ns1_rows.json",
+          "sha256": "969cfe5a67eb147c09dde8481561fd3859d2b2822af2049339875374aa8ab513",
+          "rows": 76
+        },
+        {
+          "path": "/mnt/localnvme/jeongyoon/yc1/prediction_rows.json.gz",
+          "sha256": "04ada0bb1a0c8764562e4d5b97dde95111dd35b74babae9f68899b5341c17700",
+          "rows": 178
+        },
+        {
+          "path": "/mnt/localnvme/jeongyoon/yc2/prediction_rows.json.gz",
+          "sha256": "02678fc02cfcd69528c67aa87e355eb0186a79794deb57a7256f074d2de6d80f",
+          "rows": 205
+        }
+      ],
+      "group": "all arms/workloads per allocation repeat",
+      "elapsed_feature": false,
+      "selection": "attention_residual",
+      "alpha": 0.01,
+      "worker": "GLM5.3 TP8 H2D8/depth2 nativeD2H1GiB/depth2 allocator avoidance"
+    },
+    "productive_load_policy": {
+      "schema": 1,
+      "features": [
+        "intercept",
+        "requests_per_16",
+        "suffix_sum_per_61440",
+        "mean_context_per_60000",
+        "max_suffix_per_4096",
+        "prefix_index_pairs_per_1e9"
+      ],
+      "coefficients": [
+        84.71775286733632,
+        -66.46119342769852,
+        1828.8584604095122,
+        16.67527007353967,
+        -33.86357610035248,
+        126.87708351497615
+      ],
+      "work_coefficients": [
+        1828.8584604095122,
+        126.87708351497615
+      ],
+      "minimum_efficiency": 0.7,
+      "minimum_ready_candidates": 1,
+      "provenance": {
+        "duration_fit_sha256": "34d61efc6f97eb5ad89aaaf4ba6cc6e25b41804880501d0e90bc9892413bcfde",
+        "recipe": "attention_direct",
+        "alpha": 0.01,
+        "held_mae_ms": 15.235241936581515,
+        "work_units": "Positive suffix and prefix-index terms of the direct fit; normalized work rate, not measured GPU duty cycle."
+      }
+    },
+    "deadline_margin": {
+      "finish_allowance_ms": {
+        "medium_short": 23.83441880592895,
+        "large_short": 0.0,
+        "small_short": 18.813473299568216,
+        "small_long": 6.894772114565612,
+        "medium_long": 3.64116363051059,
+        "large_long": 6.946296855739007,
+        "small_mid": 3.6712328157834158,
+        "large_mid": 0.0
+      },
+      "setup_allowance_ms": {
+        "medium_short": 15.862850000000002,
+        "large_short": 15.782929750000001,
+        "small_short": 12.086292,
+        "small_mid": 23.55279425,
+        "large_mid": 33.44028,
+        "small_long": 37.5428,
+        "medium_long": 39.608147,
+        "large_long": 40.949289
+      },
+      "finish_fallback_ms": 15.14302692394837,
+      "setup_fallback_ms": 23.9965085,
+      "extra_ms": 2,
+      "bounds_ms": [
+        10,
+        100
+      ]
+    }
+  },
+  "source_sha256": {
+    "/mnt/localnvme/jeongyoon/shape_complete_margin_20261010/frozen_complete_margin75.json": "1e80d3d742270ba4468cfe3f1b521748b782dd85cd712851d5ca09df359ad5a9",
+    "/mnt/localnvme/jeongyoon/shape_productive_20261010/frozen_productive70.json": "844b11b0a309647e2a2e5fccdc7841801b70269e05f768fee4383fa50385e73f"
+  },
+  "duration_core_identical": true,
+  "reason": "Fresh-seed interaction test: shape margin can change pipeline cadence; productive early exit may avoid prolonged load-only half-target waits. No new fitting or changed duration weights."
+}

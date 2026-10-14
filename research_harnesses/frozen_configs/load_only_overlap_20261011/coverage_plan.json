@@ -1,0 +1,25 @@
+{
+  "expected_cells": 204,
+  "profiled_class_concurrencies": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64
+  ],
+  "other_shape_concurrencies": [
+    1,
+    32,
+    64
+  ],
+  "heterogeneous_and_evolving_requests": 300,
+  "heterogeneous_and_evolving_repeats": 2,
+  "homogeneous_requests": 64,
+  "homogeneous_repeats": 1,
+  "decision_utc": 1791730571.2934923,
+  "reason": "Measured remaining time after primary mixed and dense-class sweeps",
+  "initial_core_cells": 243,
+  "full_illustrative_cells": 360
+}

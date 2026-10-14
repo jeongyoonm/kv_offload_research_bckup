@@ -15,7 +15,7 @@ from tests.v1.kv_connector.unit.offloading_connector.utils import (
     generate_store_output,
     to_keys,
 )
-from tests.v1.kv_connector.unit.utils import EOS_TOKEN_ID
+from tests.v1.kv_connector.unit.utils import EOS_TOKEN_ID, create_model_runner_output
 from vllm.config import KVEventsConfig
 from vllm.distributed.kv_events import MEDIUM_CPU, BlockRemoved, BlockStored
 from vllm.distributed.kv_transfer.kv_connector.v1.offloading.common import (
@@ -32,6 +32,7 @@ from vllm.distributed.kv_transfer.kv_connector.v1.offloading.metrics import (
 from vllm.distributed.kv_transfer.kv_connector.v1.offloading.scheduler import (
     OffloadingConnectorScheduler,
     RequestOffloadState,
+    TransferJobStatus,
     get_sliding_window_size_in_chunks,
     is_store_reachable_swa_chunk,
 )
@@ -2114,6 +2115,7 @@ def test_reset_cache(request_runner, async_scheduling: bool):
     # In-flight load jobs must be queued for flushing to prevent CUDA stream
     # races between old loads and new post-reset stores.
     assert load_job_ids <= runner.connector_scheduler._current_batch_jobs_to_flush
+    assert runner.connector_scheduler._current_batch_force_flush_on_host
 
     # All internal job tracking must be cleared.
     assert not runner.connector_scheduler._jobs
@@ -2130,6 +2132,13 @@ def test_reset_cache(request_runner, async_scheduling: bool):
     for req_status in runner.connector_scheduler._req_status.values():
         for group_state in req_status.group_states:
             assert group_state.next_stored_chunk_idx == 0
+
+    metadata = runner.connector_scheduler.build_connector_meta(
+        SchedulerOutput.make_empty()
+    )
+    assert metadata.force_flush_on_host
+    assert load_job_ids <= metadata.jobs_to_flush
+    assert not runner.connector_scheduler._current_batch_force_flush_on_host
 
 
 @pytest.mark.parametrize("async_scheduling", [True, False])
@@ -2216,6 +2225,280 @@ def test_pending_transfer_defers_prefix_lookup():
     assert is_async is False
     assert group_state.block_ids == []
     scheduler.manager.lookup.assert_not_called()
+
+
+def _start_early_load(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=100,
+        blocks_per_chunk=3,
+        async_scheduling=True,
+        worker_count=8,
+    )
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, ctx, *_: len(keys)
+    runner.new_request(token_ids=[0] * 24)
+    output = runner.scheduler.schedule()
+    [job_id] = output.kv_connector_metadata.load_jobs
+    return runner, job_id, str(runner.req_id)
+
+
+def _load_ack(runner, job_id, count, req_id=None):
+    runner.scheduler._update_from_kv_xfer_finished(
+        KVConnectorOutput(
+            finished_recving={req_id} if req_id is not None else None,
+            kv_connector_worker_meta=OffloadingWorkerMetadata(
+                completed_jobs={job_id: count}
+            ),
+        )
+    )
+
+
+@pytest.mark.parametrize("num_gpu_blocks, loads", [(10, 1), (11, 2)])
+def test_async_load_full_demand_includes_other_prefill_reservations(
+    request_runner, num_gpu_blocks, loads
+):
+    runner = request_runner(
+        block_size=4, num_gpu_blocks=num_gpu_blocks, async_scheduling=True
+    )
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[10] * 13)
+    runner.new_request(token_ids=[11] * 21)
+    output = runner.scheduler.schedule()
+    assert len(output.kv_connector_metadata.load_jobs) == loads
+    assert runner.scheduler._inflight_prefill_reserved_blocks() <= (
+        runner.scheduler.kv_cache_manager.block_pool.get_num_free_blocks()
+    )
+
+
+def test_retirement_aware_preemption_stops_after_one_fenced_victim(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=7,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    first_result = create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    blocked = scheduler.schedule()
+    assert blocked.preempted_req_ids == {"2"}
+    assert scheduler.kv_cache_manager.block_pool.get_num_free_blocks() == 0
+    assert scheduler.deferred_frees
+
+    scheduler.update_from_output(first, first_result)
+    assert not scheduler.deferred_frees
+    resumed = scheduler.schedule()
+    assert not resumed.preempted_req_ids
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+
+
+def test_retirement_aware_allocation_waits_for_existing_deferred_blocks(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=7,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    first_result = create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    scheduler.finish_requests("2", RequestStatus.FINISHED_ABORTED)
+    blocked = scheduler.schedule()
+    assert not blocked.preempted_req_ids
+    assert not blocked.num_scheduled_tokens
+    assert scheduler.deferred_frees
+    scheduler.update_from_output(first, first_result)
+    resumed = scheduler.schedule()
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+    assert not resumed.preempted_req_ids
+
+
+def test_unfenced_victim_reclaims_space_despite_unrelated_shared_retention(
+    request_runner,
+):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=8,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    scheduler.update_from_output(
+        first, create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    )
+    pool = scheduler.kv_cache_manager.block_pool
+    [shared] = pool.get_new_blocks(1)
+    pool.touch([shared])
+    scheduler._free_cow_retained_blocks([shared], scheduler.sched_step_seq + 1)
+    assert shared.ref_cnt == 2
+    resumed = scheduler.schedule()
+    assert resumed.preempted_req_ids == {"2"}
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+    assert shared.ref_cnt == 2
+
+
+def test_decode_cannot_consume_pending_load_suffix_reservation(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=5,
+        async_scheduling=True,
+        extra_config_overrides={"capacity_boundary_accounting": True},
+    )
+    scheduler = runner.scheduler
+    runner.new_request(token_ids=[10] * 5)
+    scheduler.schedule()
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[11] * 5)
+    loading = scheduler.schedule()
+    job = next(iter(loading.kv_connector_metadata.load_jobs))
+    for _ in range(2):
+        scheduler.schedule()
+    blocked = scheduler.schedule()
+    assert "0" not in blocked.num_scheduled_tokens
+    assert not blocked.preempted_req_ids
+    assert scheduler.kv_cache_manager.block_pool.get_num_free_blocks() == 1
+    assert scheduler.apply_early_kv_load_completion(job) == "1"
+    ready = scheduler.schedule()
+    assert ready.num_scheduled_tokens == {"1": 1}
+    assert not ready.preempted_req_ids
+
+
+@pytest.mark.parametrize("config_reads_allowed", [True, False])
+def test_new_load_reserves_imminent_decode_growth(
+    request_runner, monkeypatch, config_reads_allowed
+):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=5,
+        async_scheduling=True,
+        extra_config_overrides={"capacity_boundary_accounting": True},
+    )
+    runner.new_request(token_ids=[10] * 7)
+    runner.scheduler.schedule()
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[11] * 5)
+    if not config_reads_allowed:
+
+        def unexpected_config_read(_config):
+            raise AssertionError("Dispatch depth must be resolved at initialization")
+
+        monkeypatch.setattr(
+            type(runner.scheduler.vllm_config),
+            "max_concurrent_batches",
+            property(unexpected_config_read),
+        )
+    output = runner.scheduler.schedule()
+    assert not output.kv_connector_metadata.load_jobs
+    assert runner.scheduler.requests["1"].status == RequestStatus.WAITING
+    assert output.num_scheduled_tokens == {"0": 1}
+
+
+def test_early_complete_load_preempts_and_reloads_after_ordered_retirement(
+    request_runner,
+):
+    """Copy readiness permits preemption; delayed acknowledgments retire once."""
+    runner, job_id, req_id = _start_early_load(request_runner)
+    scheduler, connector = runner.scheduler, runner.connector_scheduler
+    assert scheduler.apply_early_kv_load_completion(job_id) == req_id
+    promoted = scheduler.schedule()
+    request = scheduler.requests[req_id]
+    assert scheduler.apply_early_kv_load_completion(job_id) is None
+    free = scheduler.kv_cache_manager.block_pool.free_block_queue
+    free.num_free_blocks = 0
+    output = scheduler.schedule()
+    assert output.preempted_req_ids == {req_id}
+    assert job_id not in output.kv_connector_metadata.jobs_to_flush
+    assert job_id in connector._jobs
+    assert connector._jobs[job_id].pending_count == 8
+    scheduler.update_from_output(promoted, create_model_runner_output([request]))
+    free.num_free_blocks = 99
+    assert scheduler.reset_prefix_cache()
+    assert scheduler.schedule().num_scheduled_tokens == {}
+    _load_ack(runner, job_id, 7)
+    runner.manager.complete_load.assert_not_called()
+    assert scheduler.schedule().num_scheduled_tokens == {}
+    _load_ack(runner, job_id, 1, req_id)
+    runner.manager.complete_load.assert_called_once()
+    assert job_id not in connector._jobs
+    assert req_id not in scheduler.finished_recving_kv_req_ids
+    output = scheduler.schedule()
+    [new_job] = output.kv_connector_metadata.load_jobs
+    assert new_job != job_id and not connector._jobs[new_job].load_copy_complete
+    assert scheduler.apply_early_kv_load_completion(job_id) is None
+    assert scheduler.requests[req_id].status == RequestStatus.WAITING_FOR_REMOTE_KVS
+
+
+def test_incomplete_load_preemption_rejected_before_block_free(request_runner):
+    runner, job_id, req_id = _start_early_load(request_runner)
+    scheduler = runner.scheduler
+    _load_ack(runner, job_id, 7)
+    assert scheduler.schedule().num_scheduled_tokens == {}
+    request = scheduler.requests[req_id]
+    assert request.status == RequestStatus.WAITING_FOR_REMOTE_KVS
+    # Exercise the allocator guard even if an upstream caller violates readiness.
+    request.status = RequestStatus.RUNNING
+    free = scheduler.kv_cache_manager.block_pool.free_block_queue
+    before = free.num_free_blocks
+    with pytest.raises(AssertionError, match="incomplete load"):
+        scheduler._preempt_request(request, 0)
+    assert free.num_free_blocks == before
+    assert request.status == RequestStatus.RUNNING and request.num_preemptions == 0
+
+
+def test_preemption_flushes_stores_but_keeps_completed_load_accounting(request_runner):
+    runner, job_id, req_id = _start_early_load(request_runner)
+    scheduler, connector = runner.scheduler, runner.connector_scheduler
+    scheduler.apply_early_kv_load_completion(job_id)
+    scheduler.schedule()
+    store_id = connector._generate_job_id()
+    connector._jobs[store_id] = TransferJobStatus(req_id, 8, set(), True)
+    connector._req_status[req_id].transfer_jobs.add(store_id)
+    scheduler.kv_cache_manager.block_pool.free_block_queue.num_free_blocks = 0
+    output = scheduler.schedule()
+    assert output.kv_connector_metadata.jobs_to_flush == {store_id}
+    assert job_id in connector._jobs
+
+
+@pytest.mark.parametrize(
+    "status", [RequestStatus.FINISHED_ABORTED, RequestStatus.FINISHED_STOPPED]
+)
+def test_early_ready_finished_request_waits_for_load_retirement(request_runner, status):
+    runner, job_id, req_id = _start_early_load(request_runner)
+    scheduler = runner.scheduler
+    scheduler.apply_early_kv_load_completion(job_id)
+    scheduler.schedule()
+    scheduler.finish_requests(req_id, status)
+    assert req_id in scheduler.requests
+    assert scheduler.apply_early_kv_load_completion(job_id) is None
+    _load_ack(runner, job_id, 8, req_id)
+    assert req_id not in scheduler.requests
+    runner.manager.complete_load.assert_called_once()
+    scheduler.schedule()
+    runner.manager.on_request_finished.assert_called_once()
+
+
+def test_reset_discards_copy_completion_and_stale_load_ack(request_runner):
+    runner, job_id, req_id = _start_early_load(request_runner)
+    connector = runner.connector_scheduler
+    assert connector.mark_early_load_copy_complete(job_id) == req_id
+    connector.reset_cache()
+    assert connector.mark_early_load_copy_complete(job_id) is None
+    _load_ack(runner, job_id, 8)
+    runner.manager.complete_load.assert_not_called()
+    assert not connector._req_status[req_id].transfer_jobs
 
 
 def test_async_preempt_readmit_before_transfer_output_is_deferred(request_runner):

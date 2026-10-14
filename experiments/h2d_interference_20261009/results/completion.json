@@ -1,0 +1,14 @@
+{
+  "status": "complete",
+  "screen_cells": 615,
+  "confirmation_cells": 528,
+  "diagnostic_cells": 7,
+  "serving_cells": 18,
+  "measured_requests": 576,
+  "cpu_tests_passed": 9,
+  "source_before_results_commit": "c3e4cddc51f6f94974b373344d95f6c298908c6d",
+  "source": "/mnt/localnvme/vllm_h2d_interference_20261009",
+  "branch": "experiment/h2d-compute-interference-calibration-20261009",
+  "artifacts": "/mnt/localnvme/h2d_interference_20261009",
+  "production_defaults_changed": false
+}

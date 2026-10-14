@@ -1,0 +1,17 @@
+{
+  "selection_time": 1791709257.7272706,
+  "throughput_means": {
+    "full_old": 12.818249810239706,
+    "full_block": 13.119177325241122,
+    "full_idle1": 13.129794723414783,
+    "worker_old": 11.939099675095147,
+    "full_idle4": 13.252691051851546,
+    "worker_block": 12.431073360069941
+  },
+  "selected_full": "full_idle4",
+  "idle_target": 4,
+  "predictor": "frozen_A",
+  "deadline_lead_us": 50000,
+  "h2d_block_readiness": true,
+  "reason": "Highest mean throughput of two pre-ablation matched mixed-workload repeats; freeze before broader evaluation."
+}

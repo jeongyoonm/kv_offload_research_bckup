@@ -39,8 +39,36 @@ class SchedulerInterface(ABC):
     _late_generation: int
     _late_record_enabled: bool
     _late_admission_mode: int
+    _late_cached_requests: bool
+    _late_pinned_packing: bool
+    _late_compact_tokens: bool
     _late_seal_delay_us: int
     _late_seal_extension_us: int
+    _late_seal_policy: str
+    _late_seal_target_candidates: int
+    _late_seal_load_only_target_candidates: int
+    _late_seal_load_only_ready_percent: int
+    _late_seal_load_only_consistent: bool
+    _late_seal_load_only_idle_target: int
+    _late_seal_repeat_us: int
+    _late_seal_condition_preparation: bool
+    _late_seal_recent_preparation: bool
+    _late_seal_poll_us: int
+    _late_seal_adaptive_poll_us: int
+    _late_seal_hybrid_wait_us: int
+    _late_seal_hybrid_guard_us: int
+    _late_seal_prediction_to_readiness: bool
+    _late_seal_compute_deadline: bool
+    _late_seal_compute_deadline_shadow: bool
+    _late_seal_compute_deadline_lead_us: int
+    _late_seal_native_predictor: bool
+    _late_seal_full_prediction_wait: bool
+    _late_seal_coalesced_notifications: bool
+    _late_seal_wait_trace: bool
+    _late_seal_prediction_reserve_us: int
+    _late_seal_prediction_scale_percent: int
+    _late_seal_prediction_bias_us: int
+    _late_seal_safety_us: int
     _late_seal_when_all_candidates_ready: bool
     _late_candidate_slots: int
     _late_partial_min_pending_candidates: int
@@ -219,6 +247,10 @@ class SchedulerInterface(ABC):
 
     def deferral_request_shapes(self, output: "SchedulerOutput") -> list[list[int]]:
         return []
+
+    def deferral_cpu_cached_tokens(self, output: "SchedulerOutput") -> list[int]:
+        """Unknown cache origin uses the ordinary latency estimator."""
+        return [0] * len(output.num_scheduled_tokens)
 
     def zero_token_credit_has_ready_compute(self) -> bool:
         """Unsupported schedulers retain ordinary queue admission."""

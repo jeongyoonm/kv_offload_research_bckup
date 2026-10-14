@@ -1,0 +1,33 @@
+{
+  "source_commit": "b048e95",
+  "branch": "experiment/glm53-seal-calibration-20261006",
+  "control": "legacy5",
+  "candidate": "shape5",
+  "lead_us": 5000,
+  "episodes_per_policy": 4,
+  "requests_per_episode": 75,
+  "requests_per_policy": 300,
+  "workload": {
+    "prompt_tokens": 61440,
+    "cached_tokens": 58368,
+    "cpu_hit_percent": 100,
+    "concurrency": 32,
+    "output_tokens": 1
+  },
+  "trained_model": "/mnt/localnvme/glm53_seal_calibration_20261006/trained_model.json",
+  "reuse_model": true,
+  "training_prediction_matches": 86,
+  "calibration": {
+    "quantile": 0.75,
+    "nearest_limit": 8,
+    "log_shape_radius": 0.5,
+    "minimum_neighbors": 2,
+    "fallback": "same compute regime"
+  },
+  "cpu": {
+    "passed": 568,
+    "skipped": 22,
+    "excluded_parent_failures": 3
+  },
+  "defaults_unchanged": true
+}

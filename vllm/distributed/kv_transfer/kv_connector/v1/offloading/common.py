@@ -73,6 +73,8 @@ class OffloadingConnectorMetadata(KVConnectorMetadata):
     jobs_to_flush: set[int] | None = None
     experiment_options: dict[str, int | bool] = field(default_factory=dict)
     optimistic_load_jobs: set[int] = field(default_factory=set)
+    force_flush_on_host: bool = False
+    store_allocation_audit: list[dict[str, int]] = field(default_factory=list)
 
 
 @dataclass

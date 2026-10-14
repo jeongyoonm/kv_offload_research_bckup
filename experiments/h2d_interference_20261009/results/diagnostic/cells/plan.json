@@ -1,0 +1,120 @@
+{
+  "cells": [
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 1
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 8,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 2
+    },
+    {
+      "repeat": 0,
+      "shape": null,
+      "mode": "copy_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 3
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "compute_only",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "4k",
+      "jobs": 1,
+      "id": 4
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 8,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 5
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 128,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 6
+    },
+    {
+      "repeat": 0,
+      "shape": "short",
+      "mode": "concurrent",
+      "chunk_mib": 16,
+      "depth": 2,
+      "profile": "60k",
+      "jobs": 1,
+      "id": 7
+    }
+  ],
+  "geometry": {
+    "short": {
+      "context": 4096,
+      "suffix": 64,
+      "batch": 8
+    },
+    "medium": {
+      "context": 15552,
+      "suffix": 512,
+      "batch": 8
+    },
+    "long": {
+      "context": 58368,
+      "suffix": 2048,
+      "batch": 8
+    }
+  },
+  "configs": [
+    [
+      128,
+      2
+    ],
+    [
+      8,
+      2
+    ],
+    [
+      16,
+      2
+    ]
+  ],
+  "shapes": [
+    "short"
+  ],
+  "profiles": [
+    "60k"
+  ],
+  "jobs": 1,
+  "repeats": 1,
+  "modes": [
+    "concurrent"
+  ],
+  "seed": 9109,
+  "prompt_distribution": "Tokenized random kv-number text, matching serving generator",
+  "scope": "Real cached GLM forward, independent reconstructed KV copies; GPU-resident prefixes, fixed cohorts, no scheduler late admission; not serving throughput or full model-output equivalence.",
+  "diagnostic_trace": true
+}

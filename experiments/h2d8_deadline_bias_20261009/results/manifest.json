@@ -1,0 +1,80 @@
+{
+  "artifacts": "/mnt/localnvme/h2d8_deadline_bias_20261009/paired",
+  "source_commit": "5827ae5e476cd41f92945fdad51667df05c1ad5e",
+  "raw_archive_members": 1530,
+  "files": {
+    "plan.json": {
+      "bytes": 12213,
+      "sha256": "113a7269e8dc6a9da96ed3effd77f0d1e2eff6de364ebf36ce303880dca6e03a"
+    },
+    "source_provenance.json": {
+      "bytes": 190,
+      "sha256": "15916b8eced4b00c2c6bbc834d21d18a567eb3b53d7d4a2d9b1970015a50bc37"
+    },
+    "summary.json": {
+      "bytes": 632610,
+      "sha256": "3be29bdca56298b2620782b30f6bdffde12e3525701f521927d3cac0f6135940"
+    },
+    "comparison.json": {
+      "bytes": 2013487,
+      "sha256": "7b2c1d5f6e078f4788b011257c6d44423ade8199ed1280c025c9170723862472"
+    },
+    "comparison.csv": {
+      "bytes": 1763,
+      "sha256": "023790bbc67e817b4aa83495e83c93071ba5cdb496e33cc18762a8ad5f0d6df7"
+    },
+    "process_log.jsonl": {
+      "bytes": 3513,
+      "sha256": "7382075270493ed87dff34563d7169fb921f5a1b69e5090d4e43a99780fde08c"
+    },
+    "ownership.json": {
+      "bytes": 26,
+      "sha256": "7354080bba968419bf201935ba6111362ffb4bc34292b9f096e4375ab66c1812"
+    },
+    "software.json": {
+      "bytes": 76,
+      "sha256": "e0df53744de647fa93b3df21777ddc4ec8e856a0aa9f1aa98c40f353dadf256d"
+    },
+    "verification.json": {
+      "bytes": 1339,
+      "sha256": "a42268731765de90da805b4ba6e337bef98d0038e8838457291ebdb1642c4f20"
+    },
+    "driver.log": {
+      "bytes": 3513,
+      "sha256": "7382075270493ed87dff34563d7169fb921f5a1b69e5090d4e43a99780fde08c"
+    },
+    "report.log": {
+      "bytes": 11024,
+      "sha256": "b63aef12cc1bd0848b8044b9610ce74fd707042431f342996f99aad5195d156b"
+    },
+    "startup_stack.txt": {
+      "bytes": 4505,
+      "sha256": "35eee3b61a98252d7c056cdb166bef4d29460df203d298c9c53a553884f8ecf7"
+    },
+    "startup_python_stack.txt": {
+      "bytes": 4192,
+      "sha256": "06276b6a8bcf3e3ee2fe6a9956b8d192bbc4c46c1d9ca09c7cc0322096339c33"
+    },
+    "graph_startup_stack.txt": {
+      "bytes": 3611,
+      "sha256": "26c69f13e31a1c673ca72d1a2e0ddebcdfc8bb3d1d61133804a9477bb5807f03"
+    },
+    "py_spy_install.log": {
+      "bytes": 474,
+      "sha256": "f91174b394eb7d9f080ac19af0f9ba45ccd53f1ccc75011cf8bde412894bcb0a"
+    },
+    "loaded_predictor.json.gz": {
+      "bytes": 8411865,
+      "sha256": "b1484fc1e6131565e736eca238bdaa3b3dc9785de71afaef30f274d26561ec0c"
+    },
+    "cleanup.json": {
+      "bytes": 391,
+      "sha256": "7f7c93cf1ff0e5a963370f1fbbce11295f4ac8ed24a817bdac5c7fd3d6f39272"
+    },
+    "raw_traces.tar.gz": {
+      "bytes": 6042718,
+      "sha256": "7d35eb448e2e9c81ab23a2a2a2f62d2e4ebb1f2f0c46e87c0af034d896bf9f44"
+    }
+  },
+  "scope": "Serving traces, launch provenance and results, including preparation-status exports. Warmups have distinct labels. Repeated frozen state copies are retained externally; one loaded predictor checkpoint is archived separately."
+}

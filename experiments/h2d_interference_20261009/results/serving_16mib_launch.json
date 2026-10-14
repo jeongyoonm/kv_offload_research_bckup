@@ -1,0 +1,23 @@
+{
+  "pid": 3007551,
+  "pgid": 3007551,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=60s",
+    "3h",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin/python",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d_interference_20261009/serving.py",
+    "--output",
+    "/mnt/localnvme/h2d_interference_20261009/serving_16mib",
+    "--chunk-mib",
+    "16",
+    "--depth",
+    "2",
+    "--repeats",
+    "2",
+    "--requests",
+    "32"
+  ],
+  "log": "/mnt/localnvme/h2d_interference_20261009/serving_16mib.log"
+}

@@ -1,0 +1,236 @@
+{
+  "selected": {
+    "transfer_heavy": {
+      "id": "c65536_q128",
+      "shape": [
+        65536,
+        128
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 75.38469651329797,
+      "compute_ms_per_request": 26.080665109375,
+      "ratio": 2.890443790338769,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c65536_q128/r0_worker_n32/result.json"
+    },
+    "compute_heavy": {
+      "id": "c4096_q8192",
+      "shape": [
+        4096,
+        8192
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 5.467686504824087,
+      "compute_ms_per_request": 251.20321775,
+      "ratio": 0.021765989121467322,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c4096_q8192/r0_worker_n32/result.json"
+    },
+    "balanced": {
+      "id": "c32768_q512",
+      "shape": [
+        32768,
+        512
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 38.0212380111916,
+      "compute_ms_per_request": 37.4942273125,
+      "ratio": 1.0140557823554854,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c32768_q512/r0_worker_n32/result.json"
+    }
+  },
+  "profiles": [
+    {
+      "id": "c4096_q128",
+      "shape": [
+        4096,
+        128
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 5.472464999300428,
+      "compute_ms_per_request": 12.13693275,
+      "ratio": 0.4508935751745372,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c4096_q128/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c4096_q512",
+      "shape": [
+        4096,
+        512
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 5.933119501802139,
+      "compute_ms_per_request": 21.3293199375,
+      "ratio": 0.27816730768667713,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c4096_q512/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c4096_q2048",
+      "shape": [
+        4096,
+        2048
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 5.7579494984820485,
+      "compute_ms_per_request": 64.44490778125,
+      "ratio": 0.08934684983996986,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c4096_q2048/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c4096_q8192",
+      "shape": [
+        4096,
+        8192
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 5.467686504824087,
+      "compute_ms_per_request": 251.20321775,
+      "ratio": 0.021765989121467322,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c4096_q8192/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c16384_q128",
+      "shape": [
+        16384,
+        128
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 20.096629997715354,
+      "compute_ms_per_request": 22.928862484375,
+      "ratio": 0.8764774097018687,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c16384_q128/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c16384_q512",
+      "shape": [
+        16384,
+        512
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 21.188994457945228,
+      "compute_ms_per_request": 27.976627,
+      "ratio": 0.7573820267162739,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c16384_q512/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c16384_q2048",
+      "shape": [
+        16384,
+        2048
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 19.878344996017404,
+      "compute_ms_per_request": 70.42131384375,
+      "ratio": 0.2822773945985053,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c16384_q2048/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c16384_q8192",
+      "shape": [
+        16384,
+        8192
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 18.659534996608272,
+      "compute_ms_per_request": 263.968037328125,
+      "ratio": 0.07068861512734427,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c16384_q8192/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c32768_q128",
+      "shape": [
+        32768,
+        128
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 39.63664350856561,
+      "compute_ms_per_request": 25.577359578125,
+      "ratio": 1.5496769081068396,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c32768_q128/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c32768_q512",
+      "shape": [
+        32768,
+        512
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 38.0212380111916,
+      "compute_ms_per_request": 37.4942273125,
+      "ratio": 1.0140557823554854,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c32768_q512/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c32768_q2048",
+      "shape": [
+        32768,
+        2048
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 38.28938549547456,
+      "compute_ms_per_request": 74.844891328125,
+      "ratio": 0.5115831530519743,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c32768_q2048/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c32768_q8192",
+      "shape": [
+        32768,
+        8192
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 36.85762099525891,
+      "compute_ms_per_request": 279.492457640625,
+      "ratio": 0.13187340118727253,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c32768_q8192/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c65536_q128",
+      "shape": [
+        65536,
+        128
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 75.38469651329797,
+      "compute_ms_per_request": 26.080665109375,
+      "ratio": 2.890443790338769,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c65536_q128/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c65536_q512",
+      "shape": [
+        65536,
+        512
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 79.53223299083766,
+      "compute_ms_per_request": 75.957104578125,
+      "ratio": 1.047067728984265,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c65536_q512/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c65536_q2048",
+      "shape": [
+        65536,
+        2048
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 75.91549999953713,
+      "compute_ms_per_request": 90.593245796875,
+      "ratio": 0.8379818973453298,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c65536_q2048/r0_worker_n32/result.json"
+    },
+    {
+      "id": "c65536_q8192",
+      "shape": [
+        65536,
+        8192
+      ],
+      "concurrency": 32,
+      "transfer_ms_per_request": 76.08452299505007,
+      "compute_ms_per_request": 323.098060125,
+      "ratio": 0.23548430766069756,
+      "source": "/mnt/localnvme/jeongyoon/dc11oi/cells/c65536_q8192/r0_worker_n32/result.json"
+    }
+  ],
+  "scope": "Relative demand extremes of this grid. Transfer service is the sum of slowest-rank DMA durations per job; compute is the all-rank forward envelope. This descriptive ratio does not remove submission gaps or assume disjoint DMA jobs.",
+  "balanced_comparable": true
+}

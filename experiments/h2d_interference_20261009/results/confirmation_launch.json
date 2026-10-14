@@ -1,0 +1,22 @@
+{
+  "pid": 1544550,
+  "pgid": 1544550,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=60s",
+    "4h",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/.venv/bin/python",
+    "/mnt/localnvme/vllm_h2d_interference_20261009/experiments/h2d_interference_20261009/run.py",
+    "--output",
+    "/mnt/localnvme/h2d_interference_20261009/confirmation",
+    "--confirmation",
+    "--repeats",
+    "8",
+    "--configs",
+    "128:2",
+    "8:2",
+    "16:2"
+  ],
+  "log": "/mnt/localnvme/h2d_interference_20261009/confirmation.log"
+}

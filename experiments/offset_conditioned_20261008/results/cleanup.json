@@ -1,0 +1,17 @@
+{
+  "owned_server_stopped": true,
+  "owned_active_workers": [],
+  "gpu_memory_released": true,
+  "memory_used_mib": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "compute_apps": "",
+  "checked_at": 1791414596.9465327
+}

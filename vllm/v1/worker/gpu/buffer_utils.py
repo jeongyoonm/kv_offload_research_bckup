@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from functools import partial
 from weakref import WeakSet
 
@@ -192,6 +192,8 @@ class StagedWriteTensor:
         self._staged_write_starts: list[int] = []
         self._staged_write_contents: list[int | float] = []
         self._staged_write_cu_lens: list[int] = []
+        self._staged_pinned_writes: list[tuple[int, int, torch.Tensor]] = []
+        self._pinned_inflight: list[tuple[torch.Event, list[torch.Tensor]]] = []
 
         new_buffer = partial(UvaBufferPool, max_concurrency=max_concurrency)
 
@@ -200,7 +202,7 @@ class StagedWriteTensor:
         self.write_cu_lens = new_buffer(self.num_rows, dtype=torch.int32)
 
     def stage_write(
-        self, index: int, start: int, x: Iterable[int] | Iterable[float]
+        self, index: int, start: int, x: Sequence[int] | Sequence[float] | np.ndarray
     ) -> None:
         assert index >= 0
         assert start >= 0
@@ -218,7 +220,71 @@ class StagedWriteTensor:
         self._staged_write_contents.append(x)
         self._staged_write_cu_lens.append(len(self._staged_write_contents))
 
+    def stage_pinned_write(self, index: int, start: int, tokens: torch.Tensor) -> None:
+        """Adopt private CPU storage; H2D runs only during ordered apply_write."""
+        if (
+            tokens.device.type != "cpu"
+            or not tokens.is_pinned()
+            or tokens.dtype != self.dtype
+            or tokens.ndim != 1
+            or not tokens.is_contiguous()
+            or index < 0
+            or start < 0
+            or index >= self.num_rows
+            or start + tokens.numel() > self.gpu.shape[-1]
+        ):
+            raise ValueError("invalid pinned token write")
+        if tokens.numel():
+            self._staged_pinned_writes.append((index, start, tokens))
+
+    def _apply_pinned_writes(self) -> None:
+        writes = self._staged_pinned_writes
+        if not writes:
+            return
+        self._pinned_inflight = [
+            (fence, owners)
+            for fence, owners in self._pinned_inflight
+            if not fence.query()
+        ]
+        if len(self._pinned_inflight) >= 2:
+            self._pinned_inflight.pop(0)[0].synchronize()
+        indices = self.write_indices.copy_to_uva([w[0] for w in writes])
+        starts = self.write_starts.copy_to_uva([w[1] for w in writes])
+        cumulative, total = [], 0
+        for _, _, tokens in writes:
+            total += tokens.numel()
+            cumulative.append(total)
+        lengths = self.write_cu_lens.copy_to_uva(cumulative)
+        if len(writes) == 1:
+            packed = writes[0][2]
+        else:
+            packed = torch.empty(total, dtype=self.dtype, pin_memory=True)
+            torch.cat([w[2] for w in writes], out=packed)
+        contents = packed.to(self.device, non_blocking=True)
+        _apply_write_kernel[(len(writes),)](
+            self.gpu,
+            self.gpu.stride(0),
+            indices,
+            starts,
+            contents,
+            lengths,
+            None,
+            BLOCK_SIZE=1024,
+            MULTI_GROUP=False,
+        )
+        fence = torch.Event(device=self.device)
+        fence.record()
+        self._pinned_inflight.append((fence, [packed]))
+        self._staged_pinned_writes = []
+
+    def drain_pinned_writes(self) -> None:
+        for fence, _ in self._pinned_inflight:
+            fence.synchronize()
+        self._pinned_inflight.clear()
+        self._staged_pinned_writes.clear()
+
     def apply_write(self) -> None:
+        self._apply_pinned_writes()
         n = len(self._staged_write_indices)
         if n == 0:
             return

@@ -1,0 +1,21 @@
+{
+  "PYTHONPATH": "/mnt/localnvme/jeongyoon/vllm_load_only_idle_20261011",
+  "HF_HOME": "/mnt/localnvme/huggingface",
+  "HF_HUB_OFFLINE": "1",
+  "VLLM_SERVER_DEV_MODE": "1",
+  "PYTHONHASHSEED": "0",
+  "CUDA_HOME": "/usr/local/cuda-13.0",
+  "VLLM_KV_OFFLOAD_MAX_BATCH_DESCRIPTORS": "0",
+  "VLLM_DEFERRAL_TIMING_DIR": "/mnt/localnvme/jeongyoon/lo11c/server/timing",
+  "VLLM_DEFERRAL_EXECUTION_TIMING": "1",
+  "VLLM_PREDICTOR_DATASET_SHADOW": "1",
+  "VLLM_COOPERATIVE_RESPONSE_PROGRESS": "1",
+  "VLLM_DEFERRAL_PREDICTOR_PROGRESS": "1",
+  "VLLM_PREDICTOR_GENERAL_PREFILL": "1",
+  "VLLM_DATASET_BACKGROUND_PREFIX": "coverage-bg-",
+  "VLLM_DATASET_TARGET_GATE": "/mnt/localnvme/jeongyoon/lo11c/target_hold",
+  "VLLM_DEFERRAL_NATIVE_OBSERVER": "/mnt/localnvme/jeongyoon/lo11c/libseal_execution_observer.so",
+  "VLLM_DEFERRAL_FAST_FOREST": "/mnt/localnvme/jeongyoon/glm53_predictor_overnight_20261006/fast_forest/build/libpredictor_forest_walk.so",
+  "VLLM_CACHE_ROOT": "/mnt/localnvme/jeongyoon/cpu_cache_init_20261007/glm_canary_final/vllm_cache",
+  "FLASHINFER_WORKSPACE_BASE": "/mnt/localnvme/jeongyoon/cpu_cache_init_20261007/glm_canary_final/flashinfer_workspace"
+}

@@ -1,0 +1,103 @@
+Fresh scheduler ablation after allocator and native D2H fixes
+===========================================================
+
+GLM 5.3 NVFP4 TP8, FP8 KV, concurrency 32, one output token.
+Four matched 75-request episodes per arm/workload: 300 requests each,
+1200 measured requests total. Reset/primed episodes, not continuous 300.
+Four 32-request warmups and all priming excluded. C/D order alternates.
+
+C: optimized worker, scheduler/preparation package disabled.
+D: same worker plus cached/pinned preparation, full hold/seal, readiness
+exits, 50% load-only target, frozen predictor with 90 ms subtraction and
+100 ms setup lead. Same 8 MiB/depth-2 H2D, 1 GiB/depth-2 native D2H,
+early submission, allocator avoidance, private CPU cache, NUMA/THP,
+96 GiB per-rank GPU cache. No runtime source or model selector changes.
+CPU capacity: 2,130,300,354,560 bytes aggregate.
+
+Main results (absolute levels: arithmetic episode means):
+workload arm req/s mean-TTFT-ms mean-episode-p95-ms rounds envelope-ms gap-ms
+short16k C 25.04932 1085.58 1363.70 11.75 2685.65 223.27
+short16k D 26.03985 1059.66 1396.02 11.25 2577.49 173.91
+familiar60k C 7.60765 3628.44 4964.44 13.75 9196.98 333.73
+familiar60k D 7.89211 3500.45 4481.10 12.00 9128.82 16.92
+
+Paired geometric changes (D/C; negative TTFT means improvement):
+short16k: throughput +3.921%, mean TTFT -2.405%, episode p95 +2.419%
+Per-pair throughput changes: r0 +5.665%, r1 +1.286%, r2 +6.090%, r3 +2.722%
+familiar60k: throughput +3.791%, mean TTFT -3.454%, episode p95 -9.644%
+Per-pair throughput changes: r0 +2.519%, r1 +1.349%, r2 +2.059%, r3 +9.438%
+
+Interpretation and sensitivity
+------------------------------
+The earlier claim of substantially smaller 60K scheduler gain is not
+reliably reproduced here: full paired gains are 3.92% and 3.79%.
+60K pairs 0-2 gain 1.35-2.52%; pair 3 gains 9.44%. Keep all pairs.
+The final C60K episode had 1002.45 ms of inter-compute gaps vs 90.14,
+126.06 and 116.28 ms previously. Its execution envelopes were shorter,
+8955.14 ms vs 9254.95-9310.40 ms; the slowdown is outside them.
+Only 2/9 transitions dispatched B before prior compute ended (1/9
+submitted forward before it ended), versus 13/14 and 12-13/14 in
+earlier C60K cells. D60K retained 10-11/11 early dispatches.
+
+The final C60K gaps partition into 205.99 ms before scheduling,
+189.91 ms scheduler, 273.84 ms dispatch-to-worker, 195.79 ms request
+state, plus later phases. All ranks show similar delays in the largest
+gaps; this is not evidence of one slow GPU rank or a slower kernel.
+Measured markers do not identify a deeper OS/GC/serialization root
+cause. The trace establishes loss of preparation/submission overlap.
+
+For the first three 60K pairs, compute rounds fall 15 to 12 but
+envelope savings are only about 1.7%. More batching does not imply
+equally large elapsed-time savings. These long-prefill envelopes
+already occupy most of the serving interval. This is consistent with
+amortizing batch overhead; kernel occupancy was not separately measured.
+
+16K averaged 11.75 to 11.25 rounds, 2685.65 to 2577.49 ms envelopes,
+and 223.27 to 173.91 ms gaps. Individual pairs differ: one improves
+gaps without fewer rounds; another saves envelopes while adding gaps.
+The aggregate is a preparation/sealing package effect, not an isolated
+hold/deadline benefit. Total uncached token work is identical across arms.
+
+Admissions and remaining waiting
+--------------------------------
+short16k: 43.50 admissions/episode; 34.25/64.50 opportunities; pooled recovery 53.10%; hold outside compute 131.39 ms.
+familiar60k: 66.25 admissions/episode; 66.00/73.75 opportunities; pooled recovery 89.49%; hold outside compute 0.40 ms.
+Opportunity denominator: requests whose all-rank KV completion falls
+inside any measured compute interval; numerator intersects these with
+admitted requests. Different arms have different timing windows.
+Hold outside compute is base-ready-to-seal time outside envelopes,
+including load-only waiting, not an additive throughput cost.
+
+Store flush-wait and reuse-fence exposed time were zero in audited
+metadata-to-forward windows in both arms. Short D still exposed about
+13.11 ms/episode of store descriptor construction in those windows.
+Store diagnostics overlap pre-forward phases; do not add them twice.
+Zero in this window is not a claim of no stores or zero transfer time.
+
+Validation and limitations
+--------------------------
+All 16 serving cells accepted: full CPU prefix restoration, no GPU
+prefix hits/preemptions, one output token, frozen estimator, C zero late
+admissions/compact/pinned work, D preparation observed on all 8 ranks.
+Engine execution envelopes and all gap/client partitions checked.
+Execution envelopes include submission and collective waiting, not pure
+useful GPU kernel time. Four pairs do not establish significance.
+No model numerical-equivalence claim; original sparse selector retained.
+
+Initial readiness tests: 593 passed, 22 skipped, 3 failed; same three
+failed in unchanged parent. Fixture/dependency repairs: 3 targeted passed.
+See GATE_NOTES.txt and preserved original logs. No serving code changed.
+Report validation against historical traces passed.
+
+Reproduction and artifacts
+--------------------------
+Code: /mnt/localnvme/jeongyoon/vllm_native_scheduler_ab_20261010
+Branch: experiment/native-worker-scheduler-ablation-20261010
+Measured source commit: e010579
+Parent runtime: 130630e
+Raw: /mnt/localnvme/jeongyoon/ns1
+Logbook: /mnt/localnvme/jeongyoon/native_scheduler_ab_20261010
+Frozen checkpoint digest and all options are in plan.json.
+Raw archive contains all measured/warmup/priming traces and commands.
+Environment credential fields are redacted by the archive utility.
+All owned serving processes are stopped per completed driver summary.

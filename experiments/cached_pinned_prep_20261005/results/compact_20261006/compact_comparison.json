@@ -1,0 +1,158 @@
+{
+  "comparisons": [
+    {
+      "reference": "current",
+      "candidate": "cached_pinned",
+      "paired_runs": [
+        {
+          "repeat": "r0",
+          "throughput_ratio": 0.9741564903106374,
+          "mean_ttft_ratio": 1.0298839565952624,
+          "p95_ttft_ratio": 0.9598688034498984,
+          "reference_req_s": 7.055476869168485,
+          "candidate_req_s": 6.873138584337056,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r1",
+          "throughput_ratio": 0.984013000810814,
+          "mean_ttft_ratio": 1.0131461996071705,
+          "p95_ttft_ratio": 0.9126725445291586,
+          "reference_req_s": 7.064792824708445,
+          "candidate_req_s": 6.9518479875480645,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r2",
+          "throughput_ratio": 0.991985600505783,
+          "mean_ttft_ratio": 1.0045140348672634,
+          "p95_ttft_ratio": 0.9434352228636907,
+          "reference_req_s": 7.095285669276326,
+          "candidate_req_s": 7.038421215397153,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        }
+      ],
+      "throughput": {
+        "geometric_mean_ratio": 0.9833579750383281,
+        "lower_95": 0.9614098192351984,
+        "upper_95": 1.0058071882818131
+      },
+      "mean_ttft": {
+        "geometric_mean_ratio": 1.015793603752424,
+        "lower_95": 0.984309982217574,
+        "upper_95": 1.0482842438514017
+      },
+      "p95_ttft": {
+        "geometric_mean_ratio": 0.9384539857490602,
+        "lower_95": 0.8805812726051323,
+        "upper_95": 1.0001301535323661
+      }
+    },
+    {
+      "reference": "current",
+      "candidate": "compact_pinned",
+      "paired_runs": [
+        {
+          "repeat": "r0",
+          "throughput_ratio": 1.010238305754823,
+          "mean_ttft_ratio": 0.9879467637420453,
+          "p95_ttft_ratio": 0.9828425329253767,
+          "reference_req_s": 7.055476869168485,
+          "candidate_req_s": 7.127712998601113,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r1",
+          "throughput_ratio": 1.0101846689805907,
+          "mean_ttft_ratio": 0.9843693182547538,
+          "p95_ttft_ratio": 0.9788929170560543,
+          "reference_req_s": 7.064792824708445,
+          "candidate_req_s": 7.1367454010445535,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r2",
+          "throughput_ratio": 1.0008938487775427,
+          "mean_ttft_ratio": 1.0051445731538495,
+          "p95_ttft_ratio": 0.9864782487443274,
+          "reference_req_s": 7.095285669276326,
+          "candidate_req_s": 7.1016277816981255,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        }
+      ],
+      "throughput": {
+        "geometric_mean_ratio": 1.007096009389452,
+        "lower_95": 0.993800263556962,
+        "upper_95": 1.0205696348862214
+      },
+      "mean_ttft": {
+        "geometric_mean_ratio": 0.9924456091348405,
+        "lower_95": 0.9653112941269762,
+        "upper_95": 1.0203426532803679
+      },
+      "p95_ttft": {
+        "geometric_mean_ratio": 0.9827330172534419,
+        "lower_95": 0.9733531176055232,
+        "upper_95": 0.992203308061376
+      }
+    },
+    {
+      "reference": "cached_pinned",
+      "candidate": "compact_pinned",
+      "paired_runs": [
+        {
+          "repeat": "r0",
+          "throughput_ratio": 1.037039034080325,
+          "mean_ttft_ratio": 0.9592796910907719,
+          "p95_ttft_ratio": 1.023934239130293,
+          "reference_req_s": 6.873138584337056,
+          "candidate_req_s": 7.127712998601113,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r1",
+          "throughput_ratio": 1.0265968723464136,
+          "mean_ttft_ratio": 0.9715965165110678,
+          "p95_ttft_ratio": 1.0725565515516393,
+          "reference_req_s": 6.9518479875480645,
+          "candidate_req_s": 7.1367454010445535,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        },
+        {
+          "repeat": "r2",
+          "throughput_ratio": 1.0089802193370727,
+          "mean_ttft_ratio": 1.000627704805209,
+          "p95_ttft_ratio": 1.045623721520577,
+          "reference_req_s": 7.038421215397153,
+          "candidate_req_s": 7.1016277816981255,
+          "reference_compute_calls": 14,
+          "candidate_compute_calls": 14
+        }
+      ],
+      "throughput": {
+        "geometric_mean_ratio": 1.0241397689892113,
+        "lower_95": 0.9894519598366079,
+        "upper_95": 1.0600436494142453
+      },
+      "mean_ttft": {
+        "geometric_mean_ratio": 0.9770150210324873,
+        "lower_95": 0.9258742445010362,
+        "upper_95": 1.0309805645771404
+      },
+      "p95_ttft": {
+        "geometric_mean_ratio": 1.047182954280959,
+        "lower_95": 0.9884586323979906,
+        "upper_95": 1.1093960878021527
+      }
+    }
+  ],
+  "scope": "Three warmed alternating policy-order runs on one workload and one server with a common frozen predictor. Current is the existing full prototype, not vanilla vLLM. Confidence intervals describe run variation assuming independent approximately normal log ratios."
+}

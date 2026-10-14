@@ -1,0 +1,5 @@
+{
+  "source": "/mnt/localnvme/jeongyoon/vllm_native_scheduler_ab_20261010",
+  "branch": "experiment/native-worker-scheduler-ablation-20261010",
+  "commit": "e01057926d96df72f6e06c75da7e3240fefbf61e"
+}

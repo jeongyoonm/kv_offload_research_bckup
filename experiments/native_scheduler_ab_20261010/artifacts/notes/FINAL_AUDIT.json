@@ -1,0 +1,55 @@
+{
+  "complete": true,
+  "stopped": true,
+  "measured_cells": 16,
+  "measured_requests": 1200,
+  "paired_repeats": 4,
+  "requests_per_episode": 75,
+  "unchanged_runtime_source": true,
+  "matched_total_suffix_work": true,
+  "gap_phase_partition_checked": true,
+  "client_time_partition_checked": true,
+  "leave_one_pair_out": [
+    {
+      "workload": "short16k",
+      "omitted_repeat": 0,
+      "throughput_change_percent": 3.346547578768422
+    },
+    {
+      "workload": "short16k",
+      "omitted_repeat": 1,
+      "throughput_change_percent": 4.814853305665601
+    },
+    {
+      "workload": "short16k",
+      "omitted_repeat": 2,
+      "throughput_change_percent": 3.208235369515733
+    },
+    {
+      "workload": "short16k",
+      "omitted_repeat": 3,
+      "throughput_change_percent": 4.324025984588142
+    },
+    {
+      "workload": "familiar60k",
+      "omitted_repeat": 0,
+      "throughput_change_percent": 4.2186680733522275
+    },
+    {
+      "workload": "familiar60k",
+      "omitted_repeat": 1,
+      "throughput_change_percent": 4.6181437239720236
+    },
+    {
+      "workload": "familiar60k",
+      "omitted_repeat": 2,
+      "throughput_change_percent": 4.374951703057728
+    },
+    {
+      "workload": "familiar60k",
+      "omitted_repeat": 3,
+      "throughput_change_percent": 1.9743954006180786
+    }
+  ],
+  "interpretation": "All four pairs are primary. Leave-one-pair-out values describe sensitivity; no pair was excluded. Acceptance checks validate serving/cache/protocol conditions, not model numerical equivalence."
+}

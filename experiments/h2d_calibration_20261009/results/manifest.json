@@ -1,0 +1,231 @@
+{
+  "artifact_root": "/mnt/localnvme/h2d_calibration_20261009",
+  "source": "/mnt/localnvme/vllm_h2d_calibration_20261009",
+  "branch": "experiment/h2d-startup-calibration-20261009",
+  "files": {
+    "FINDINGS.md": {
+      "bytes": 7618,
+      "sha256": "cd6248910a5d61d16a472423d9722a134c85bfa09a9b20f853f8e42ade458da6"
+    },
+    "analysis_lint.log.gz": {
+      "bytes": 1238,
+      "sha256": "09aec6aec6c3987999d18954bd5d64cb0ee542c82147beb77289cb6d374b333c"
+    },
+    "analysis_lint2.log.gz": {
+      "bytes": 948,
+      "sha256": "d818d1126a46f51bd3172a67fd04e0ac90e45ee5161f6878c8e2c1a7d0728572"
+    },
+    "analysis_lint3.log.gz": {
+      "bytes": 697,
+      "sha256": "4eb87365b799bf3482f28f7f363091795035d72abf83c78e5a995a9d72735f3c"
+    },
+    "analysis_lint4.log.gz": {
+      "bytes": 740,
+      "sha256": "df97b9ae1bb6fe1d68e00299bae0b501494c1da0c560d4920f8c3a4ede18d16e"
+    },
+    "analysis_lint5.log.gz": {
+      "bytes": 696,
+      "sha256": "f26f25183c21f13e7d637627373cbc396cf5d583648f7f53a8f74a80bad94f21"
+    },
+    "cleanup.json": {
+      "bytes": 606,
+      "sha256": "b6500d96a93e8e3b8ac77b51e9c50588f4ea1b08d704608cea2bcc932fb8ce34"
+    },
+    "commit_harness.log.gz": {
+      "bytes": 864,
+      "sha256": "c2cee2991339dae3f9ec55662b0f43fd8c16b9cc3f287319455c01db7d8f60b1"
+    },
+    "confirmation/REPORT.md": {
+      "bytes": 1196,
+      "sha256": "3ce1e386facfa61b81484cbbdf2a00c1684301bc6b893d8e16d38c93858b1146"
+    },
+    "confirmation/comparison.json": {
+      "bytes": 79956,
+      "sha256": "c6743a5f8a53efe33670eec609878c806c0d53ff61a89befee1aa2fbff57f5b6"
+    },
+    "confirmation/events.jsonl.gz": {
+      "bytes": 98102,
+      "sha256": "d5386c35a034a8f24e8c325c399ef775fb6303a1f88bdc2036d0752c14d7d3ac"
+    },
+    "confirmation/ownership.json": {
+      "bytes": 123,
+      "sha256": "d12f72ba881c48660b2de0d16617f17a1b466bebcbc67859401348f88cd28be8"
+    },
+    "confirmation/plan.json": {
+      "bytes": 15148,
+      "sha256": "fafe7a2765f93320d3725fc6322a866a9e822c3936c80be056f21ae57f273517"
+    },
+    "confirmation/summary.json": {
+      "bytes": 13710,
+      "sha256": "9e1c37e6c445d736370da4a73725280f02df36e83a01f53f6e1dca244d7e8018"
+    },
+    "confirmation.log.gz": {
+      "bytes": 759,
+      "sha256": "484d7b8a3cf7f24fd32060def94b50c0cab005615bfaf2656d159836926dc078"
+    },
+    "confirmation_analysis.log.gz": {
+      "bytes": 259,
+      "sha256": "26017de370a8d893ce678b1bc04395d6bf6f94fee2498f5c4aedfae905fdaf05"
+    },
+    "confirmation_strict/REPORT.md": {
+      "bytes": 1195,
+      "sha256": "7cb2d956fc0cf4b9173788b9a0be6b4ee61522a971c7832ca0c8fd14c165e254"
+    },
+    "confirmation_strict/comparison.json": {
+      "bytes": 79946,
+      "sha256": "0843cae9c3a520d8605c560a0429449f698cf72503e4948d8ccd727b488bdef2"
+    },
+    "confirmation_strict/events.jsonl.gz": {
+      "bytes": 99087,
+      "sha256": "da95bcea17f696267737057ee6ae6a4230673b9a03b920df21e818a06a49aa00"
+    },
+    "confirmation_strict/ownership.json": {
+      "bytes": 123,
+      "sha256": "8d8979f6e3909c142192275c2e3fbb6286f26168fc437db3e9c182f164a53884"
+    },
+    "confirmation_strict/plan.json": {
+      "bytes": 15148,
+      "sha256": "0c886619cfee2958267981bdcae211752f41448f15f97efb6c0b058906ca82e0"
+    },
+    "confirmation_strict/summary.json": {
+      "bytes": 13715,
+      "sha256": "c213c789c730b3daf5cc67b8c2e18fa6eac4332b03f776c4894fb4af5736eed1"
+    },
+    "confirmation_strict.log.gz": {
+      "bytes": 766,
+      "sha256": "c0a409a2461c078cdde613bc8b20d7e86af423aff82d51b35c2e048a664dbbfa"
+    },
+    "confirmation_strict_analysis.log.gz": {
+      "bytes": 263,
+      "sha256": "43a69216664d6a910115865bb801ceaf4ee57be05670602cb6351477ead50a34"
+    },
+    "final_source_lint.log.gz": {
+      "bytes": 696,
+      "sha256": "f26f25183c21f13e7d637627373cbc396cf5d583648f7f53a8f74a80bad94f21"
+    },
+    "harness_lint.log.gz": {
+      "bytes": 1259,
+      "sha256": "8c680e82d824182bae6fe7f3244f2b777394c3096d1a2a6bbf137f17dcba886b"
+    },
+    "harness_lint2.log.gz": {
+      "bytes": 742,
+      "sha256": "3091785f04624890a3b80bc776a247e1bb62c30b293207f930a06ed9809c77fc"
+    },
+    "native_tests.log.gz": {
+      "bytes": 437,
+      "sha256": "3b821b483cb09b270a6557a7bfccfa9c5020bb1df3b6914a7356ab1f7bcfd091"
+    },
+    "provenance.json": {
+      "bytes": 5700,
+      "sha256": "421039cfa2370688cc9564b0262b9298f37b910b7980f808ba568c201d7db0d2"
+    },
+    "results_lint.log.gz": {
+      "bytes": 903,
+      "sha256": "3a0e67a71725fb2d111e5864c94a410b35d9bdd63b0d8628c60c974288bffdc0"
+    },
+    "results_lint2.log.gz": {
+      "bytes": 696,
+      "sha256": "e947443cc9da3d84f4f09275a5af0646bec382e0e405f0f8d3e6a57b8d12e050"
+    },
+    "smoke/events.jsonl.gz": {
+      "bytes": 3719,
+      "sha256": "1d9ba02dc716862c3692666407f85497106b597bf5a9ffc022ce58a88e517139"
+    },
+    "smoke/ownership.json": {
+      "bytes": 123,
+      "sha256": "acc6aa8f1a73c1b576d6621123f71c9574f3babaa8e90297473e214117ced1dc"
+    },
+    "smoke/plan.json": {
+      "bytes": 1822,
+      "sha256": "6f0ce980d03c6ffa6f1582c0122d9f1dbfeb702fce021cad15b1bdc82ef1f34f"
+    },
+    "smoke/summary.json": {
+      "bytes": 13715,
+      "sha256": "aaf55786dfd1568414e062ff4ea2eb1ee5c5120ae88a6a70f4942aae06ce4368"
+    },
+    "smoke.log.gz": {
+      "bytes": 688,
+      "sha256": "c71cfb20b27d1c6c6f6d573fb0f3d959c0c725e6d31a8bc52de2cce36626ae99"
+    },
+    "startup_profile.json": {
+      "bytes": 17482,
+      "sha256": "75915b6fbafdbe2aa23f78721bec66cfbbe39bf82d179f1a02c2d4731bf434dc"
+    },
+    "sweep/REPORT.md": {
+      "bytes": 2216,
+      "sha256": "6794c0b422def1f2e5cc28c0b70fabf42b47dddab2c82feb04cfef030d7b93fa"
+    },
+    "sweep/calibration.pdf": {
+      "bytes": 31489,
+      "sha256": "5ff507d4eaed5d7c96223bf2069ebef76b5523a4a6ffb11a968071f13b5f75a6"
+    },
+    "sweep/calibration.png": {
+      "bytes": 168875,
+      "sha256": "4eff891faee165b15310b6b127bdf4cbce2de380b5b47cd2ec2e8802f8d0d017"
+    },
+    "sweep/calibration.svg": {
+      "bytes": 121046,
+      "sha256": "dc04c9cdb1637d468ec0036079526432affd563041680068efbd0d1be5fc6f71"
+    },
+    "sweep/comparison.json": {
+      "bytes": 304554,
+      "sha256": "e37bcaabcf6043b7a1b95ae6835fdafa4e63a84b0ef0bce5d109ee2621f33f59"
+    },
+    "sweep/events.jsonl.gz": {
+      "bytes": 330931,
+      "sha256": "d7541e4b1b53444e9a3895ca637769a523840b14bb74e098afef8ac4d625704b"
+    },
+    "sweep/ownership.json": {
+      "bytes": 123,
+      "sha256": "0ae2dd9f0efb673b2985a72ddb8cf6c64919839e825b52a2eda6a866b52e809e"
+    },
+    "sweep/plan.json": {
+      "bytes": 49667,
+      "sha256": "156bd0576c997100964a313b7fbf19a70e022a493ea6fb2cb7685db85aa45645"
+    },
+    "sweep/summary.json": {
+      "bytes": 13711,
+      "sha256": "649d94f459589468dc1e2983f8700a2e16c7683fbad87bfba88b1da77d475b3d"
+    },
+    "sweep.log.gz": {
+      "bytes": 934,
+      "sha256": "e8860da5848e4a25cee9326d27e92ed26c0261b87394dda4f56338c68e62e6cf"
+    },
+    "sweep_analysis.log.gz": {
+      "bytes": 261,
+      "sha256": "a54331dc07454ad00236c3b389b4d595017592e52829b6205f6e34563f66c01c"
+    },
+    "plots/confirmation_results.pdf": {
+      "bytes": 26429,
+      "sha256": "e90a25732173a67ce785d9b3631af5b27185bff8ed282572635813377afc30f9"
+    },
+    "plots/confirmation_results.png": {
+      "bytes": 526122,
+      "sha256": "1446292d0dc6989e19036e7b620cb9093d519263918abe573e8b71913905ed84"
+    },
+    "plots/confirmation_results.svg": {
+      "bytes": 208047,
+      "sha256": "ac69ba50906728a9b579ed170c7bbe9292158c1e0692b6563c613a76a22f8a35"
+    },
+    "plots/confirmation_strict.csv": {
+      "bytes": 2354,
+      "sha256": "02db49c9e35dbbd441c1540f8f51ad55e28f82da95624b8f17997f914cfd3ca2"
+    },
+    "plots/full_sweep.pdf": {
+      "bytes": 34644,
+      "sha256": "d4fef0afe5a3b32e7dd2081442a321ab58fac66ef9fa3ddef69a1f4703dd7147"
+    },
+    "plots/full_sweep.png": {
+      "bytes": 407375,
+      "sha256": "d9a3e3599e651153be3684564bd31973b574263b227fd5be3a2ca1a88383c17b"
+    },
+    "plots/full_sweep.svg": {
+      "bytes": 166540,
+      "sha256": "6c22b65793e9903157fb4a668fe82a6a1cd24bd57082b28f66b4c3a1d539a05d"
+    },
+    "plots/sweep.csv": {
+      "bytes": 10930,
+      "sha256": "d09e00eaba93e36b358a6e59fbeaf0c9d6336bc1216d37a086ecc6dda66b22f9"
+    }
+  }
+}

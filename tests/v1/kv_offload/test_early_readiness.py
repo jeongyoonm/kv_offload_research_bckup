@@ -146,14 +146,14 @@ def test_scheduler_early_readiness_is_stale_safe_and_deduplicated():
     scheduler.requests = {"req": request}
     scheduler.finished_recving_kv_req_ids = set()
     scheduler.connector = MagicMock()
-    scheduler.connector.get_early_ready_request.return_value = "req"
+    scheduler.connector.mark_early_load_copy_complete.return_value = "req"
 
     assert scheduler.apply_early_kv_load_completion(3) == "req"
     assert scheduler.apply_early_kv_load_completion(3) is None
     request.status = RequestStatus.FINISHED_ABORTED
     scheduler.finished_recving_kv_req_ids.clear()
     assert scheduler.apply_early_kv_load_completion(3) is None
-    scheduler.connector.get_early_ready_request.return_value = None
+    scheduler.connector.mark_early_load_copy_complete.return_value = None
     assert scheduler.apply_early_kv_load_completion(99) is None
 
 
@@ -279,6 +279,67 @@ def test_endpoint_delay_validation(delay, valid):
             KVLoadSchedulingRequest(schedule_delay_ms=delay)
 
 
+@pytest.mark.asyncio
+@pytest.mark.parametrize("host", ["127.0.0.1", "192.0.2.1"])
+async def test_estimator_endpoint_preserves_loopback_guard_and_forwards_state(host):
+    from unittest.mock import AsyncMock
+
+    from fastapi import HTTPException
+    from starlette.requests import Request
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        KVLoadSchedulingRequest,
+        set_kv_load_scheduling,
+    )
+
+    rpc = AsyncMock(return_value={"seal_estimator": {"loaded": True}})
+    app = SimpleNamespace(
+        state=SimpleNamespace(
+            engine_client=SimpleNamespace(set_kv_load_scheduling=rpc),
+            vllm_config=SimpleNamespace(
+                kv_transfer_config=SimpleNamespace(
+                    kv_connector_extra_config={"early_load_completion": True}
+                )
+            ),
+        )
+    )
+    raw = Request({"type": "http", "client": (host, 1234), "app": app})
+    settings = KVLoadSchedulingRequest(seal_estimator={"action": "load", "state": {}})
+    if host == "127.0.0.1":
+        await set_kv_load_scheduling(settings, raw)
+        rpc.assert_awaited_once_with(False, 0, None, settings.seal_estimator)
+    else:
+        with pytest.raises(HTTPException) as exc:
+            await set_kv_load_scheduling(settings, raw)
+        assert exc.value.status_code == 403
+        rpc.assert_not_awaited()
+
+
+@pytest.mark.parametrize("pending", [False, True])
+def test_estimator_restore_rejection_does_not_replace_live_model(monkeypatch, pending):
+    from vllm.v1.kv_offload.seal_predictor import ComputeEstimator
+
+    core = EngineCore.__new__(EngineCore)
+    original = ComputeEstimator()
+    options = dict(early.EXPERIMENT_DEFAULTS)
+    core.early_load_readiness = SimpleNamespace(
+        experiment_options=options, configure=MagicMock()
+    )
+    core._refresh_early_load_readiness = MagicMock()
+    core.scheduler = SimpleNamespace(has_requests=lambda: pending)
+    core.batch_queue = deque()
+    core.deferral_timing = SimpleNamespace(seal_estimator=original, collect=MagicMock())
+    core.vllm_config = SimpleNamespace()
+    monkeypatch.setattr(
+        "vllm.v1.kv_offload.seal_predictor.estimator_context", lambda _: {}
+    )
+    with pytest.raises(RuntimeError if pending else ValueError):
+        core.set_kv_load_scheduling(True, 0, {}, {"action": "load", "state": {}})
+    assert core.deferral_timing.seal_estimator is original
+    assert core.early_load_readiness.experiment_options == options
+    core.early_load_readiness.configure.assert_not_called()
+
+
 def test_completion_during_delay_is_ready_for_immediate_successor(monkeypatch):
     """A completed predecessor must not prevent the post-delay readiness drain."""
     records: dict[int, deque] = {rank: deque() for rank in range(8)}
@@ -289,7 +350,7 @@ def test_completion_during_delay_is_ready_for_immediate_successor(monkeypatch):
     scheduler.requests = {"req": request}
     scheduler.finished_recving_kv_req_ids = set()
     scheduler.connector = MagicMock()
-    scheduler.connector.get_early_ready_request.return_value = "req"
+    scheduler.connector.mark_early_load_copy_complete.return_value = "req"
     core.scheduler = scheduler
     predecessor: Future = Future()
     sleeps: list[float] = []
@@ -1035,6 +1096,7 @@ def test_completed_timing_survives_collection(tmp_path, monkeypatch):
     timing.steps = {}
     timing.registrations = {}
     timing.events = []
+    timing.seal_estimator = MagicMock()
     monkeypatch.setattr("vllm.v1.kv_offload.step_timing.time.monotonic_ns", lambda: 100)
     try:
         assert timing.register(dict(step=7, dispatch_ns=10))
@@ -2091,6 +2153,35 @@ def test_dispatch_load_ledger_exact_tokens_and_reclamation():
     assert ledger.snapshot() is None
 
 
+def test_forecast_load_age_uses_received_completions_and_resets(monkeypatch):
+    """Future receipts cannot change a forecast snapshot already returned."""
+    from vllm.v1.kv_offload import scheduling_deferral as module
+
+    now = [1_000_000]
+    monkeypatch.setattr(module.time, "monotonic_ns", lambda: now[0])
+    ledger = module.OutstandingLoads()
+    ledger.dispatch(
+        {
+            1: SimpleNamespace(external_tokens=100),
+            2: SimpleNamespace(external_tokens=200),
+        }
+    )
+    now[0] = 3_000_000
+    ledger.dispatch({3: SimpleNamespace(external_tokens=300)})
+    now[0] = 4_000_000
+    ledger.complete(1)
+    ledger.complete(1)
+    data = {"dispatch_ns": 2_000_000}
+    snapshot = ledger.forecast_features(data, 5_000_000)
+    assert snapshot == [2, 500, 2.0, 4.0, 2.8, 1, 200, 1, 300, 100]
+    now[0] = 6_000_000
+    ledger.complete(2)
+    assert snapshot == [2, 500, 2.0, 4.0, 2.8, 1, 200, 1, 300, 100]
+    assert len(ledger.completed) == 2
+    ledger.reset()
+    assert ledger.forecast_features(data, 7_000_000) == [0] * 10
+
+
 def test_fill_exits_on_execution_completion_before_primary_channel(monkeypatch):
     core, timing, clock, outstanding = _fill_core(monkeypatch)
     assert core._defer_fill_scheduling(dict(a=False), outstanding, 1, True)
@@ -2773,11 +2864,13 @@ def test_late_control_rejects_stale_identity_and_duplicate_publication(tmp_path)
 
     path = tmp_path / "control"
     path.write_bytes(struct.pack("<QQ", 9, 8) + bytes(8))
+    # Worker RPC metadata carries the control path as a string.
+    control = str(path)
     with pytest.raises(RuntimeError, match="identity"):
-        signal_prepared(path, 8, 0, 1)
-    signal_prepared(path, 9, 0, 1)
+        signal_prepared(control, 8, 0, 1)
+    signal_prepared(control, 9, 0, 1)
     with pytest.raises(RuntimeError, match="duplicate"):
-        signal_prepared(path, 9, 0, 1)
+        signal_prepared(control, 9, 0, 1)
     assert path.read_bytes()[16:] == bytes([1]) + bytes(7)
 
 
@@ -2978,7 +3071,7 @@ def test_late_notice_candidate_slot_cap_still_respects_token_budget():
         current_step=5,
         _late_cancelled=set(),
     )
-    staged = []
+    staged: list = []
 
     def prepare(step, base, candidates):
         staged.extend(c.req_id for c in candidates)
@@ -3106,3 +3199,334 @@ def test_late_opportunity_analysis_keeps_missing_ranks_and_avoids_future_selecti
     assert result["batches"][1]["boundaries"]["worker_entry"]["became_ready"] == [
         "first"
     ]
+
+
+@pytest.mark.parametrize("poll_us", [0, 5001, -1, True, 1.5])
+def test_fixed_seal_poll_interval_rejects_busy_spin_and_invalid_values(poll_us):
+    with pytest.raises(ValueError):
+        early.validate_experiment_options({"late_seal_poll_us": poll_us})
+
+
+def test_fixed_seal_poll_control_preserves_default():
+    assert early.validate_experiment_options({})["late_seal_poll_us"] == 25
+    assert (
+        early.validate_experiment_options({"late_seal_poll_us": 1000})[
+            "late_seal_poll_us"
+        ]
+        == 1000
+    )
+
+
+@pytest.mark.parametrize("poll_us", [1000, 2000, 5000, 10000])
+def test_adaptive_poll_interval_preserves_pre_ack_interval(poll_us):
+    options = early.validate_experiment_options({"late_seal_adaptive_poll_us": poll_us})
+    assert options["late_seal_adaptive_poll_us"] == poll_us
+    assert options["late_seal_poll_us"] == 25
+
+
+@pytest.mark.parametrize("poll_us", [0, -1, 10001, True, 1.5])
+def test_adaptive_poll_interval_is_positive_and_bounded(poll_us):
+    with pytest.raises(ValueError):
+        early.validate_experiment_options({"late_seal_adaptive_poll_us": poll_us})
+
+
+@pytest.mark.parametrize(
+    "invalid",
+    [
+        {"late_admission_mode": 0},
+        {"late_seal_safety_us": 0},
+        {"late_seal_target_candidates": 0},
+        {"late_seal_repeat_us": 0},
+    ],
+)
+def test_evaluation_event_options_require_mode_and_bounded_progress(invalid):
+    options = dict(
+        late_seal_policy="event",
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        deferral_policy="timing",
+    )
+    assert early.validate_experiment_options(options)["late_seal_policy"] == "event"
+    with pytest.raises(ValueError):
+        early.validate_experiment_options(dict(options, **invalid))
+
+
+@pytest.mark.parametrize("policy", ["fixed", "event"])
+def test_prediction_to_readiness_requires_predictive_policy(policy):
+    with pytest.raises(ValueError, match="prediction-to-readiness"):
+        early.validate_experiment_options(
+            {
+                "late_admission_mode": 4,
+                "cooperative_response_progress": True,
+                "late_seal_policy": policy,
+                "late_seal_prediction_to_readiness": True,
+            }
+        )
+
+
+@pytest.mark.parametrize("bias", [-1, 300001, 1.0, True])
+def test_prediction_bias_rejects_invalid_values(bias):
+    with pytest.raises(ValueError, match="late_seal_prediction_bias_us"):
+        early.validate_experiment_options({"late_seal_prediction_bias_us": bias})
+
+
+def test_prediction_bias_requires_predictive_policy():
+    with pytest.raises(ValueError, match="prediction bias requires predictive"):
+        early.validate_experiment_options({"late_seal_prediction_bias_us": 90000})
+    assert early.validate_experiment_options({})["late_seal_prediction_bias_us"] == 0
+
+
+def test_prediction_to_readiness_is_opt_in():
+    assert not early.validate_experiment_options({})[
+        "late_seal_prediction_to_readiness"
+    ]
+    assert early.validate_experiment_options(
+        {
+            "late_admission_mode": 4,
+            "cooperative_response_progress": True,
+            "late_seal_policy": "predictive",
+            "late_seal_prediction_to_readiness": True,
+        }
+    )["late_seal_prediction_to_readiness"]
+
+
+@pytest.mark.parametrize("policy", ["event", "predictive"])
+def test_load_only_percentage_requires_supported_readiness_path(policy):
+    options = dict(
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        late_seal_policy=policy,
+        late_seal_prediction_to_readiness=policy == "predictive",
+        late_seal_load_only_ready_percent=50,
+    )
+    assert (
+        early.validate_experiment_options(options)["late_seal_load_only_ready_percent"]
+        == 50
+    )
+    with pytest.raises(ValueError, match="load-only percentage"):
+        early.validate_experiment_options(
+            dict(
+                options,
+                late_seal_policy="fixed",
+                late_seal_prediction_to_readiness=False,
+            )
+        )
+    if policy == "predictive":
+        with pytest.raises(ValueError, match="load-only percentage"):
+            early.validate_experiment_options(
+                dict(options, late_seal_prediction_to_readiness=False)
+            )
+
+
+@pytest.mark.parametrize("percent", [-1, 101, 50.0, True])
+def test_load_only_percentage_rejects_invalid_bounds_or_types(percent):
+    with pytest.raises(ValueError, match="late_seal_load_only_ready_percent"):
+        early.validate_experiment_options(
+            dict(
+                late_admission_mode=4,
+                cooperative_response_progress=True,
+                late_seal_policy="event",
+                late_seal_load_only_ready_percent=percent,
+            )
+        )
+
+
+@pytest.mark.parametrize(
+    "missing", ["late_seal_condition_preparation", "late_seal_prediction_to_readiness"]
+)
+def test_full_predicted_wait_requires_conditioned_readiness_policy(missing):
+    options = dict(
+        late_admission_mode=4,
+        cooperative_response_progress=True,
+        late_seal_policy="predictive",
+        late_seal_condition_preparation=True,
+        late_seal_prediction_to_readiness=True,
+        late_seal_full_prediction_wait=True,
+    )
+    assert early.validate_experiment_options(options)["late_seal_full_prediction_wait"]
+    options[missing] = False
+    with pytest.raises(ValueError, match="full predicted wait"):
+        early.validate_experiment_options(options)
+    assert not early.validate_experiment_options({})["late_seal_full_prediction_wait"]
+
+
+def test_coalesced_notifications_require_full_prediction_wait():
+    assert not early.validate_experiment_options({})[
+        "late_seal_coalesced_notifications"
+    ]
+    with pytest.raises(ValueError, match="require full predicted waits"):
+        early.validate_experiment_options({"late_seal_coalesced_notifications": True})
+
+
+def test_coalesced_startup_owns_rank_descriptors_and_closes_them():
+    """Create real native CPU rings; allocating the channel requires no CUDA work."""
+    from pathlib import Path
+    from types import SimpleNamespace
+
+    extra = {
+        "early_load_completion": True,
+        "async_h2d_submission": True,
+        "coalesced_seal_notifications": True,
+    }
+    config = SimpleNamespace(
+        kv_transfer_config=SimpleNamespace(kv_connector_extra_config=extra),
+        parallel_config=SimpleNamespace(world_size=8),
+    )
+    readiness = EarlyLoadReadiness.from_config(config)
+    assert readiness is not None
+    try:
+        channel = readiness.seal_notifications
+        assert channel is not None
+        descriptors = [Path(path + ".seal") for path in readiness.paths]
+        assert all(path.exists() for path in descriptors)
+        assert not hasattr(channel, "thread")
+    finally:
+        readiness.close()
+    assert all(not path.exists() for path in descriptors)
+    assert not Path(channel.path).exists()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "host,flag,status",
+    [
+        ("127.0.0.1", True, 200),
+        ("127.0.0.1", False, 404),
+        ("127.0.0.1", "true", 404),
+        ("203.0.113.1", True, 403),
+    ],
+)
+async def test_read_only_cohort_status_needs_explicit_opt_in_and_loopback(
+    host, flag, status
+):
+    from unittest.mock import AsyncMock
+
+    from fastapi import HTTPException
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        get_deferral_cohort,
+    )
+
+    rpc = AsyncMock(return_value={"requests": 0})
+    raw = SimpleNamespace(
+        client=SimpleNamespace(host=host),
+        app=SimpleNamespace(
+            state=SimpleNamespace(
+                vllm_config=SimpleNamespace(
+                    kv_transfer_config=SimpleNamespace(
+                        kv_connector_extra_config={"cohort_status_diagnostics": flag}
+                    )
+                ),
+                engine_client=SimpleNamespace(get_deferral_cohort_status=rpc),
+            )
+        ),
+    )
+    if status == 200:
+        assert await get_deferral_cohort(raw) == {"requests": 0}
+        rpc.assert_awaited_once_with()
+    else:
+        with pytest.raises(HTTPException) as error:
+            await get_deferral_cohort(raw)
+        assert error.value.status_code == status
+        rpc.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_read_only_cohort_opt_in_does_not_enable_policy_mutation():
+    from fastapi import HTTPException
+
+    from vllm.entrypoints.serve.experimental.kv_load_scheduling import (
+        KVLoadSchedulingRequest,
+        set_kv_load_scheduling,
+    )
+
+    raw = SimpleNamespace(
+        client=SimpleNamespace(host="127.0.0.1"),
+        app=SimpleNamespace(
+            state=SimpleNamespace(
+                vllm_config=SimpleNamespace(
+                    kv_transfer_config=SimpleNamespace(
+                        kv_connector_extra_config={"cohort_status_diagnostics": True}
+                    )
+                ),
+            )
+        ),
+    )
+    with pytest.raises(HTTPException) as error:
+        await set_kv_load_scheduling(KVLoadSchedulingRequest(), raw)
+    assert error.value.status_code == 404
+
+
+def test_opportunity_ratio_uses_native_time_and_rejects_partial_rank_coverage():
+    from experiments.load_only_overlap_20261011.opportunities import summarize
+
+    notifications = [
+        dict(
+            event="early_notification_received",
+            job_id=1,
+            rank=rank,
+            completion_ns=100,
+            status=1,
+        )
+        for rank in range(8)
+    ]
+    owner = dict(event="job_observed_done", job_id=1, request="request", time_ns=500)
+    transport = dict(has_compute=True)
+    protocol = [
+        dict(
+            event="membership_sealed",
+            activated={"request": 128},
+            transport=transport,
+        )
+    ]
+    compute = [dict(execution_ranks=[[1, 75, 78, 80, 250, 1, 120, 198, 200]] * 8)]
+    windows = [(50, 600)]
+    result = summarize([owner, *notifications], protocol, compute, windows)
+    assert result["ready_during_compute_definite"] == 1
+    assert result["late_admission_ratio_percent"] == 100
+    result = summarize([owner, *notifications[:-1]], protocol, compute, windows)
+    assert result["native_ready_coverage_complete"] is False
+    assert result["late_admission_ratio_percent"] is None
+    unknown_owner = dict(
+        event="job_observed_done", job_id=2, request="other", time_ns=500
+    )
+    result = summarize(
+        [owner, unknown_owner, *notifications], protocol, compute, windows
+    )
+    assert result["late_admission_ratio_percent"] is None
+    assert result["admission_ratio_lower_bound_percent"] == 50
+    assert result["admission_ratio_upper_bound_percent"] == 100
+    transport["has_compute"] = False
+    result = summarize([owner, *notifications], protocol, compute, windows)
+    assert result["total_late_admissions"] == 1
+    assert result["late_admitted_during_compute_definite"] == 0
+
+
+def test_gpu_gap_bounds_preserve_wide_but_ordered_native_start_brackets():
+    from experiments.load_only_overlap_20261011.opportunities import execution_bounds
+
+    compute = [
+        dict(
+            step=step,
+            time_ns=now * 1_000_000,
+            execution_ranks=[
+                [
+                    step,
+                    (start - 1) * 1_000_000,
+                    start * 1_000_000,
+                    (start + 10) * 1_000_000,
+                    now * 1_000_000,
+                    1,
+                    50_000_000,
+                    (start + 50) * 1_000_000,
+                    (start + 60) * 1_000_000,
+                ]
+            ]
+            * 8,
+        )
+        for step, start, now in [(1, 100, 200), (2, 155, 250)]
+    ]
+    result = execution_bounds(compute, [(90_000_000, 300_000_000)])
+    assert result["start_bracket_above_predictor_2ms"] == 2
+    assert result["inter_compute_gap_lower_ms"] == 0
+    assert result["inter_compute_gap_upper_ms"] == 15

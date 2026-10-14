@@ -1,0 +1,16 @@
+{
+  "guarded_sparse_mlp": {
+    "rows": 5186,
+    "maximum_prediction_difference_ms": 9.99957819658448e-07,
+    "feature_equivalence": true,
+    "round_trip": true,
+    "causality_checks": true
+  },
+  "envelope_sparse_mlp": {
+    "rows": 5186,
+    "maximum_prediction_difference_ms": 9.996281278290553e-07,
+    "feature_equivalence": true,
+    "round_trip": true,
+    "causality_checks": true
+  }
+}

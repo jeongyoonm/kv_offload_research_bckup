@@ -1,0 +1,29 @@
+{
+  "cpu_checks": [
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_offload/test_late_admission_harness.py -q",
+      "passed": 206,
+      "skipped": 8
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_offload/test_early_readiness.py -q -k 'prediction_bias or prediction_to_readiness or load_only_percentage'",
+      "passed": 15,
+      "deselected": 389
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_connector/unit/offloading_connector/test_worker.py -q -k 'store or handle_preemptions'",
+      "passed": 8,
+      "deselected": 11
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/v1/kv_connector/unit/offloading_connector/test_worker.py -q -k 'instrumentation'",
+      "passed": 2,
+      "deselected": 17,
+      "scope": "Rerun after test mock typing fix; included in the eight checks above"
+    }
+  ],
+  "preflight": "Four-arm configuration validation passed",
+  "precommit": "All applicable normal commit hooks passed, including mypy; no hooks skipped",
+  "source_commit": "5827ae5e476cd41f92945fdad51667df05c1ad5e",
+  "startup": "Owned server cold-rebuilt FlashInfer MoE and attention kernels after workspace relocation. Startup/warmups excluded from measured results. Stack diagnostics were taken only during startup; no sampling profiler in serving cells."
+}

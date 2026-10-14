@@ -1,0 +1,63 @@
+{
+  "original": "/mnt/localnvme/jeongyoon/tracelab_request_slots_20261013/workload.csv",
+  "original_csv_sha256": "9f077ff969a2d839e6753d4e58e7796fcfdf62fd8bc6f28873b3b6acdc3c7e65",
+  "original_content": {
+    "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+    "calls": 665453,
+    "sessions": 8058,
+    "tool_wait_ms": "11061086477.000000"
+  },
+  "variants": {
+    "0.05": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.05.csv",
+      "csv_sha256": "fce04c30296184834b2460ed8565c12ea06f77ffe82a478d0ed6340536238e99",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    },
+    "0.075": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.075.csv",
+      "csv_sha256": "97fee9249efc992dde204aa34e5d3c49ac00b172e76b0f3c1423470b8bb78ea5",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    },
+    "0.1": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.1.csv",
+      "csv_sha256": "8d559f04e9b8ed00c8f51e431be5968322c700e4850ff08e6ebd76923a6b3f1d",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    },
+    "0.15": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.15.csv",
+      "csv_sha256": "21c0aad590de3abb5572bed9a0df333965b0679ff3805ce27107cdc451de044c",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    },
+    "0.2": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.2.csv",
+      "csv_sha256": "6fb03bc0bfb6c5cbb84f5c03522af02f2db135b4899e3398f960a110ea368403",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    },
+    "0.25": {
+      "path": "/mnt/localnvme/jeongyoon/tracelab_arrival_intensity_20261013/workloads/rate_0.25.csv",
+      "csv_sha256": "001adc1f63f435c6c32d1ba9e4913e0805450fcde30b7d2d0debe75510048a33",
+      "nonarrival_sha256": "567551bcb6a93b28ab6211024098940966c49f0e0c3287b05a8ac4445ac2a7fd",
+      "calls": 665453,
+      "sessions": 8058,
+      "tool_wait_ms": "11061086477.000000"
+    }
+  },
+  "changed": "Only synthetic session arrival_time is divided by arrival rate.",
+  "preserved": "Session IDs and order, every round, prefix/input/output lengths, tool waits, source mix, random seed, and native prompt construction.",
+  "sampling": "All 8058 sessions and 665453 calls retained; no windows or sampling."
+}

@@ -1101,7 +1101,13 @@ class Worker(WorkerBase):
         return self.profiler.annotate_context_manager(annotation)
 
     def configure_late_admission(
-        self, mode, generation, markers=False, candidate_slots=4
+        self,
+        mode,
+        generation,
+        markers=False,
+        candidate_slots=4,
+        cached_requests=False,
+        pinned_packing=False,
     ):
         from vllm.v1.worker.gpu.buffer_utils import configure_late_admission
         from vllm.v1.worker.gpu.model_runner import GPUModelRunner as V2Runner
@@ -1122,6 +1128,7 @@ class Worker(WorkerBase):
             export_records,
         )
 
+        runner.req_states.all_token_ids.drain_pinned_writes()
         old_lane = getattr(runner, "_late_lane", None)
         if old_lane is not None:
             old_lane.close()
@@ -1137,8 +1144,11 @@ class Worker(WorkerBase):
             PreparationLane(
                 self.rank,
                 generation,
-                notice_only=mode == 4,
+                notice_only=mode == 4 and not (cached_requests or pinned_packing),
                 candidate_slots=candidate_slots,
+                cached_requests=cached_requests,
+                pinned_packing=pinned_packing,
+                device=self.device,
             )
             if mode
             else None
@@ -1150,7 +1160,9 @@ class Worker(WorkerBase):
             export=exported,
             generation=generation,
             candidate_slots=candidate_slots,
-            preparation_path=runner._late_lane.path if mode else None,
+            preparation_path=runner._late_lane.path
+            if runner._late_lane is not None
+            else None,
         )
 
     def configure_queue_stages(self, enabled, generation, credit=0):
@@ -1225,7 +1237,9 @@ class Worker(WorkerBase):
         self, scheduler_output: "SchedulerOutput"
     ) -> ModelRunnerOutput | AsyncModelRunnerOutput | None:
         if self.use_v2_model_runner:
-            runner = self.model_runner
+            from vllm.v1.worker.gpu.model_runner import GPUModelRunner as V2Runner
+
+            runner = cast(V2Runner, self.model_runner)
             lane = getattr(runner, "_late_lane", None)
             if (
                 lane is not None
@@ -1239,7 +1253,16 @@ class Worker(WorkerBase):
                 expected = scheduler_output.late_prepared_ids or set()
                 if not expected.issubset(prepared):
                     raise RuntimeError("sealed candidate preparation is missing")
-                runner._late_prepared = {} if runner._late_mode == 4 else prepared
+                from vllm.v1.kv_offload.late_admission_runtime import resolve_references
+
+                resolve_references(scheduler_output, prepared, runner._late_generation)
+                runner._late_prepared = (
+                    prepared
+                    if lane.cached_requests
+                    or lane.pinned_packing
+                    or runner._late_mode != 4
+                    else {}
+                )
                 from vllm.v1.kv_offload.late_admission_runtime import record
 
                 record(
@@ -1249,6 +1272,16 @@ class Worker(WorkerBase):
                     activated=sorted(expected),
                     prepared=sorted(prepared_at),
                     prepared_ns=prepared_at,
+                    cached_requests=sum(
+                        p.source is not None for p in prepared.values()
+                    ),
+                    pinned_tokens=sum(
+                        p.pinned_tokens is not None for p in prepared.values()
+                    ),
+                    compact_tokens=sum(
+                        p.source is not None and p.source.prefill_token_ids is None
+                        for p in prepared.values()
+                    ),
                 )
         self._deferral_rpc_timing = scheduler_output.deferral_rpc_timing
         timing = None

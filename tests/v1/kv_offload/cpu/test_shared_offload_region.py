@@ -23,6 +23,80 @@ from vllm.v1.kv_offload.cpu.shared_offload_region import (
 PAGE_SIZE = mmap.PAGESIZE
 
 
+def test_private_memfd_preserves_views_without_shm_capacity(monkeypatch):
+    import vllm.v1.kv_offload.cpu.shared_offload_region as module
+
+    capacity = MagicMock(side_effect=AssertionError("must not use /dev/shm"))
+    monkeypatch.setattr(module, "check_shm_free_space", capacity)
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=4,
+        rank=0,
+        kv_bytes_per_block=PAGE_SIZE,
+        cpu_page_size=PAGE_SIZE,
+        memory_layout="private",
+        memory_backing="memfd",
+    )
+    fd = region.fd
+    try:
+        view = region.create_next_worker_view(PAGE_SIZE)
+        view.fill_(37)
+        assert view.shape == (4, PAGE_SIZE)
+        assert view.stride() == (PAGE_SIZE, 1)
+        assert region._base[0].item() == 37
+        assert not os.path.exists(region.mmap_path)
+        del view
+    finally:
+        region.cleanup()
+    with pytest.raises(OSError):
+        os.fstat(fd)
+    capacity.assert_not_called()
+
+
+def test_memfd_rejects_shared_layout_before_allocating():
+    with pytest.raises(ValueError, match="requires private"):
+        SharedOffloadRegion(
+            engine_id=str(uuid.uuid4()),
+            num_blocks=4,
+            rank=0,
+            kv_bytes_per_block=PAGE_SIZE,
+            cpu_page_size=PAGE_SIZE,
+            memory_layout="block",
+            memory_backing="memfd",
+        )
+
+
+def test_private_memfd_cuda_registration_and_roundtrip():
+    import torch
+
+    from vllm.platforms import current_platform
+    from vllm.v1.kv_offload.cpu.gpu_worker import pin_mmap_region
+
+    if not current_platform.is_cuda():
+        pytest.skip("CUDA host registration requires CUDA")
+    region = SharedOffloadRegion(
+        engine_id=str(uuid.uuid4()),
+        num_blocks=256,
+        rank=0,
+        kv_bytes_per_block=PAGE_SIZE,
+        cpu_page_size=PAGE_SIZE,
+        memory_layout="private",
+        memory_backing="memfd",
+    )
+    try:
+        pin_mmap_region(region)
+        assert region.is_pinned
+        view = region.create_next_worker_view(PAGE_SIZE)
+        view.random_()
+        device = torch.empty_like(view, device=current_platform.device_type)
+        device.copy_(view, non_blocking=True)
+        restored = device.to("cpu")
+        assert torch.equal(view, restored)
+        del view, device, restored
+    finally:
+        region.cleanup()
+
+
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
 # ---------------------------------------------------------------------------
@@ -223,6 +297,180 @@ def _mp_barrier_construct_and_hold(
 def iid():
     """Fresh instance ID for each test."""
     return str(uuid.uuid4())
+
+
+@pytest.mark.parametrize("initializers", [1, 2, 4, 8])
+def test_contiguous_population_prepares_every_rank_before_return(iid, initializers):
+    """Uneven row partitions must be resident before any worker can use them."""
+    workers = 8
+    blocks = 11
+    slot = PAGE_SIZE + 128
+    row = ((slot * workers + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    barrier = threading.Barrier(workers)
+    regions: list[SharedOffloadRegion | None] = [None] * workers
+    failures = []
+
+    def construct(rank):
+        try:
+            regions[rank] = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                barrier=lambda: barrier.wait(10),
+                population_mode="contiguous",
+                population_workers=initializers,
+                population_chunk_bytes=3 * PAGE_SIZE,
+                num_workers=workers,
+                process_rank=rank,
+            )
+        except Exception as error:
+            failures.append(error)
+            barrier.abort()
+
+    threads = [threading.Thread(target=construct, args=(r,)) for r in range(workers)]
+    try:
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join(15)
+        assert not any(thread.is_alive() for thread in threads)
+        assert not failures
+        ready_regions = [r for r in regions if r is not None]
+        assert len(ready_regions) == workers
+        assert all(_page_residency(ready_regions[0].mmap_obj, blocks * row))
+        assert (
+            sum(r.init_stats["populate_bytes"] for r in ready_regions) == blocks * row
+        )
+        for rank, region in enumerate(ready_regions):
+            view = region.create_next_worker_view(slot)
+            view[:, :] = rank + 1
+            del view
+        for rank, region in enumerate(ready_regions):
+            # Check the shared backing bytes, including unaligned slot ends.
+            for block in range(blocks):
+                start = block * row + rank * slot
+                assert region.mmap_obj[start : start + slot] == bytes([rank + 1]) * slot
+    finally:
+        for region in regions:
+            if region is not None:
+                region.cleanup()
+        _cleanup_file(f"/dev/shm/vllm_offload_{iid}.mmap")
+
+
+def test_contiguous_population_failure_releases_mapping(iid, monkeypatch):
+    """A failed initializer must not leak its named shared-memory allocation."""
+    import vllm.v1.kv_offload.cpu.shared_offload_region as module
+
+    def fail(*args):
+        raise OSError(errno.ENOMEM, "injected population failure")
+
+    monkeypatch.setattr(module, "_get_populate_write_fn", lambda _: fail)
+    before = len(os.listdir("/proc/self/fd"))
+    with pytest.raises(OSError, match="injected population failure"):
+        SharedOffloadRegion(
+            engine_id=iid,
+            num_blocks=3,
+            rank=0,
+            kv_bytes_per_block=PAGE_SIZE,
+            cpu_page_size=PAGE_SIZE,
+            population_mode="contiguous",
+            process_rank=0,
+        )
+    assert not os.path.exists(f"/dev/shm/vllm_offload_{iid}.mmap")
+    assert len(os.listdir("/proc/self/fd")) == before
+
+
+def test_worker_layout_keeps_strided_blocks_inside_disjoint_registrations(iid):
+    """Packed tensor slots stay within each rank's page-aligned transfer range."""
+    workers, blocks, slot = 8, 11, PAGE_SIZE + 128
+    row = ((workers * slot + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    regions = []
+    try:
+        for rank in range(workers):
+            region = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                num_workers=workers,
+                memory_layout="worker",
+            )
+            regions.append(region)
+            first = region.create_next_worker_view(PAGE_SIZE)
+            second = region.create_next_worker_view(128)
+            assert first.stride() == second.stride() == (slot, 1)
+            assert region.registration_offset % PAGE_SIZE == 0
+            assert region.registration_size_bytes % PAGE_SIZE == 0
+            first[:, :] = rank + 1
+            second[:, :] = rank + 17
+            assert second[-1].data_ptr() + 128 <= (
+                region._base.data_ptr()
+                + region.registration_offset
+                + region.registration_size_bytes
+            )
+            del first, second
+        observer = regions[0]
+        for rank, region in enumerate(regions):
+            for block in range(blocks):
+                offset = region.registration_offset + block * slot
+                assert observer.mmap_obj[offset : offset + PAGE_SIZE] == (
+                    bytes([rank + 1]) * PAGE_SIZE
+                )
+                assert observer.mmap_obj[offset + PAGE_SIZE : offset + slot] == (
+                    bytes([rank + 17]) * 128
+                )
+            if rank + 1 < workers:
+                assert region.registration_offset + region.registration_size_bytes == (
+                    regions[rank + 1].registration_offset
+                )
+        with pytest.raises(ValueError, match="canonical"):
+            observer.create_next_canonical_view(128)
+        with pytest.raises(ValueError, match="secondary-tier"):
+            observer.create_kv_memoryview()
+    finally:
+        for region in regions:
+            region.cleanup()
+        _cleanup_file(f"/dev/shm/vllm_offload_{iid}.mmap")
+
+
+def test_private_worker_regions_preserve_capacity_without_sharing_pages(iid):
+    """Each rank owns its file and all tensor slots fit its registered mapping."""
+    workers, blocks, slot = 8, 11, PAGE_SIZE + 128
+    row = ((workers * slot + PAGE_SIZE - 1) // PAGE_SIZE) * PAGE_SIZE
+    regions = []
+    try:
+        for rank in range(workers):
+            region = SharedOffloadRegion(
+                engine_id=iid,
+                num_blocks=blocks,
+                rank=rank,
+                kv_bytes_per_block=row,
+                cpu_page_size=slot,
+                num_workers=workers,
+                memory_layout="private",
+            )
+            regions.append(region)
+            view = region.create_next_worker_view(slot)
+            assert view.stride() == (slot, 1)
+            assert region.registration_offset == 0
+            assert region.registration_size_bytes == region.total_size_bytes
+            view[:, :] = rank + 1
+            del view
+        assert len({os.fstat(r.fd).st_ino for r in regions}) == workers
+        assert sum(r.total_size_bytes for r in regions) == regions[0].cache_size_bytes
+        for rank, region in enumerate(regions):
+            for block in range(blocks):
+                offset = block * slot
+                assert (
+                    region.mmap_obj[offset : offset + slot] == bytes([rank + 1]) * slot
+                )
+    finally:
+        for region in regions:
+            region.cleanup()
+            assert not os.path.exists(region.mmap_path)
 
 
 # ---------------------------------------------------------------------------

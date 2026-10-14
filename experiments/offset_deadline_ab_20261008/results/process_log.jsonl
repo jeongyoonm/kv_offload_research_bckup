@@ -1,0 +1,44 @@
+{"event": "comparison_started", "time": 1791435809.6854944, "expected_cells": 32}
+{"event": "server_ready", "time": 1791436074.2574174}
+{"event": "live_cell", "time": 1791436159.8392947, "label": "deadline_off", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 5.851136229136486}
+{"event": "live_cell", "time": 1791436241.4953806, "label": "deadline_on", "workload": "familiar60k", "repeat": "warmup", "accepted": true, "throughput_rps": 5.642245725395275}
+{"event": "live_cell", "time": 1791436267.295473, "label": "deadline_off", "workload": "short16k", "repeat": "warmup", "accepted": true, "throughput_rps": 20.584049041522572}
+{"event": "live_cell", "time": 1791436292.779361, "label": "deadline_on", "workload": "short16k", "repeat": "warmup", "accepted": true, "throughput_rps": 21.09729314667928}
+{"event": "live_cell", "time": 1791436322.21439, "label": "deadline_off", "workload": "heterogeneous", "repeat": "warmup", "accepted": true, "throughput_rps": 1.7062128942970383}
+{"event": "live_cell", "time": 1791436351.5194929, "label": "deadline_on", "workload": "heterogeneous", "repeat": "warmup", "accepted": true, "throughput_rps": 1.71128842298822}
+{"event": "live_cell", "time": 1791436530.2483017, "label": "deadline_off", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 6.971547778510974}
+{"event": "live_cell", "time": 1791436709.4941247, "label": "deadline_on", "workload": "familiar60k", "repeat": 0, "accepted": true, "throughput_rps": 6.726906627960854}
+{"event": "live_cell", "time": 1791436758.519473, "label": "deadline_off", "workload": "short16k", "repeat": 0, "accepted": true, "throughput_rps": 24.73946075617736}
+{"event": "live_cell", "time": 1791436808.1764798, "label": "deadline_on", "workload": "short16k", "repeat": 0, "accepted": true, "throughput_rps": 24.129495062360995}
+{"event": "live_cell", "time": 1791436866.0129938, "label": "deadline_off", "workload": "heterogeneous", "repeat": 0, "accepted": true, "throughput_rps": 1.7230136479535898}
+{"event": "live_cell", "time": 1791436923.9832916, "label": "deadline_on", "workload": "heterogeneous", "repeat": 0, "accepted": true, "throughput_rps": 1.719959153583523}
+{"event": "live_cell", "time": 1791437102.676676, "label": "deadline_on", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 7.225013064357731}
+{"event": "live_cell", "time": 1791437281.553138, "label": "deadline_off", "workload": "familiar60k", "repeat": 1, "accepted": true, "throughput_rps": 7.193891760659679}
+{"event": "live_cell", "time": 1791437330.6230032, "label": "deadline_on", "workload": "short16k", "repeat": 1, "accepted": true, "throughput_rps": 23.517063517218038}
+{"event": "live_cell", "time": 1791437380.1017208, "label": "deadline_off", "workload": "short16k", "repeat": 1, "accepted": true, "throughput_rps": 20.742322125546195}
+{"event": "live_cell", "time": 1791437438.2414863, "label": "deadline_on", "workload": "heterogeneous", "repeat": 1, "accepted": true, "throughput_rps": 1.7205140208165748}
+{"event": "live_cell", "time": 1791437496.1556582, "label": "deadline_off", "workload": "heterogeneous", "repeat": 1, "accepted": true, "throughput_rps": 1.7236534996844926}
+{"event": "live_cell", "time": 1791437676.7382376, "label": "deadline_off", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 6.206357798092055}
+{"event": "live_cell", "time": 1791437855.9204063, "label": "deadline_on", "workload": "familiar60k", "repeat": 2, "accepted": true, "throughput_rps": 7.1295371948718325}
+{"event": "live_cell", "time": 1791437904.7484667, "label": "deadline_off", "workload": "short16k", "repeat": 2, "accepted": true, "throughput_rps": 24.365320509120547}
+{"event": "live_cell", "time": 1791437953.6617882, "label": "deadline_on", "workload": "short16k", "repeat": 2, "accepted": true, "throughput_rps": 24.411806950753615}
+{"event": "live_cell", "time": 1791438011.3548198, "label": "deadline_off", "workload": "heterogeneous", "repeat": 2, "accepted": true, "throughput_rps": 1.7239804310357882}
+{"event": "live_cell", "time": 1791438069.252395, "label": "deadline_on", "workload": "heterogeneous", "repeat": 2, "accepted": true, "throughput_rps": 1.7227284947755308}
+{"event": "live_cell", "time": 1791438248.3482342, "label": "deadline_on", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 7.16371725847121}
+{"event": "live_cell", "time": 1791438429.2505028, "label": "deadline_off", "workload": "familiar60k", "repeat": 3, "accepted": true, "throughput_rps": 6.152827102806129}
+{"event": "live_cell", "time": 1791438478.8224835, "label": "deadline_on", "workload": "short16k", "repeat": 3, "accepted": true, "throughput_rps": 23.885241176611338}
+{"event": "live_cell", "time": 1791438528.5475106, "label": "deadline_off", "workload": "short16k", "repeat": 3, "accepted": true, "throughput_rps": 22.200126157100915}
+{"event": "live_cell", "time": 1791438586.3863416, "label": "deadline_on", "workload": "heterogeneous", "repeat": 3, "accepted": true, "throughput_rps": 1.7236235595256373}
+{"event": "live_cell", "time": 1791438644.3508315, "label": "deadline_off", "workload": "heterogeneous", "repeat": 3, "accepted": true, "throughput_rps": 1.7167313120699568}
+{"event": "live_cell", "time": 1791438824.7363646, "label": "deadline_off", "workload": "familiar60k", "repeat": 4, "accepted": true, "throughput_rps": 6.191230665913125}
+{"event": "live_cell", "time": 1791439004.6234975, "label": "deadline_on", "workload": "familiar60k", "repeat": 4, "accepted": true, "throughput_rps": 6.800269437410469}
+{"event": "live_cell", "time": 1791439184.625745, "label": "deadline_on", "workload": "familiar60k", "repeat": 5, "accepted": true, "throughput_rps": 6.179164850229069}
+{"event": "live_cell", "time": 1791439364.9380748, "label": "deadline_off", "workload": "familiar60k", "repeat": 5, "accepted": true, "throughput_rps": 6.140339816537827}
+{"event": "live_cell", "time": 1791439545.5926564, "label": "deadline_off", "workload": "familiar60k", "repeat": 6, "accepted": true, "throughput_rps": 6.131261547421798}
+{"event": "live_cell", "time": 1791439726.4326682, "label": "deadline_on", "workload": "familiar60k", "repeat": 6, "accepted": true, "throughput_rps": 6.154667217510368}
+{"event": "live_cell", "time": 1791439905.7664323, "label": "deadline_on", "workload": "familiar60k", "repeat": 7, "accepted": true, "throughput_rps": 6.98474174198056}
+{"event": "live_cell", "time": 1791440086.612552, "label": "deadline_off", "workload": "familiar60k", "repeat": 7, "accepted": true, "throughput_rps": 6.1709088025081895}
+{"event": "comparison_complete", "time": 1791440086.6876075, "cells": 32}
+{"event": "comparison_stopped", "time": 1791440088.181901, "cells": 32}
+{"event": "final_audit_passed", "time": 1791440277.4132285, "cells": 32, "requests": 2400, "forecasts": 184}
+{"event": "cleanup_confirmed", "time": 1791440277.4132292, "owned_session": 1831070, "gpu_memory_mib": [0, 0, 0, 0, 0, 0, 0, 0]}

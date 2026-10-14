@@ -1,0 +1,55 @@
+{
+  "episodes": [
+    {
+      "arm": "control",
+      "repeat": 0,
+      "client_elapsed_ms": 9622.051071,
+      "response_span_ms": 9621.533845,
+      "before_first_compute_ms": 252.8245,
+      "gpu_span_ms": 9269.045196,
+      "after_last_compute_ms": 99.664149,
+      "client_harness_overhead_ms": 0.5172259999999369
+    },
+    {
+      "arm": "control",
+      "repeat": 1,
+      "client_elapsed_ms": 9656.573029000001,
+      "response_span_ms": 9656.066875,
+      "before_first_compute_ms": 278.236945,
+      "gpu_span_ms": 9272.778279,
+      "after_last_compute_ms": 105.051651,
+      "client_harness_overhead_ms": 0.5061540000006062
+    },
+    {
+      "arm": "control",
+      "repeat": 2,
+      "client_elapsed_ms": 9672.017841,
+      "response_span_ms": 9671.470158,
+      "before_first_compute_ms": 192.481208,
+      "gpu_span_ms": 9408.790954,
+      "after_last_compute_ms": 70.197996,
+      "client_harness_overhead_ms": 0.5476830000006885
+    },
+    {
+      "arm": "control",
+      "repeat": 3,
+      "client_elapsed_ms": 9551.152458,
+      "response_span_ms": 9550.659382,
+      "before_first_compute_ms": 223.184541,
+      "gpu_span_ms": 9224.088623,
+      "after_last_compute_ms": 103.386218,
+      "client_harness_overhead_ms": 0.49307600000065577
+    }
+  ],
+  "means": {
+    "control": {
+      "client_elapsed_ms": 9625.448599750001,
+      "response_span_ms": 9624.932565,
+      "before_first_compute_ms": 236.6817985,
+      "gpu_span_ms": 9293.675763,
+      "after_last_compute_ms": 94.57500350000001,
+      "client_harness_overhead_ms": 0.5160347500004718
+    }
+  },
+  "definition": "Before/after compute use the earliest request start and latest response end, and conservative all-rank GPU bounds. The GPU span includes compute and inter-compute gaps. Client harness overhead includes time before the earliest request thread starts and after the final response ends. These terms partition client elapsed time algebraically; they do not identify the causes of startup or final-response latency."
+}

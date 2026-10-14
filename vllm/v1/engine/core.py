@@ -105,6 +105,7 @@ _R = TypeVar("_R")  # Return type for collective_rpc
 
 
 if TYPE_CHECKING:
+    from vllm.v1.core.sched.scheduler import Scheduler
     from vllm.v1.kv_offload.timing_replay import Capture
 
 
@@ -266,7 +267,14 @@ class EngineCore:
         )
         self.async_scheduling = vllm_config.scheduler_config.async_scheduling
 
-        self.aborts_queue = queue.Queue[list[str]]()
+        from vllm.v1.kv_offload.seal_notifications import NotificationQueue
+
+        notifications = getattr(self.early_load_readiness, "seal_notifications", None)
+        self.aborts_queue: queue.Queue[list[str]] = (
+            NotificationQueue(notifications)
+            if notifications
+            else queue.Queue[list[str]]()
+        )
 
         self._idle_state_callbacks: list[Callable] = []
 
@@ -1527,6 +1535,16 @@ class EngineCore:
         timing.loads.dispatch(getattr(metadata, "load_jobs", {}))
         data = dict(
             load_state=timing.loads.snapshot(),
+            predictor_general_prefill=(
+                os.environ.get("VLLM_PREDICTOR_GENERAL_PREFILL") == "1"
+            ),
+            prefill_only=bool(output.num_scheduled_tokens)
+            and all(
+                cast("Scheduler", self.scheduler).requests[r].num_computed_tokens - n
+                < cast("Scheduler", self.scheduler).requests[r].num_prompt_tokens
+                for r, n in output.num_scheduled_tokens.items()
+            ),
+            cpu_cached_prefix_tokens=self.scheduler.deferral_cpu_cached_tokens(output),
             step=output.readiness_timeline_step,
             shape=shape,
             request_shapes=self.scheduler.deferral_request_shapes(output),
@@ -1739,12 +1757,40 @@ class EngineCore:
             reset_running_requests, reset_connector
         )
 
+    def get_deferral_cohort_status(self) -> dict[str, Any]:
+        connector = getattr(self.scheduler, "connector", None)
+        result = dict(
+            paused=self.scheduler.pause_state != PauseState.UNPAUSED,
+            requests=len(self.scheduler.deferral_live_request_ids()),
+            queued_steps=len(self.batch_queue or ()),
+            connector_work_pending=(
+                connector is not None and connector.has_pending_push_work()
+            ),
+        )
+        if os.environ.get("VLLM_PREDICTOR_DATASET_SHADOW") == "1":
+            result["dataset_target_ready"] = sum(
+                "coverage-main-" in r.request_id
+                and r.num_computed_tokens > 0
+                and (
+                    r.status != RequestStatus.WAITING_FOR_REMOTE_KVS
+                    or r.request_id
+                    in cast("Scheduler", self.scheduler).finished_recving_kv_req_ids
+                )
+                for r in cast("Scheduler", self.scheduler).requests.values()
+            )
+            result["dataset_background_submitted"] = sum(
+                "coverage-bg-" in r.request_id and r.num_computed_tokens > 0
+                for r in cast("Scheduler", self.scheduler).requests.values()
+            )
+        return result
+
     def set_kv_load_scheduling(
         self,
         early_load_completion: bool,
         schedule_delay_ms: float,
         experiment_options: dict | None = None,
-    ) -> dict[str, bool | float | str]:
+        seal_estimator: dict | None = None,
+    ) -> dict[str, Any]:
         readiness = self.early_load_readiness
         if readiness is None:
             raise RuntimeError("the early KV readiness experiment is not enabled")
@@ -1757,6 +1803,38 @@ class EngineCore:
         from vllm.v1.kv_offload.early_readiness import validate_experiment_options
 
         options = validate_experiment_options(experiment_options or {})
+        estimator_result = {}
+        restored_estimator = None
+        if seal_estimator is not None:
+            from vllm.v1.kv_offload.seal_predictor import (
+                ComputeEstimator,
+                estimator_context,
+            )
+
+            action = seal_estimator.get("action")
+            expected_keys = {"action", "state"} if action == "load" else {"action"}
+            if (
+                action not in ("status", "export", "load")
+                or set(seal_estimator) != expected_keys
+            ):
+                raise ValueError("invalid seal estimator action")
+            if self.deferral_timing is None:
+                raise ValueError("seal estimator requires execution timing")
+            context = estimator_context(self.vllm_config)
+            self.deferral_timing.collect()
+            estimator = self.deferral_timing.seal_estimator
+            if action == "load":
+                restored_estimator = ComputeEstimator.from_state_dict(
+                    seal_estimator["state"], context
+                )
+                estimator_result = {"loaded": True, "context": context}
+            elif action == "export":
+                estimator_result = {"state": estimator.state_dict(context)}
+            else:
+                estimator_result = {
+                    "context": context,
+                    "trained": estimator.coefficients is not None,
+                }
         diagnostic_mode = options["timing_diagnostic_mode"]
         if options["cooperative_response_progress"]:
             from vllm.v1.executor.multiproc_executor import MultiprocExecutor
@@ -1804,6 +1882,11 @@ class EngineCore:
             or not 0 <= schedule_delay_ms <= 120
         ):
             raise ValueError("schedule_delay_ms must be a number from 0 to 120")
+        if (
+            options["late_seal_coalesced_notifications"]
+            and getattr(readiness, "seal_notifications", None) is None
+        ):
+            raise ValueError("start with coalesced_seal_notifications enabled")
         policy = options["deferral_policy"]
         from vllm.v1.kv_offload.overlap_predictor import OverlapPredictor
         from vllm.v1.kv_offload.scheduling_deferral import Predictor
@@ -1971,6 +2054,8 @@ class EngineCore:
                     generation,
                     options["late_admission_markers"],
                     options["late_candidate_slots"],
+                    options["late_cached_requests"],
+                    options["late_pinned_packing"],
                 ),
             )
             world = self.vllm_config.parallel_config.world_size
@@ -1992,9 +2077,77 @@ class EngineCore:
             self.scheduler._late_record_enabled = options["late_admission_markers"]
             self._late_admission_configured = True
             self._timing_diagnostic_failed = False
+            self.scheduler._late_cached_requests = options["late_cached_requests"]
+            self.scheduler._late_pinned_packing = options["late_pinned_packing"]
+            self.scheduler._late_compact_tokens = options["late_compact_tokens"]
             self.scheduler._late_admission_mode = options["late_admission_mode"]
             self.scheduler._late_seal_delay_us = options["late_seal_delay_us"]
             self.scheduler._late_seal_extension_us = options["late_seal_extension_us"]
+            self.scheduler._late_seal_policy = options["late_seal_policy"]
+            self.scheduler._late_seal_target_candidates = options[
+                "late_seal_target_candidates"
+            ]
+            self.scheduler._late_seal_load_only_target_candidates = options[
+                "late_seal_load_only_target_candidates"
+            ]
+            self.scheduler._late_seal_load_only_ready_percent = options[
+                "late_seal_load_only_ready_percent"
+            ]
+            self.scheduler._late_seal_load_only_consistent = options[
+                "late_seal_load_only_consistent"
+            ]
+            self.scheduler._late_seal_load_only_idle_target = options[
+                "late_seal_load_only_idle_target"
+            ]
+            self.scheduler._late_seal_repeat_us = options["late_seal_repeat_us"]
+            self.scheduler._late_seal_condition_preparation = options[
+                "late_seal_condition_preparation"
+            ]
+            self.scheduler._late_seal_recent_preparation = options[
+                "late_seal_recent_preparation"
+            ]
+            self.scheduler._late_seal_poll_us = options["late_seal_poll_us"]
+            self.scheduler._late_seal_adaptive_poll_us = options[
+                "late_seal_adaptive_poll_us"
+            ]
+            self.scheduler._late_seal_hybrid_wait_us = options[
+                "late_seal_hybrid_wait_us"
+            ]
+            self.scheduler._late_seal_prediction_to_readiness = options[
+                "late_seal_prediction_to_readiness"
+            ]
+            self.scheduler._late_seal_compute_deadline = options[
+                "late_seal_compute_deadline"
+            ]
+            self.scheduler._late_seal_compute_deadline_shadow = options[
+                "late_seal_compute_deadline_shadow"
+            ]
+            self.scheduler._late_seal_compute_deadline_lead_us = options[
+                "late_seal_compute_deadline_lead_us"
+            ]
+            self.scheduler._late_seal_native_predictor = options[
+                "late_seal_native_predictor"
+            ]
+            self.scheduler._late_seal_full_prediction_wait = options[
+                "late_seal_full_prediction_wait"
+            ]
+            self.scheduler._late_seal_coalesced_notifications = options[
+                "late_seal_coalesced_notifications"
+            ]
+            self.scheduler._late_seal_wait_trace = options["late_seal_wait_trace"]
+            self.scheduler._late_seal_hybrid_guard_us = options[
+                "late_seal_hybrid_guard_us"
+            ]
+            self.scheduler._late_seal_prediction_reserve_us = options[
+                "late_seal_prediction_reserve_us"
+            ]
+            self.scheduler._late_seal_prediction_scale_percent = options[
+                "late_seal_prediction_scale_percent"
+            ]
+            self.scheduler._late_seal_prediction_bias_us = options[
+                "late_seal_prediction_bias_us"
+            ]
+            self.scheduler._late_seal_safety_us = options["late_seal_safety_us"]
             self.scheduler._late_seal_when_all_candidates_ready = options[
                 "late_seal_when_all_candidates_ready"
             ]
@@ -2009,9 +2162,28 @@ class EngineCore:
                 self, *args
             )
             self.scheduler._late_admission_records = []
+        if self.deferral_timing is not None:
+            if restored_estimator is not None:
+                self.deferral_timing.seal_estimator = restored_estimator
+            self.deferral_timing.seal_estimator.frozen = options[
+                "late_seal_freeze_estimator"
+            ]
+            self.deferral_timing.seal_estimator.calibration_mode = options[
+                "late_seal_calibration"
+            ]
         readiness.configure(early_load_completion, schedule_delay_ms)
         readiness.experiment_options = options
         self.scheduler._kv_experiment_options = options
+        cache_manager = getattr(self.scheduler, "kv_cache_manager", None)
+        if cache_manager is not None:
+            block_pool = cache_manager.block_pool
+            block_pool.prefer_unfenced_blocks = options[
+                "store_reuse_allocator_preference"
+            ]
+            block_pool.audit_store_allocations = options["store_reuse_allocator_audit"]
+            block_pool.store_allocation_audit = []
+        elif options["store_reuse_allocator_preference"]:
+            raise ValueError("Store-aware allocation requires a GPU block pool")
         assert self.vllm_config.kv_transfer_config is not None
         extra = self.vllm_config.kv_transfer_config.kv_connector_extra_config
         extra["early_load_completion"] = readiness.enabled
@@ -2038,6 +2210,11 @@ class EngineCore:
                 replay_result = timing_replay.replay(self)
                 self._timing_diagnostic_failed = False
         return {
+            **(
+                {"seal_estimator": estimator_result}
+                if seal_estimator is not None
+                else {}
+            ),
             **({"timing_replay_result": replay_result} if action != "none" else {}),
             "early_load_completion": readiness.enabled,
             "schedule_delay_ms": readiness.schedule_delay_ms,

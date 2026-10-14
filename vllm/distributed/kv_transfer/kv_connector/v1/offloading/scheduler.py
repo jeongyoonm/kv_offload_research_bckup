@@ -28,6 +28,7 @@ from vllm.distributed.kv_transfer.kv_connector.v1.offloading.metrics import (
 )
 from vllm.logger import init_logger
 from vllm.utils.math_utils import cdiv, round_down
+from vllm.v1.core.block_pool import BlockPool
 from vllm.v1.core.kv_cache_manager import KVCacheBlocks
 from vllm.v1.core.sched.output import SchedulerOutput
 from vllm.v1.kv_cache_interface import (
@@ -38,6 +39,7 @@ from vllm.v1.kv_cache_interface import (
     MambaSpec,
     SlidingWindowSpec,
 )
+from vllm.v1.kv_offload import timeline
 from vllm.v1.kv_offload.base import (
     GPULoadStoreSpec,
     Locality,
@@ -75,6 +77,8 @@ class TransferJobStatus:
     # Offload keys this job covers; passed to manager.complete_*().
     keys: set[OffloadKey]
     is_store: bool
+    # All-rank copy completion can precede ordered worker acknowledgments.
+    load_copy_complete: bool = False
     # Store source blocks fenced after the request finishes.
     deferred_fence_block_ids: list[int] | None = None
     # Store source blocks fenced when the transfer is created.
@@ -537,6 +541,7 @@ class OffloadingConnectorScheduler:
         self._req_status: dict[ReqId, RequestOffloadState] = {}
         self._current_batch_load_jobs: dict[int, TransferJob] = {}
         self._current_batch_jobs_to_flush: set[int] = set()
+        self._current_batch_force_flush_on_host = False
         # GPU block IDs allocated in the current engine step
         self._current_batch_allocated_block_ids: set[int] = set()
         # if GPU prefix caching is enabled,
@@ -562,6 +567,7 @@ class OffloadingConnectorScheduler:
         # protected by their ref_cnt) and for sliding window blocks (which can
         # be freed before a request finishes).
         self._block_id_to_pending_jobs: dict[int, set[int]] = {}
+        self.gpu_block_pool: BlockPool | None = None
 
         self._events_tracker = OffloadingEventsTracker(spec.kv_events_config)
 
@@ -1555,9 +1561,22 @@ class OffloadingConnectorScheduler:
             req_status = self._req_status.get(req_id)
             if req_status is None or not req_status.transfer_jobs:
                 continue
-            any_jid = next(iter(req_status.transfer_jobs))
-            assert self._jobs[any_jid].is_store
-            self._current_batch_jobs_to_flush.update(req_status.transfer_jobs)
+            self.validate_preemption(req_id)
+            self._current_batch_jobs_to_flush.update(
+                job_id
+                for job_id in req_status.transfer_jobs
+                if self._jobs[job_id].is_store
+            )
+            if timeline.enabled():
+                for job_id in req_status.transfer_jobs:
+                    job = self._jobs[job_id]
+                    if not job.is_store:
+                        timeline.emit(
+                            "preempt_copy_complete_load_pending_retirement",
+                            request=req_id,
+                            job_id=job_id,
+                            pending_acks=job.pending_count,
+                        )
 
         # Flush jobs that contain re-allocated blocks.
         if (
@@ -1579,7 +1598,11 @@ class OffloadingConnectorScheduler:
             load_jobs=self._current_batch_load_jobs,
             store_jobs=partial_store_jobs | normal_store_jobs,
             jobs_to_flush=self._current_batch_jobs_to_flush,
+            force_flush_on_host=self._current_batch_force_flush_on_host,
         )
+        if self.gpu_block_pool is not None:
+            meta.store_allocation_audit = self.gpu_block_pool.store_allocation_audit
+            self.gpu_block_pool.store_allocation_audit = []
 
         # All prepare_store calls for finished requests have been issued.
         # Signal on_request_finished and clean up state where possible.
@@ -1596,6 +1619,7 @@ class OffloadingConnectorScheduler:
                 del self._req_status[req_id]
         self._current_batch_load_jobs = {}
         self._current_batch_jobs_to_flush = set()
+        self._current_batch_force_flush_on_host = False
         self._current_batch_allocated_block_ids = set()
         return meta
 
@@ -1611,14 +1635,29 @@ class OffloadingConnectorScheduler:
             or self.manager.has_pending_work()
         )
 
-    def get_early_ready_request(self, job_id: int) -> ReqId | None:
-        """Resolve an independently completed active load without accounting it."""
+    def mark_early_load_copy_complete(self, job_id: int) -> ReqId | None:
+        """Record all-rank copy completion without retiring worker accounting."""
         if job_id < self._stale_job_threshold:
             return None
         job = self._jobs.get(job_id)
         if job is None or job.is_store:
             return None
-        return job.req_id if job.req_id in self._req_status else None
+        if job.req_id not in self._req_status:
+            return None
+        job.load_copy_complete = True
+        return job.req_id
+
+    def validate_preemption(self, req_id: ReqId) -> None:
+        """Require completed load writes before the allocator releases blocks."""
+        req_status = self._req_status.get(req_id)
+        if req_status is None:
+            return
+        for job_id in req_status.transfer_jobs:
+            job = self._jobs[job_id]
+            assert job.is_store or job.load_copy_complete, (
+                f"Preempting request {req_id} with incomplete load {job_id} "
+                f"({job.pending_count} ordinary acknowledgments pending)"
+            )
 
     def update_connector_output(self, connector_output: KVConnectorOutput):
         """
@@ -1785,6 +1824,7 @@ class OffloadingConnectorScheduler:
 
         # Flush all in-flight jobs
         self._current_batch_jobs_to_flush.update(self._jobs.keys())
+        self._current_batch_force_flush_on_host = True
 
         for req_id, status in list(self._req_status.items()):
             if status.req.is_finished():

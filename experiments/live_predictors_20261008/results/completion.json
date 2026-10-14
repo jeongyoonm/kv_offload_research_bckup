@@ -1,0 +1,16 @@
+{
+  "complete": true,
+  "measured_cells": 36,
+  "measured_requests": 2700,
+  "cpu_tests": "211 passed, 8 skipped",
+  "cpu_export_equivalence_rows_per_model": 5186,
+  "request_accounting_audit_passed": true,
+  "allocation": {
+    "seconds": 3996.1925721080042,
+    "server_stopped": true
+  },
+  "gpu_cleanup": "Confirmed all eight GPUs at 0 MiB after driver exit code 0",
+  "branch": "experiment/glm53-live-predictor-comparison-20261008",
+  "artifacts": "/mnt/localnvme/glm53_live_predictors_20261008",
+  "protocol": "Four matched 75-request episodes, not one continuous stream"
+}

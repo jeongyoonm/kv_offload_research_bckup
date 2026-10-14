@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "cells": [
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r0_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r0_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 10,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r1_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r1_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r2_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p61440_f95_h100/r2_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r0_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 5,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r0_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 8,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r1_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 4,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r1_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 4,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r2_bridge",
+      "unique_requests": 64,
+      "prediction_windows": 4,
+      "training_samples": 128,
+      "preparation_samples": 64
+    },
+    {
+      "path": "/mnt/localnvme/glm53_coalesced_notify_20261004/ab/gpu/p8192_f95_h100/r2_coalesced",
+      "unique_requests": 64,
+      "prediction_windows": 9,
+      "training_samples": 128,
+      "preparation_samples": 64
+    }
+  ],
+  "measured_requests": 768,
+  "time": 1791085981.7446897
+}

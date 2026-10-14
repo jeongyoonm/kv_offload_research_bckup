@@ -2319,6 +2319,33 @@ def test_retirement_aware_allocation_waits_for_existing_deferred_blocks(request_
     assert not resumed.preempted_req_ids
 
 
+def test_unfenced_victim_reclaims_space_despite_unrelated_shared_retention(
+    request_runner,
+):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=8,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    scheduler.update_from_output(
+        first, create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    )
+    pool = scheduler.kv_cache_manager.block_pool
+    [shared] = pool.get_new_blocks(1)
+    pool.touch([shared])
+    scheduler._free_cow_retained_blocks([shared], scheduler.sched_step_seq + 1)
+    assert shared.ref_cnt == 2
+    resumed = scheduler.schedule()
+    assert resumed.preempted_req_ids == {"2"}
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+    assert shared.ref_cnt == 2
+
+
 def test_decode_cannot_consume_pending_load_suffix_reservation(request_runner):
     runner = request_runner(
         block_size=4,

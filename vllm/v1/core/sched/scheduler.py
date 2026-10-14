@@ -762,6 +762,7 @@ class Scheduler(SchedulerInterface):
                         preempted_req = self.running.pop()
 
                     free_before = pool.get_num_free_blocks()
+                    deferred_before = len(self.deferred_frees)
                     self._preempt_request(
                         preempted_req,
                         scheduled_timestamp,
@@ -784,7 +785,9 @@ class Scheduler(SchedulerInterface):
                             scheduled_seq=self.sched_step_seq,
                             processed_seq=self.processed_step_seq,
                         )
-                    if self.retirement_aware_preemption and self.deferred_frees:
+                    if self.retirement_aware_preemption and (
+                        len(self.deferred_frees) > deferred_before
+                    ):
                         # Reclamation needs ordered retirement. Repeated victims
                         # cannot make these fenced blocks immediately reusable.
                         break

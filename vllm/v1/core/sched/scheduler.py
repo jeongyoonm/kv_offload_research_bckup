@@ -146,6 +146,17 @@ class Scheduler(SchedulerInterface):
         # KVConnectorBase_V1.requires_kv_delivery.
         self.requires_kv_delivery = False
         kv_transfer_config = self.vllm_config.kv_transfer_config
+        extra_config = (
+            kv_transfer_config.kv_connector_extra_config
+            if kv_transfer_config is not None
+            else {}
+        )
+        self.capacity_boundary_accounting = bool(
+            extra_config.get("capacity_boundary_accounting", False)
+        )
+        self.retirement_aware_preemption = bool(
+            extra_config.get("retirement_aware_preemption", False)
+        )
         if kv_transfer_config is not None:
             assert not self.is_encoder_decoder, (
                 "Encoder-decoder models are not currently supported with KV connectors"
@@ -657,16 +668,58 @@ class Scheduler(SchedulerInterface):
                 continue
 
             # Schedule newly needed KV blocks for the request.
+            wait_for_prefill = False
             with record_function_or_nullcontext("schedule: allocate_slots"):
                 while True:
+                    reserved_blocks = (
+                        self._inflight_prefill_reserved_blocks(exclude=request)
+                        if self.capacity_boundary_accounting
+                        else 0
+                    )
                     new_blocks = self.kv_cache_manager.allocate_slots(
                         request,
                         num_new_tokens,
                         num_lookahead_tokens=self.num_lookahead_tokens,
+                        reserved_blocks=reserved_blocks,
                     )
 
                     if new_blocks is not None:
                         # The request can be scheduled.
+                        break
+
+                    pool = self.kv_cache_manager.block_pool
+                    required_blocks = self._running_allocation_blocks(
+                        request, num_new_tokens
+                    )
+                    if self.capacity_boundary_accounting and (
+                        required_blocks <= pool.get_num_free_blocks()
+                    ):
+                        # Leave the reserved suffix space for its owner, which
+                        # may be selected later in this step.
+                        wait_for_prefill = True
+                        if timeline.enabled():
+                            timeline.emit(
+                                "capacity_reservation_wait",
+                                request=request.request_id,
+                                step=self.current_step,
+                                required_blocks=required_blocks,
+                                free_blocks=pool.get_num_free_blocks(),
+                                reserved_blocks=reserved_blocks,
+                            )
+                        break
+                    if self.retirement_aware_preemption and (
+                        required_blocks
+                        <= pool.get_num_free_blocks() + self._deferred_reusable_blocks()
+                    ):
+                        if timeline.enabled():
+                            timeline.emit(
+                                "capacity_retirement_wait",
+                                request=request.request_id,
+                                step=self.current_step,
+                                reason="existing_deferred_blocks",
+                                required_blocks=required_blocks,
+                                free_blocks=pool.get_num_free_blocks(),
+                            )
                         break
 
                     # The request cannot be scheduled.
@@ -708,17 +761,41 @@ class Scheduler(SchedulerInterface):
                     else:
                         preempted_req = self.running.pop()
 
+                    free_before = pool.get_num_free_blocks()
                     self._preempt_request(
                         preempted_req,
                         scheduled_timestamp,
                         drop_stale_output=self.requires_kv_delivery,
                     )
                     preempted_reqs.append(preempted_req)
+                    if timeline.enabled() and (
+                        self.capacity_boundary_accounting
+                        or self.retirement_aware_preemption
+                    ):
+                        timeline.emit(
+                            "capacity_preempt",
+                            request=request.request_id,
+                            victim=preempted_req.request_id,
+                            step=self.current_step,
+                            required_blocks=required_blocks,
+                            free_before=free_before,
+                            free_after=pool.get_num_free_blocks(),
+                            deferred_blocks=self._deferred_reusable_blocks(),
+                            scheduled_seq=self.sched_step_seq,
+                            processed_seq=self.processed_step_seq,
+                        )
+                    if self.retirement_aware_preemption and self.deferred_frees:
+                        # Reclamation needs ordered retirement. Repeated victims
+                        # cannot make these fenced blocks immediately reusable.
+                        break
                     if preempted_req == request:
                         # No more request to preempt. Cannot schedule this request.
                         break
 
             if new_blocks is None:
+                if wait_for_prefill:
+                    req_index += 1
+                    continue
                 # Cannot schedule this request.
                 break
 
@@ -1137,7 +1214,15 @@ class Scheduler(SchedulerInterface):
                         )
 
                     reserved_blocks = 0
-                    if load_kv_async:
+                    if self.capacity_boundary_accounting:
+                        reserved_blocks = self._inflight_prefill_reserved_blocks(
+                            exclude=request
+                        )
+                        if request not in self._inflight_prefills:
+                            reserved_blocks += self._decode_growth_reserved_blocks(
+                                num_scheduled_tokens
+                            )
+                    elif load_kv_async:
                         # An async load holds its blocks for the whole transfer with
                         # no forward progress and isn't preemptible here. Admit it
                         # only if it fits in (free - other in-flight reservations), to
@@ -1159,6 +1244,17 @@ class Scheduler(SchedulerInterface):
                     )
 
                     if new_blocks is None:
+                        if self.capacity_boundary_accounting and timeline.enabled():
+                            timeline.emit(
+                                "capacity_admission_deferred",
+                                request=request_id,
+                                step=self.current_step,
+                                asynchronous=load_kv_async,
+                                free_blocks=(
+                                    self.kv_cache_manager.block_pool.get_num_free_blocks()
+                                ),
+                                reserved_blocks=reserved_blocks,
+                            )
                         # The request cannot be scheduled.
 
                         # NOTE: we need to untouch the request from the encode cache
@@ -3181,12 +3277,62 @@ class Scheduler(SchedulerInterface):
             apply_admission_cap=True,
         )
 
-    def _inflight_prefill_reserved_blocks(self) -> int:
+    def _inflight_prefill_reserved_blocks(self, exclude: Request | None = None) -> int:
         """Num blocks in-flight prefills still need to finish (their reservation)."""
 
         return sum(
-            self._request_remaining_blocks(req) for req in self._inflight_prefills
+            self._request_remaining_blocks(req)
+            for req in self._inflight_prefills
+            if req is not exclude
         )
+
+    def _running_allocation_blocks(self, request: Request, new_tokens: int) -> int:
+        tokens = request.num_computed_tokens + new_tokens
+        return self.kv_cache_manager.coordinator.get_num_blocks_to_allocate(
+            request_id=request.request_id,
+            num_tokens=min(tokens + self.num_lookahead_tokens, self.max_model_len),
+            new_computed_blocks=self.kv_cache_manager.empty_kv_cache_blocks.blocks,
+            num_encoder_tokens=0,
+            total_computed_tokens=request.num_computed_tokens,
+            num_local_computed_tokens=request.num_computed_tokens,
+            num_tokens_main_model=tokens,
+        )
+
+    def _deferred_reusable_blocks(self) -> int:
+        retained: dict[int, tuple[KVCacheBlock, int]] = {}
+        for _, blocks in self.deferred_frees:
+            for block in blocks:
+                _, count = retained.get(block.block_id, (block, 0))
+                retained[block.block_id] = (block, count + 1)
+        return sum(
+            not block.is_null and block.ref_cnt == count
+            for block, count in retained.values()
+        )
+
+    def _decode_growth_reserved_blocks(self, scheduled: dict[str, int]) -> int:
+        """Reserve block-rounded growth over the configured dispatch horizon."""
+        horizon = self.vllm_config.max_concurrent_batches
+        growth = horizon * (self.num_sampled_tokens_per_step + self.num_spec_tokens)
+        reserved = 0
+        for request in self.running:
+            tokens = request.num_computed_tokens + scheduled.get(request.request_id, 0)
+            if tokens < request.num_prompt_tokens:
+                continue
+            future = min(
+                tokens + growth + self.num_lookahead_tokens,
+                self.max_model_len,
+                request.num_prompt_tokens + request.max_tokens - 1,
+            )
+            reserved += self.kv_cache_manager.coordinator.get_num_blocks_to_allocate(
+                request_id=request.request_id,
+                num_tokens=future,
+                new_computed_blocks=self.kv_cache_manager.empty_kv_cache_blocks.blocks,
+                num_encoder_tokens=0,
+                total_computed_tokens=request.num_computed_tokens,
+                num_local_computed_tokens=request.num_computed_tokens,
+                num_tokens_main_model=future,
+            )
+        return reserved
 
     def _update_waiting_for_remote_kv(self, request: Request) -> None:
         """

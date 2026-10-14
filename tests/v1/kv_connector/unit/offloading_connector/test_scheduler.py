@@ -2253,6 +2253,119 @@ def _load_ack(runner, job_id, count, req_id=None):
     )
 
 
+@pytest.mark.parametrize("num_gpu_blocks, loads", [(10, 1), (11, 2)])
+def test_async_load_full_demand_includes_other_prefill_reservations(
+    request_runner, num_gpu_blocks, loads
+):
+    runner = request_runner(
+        block_size=4, num_gpu_blocks=num_gpu_blocks, async_scheduling=True
+    )
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[10] * 13)
+    runner.new_request(token_ids=[11] * 21)
+    output = runner.scheduler.schedule()
+    assert len(output.kv_connector_metadata.load_jobs) == loads
+    assert runner.scheduler._inflight_prefill_reserved_blocks() <= (
+        runner.scheduler.kv_cache_manager.block_pool.get_num_free_blocks()
+    )
+
+
+def test_retirement_aware_preemption_stops_after_one_fenced_victim(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=7,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    first_result = create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    blocked = scheduler.schedule()
+    assert blocked.preempted_req_ids == {"2"}
+    assert scheduler.kv_cache_manager.block_pool.get_num_free_blocks() == 0
+    assert scheduler.deferred_frees
+
+    scheduler.update_from_output(first, first_result)
+    assert not scheduler.deferred_frees
+    resumed = scheduler.schedule()
+    assert not resumed.preempted_req_ids
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+
+
+def test_retirement_aware_allocation_waits_for_existing_deferred_blocks(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=7,
+        async_scheduling=True,
+        extra_config_overrides={"retirement_aware_preemption": True},
+    )
+    for i in range(3):
+        runner.new_request(token_ids=[10 + i] * 8)
+    scheduler = runner.scheduler
+    first = scheduler.schedule()
+    first_result = create_model_runner_output(reqs=list(scheduler.running), token_id=30)
+    scheduler.finish_requests("2", RequestStatus.FINISHED_ABORTED)
+    blocked = scheduler.schedule()
+    assert not blocked.preempted_req_ids
+    assert not blocked.num_scheduled_tokens
+    assert scheduler.deferred_frees
+    scheduler.update_from_output(first, first_result)
+    resumed = scheduler.schedule()
+    assert resumed.num_scheduled_tokens == {"0": 1, "1": 1}
+    assert not resumed.preempted_req_ids
+
+
+def test_decode_cannot_consume_pending_load_suffix_reservation(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=5,
+        async_scheduling=True,
+        extra_config_overrides={"capacity_boundary_accounting": True},
+    )
+    scheduler = runner.scheduler
+    runner.new_request(token_ids=[10] * 5)
+    scheduler.schedule()
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[11] * 5)
+    loading = scheduler.schedule()
+    job = next(iter(loading.kv_connector_metadata.load_jobs))
+    for _ in range(2):
+        scheduler.schedule()
+    blocked = scheduler.schedule()
+    assert "0" not in blocked.num_scheduled_tokens
+    assert not blocked.preempted_req_ids
+    assert scheduler.kv_cache_manager.block_pool.get_num_free_blocks() == 1
+    assert scheduler.apply_early_kv_load_completion(job) == "1"
+    ready = scheduler.schedule()
+    assert ready.num_scheduled_tokens == {"1": 1}
+    assert not ready.preempted_req_ids
+
+
+def test_new_load_reserves_imminent_decode_growth(request_runner):
+    runner = request_runner(
+        block_size=4,
+        num_gpu_blocks=5,
+        async_scheduling=True,
+        extra_config_overrides={"capacity_boundary_accounting": True},
+    )
+    runner.new_request(token_ids=[10] * 7)
+    runner.scheduler.schedule()
+    runner.connector_scheduler._maximal_prefix_lookup = lambda keys, context, *_: len(
+        keys
+    )
+    runner.new_request(token_ids=[11] * 5)
+    output = runner.scheduler.schedule()
+    assert not output.kv_connector_metadata.load_jobs
+    assert runner.scheduler.requests["1"].status == RequestStatus.WAITING
+    assert output.num_scheduled_tokens == {"0": 1}
+
+
 def test_early_complete_load_preempts_and_reloads_after_ordered_retirement(
     request_runner,
 ):
